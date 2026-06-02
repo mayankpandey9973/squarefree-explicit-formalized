@@ -15,8 +15,8 @@ namespace Squarefree
 
 /-- **Prop 6.1** (writeup 1230–1236); `x = H/Δ²` is `S.x`; the single `C` is both the `≪`
 constant and the absolute `X^{O(u)}` budget constant. -/
-theorem prop_6_1 (P : Globals) (S : Scale P) (RaOf : ℤ → Finset ℕ) :
-    ∃ C : ℝ, 0 < C ∧
+theorem prop_6_1 : ∃ C : ℝ, 0 < C ∧
+    ∀ (P : Globals) (S : Scale P) (RaOf : ℤ → Finset ℕ),
       (∑ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, ((RaOf a).card : ℝ)) ≤
         C * P.H * P.X ^ (C * P.u) *
           ( S.x * P.G * S.Ω ^ 2

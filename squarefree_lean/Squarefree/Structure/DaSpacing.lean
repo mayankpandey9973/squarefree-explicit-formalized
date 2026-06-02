@@ -31,25 +31,22 @@ noncomputable def DaCard (X H : ℝ) (a : ℤ) (D : ℝ) : ℕ :=
   ((Finset.Icc ⌈D⌉ ⌊2 * D⌋).filter (fun d => inDa X H a d)).card
 
 /-- **Lemma 3.1**: spacing lower bound in `𝒟_a` (writeup 270–322). -/
-theorem lemma_3_1 (P : Globals) (S : Scale P) (a : ℤ) (ha : 0 < a) :
-    ∃ c : ℝ, 0 < c ∧
-      ∀ d b : ℤ, 0 < b →
-        inDa P.X P.H a d → inDa P.X P.H a (d + b) →
+theorem lemma_3_1 : ∃ c : ℝ, 0 < c ∧
+    ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a →
+      ∀ d b : ℤ, 0 < b → inDa P.X P.H a d → inDa P.X P.H a (d + b) →
         (∃ d' : ℤ, d < d' ∧ d' < d + b ∧ inDa P.X P.H a d') →
         c * (a : ℝ) ^ (-1/3 : ℝ) * S.Δ ^ (5/3 : ℝ) * (P.H ^ 5 / P.X) ^ (1/3 : ℝ) ≤ (b : ℝ) := by
   sorry -- STUB: lemma_3_1
 
 /-- **Prop 3.2** (writeup 346–393). Fiber bound is the STATED WEAK (non-sharp) form. -/
-theorem prop_3_2 (P : Globals) (S : Scale P) (a : ℤ) (ha : 0 < a)
-    (D : ℝ) (hD : 0 < D) (dtil : ℝ → ℝ) :
-    ∃ (Ra : Finset ℕ) (dStar : ℕ → ℤ),
-      (∀ r ∈ Ra, inDa P.X P.H a (dStar r)) ∧
-      (∃ c₁ C₁ : ℝ, 0 < c₁ ∧ 0 < C₁ ∧ ∀ r ∈ Ra, c₁ * S.R ≤ (r : ℝ) ∧ (r : ℝ) ≤ C₁ * S.R) ∧
-      (∀ r ∈ Ra, Rfun P.X (a : ℝ) (dtil (r : ℝ)) = (r : ℝ)) ∧
-      (∃ C₂ : ℝ, 0 < C₂ ∧ (DaCard P.X P.H a D : ℝ) ≤
-        C₂ * (Ra.card : ℝ) * (1 + (S.Δ / S.A) ^ (8/3 : ℝ) * P.G ^ (-2/3 : ℝ))) ∧
-      (∃ C₃ : ℝ, 0 < C₃ ∧ ∀ r ∈ Ra,
-        |(dStar r : ℝ) - dtil (r : ℝ)| ≤ C₃ * (S.Δ / P.G) * (S.Δ ^ 3 / S.A ^ 3)) := by
+theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 < C₂ ∧ 0 < C₃ ∧
+    ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a → ∀ (D : ℝ), 0 < D → ∀ (dtil : ℝ → ℝ),
+      ∃ (Ra : Finset ℕ) (dStar : ℕ → ℤ),
+        (∀ r ∈ Ra, inDa P.X P.H a (dStar r)) ∧
+        (∀ r ∈ Ra, c₁ * S.R ≤ (r : ℝ) ∧ (r : ℝ) ≤ C₁ * S.R) ∧
+        (∀ r ∈ Ra, Rfun P.X (a : ℝ) (dtil (r : ℝ)) = (r : ℝ)) ∧
+        ((DaCard P.X P.H a D : ℝ) ≤ C₂ * (Ra.card : ℝ) * (1 + (S.Δ / S.A) ^ (8/3 : ℝ) * P.G ^ (-2/3 : ℝ))) ∧
+        (∀ r ∈ Ra, |(dStar r : ℝ) - dtil (r : ℝ)| ≤ C₃ * (S.Δ / P.G) * (S.Δ ^ 3 / S.A ^ 3)) := by
   sorry -- STUB: prop_3_2
 
 /-- `𝐃(Ω) := ∑_{a∼A} #𝒟_a` (writeup line 2008), the dyadic `A`-block sum of `DaCard`. -/

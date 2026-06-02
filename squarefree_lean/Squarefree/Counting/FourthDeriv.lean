@@ -15,11 +15,11 @@ namespace Squarefree.Counting
 
 /-- **Lemma 2.1** (writeup 84–94): 4th-derivative counting via 3-fold differencing.
 `|f⁽⁴⁾| ≍ Λ` is normalized to `Λ ≤ |f⁽⁴⁾| ≤ 2Λ` on `[N,3N]`; count over `(N,2N]`. -/
-theorem fourthDeriv_count (N Λ δ : ℝ) (f : ℝ → ℝ)
-    (hN : 2 ≤ N) (hδ : 0 < δ) (hδ' : δ < 1/4) (hΛ : 0 < Λ) (hf : ContDiff ℝ 4 f)
-    (hlo : ∀ x ∈ Set.Icc N (3 * N), Λ ≤ |iteratedDeriv 4 f x|)
-    (hhi : ∀ x ∈ Set.Icc N (3 * N), |iteratedDeriv 4 f x| ≤ 2 * Λ) :
-    ∃ C : ℝ, 0 < C ∧
+theorem fourthDeriv_count : ∃ C : ℝ, 0 < C ∧
+    ∀ (N Λ δ : ℝ) (f : ℝ → ℝ),
+      2 ≤ N → 0 < δ → δ < 1/4 → 0 < Λ → ContDiff ℝ 4 f →
+      (∀ x ∈ Set.Icc N (3 * N), Λ ≤ |iteratedDeriv 4 f x|) →
+      (∀ x ∈ Set.Icc N (3 * N), |iteratedDeriv 4 f x| ≤ 2 * Λ) →
       (((Finset.Ioc ⌊N⌋ ⌊2 * N⌋).filter (fun n => distInt (f (n : ℝ)) ≤ δ)).card : ℝ)
         ≤ C * (N ^ (7/8 : ℝ) + N * δ ^ (1/8 : ℝ)
                + N ^ (7/8 : ℝ) * (δ / Λ) ^ (1/8 : ℝ) + Λ ^ (1/15 : ℝ) * N) := by

@@ -17,11 +17,11 @@ open Squarefree.Counting
 
 /-- **Prop 4.3** (writeup 463–469): integer points near a curve, `|F''| ≍ 1` normalized to
 `1 ≤ |F''| ≤ 2` on `[1/2, 5/2]`; count over `(N,2N]`. -/
-theorem nearCurve_count (N T δ : ℝ) (F : ℝ → ℝ)
-    (hN : 1 < N) (hT : 1 < T) (hδ : 0 < δ) (hδ' : δ < 1) (hF : ContDiff ℝ 2 F)
-    (hlo : ∀ x ∈ Set.Icc (1/2 : ℝ) (5/2), 1 ≤ |iteratedDeriv 2 F x|)
-    (hhi : ∀ x ∈ Set.Icc (1/2 : ℝ) (5/2), |iteratedDeriv 2 F x| ≤ 2) :
-    ∃ C : ℝ, 0 < C ∧
+theorem nearCurve_count : ∃ C : ℝ, 0 < C ∧
+    ∀ (N T δ : ℝ) (F : ℝ → ℝ),
+      1 < N → 1 < T → 0 < δ → δ < 1 → ContDiff ℝ 2 F →
+      (∀ x ∈ Set.Icc (1/2 : ℝ) (5/2), 1 ≤ |iteratedDeriv 2 F x|) →
+      (∀ x ∈ Set.Icc (1/2 : ℝ) (5/2), |iteratedDeriv 2 F x| ≤ 2) →
       (((Finset.Ioc ⌊N⌋ ⌊2 * N⌋).filter
           (fun n => distInt (T * F ((n : ℝ) / N)) ≤ δ)).card : ℝ)
         ≤ C * ((N * T) ^ (1/3 : ℝ) + N * δ
