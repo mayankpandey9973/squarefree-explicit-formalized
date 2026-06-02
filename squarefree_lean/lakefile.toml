@@ -1,0 +1,16 @@
+name = "squarefree_lean"
+version = "0.1.0"
+defaultTargets = ["Squarefree"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+relaxedAutoImplicit = false
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "343ccbbb7ce4d177eaa29553c88336799782d6dc"
+
+[[lean_lib]]
+name = "Squarefree"

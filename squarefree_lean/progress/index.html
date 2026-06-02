@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Squarefree Lean — Formalization Status</title>
+<style>
+  :root {
+    --bg: #0e1116;
+    --panel: #161b22;
+    --panel2: #1c232c;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --border: #30363d;
+    --planned: #6e7681;
+    --scaffolded: #58a6ff;
+    --error: #f85149;
+    --inprogress: #db61a2;
+    --partial: #d29922;
+    --done: #3fb950;
+    --checking: #a371f7;
+    --safe-l: env(safe-area-inset-left, 0px);
+    --safe-r: env(safe-area-inset-right, 0px);
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    -webkit-text-size-adjust: 100%;
+  }
+  header {
+    padding: 10px 14px;
+    padding-left: calc(14px + var(--safe-l));
+    padding-right: calc(14px + var(--safe-r));
+    padding-top: calc(10px + var(--safe-t));
+    border-bottom: 1px solid var(--border);
+    background: var(--panel); position: sticky; top: 0; z-index: 10;
+  }
+  .titlebar { display: flex; align-items: flex-start; gap: 10px; }
+  h1 { font-size: 17px; margin: 0 0 4px 0; line-height: 1.25; flex: 1; min-width: 0; }
+  h1 .sub { color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 8px; display: inline-block; }
+  #banner {
+    display: none; margin-top: 8px; padding: 10px 12px; border-radius: 6px;
+    background: #3a2d00; color: #ffd666; border: 1px solid #6b5400; font-size: 14px;
+  }
+  #banner.show { display: block; }
+  #totals { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 14px; font-size: 13px;
+    background: var(--panel2); border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; }
+  .meta { color: var(--muted); font-size: 12px; }
+
+  /* view toggle */
+  .toggle {
+    display: inline-flex; border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden; flex: none; background: var(--panel2);
+  }
+  .toggle button {
+    background: transparent; color: var(--muted); border: 0; cursor: pointer;
+    font-size: 14px; font-weight: 600; padding: 0 14px; min-height: 44px;
+    font-family: inherit;
+  }
+  .toggle button.active { background: var(--scaffolded); color: #0d1117; }
+  .toggle button + button { border-left: 1px solid var(--border); }
+
+  main {
+    height: calc(100vh - var(--header-h, 120px));
+  }
+
+  /* ---------- GRAPH VIEW ---------- */
+  #graphview { display: flex; height: 100%; }
+  #graphview.hidden { display: none; }
+  #graphwrap { flex: 1; position: relative; overflow: auto; -webkit-overflow-scrolling: touch; }
+  svg { display: block; max-width: none; }
+  .layerband { fill: rgba(255,255,255,0.015); }
+  .layerlabel { fill: var(--muted); font-size: 13px; font-weight: 600; }
+  .edge { stroke: #3d4754; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+  .edge.hl { stroke: #8b949e; stroke-width: 2.2; }
+  .node rect {
+    rx: 7; ry: 7; stroke: var(--border); stroke-width: 1.5; cursor: pointer;
+  }
+  .node text { fill: #0d1117; font-size: 11.5px; font-weight: 600; pointer-events: none; }
+  .node .cnt { fill: #0d1117; font-size: 10px; font-weight: 500; opacity: 0.85; }
+  .node .badgebg { fill: rgba(13,17,23,0.78); pointer-events: none; }
+  .node .badge { fill: #e6edf3; font-size: 9.5px; font-weight: 700; pointer-events: none; }
+  .node.planned rect { fill: var(--planned); }
+  .node.scaffolded rect { fill: var(--scaffolded); }
+  .node.error rect { fill: var(--error); }
+  .node.in-progress rect { fill: var(--inprogress); }
+  .node.partial rect { fill: var(--partial); }
+  .node.done rect { fill: var(--done); }
+  .node.checking rect { fill: var(--checking); }
+  .node.sel rect { stroke: #fff; stroke-width: 3; }
+  #side {
+    width: 320px; border-left: 1px solid var(--border); background: var(--panel);
+    padding: 16px; overflow-y: auto; font-size: 14px;
+    padding-right: calc(16px + var(--safe-r));
+  }
+  #side h2 { font-size: 15px; margin: 0 0 10px 0; word-break: break-all; }
+  #side .row { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  #side .row .k { color: var(--muted); }
+  #side .empty { color: var(--muted); }
+  #side .statusline { padding: 6px 10px; border-radius: 6px; display: inline-block; color: #0d1117; font-weight: 700; margin-bottom: 12px; }
+  code { background: var(--panel2); padding: 1px 5px; border-radius: 4px; font-size: 12px; word-break: break-all; }
+  .pillist { margin-top: 6px; }
+  .pillist .dep { display:block; color: var(--muted); padding: 3px 0; }
+
+  /* ---------- LIST / CARD VIEW ---------- */
+  #listview {
+    display: none; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: 10px 12px calc(24px + var(--safe-b)) 12px;
+    padding-left: calc(12px + var(--safe-l));
+    padding-right: calc(12px + var(--safe-r));
+  }
+  #listview.shown { display: block; }
+  .layergroup { margin-bottom: 16px; }
+  .layerhdr {
+    display: flex; align-items: baseline; gap: 8px;
+    font-size: 13px; font-weight: 700; color: var(--muted);
+    letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 6px 2px; position: sticky; top: 0; background: var(--bg); z-index: 1;
+  }
+  .layerhdr .lcount { font-weight: 500; font-size: 12px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 8px; overflow: hidden;
+  }
+  .cardhead {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; min-height: 52px; padding: 8px 12px;
+    background: transparent; border: 0; color: var(--text);
+    font-family: inherit; font-size: 15px; text-align: left; cursor: pointer;
+  }
+  .cardhead:active { background: var(--panel2); }
+  .cardhead .sdot { width: 13px; height: 13px; border-radius: 50%; flex: none; }
+  .cardhead .name { flex: 1; min-width: 0; font-weight: 600; word-break: break-word; }
+  .cardhead .name .stext { display: block; color: var(--muted); font-weight: 400; font-size: 12px; margin-top: 1px; }
+  .cardhead .badges { display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; flex: none; max-width: 45%; }
+  .minibadge {
+    font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+    background: var(--panel2); border: 1px solid var(--border); white-space: nowrap;
+  }
+  .minibadge.kn { color: var(--text); }
+  .minibadge.sorry { color: #ffb3ad; border-color: #5a2722; background: #2a1614; }
+  .minibadge.stub { color: #9fd0ff; border-color: #234a6b; background: #102330; }
+  .cardhead .chev { color: var(--muted); flex: none; transition: transform 0.15s; font-size: 14px; }
+  .card.open .chev { transform: rotate(90deg); }
+  .carddetail { display: none; padding: 4px 12px 12px 12px; font-size: 14px; border-top: 1px solid var(--border); }
+  .card.open .carddetail { display: block; }
+  .carddetail .statusline { padding: 5px 10px; border-radius: 6px; display: inline-block; color: #0d1117; font-weight: 700; margin: 10px 0 8px 0; font-size: 13px; }
+  .carddetail .row { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .carddetail .row .k { color: var(--muted); flex: none; }
+  .carddetail .row .v { text-align: right; word-break: break-word; }
+  .carddetail .seclabel { color: var(--muted); margin-top: 12px; font-size: 13px; }
+  .carddetail .dep { display: block; color: var(--muted); padding: 3px 0; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 700px) {
+    h1 { font-size: 16px; }
+    h1 .sub { display: block; margin-left: 0; margin-top: 2px; }
+    #side { display: none; } /* graph view side panel hidden on phones; details live in list view */
+    #graphview #graphwrap { width: 100%; }
+  }
+  @media (min-width: 701px) {
+    /* desktop list view: constrain width for readability */
+    #listview .layergroup { max-width: 880px; margin-left: auto; margin-right: auto; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="titlebar">
+    <h1>Squarefree Lean — Status
+      <span class="sub" id="genat">loading…</span>
+    </h1>
+    <div class="toggle" role="tablist" aria-label="View mode">
+      <button id="btnGraph" type="button">Graph</button>
+      <button id="btnList" type="button">List</button>
+    </div>
+  </div>
+  <div id="banner">⏳ mathlib bootstrap in progress… build status not yet available; showing source-derived status.</div>
+  <div id="totals"></div>
+</header>
+<main>
+  <div id="graphview">
+    <div id="graphwrap">
+      <svg id="svg" width="1200" height="800"></svg>
+    </div>
+    <div id="side">
+      <div class="empty">Click a node to see details.</div>
+    </div>
+  </div>
+  <div id="listview"></div>
+</main>
+
+<script>
+const SVGNS = "http://www.w3.org/2000/svg";
+const LAYER_ORDER = ["L0","L1","L2","L3","L4","L5"];
+const STATUS_COLOR = {
+  "planned":"#6e7681","scaffolded":"#58a6ff","error":"#f85149",
+  "in-progress":"#db61a2","partial":"#d29922","done":"#3fb950","checking":"#a371f7"
+};
+const LEGEND = [
+  ["done","done"],["partial","partial"],["in-progress","in-progress"],
+  ["scaffolded","scaffolded"],["planned","planned"],["error","error"],["checking","checking"]
+];
+
+let selected = null;
+let lastSig = "";
+let lastData = null;
+let openCards = new Set();   // module names whose list cards are expanded
+let view = null;            // "graph" | "list"
+
+function el(tag, attrs) {
+  const e = document.createElementNS(SVGNS, tag);
+  for (const k in (attrs||{})) e.setAttribute(k, attrs[k]);
+  return e;
+}
+
+function shortLabel(mod) {
+  // strip leading "Squarefree."
+  return mod.replace(/^Squarefree\.?/, "") || "Squarefree (root)";
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+/* ---------- view switching ---------- */
+function setView(v, persist) {
+  view = v;
+  const gv = document.getElementById("graphview");
+  const lv = document.getElementById("listview");
+  if (v === "list") {
+    gv.classList.add("hidden");
+    lv.classList.add("shown");
+  } else {
+    gv.classList.remove("hidden");
+    lv.classList.remove("shown");
+  }
+  document.getElementById("btnGraph").classList.toggle("active", v === "graph");
+  document.getElementById("btnList").classList.toggle("active", v === "list");
+  if (persist) { try { localStorage.setItem("sqf_view", v); } catch (e) {} }
+}
+
+function initView() {
+  let stored = null;
+  try { stored = localStorage.getItem("sqf_view"); } catch (e) {}
+  if (stored === "graph" || stored === "list") {
+    setView(stored, false);
+  } else {
+    // default by screen width: phones -> list, wider -> graph
+    setView(window.matchMedia("(max-width: 700px)").matches ? "list" : "graph", false);
+  }
+  document.getElementById("btnGraph").addEventListener("click", () => setView("graph", true));
+  document.getElementById("btnList").addEventListener("click", () => setView("list", true));
+}
+
+function measureHeader() {
+  const h = document.querySelector("header").offsetHeight;
+  document.documentElement.style.setProperty("--header-h", h + "px");
+}
+
+/* ---------- ordered layers helper ---------- */
+function orderedLayers(modules) {
+  const byLayer = {};
+  for (const m of modules) (byLayer[m.layer] = byLayer[m.layer] || []).push(m);
+  const known = LAYER_ORDER.filter(l => byLayer[l] && byLayer[l].length);
+  const extras = Object.keys(byLayer)
+    .filter(l => !LAYER_ORDER.includes(l))
+    .sort();
+  return { byLayer, layers: known.concat(extras) };
+}
+
+/* ---------- top-level render ---------- */
+function render(data) {
+  lastData = data;
+  // banner
+  const banner = document.getElementById("banner");
+  banner.className = data.bootstrap_done ? "" : "show";
+  document.getElementById("genat").textContent =
+    "updated " + new Date(data.generated_at).toLocaleTimeString() +
+    (data.bootstrap_done ? (data.build_ran ? " · build OK" : " · build idle") : " · pre-bootstrap");
+
+  // totals chips
+  const totalsEl = document.getElementById("totals");
+  totalsEl.innerHTML = "";
+  for (const [st] of LEGEND) {
+    const n = (data.totals && data.totals[st]) || 0;
+    if (!n && (st === "checking" || st === "error")) continue; // hide zero rare states
+    const c = document.createElement("span");
+    c.className = "chip";
+    c.innerHTML = `<span class="dot" style="background:${STATUS_COLOR[st]}"></span>${st}: <b>${n}</b>`;
+    totalsEl.appendChild(c);
+  }
+  const meta = document.createElement("span");
+  meta.className = "meta";
+  meta.textContent = `${data.module_count} modules`;
+  totalsEl.appendChild(meta);
+
+  drawGraph(data);
+  drawList(data);
+  measureHeader();
+}
+
+/* ---------- GRAPH (desktop DAG, unchanged layout) ---------- */
+function drawGraph(data) {
+  const svg = document.getElementById("svg");
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  const defs = el("defs");
+  const marker = el("marker", {id:"arrow", viewBox:"0 0 10 10", refX:"9", refY:"5",
+    markerWidth:"7", markerHeight:"7", orient:"auto-start-reverse"});
+  marker.appendChild(el("path", {d:"M 0 0 L 10 5 L 0 10 z", fill:"#3d4754"}));
+  defs.appendChild(marker);
+  svg.appendChild(defs);
+
+  const { byLayer, layers } = orderedLayers(data.modules);
+
+  const NODE_W = 168, NODE_H = 46, GAP_X = 24, LAYER_H = 120;
+  const LABEL_W = 40, PAD_TOP = 16;
+  for (const l of layers) byLayer[l].sort((a,b)=>a.module.localeCompare(b.module));
+
+  let maxCols = 0;
+  for (const l of layers) maxCols = Math.max(maxCols, byLayer[l].length);
+  const width = LABEL_W + maxCols * (NODE_W + GAP_X) + GAP_X;
+  const height = PAD_TOP + layers.length * LAYER_H + 20;
+  const W = Math.max(width, 900), H = Math.max(height, 400);
+  svg.setAttribute("width", W);
+  svg.setAttribute("height", H);
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("preserveAspectRatio", "xMinYMin meet");
+
+  const pos = {};
+  layers.forEach((l, li) => {
+    const rowY = PAD_TOP + li * LAYER_H;
+    svg.appendChild(el("rect", {class:"layerband", x:0, y:rowY-6,
+      width: Math.max(width,900), height: LAYER_H-8}));
+    const lab = el("text", {class:"layerlabel", x:8, y:rowY + NODE_H/2 + 4});
+    lab.textContent = l;
+    svg.appendChild(lab);
+
+    const nodes = byLayer[l];
+    const totalW = nodes.length * (NODE_W + GAP_X) - GAP_X;
+    let startX = LABEL_W + Math.max(0, (width - LABEL_W - totalW)/2);
+    nodes.forEach((m, ci) => {
+      const x = startX + ci * (NODE_W + GAP_X);
+      const y = rowY;
+      pos[m.module] = {x, y, cx: x + NODE_W/2, cy: y + NODE_H/2, w:NODE_W, h:NODE_H};
+    });
+  });
+
+  const edgeEls = {};
+  for (const m of data.modules) {
+    for (const dep of (m.edges||[])) {
+      const a = pos[dep], b = pos[m.module];
+      if (!a || !b) continue;
+      const x1 = a.cx, y1 = a.y + a.h, x2 = b.cx, y2 = b.y;
+      const my = (y1 + y2)/2;
+      const path = el("path", {class:"edge",
+        d:`M ${x1} ${y1} C ${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`});
+      svg.appendChild(path);
+      (edgeEls[m.module] = edgeEls[m.module]||[]).push(path);
+      (edgeEls[dep] = edgeEls[dep]||[]).push(path);
+    }
+  }
+
+  for (const m of data.modules) {
+    const p = pos[m.module]; if (!p) continue;
+    const g = el("g", {class:"node " + m.status});
+    g.dataset.module = m.module;
+    if (selected === m.module) g.classList.add("sel");
+    g.appendChild(el("rect", {x:p.x, y:p.y, width:p.w, height:p.h}));
+    const t = el("text", {x:p.cx, y:p.y+18, "text-anchor":"middle"});
+    t.textContent = trunc(shortLabel(m.module), 24);
+    g.appendChild(t);
+    const parts = [];
+    if (m.sorry_count) parts.push("sorry " + m.sorry_count);
+    if (m.stub_count) parts.push("STUB " + m.stub_count);
+    if (m.axiom_count) parts.push("ax " + m.axiom_count);
+    if (!parts.length) parts.push(m.exists ? m.status : "—");
+    const c = el("text", {class:"cnt", x:p.cx, y:p.y+35, "text-anchor":"middle"});
+    c.textContent = trunc(parts.join(" · "), 28);
+    g.appendChild(c);
+    if (m.expected_count > 0) {
+      const txt = `${m.present_count}/${m.expected_count}`;
+      const bw = 12 + txt.length * 6;
+      const bx = p.x + p.w - bw - 4, by = p.y + 4;
+      g.appendChild(el("rect", {class:"badgebg", x:bx, y:by, width:bw, height:14, rx:7, ry:7}));
+      const bt = el("text", {class:"badge", x:bx + bw/2, y:by+10.5, "text-anchor":"middle"});
+      bt.textContent = txt;
+      g.appendChild(bt);
+    }
+    g.addEventListener("click", () => selectNode(m, edgeEls));
+    svg.appendChild(g);
+  }
+
+  if (selected) {
+    const m = data.modules.find(x=>x.module===selected);
+    if (m) highlightEdges(m, edgeEls);
+  }
+}
+
+function trunc(s, n){ return s.length>n ? s.slice(0,n-1)+"…" : s; }
+
+function highlightEdges(m, edgeEls) {
+  document.querySelectorAll(".edge.hl").forEach(e=>e.classList.remove("hl"));
+  (edgeEls[m.module]||[]).forEach(e=>e.classList.add("hl"));
+}
+
+function selectNode(m, edgeEls) {
+  selected = m.module;
+  document.querySelectorAll(".node.sel").forEach(n=>n.classList.remove("sel"));
+  const g = document.querySelector(`.node[data-module="${cssEsc(m.module)}"]`);
+  if (g) g.classList.add("sel");
+  highlightEdges(m, edgeEls);
+  showSide(m);
+}
+
+function cssEsc(s){ return s.replace(/([.])/g,"\\$1"); }
+
+function showSide(m) {
+  const side = document.getElementById("side");
+  const col = STATUS_COLOR[m.status] || "#666";
+  const rows = [
+    ["module", `<code>${esc(m.module)}</code>`],
+    ["file", `<code>${esc(m.file)}</code>`],
+    ["layer", esc(m.layer)],
+    ["exists", m.exists],
+    ["build", esc(m.build_status)],
+    ["theorems/lemmas", m.theorem_count],
+    ["defs/structures", m.def_count],
+    ["sorry", m.sorry_count],
+    ["STUB", m.stub_count],
+    ["axiom", m.axiom_count],
+    ["last checked", new Date(m.last_checked).toLocaleTimeString()],
+  ];
+  if ((m.expected_count || 0) > 0) {
+    rows.splice(5, 0,
+      ["planned deliverables", `<b>${m.present_count}/${m.expected_count}</b> present`]);
+  }
+  let html = `<div class="statusline" style="background:${col}">${esc(m.status).toUpperCase()}</div>`;
+  html += `<h2>${esc(shortLabel(m.module))}</h2>`;
+  for (const [k,v] of rows) html += `<div class="row"><span class="k">${k}</span><span>${v}</span></div>`;
+  if ((m.expected_count || 0) > 0) {
+    const miss = m.missing || [];
+    html += `<div class="pillist"><div class="k" style="color:var(--muted);margin-top:10px;">`
+          + `missing deliverables (${miss.length}):</div>`;
+    if (miss.length) for (const n of miss) html += `<span class="dep">✗ <code>${esc(n)}</code></span>`;
+    else html += `<span class="dep" style="color:var(--done)">✓ all present</span>`;
+    html += `</div>`;
+  }
+  html += `<div class="pillist"><div class="k" style="color:var(--muted);margin-top:10px;">depends on:</div>`;
+  if ((m.edges||[]).length) for (const d of m.edges) html += `<span class="dep">→ ${esc(shortLabel(d))}</span>`;
+  else html += `<span class="dep">(none)</span>`;
+  html += `</div>`;
+  side.innerHTML = html;
+}
+
+/* ---------- LIST / CARD VIEW ---------- */
+function drawList(data) {
+  const root = document.getElementById("listview");
+  root.innerHTML = "";
+  const { byLayer, layers } = orderedLayers(data.modules);
+
+  for (const l of layers) {
+    const mods = byLayer[l].slice().sort((a,b)=>a.module.localeCompare(b.module));
+    const grp = document.createElement("div");
+    grp.className = "layergroup";
+
+    const hdr = document.createElement("div");
+    hdr.className = "layerhdr";
+    hdr.innerHTML = `<span>${esc(l)}</span><span class="lcount">${mods.length} module${mods.length===1?"":"s"}</span>`;
+    grp.appendChild(hdr);
+
+    for (const m of mods) grp.appendChild(buildCard(m));
+    root.appendChild(grp);
+  }
+}
+
+function buildCard(m) {
+  const card = document.createElement("div");
+  card.className = "card";
+  if (openCards.has(m.module)) card.classList.add("open");
+  card.dataset.module = m.module;
+  const col = STATUS_COLOR[m.status] || "#666";
+
+  // head (tap target)
+  const head = document.createElement("button");
+  head.type = "button";
+  head.className = "cardhead";
+  head.setAttribute("aria-expanded", openCards.has(m.module) ? "true" : "false");
+
+  let badges = "";
+  if ((m.expected_count || 0) > 0) {
+    badges += `<span class="minibadge kn">${m.present_count}/${m.expected_count}</span>`;
+  }
+  if (m.sorry_count) badges += `<span class="minibadge sorry">sorry ${m.sorry_count}</span>`;
+  if (m.stub_count) badges += `<span class="minibadge stub">STUB ${m.stub_count}</span>`;
+
+  head.innerHTML =
+    `<span class="sdot" style="background:${col}"></span>` +
+    `<span class="name">${esc(shortLabel(m.module))}` +
+      `<span class="stext">${esc(m.status)}</span></span>` +
+    `<span class="badges">${badges}</span>` +
+    `<span class="chev">▶</span>`;
+
+  head.addEventListener("click", () => {
+    const nowOpen = !card.classList.contains("open");
+    card.classList.toggle("open", nowOpen);
+    head.setAttribute("aria-expanded", nowOpen ? "true" : "false");
+    if (nowOpen) openCards.add(m.module); else openCards.delete(m.module);
+  });
+  card.appendChild(head);
+
+  // detail
+  const detail = document.createElement("div");
+  detail.className = "carddetail";
+  detail.innerHTML = cardDetailHTML(m, col);
+  card.appendChild(detail);
+
+  return card;
+}
+
+function cardDetailHTML(m, col) {
+  const rows = [
+    ["module", `<code>${esc(m.module)}</code>`],
+    ["file", `<code>${esc(m.file)}</code>`],
+    ["layer", esc(m.layer)],
+    ["build", esc(m.build_status)],
+    ["theorems/lemmas", m.theorem_count],
+    ["defs/structures", m.def_count],
+    ["sorry", m.sorry_count],
+    ["STUB", m.stub_count],
+    ["axiom", m.axiom_count],
+    ["last checked", new Date(m.last_checked).toLocaleTimeString()],
+  ];
+  if ((m.expected_count || 0) > 0) {
+    rows.splice(4, 0,
+      ["planned deliverables", `<b>${m.present_count}/${m.expected_count}</b> present`]);
+  }
+  let html = `<div class="statusline" style="background:${col}">${esc(m.status).toUpperCase()}</div>`;
+  for (const [k,v] of rows) html += `<div class="row"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+
+  if ((m.expected_count || 0) > 0) {
+    const miss = m.missing || [];
+    html += `<div class="seclabel">missing deliverables (${miss.length}):</div>`;
+    if (miss.length) for (const n of miss) html += `<span class="dep">✗ <code>${esc(n)}</code></span>`;
+    else html += `<span class="dep" style="color:var(--done)">✓ all present</span>`;
+  }
+
+  html += `<div class="seclabel">depends on:</div>`;
+  if ((m.edges||[]).length) for (const d of m.edges) html += `<span class="dep">→ ${esc(shortLabel(d))}</span>`;
+  else html += `<span class="dep">(none)</span>`;
+
+  return html;
+}
+
+/* ---------- polling ---------- */
+async function poll() {
+  try {
+    const r = await fetch("status.json?_=" + Date.now(), {cache:"no-store"});
+    if (r.ok) {
+      const data = await r.json();
+      const sig = JSON.stringify({g:data.generated_at, t:data.totals,
+        s:data.modules.map(m=>[m.module,m.status,m.sorry_count,m.stub_count,m.axiom_count,
+          m.present_count,m.expected_count])});
+      if (sig !== lastSig) { lastSig = sig; render(data); }
+    }
+  } catch (e) { /* keep last render */ }
+}
+
+initView();
+window.addEventListener("resize", measureHeader);
+poll();
+setInterval(poll, 5000);
+</script>
+</body>
+</html>

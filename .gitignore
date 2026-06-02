@@ -1,0 +1,14 @@
+# Lean build artifacts
+squarefree_lean/.lake/
+**/*.olean
+**/*.ilean
+
+# scratch
+squarefree_lean/tmp/
+
+# visualizer runtime state (keep tools/*.py, tools/*.sh, progress/index.html)
+squarefree_lean/progress/status.json
+squarefree_lean/progress/*.pid
+squarefree_lean/progress/*.log
+squarefree_lean/progress/bootstrap.done
+squarefree_lean/progress/.lakebuild.lock
