@@ -16,6 +16,7 @@ import Squarefree.Geometry.NearCurve
 
 -- §3 structural layer and §2 short-Δ regime (Prop 2.4)
 import Squarefree.Structure.DaSpacing
+import Squarefree.Structure.Fiber
 import Squarefree.ShortDelta
 
 -- §7 bracket layer

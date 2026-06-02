@@ -498,17 +498,6 @@ theorem lemma_3_1 : ∃ c : ℝ, 0 < c ∧
   rw [hJzero] at hJabs_pos
   simp at hJabs_pos
 
-/-- **Prop 3.2** (writeup 346–393). Fiber bound is the STATED WEAK (non-sharp) form. -/
-theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 < C₂ ∧ 0 < C₃ ∧
-    ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a → ∀ (D : ℝ), 0 < D → ∀ (dtil : ℝ → ℝ),
-      ∃ (Ra : Finset ℕ) (dStar : ℕ → ℤ),
-        (∀ r ∈ Ra, inDa P.X P.H a (dStar r)) ∧
-        (∀ r ∈ Ra, c₁ * S.R ≤ (r : ℝ) ∧ (r : ℝ) ≤ C₁ * S.R) ∧
-        (∀ r ∈ Ra, Rfun P.X (a : ℝ) (dtil (r : ℝ)) = (r : ℝ)) ∧
-        ((DaCard P.X P.H a D : ℝ) ≤ C₂ * (Ra.card : ℝ) * (1 + (S.Δ / S.A) ^ (8/3 : ℝ) * P.G ^ (-2/3 : ℝ))) ∧
-        (∀ r ∈ Ra, |(dStar r : ℝ) - dtil (r : ℝ)| ≤ C₃ * (S.Δ / P.G) * (S.Δ ^ 3 / S.A ^ 3)) := by
-  sorry -- STUB: prop_3_2
-
 /-- `𝐃(Ω) := ∑_{a∼A} #𝒟_a` (writeup line 2008), the dyadic `A`-block sum of `DaCard`. -/
 noncomputable def DBlock (P : Globals) (S : Scale P) (D : ℝ) : ℝ :=
   ∑ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, (DaCard P.X P.H a D : ℝ)
