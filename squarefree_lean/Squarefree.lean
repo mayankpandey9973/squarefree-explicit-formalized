@@ -10,6 +10,9 @@ import Squarefree.FiniteDiff
 -- L1 Analytic engine
 import Squarefree.Counting.PopularDiff
 import Squarefree.Counting.Preimage
+import Squarefree.Counting.FourthDeriv
+import Squarefree.Counting.Bands
+import Squarefree.Geometry.NearCurve
 
 -- §3 structural layer and §2 short-Δ regime (Prop 2.4)
 import Squarefree.Structure.DaSpacing
