@@ -21,26 +21,32 @@ open Classical Finset Squarefree.FiniteDiff Set
 namespace Squarefree.Counting
 
 set_option maxHeartbeats 1600000 in
-/-- **Lemma 2.1** (writeup 84–194): 4th-derivative counting via 3-fold differencing. -/
-theorem fourthDeriv_count : ∃ C : ℝ, 0 < C ∧
+/-- **Lemma 2.1** (writeup 84–194): 4th-derivative counting via 3-fold differencing.
+Generalized from `|f⁗| ≤ 2Λ` to `|f⁗| ≤ K·Λ`; the constant `C` may depend on `K` (the
+cross-term genuinely carries `K`, so a single absolute constant is impossible). -/
+theorem fourthDeriv_count : ∀ (K : ℝ), 1 ≤ K → ∃ C : ℝ, 0 < C ∧
     ∀ (N Λ δ : ℝ) (f : ℝ → ℝ),
       2 ≤ N → 0 < δ → δ < 1/4 → 0 < Λ → ContDiffOn ℝ 4 f (Set.Ioo 0 (4 * N)) →
       (∀ x ∈ Set.Icc N (3 * N), Λ ≤ |iteratedDeriv 4 f x|) →
-      (∀ x ∈ Set.Icc N (3 * N), |iteratedDeriv 4 f x| ≤ 2 * Λ) →
+      (∀ x ∈ Set.Icc N (3 * N), |iteratedDeriv 4 f x| ≤ K * Λ) →
       (((Finset.Ioc ⌊N⌋ ⌊2 * N⌋).filter (fun (n : ℤ) => distInt (f (n : ℝ)) ≤ δ)).card : ℝ)
         ≤ C * (N ^ (7/8 : ℝ) + N * δ ^ (1/8 : ℝ)
                + N ^ (7/8 : ℝ) * (δ / Λ) ^ (1/8 : ℝ) + Λ ^ (1/15 : ℝ) * N) := by
-  -- The constant K for `four_case_bound`, large enough for every branch.
-  set K : ℝ := 2 ^ 70 with hKdef
-  have hK1 : (1 : ℝ) ≤ K := by
-    rw [hKdef]; exact one_le_pow₀ (by norm_num : (1:ℝ) ≤ 2)
+  intro K hK1
+  -- The combined budget multiplier for `four_case_bound`: `2^70 · K` (final_combine gives
+  -- budget `(2^70·K)·(…)`).
+  set Kfc : ℝ := 2 ^ 70 * K with hKfcdef
+  have hKfc1 : (1 : ℝ) ≤ Kfc := by
+    rw [hKfcdef]; calc (1:ℝ) = 1 * 1 := by ring
+      _ ≤ 2 ^ 70 * K := by
+          apply mul_le_mul (one_le_pow₀ (by norm_num : (1:ℝ) ≤ 2)) hK1 (by norm_num) (by positivity)
   obtain ⟨C₀, hC₀pos, hC₀⟩ :
       ∃ C : ℝ, 0 < C ∧ ∀ M N Λ δ : ℝ, 0 < M → 1 ≤ N → 0 < Λ → 0 < δ →
-        M ^ 8 ≤ K * (N ^ 7 + Λ * N ^ 15 / M ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) →
+        M ^ 8 ≤ Kfc * (N ^ 7 + Λ * N ^ 15 / M ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) →
         M ≤ C * (N ^ (7/8 : ℝ) + N * δ ^ (1/8 : ℝ)
                + N ^ (7/8 : ℝ) * (δ / Λ) ^ (1/8 : ℝ) + Λ ^ (1/15 : ℝ) * N) := by
-    refine ⟨(4*K) ^ (1/8 : ℝ) + (4*K) ^ (1/15 : ℝ), by positivity, ?_⟩
-    exact four_case_bound K hK1
+    refine ⟨(4*Kfc) ^ (1/8 : ℝ) + (4*Kfc) ^ (1/15 : ℝ), by positivity, ?_⟩
+    exact four_case_bound Kfc hKfc1
   refine ⟨max C₀ 1, by positivity, ?_⟩
   intro N Λ δ f hN hδ hδ4 hΛ hf hlb hub
   have hNpos : (0:ℝ) < N := by linarith
@@ -105,9 +111,13 @@ theorem fourthDeriv_count : ∃ C : ℝ, 0 < C ∧
       positivity
     -- `16Ñ ≤ 32 N`.
     have hÑ32 : 16 * Ñ ≤ 32 * N := by rw [hÑ]; linarith
-    -- the "collapse" target: M² ≤ 16Ñ ⟹ M⁸ ≤ K·budget.
+    -- `2^20 ≤ Kfc` and `2^30 ≤ Kfc` (since `Kfc = 2^70·K ≥ 2^70`).
+    have hKfcge70 : (2:ℝ) ^ 70 ≤ Kfc := by
+      rw [hKfcdef]; calc (2:ℝ) ^ 70 = 2 ^ 70 * 1 := by ring
+        _ ≤ 2 ^ 70 * K := by apply mul_le_mul_of_nonneg_left hK1 (by positivity)
+    -- the "collapse" target: M² ≤ 16Ñ ⟹ M⁸ ≤ Kfc·budget.
     have collapse1 : (M:ℝ) ^ 2 ≤ 16 * Ñ →
-        (M:ℝ) ^ 8 ≤ K * (N ^ 7 + Λ * N ^ 15 / (M:ℝ) ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) := by
+        (M:ℝ) ^ 8 ≤ Kfc * (N ^ 7 + Λ * N ^ 15 / (M:ℝ) ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) := by
       intro hcol
       have h1 : (M:ℝ) ^ 2 ≤ 32 * N := le_trans hcol hÑ32
       have h2 : (M:ℝ) ^ 8 ≤ (32 * N) ^ 4 := by
@@ -115,19 +125,19 @@ theorem fourthDeriv_count : ∃ C : ℝ, 0 < C ∧
           apply pow_le_pow_left₀ (by positivity) h1
         calc (M:ℝ) ^ 8 = ((M:ℝ) ^ 2) ^ 4 := by ring
           _ ≤ (32 * N) ^ 4 := this
-      have h3 : (32 * N) ^ 4 ≤ K * N ^ 7 := by
+      have h3 : (32 * N) ^ 4 ≤ Kfc * N ^ 7 := by
         have hNle : N ^ 4 ≤ N ^ 7 := by
           apply pow_le_pow_right₀ hN1 (by norm_num)
-        have hKge : (2:ℝ) ^ 20 ≤ K := by
-          rw [hKdef]; exact pow_le_pow_right₀ (by norm_num) (by norm_num)
+        have hKge : (2:ℝ) ^ 20 ≤ Kfc :=
+          le_trans (by norm_num) hKfcge70
         calc (32 * N) ^ 4 = 2 ^ 20 * N ^ 4 := by norm_num; ring
-          _ ≤ K * N ^ 7 := by
+          _ ≤ Kfc * N ^ 7 := by
               apply mul_le_mul hKge hNle (by positivity) (le_trans (by positivity) hKge)
-      have : (M:ℝ) ^ 8 ≤ K * N ^ 7 := le_trans h2 h3
-      nlinarith [this, hbudget0, mul_nonneg (le_of_lt (by linarith : (0:ℝ) < K))
+      have : (M:ℝ) ^ 8 ≤ Kfc * N ^ 7 := le_trans h2 h3
+      nlinarith [this, hbudget0, mul_nonneg (le_of_lt (by linarith : (0:ℝ) < Kfc))
         (by positivity : (0:ℝ) ≤ Λ * N ^ 15 / (M:ℝ) ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ)]
     have collapse2 : (M:ℝ) ^ 4 ≤ (16 * Ñ) ^ 3 →
-        (M:ℝ) ^ 8 ≤ K * (N ^ 7 + Λ * N ^ 15 / (M:ℝ) ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) := by
+        (M:ℝ) ^ 8 ≤ Kfc * (N ^ 7 + Λ * N ^ 15 / (M:ℝ) ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) := by
       intro hcol
       have h1 : (M:ℝ) ^ 4 ≤ (32 * N) ^ 3 := by
         refine le_trans hcol ?_
@@ -135,15 +145,15 @@ theorem fourthDeriv_count : ∃ C : ℝ, 0 < C ∧
       have h2 : (M:ℝ) ^ 8 ≤ ((32 * N) ^ 3) ^ 2 := by
         calc (M:ℝ) ^ 8 = ((M:ℝ) ^ 4) ^ 2 := by ring
           _ ≤ ((32 * N) ^ 3) ^ 2 := by apply pow_le_pow_left₀ (by positivity) h1
-      have h3 : ((32 * N) ^ 3) ^ 2 ≤ K * N ^ 7 := by
+      have h3 : ((32 * N) ^ 3) ^ 2 ≤ Kfc * N ^ 7 := by
         have hNle : N ^ 6 ≤ N ^ 7 := by apply pow_le_pow_right₀ hN1 (by norm_num)
-        have hKge : (2:ℝ) ^ 30 ≤ K := by
-          rw [hKdef]; exact pow_le_pow_right₀ (by norm_num) (by norm_num)
+        have hKge : (2:ℝ) ^ 30 ≤ Kfc :=
+          le_trans (by norm_num) hKfcge70
         calc ((32 * N) ^ 3) ^ 2 = 2 ^ 30 * N ^ 6 := by norm_num; ring
-          _ ≤ K * N ^ 7 := by
+          _ ≤ Kfc * N ^ 7 := by
               apply mul_le_mul hKge hNle (by positivity) (le_trans (by positivity) hKge)
-      have : (M:ℝ) ^ 8 ≤ K * N ^ 7 := le_trans h2 h3
-      nlinarith [this, hbudget0, mul_nonneg (le_of_lt (by linarith : (0:ℝ) < K))
+      have : (M:ℝ) ^ 8 ≤ Kfc * N ^ 7 := le_trans h2 h3
+      nlinarith [this, hbudget0, mul_nonneg (le_of_lt (by linarith : (0:ℝ) < Kfc))
         (by positivity : (0:ℝ) ≤ Λ * N ^ 15 / (M:ℝ) ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ)]
     -- ===== First popular difference =====
     obtain ⟨h₁, hh₁lo, hh₁hi, hrc₁⟩ := popular_diff Ñ S lo (hmemAux S (subset_refl S))
@@ -283,12 +293,15 @@ theorem fourthDeriv_count : ∃ C : ℝ, 0 < C ∧
       have h12 : (1:ℝ) ≤ (h₁:ℝ) * (h₂:ℝ) := by nlinarith [hh1r, hh2r]
       nlinarith [h12, hh3r]
     have hFpos : (0:ℝ) < P * Λ := by positivity
-    obtain ⟨hexp, hvar⟩ := expanding_and_variation (N := N) (Λ := Λ)
+    obtain ⟨hexp, hvar⟩ := expanding_and_variation (N := N) (Λ := Λ) (K := K)
       (h₁ := (h₁:ℝ)) (h₂ := (h₂:ℝ)) (h₃ := (h₃:ℝ)) (f := f)
-      hN hΛ hh1r hh2r hh3r hsumle hf hlb hub
+      hN hΛ hK1 hh1r hh2r hh3r hsumle hf hlb hub
     -- ===== Apply preimage_count to g on [N,2N], tolerance 8δ =====
-    have hpc := preimage_count N (2 * N) (2 * (P * Λ) * N) (P * Λ) (8 * δ) g hFpos
-      (by positivity) (by positivity)
+    have hVnn : (0:ℝ) ≤ K * (P * Λ) * N := by
+      have hK0 : (0:ℝ) ≤ K := by linarith
+      positivity
+    have hpc := preimage_count N (2 * N) (K * (P * Λ) * N) (P * Λ) (8 * δ) g hFpos
+      (by positivity) hVnn
       (by
         intro x hx y hy
         have he := hexp x hx y hy
@@ -298,7 +311,7 @@ theorem fourthDeriv_count : ∃ C : ℝ, 0 < C ∧
       (by
         intro x hx y hy
         have hv := hvar x hx y hy
-        have heqV : 2 * (P * Λ) * N = 2 * ((h₁:ℝ) * (h₂:ℝ) * (h₃:ℝ) * Λ) * N := by
+        have heqV : K * (P * Λ) * N = K * ((h₁:ℝ) * (h₂:ℝ) * (h₃:ℝ) * Λ) * N := by
           rw [hPdef]
         rw [heqV]; exact hv)
     -- hpc : #((Icc ⌈N⌉ ⌊2N⌋).filter (distInt (g ↑n) ≤ 8δ)) ≤ (V+16δ+1)(16δ/(PΛ)+1)
@@ -340,7 +353,7 @@ theorem fourthDeriv_count : ∃ C : ℝ, 0 < C ∧
               = (n : ℝ) + (h₁ : ℝ) + (h₂ : ℝ) + (h₃ : ℝ) := by push_cast; ring
           rwa [e] at d111
     have hA₃ub : (A₃.card : ℝ)
-        ≤ (2 * (P * Λ) * N + 2 * (8 * δ) + 1) * (2 * (8 * δ) / (P * Λ) + 1) := by
+        ≤ (K * (P * Λ) * N + 2 * (8 * δ) + 1) * (2 * (8 * δ) / (P * Λ) + 1) := by
       refine le_trans ?_ hpc
       exact_mod_cast Finset.card_le_card hA₃sub
     -- ===== Bound P ≤ C_P · Ñ⁷/M⁷ =====
@@ -434,17 +447,17 @@ theorem fourthDeriv_count : ∃ C : ℝ, 0 < C ∧
     have hM8le : (M:ℝ) ^ 8 ≤ (16 * Ñ) ^ 7 * (A₃.card : ℝ) := by
       rw [div_le_iff₀ hÑ7pos] at hA₃chain; linarith [hA₃chain]
     have hM8ub : (M:ℝ) ^ 8
-        ≤ (16 * Ñ) ^ 7 * ((2 * (P * Λ) * N + 16 * δ + 1) * (16 * δ / (P * Λ) + 1)) := by
+        ≤ (16 * Ñ) ^ 7 * ((K * (P * Λ) * N + 16 * δ + 1) * (16 * δ / (P * Λ) + 1)) := by
       refine le_trans hM8le ?_
       have h16 : (2 * (8 * δ)) = 16 * δ := by ring
-      rw [show (2 * (P * Λ) * N + 2 * (8 * δ) + 1) * (2 * (8 * δ) / (P * Λ) + 1)
-        = (2 * (P * Λ) * N + 16 * δ + 1) * (16 * δ / (P * Λ) + 1) from by rw [h16]] at hA₃ub
+      rw [show (K * (P * Λ) * N + 2 * (8 * δ) + 1) * (2 * (8 * δ) / (P * Λ) + 1)
+        = (K * (P * Λ) * N + 16 * δ + 1) * (16 * δ / (P * Λ) + 1) from by rw [h16]] at hA₃ub
       apply mul_le_mul_of_nonneg_left hA₃ub (le_of_lt hÑ7pos)
     have hÑ2N : Ñ ≤ 2 * N := by rw [hÑ]; linarith
     -- `hPbd : P ≤ 8192000·Ñ⁷/M⁷` is in terms of Ñ; convert to abstract form.
-    have := final_combine (M := (M:ℝ)) (N := N) (Λ := Λ) (δ := δ) (P := P) (Ñ := Ñ)
-      hMreal hN1 hΛ hδ (by linarith) hÑpos hÑ2N hP1 hPbd hM8ub
-    -- `final_combine` gives `2^70 = K`.
-    rw [hKdef]; exact this
+    have := final_combine (M := (M:ℝ)) (N := N) (Λ := Λ) (δ := δ) (P := P) (Ñ := Ñ) (K := K)
+      hMreal hN1 hΛ hδ (by linarith) hK1 hÑpos hÑ2N hP1 hPbd hM8ub
+    -- `final_combine` gives the budget multiplier `2^70·K = Kfc`.
+    rw [hKfcdef]; exact this
 
 end Squarefree.Counting

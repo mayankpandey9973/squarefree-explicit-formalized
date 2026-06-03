@@ -19,32 +19,36 @@ open Squarefree.FiniteDiff Set Real
 
 namespace Squarefree.Counting
 
-/-- **Final combine of Lemma 2.1** (writeup 175–186).  The preimage-count product bound,
-together with `P ≤ C·Ñ⁷/M⁷` and `P ≥ 1`, yields the combined inequality fed to
-`four_case_bound`. -/
-theorem final_combine {M N Λ δ P Ñ : ℝ}
-    (hM : 0 < M) (hN : 1 ≤ N) (hΛ : 0 < Λ) (hδ : 0 < δ) (hδ1 : δ < 1)
+/-- **Final combine of Lemma 2.1** (writeup 175–186).  The preimage-count product bound
+(with variation coefficient `K ≥ 1` carried by the upper bound `|f⁗| ≤ K·Λ`), together with
+`P ≤ C·Ñ⁷/M⁷` and `P ≥ 1`, yields the combined inequality fed to `four_case_bound`.  The
+budget multiplier picks up a factor `K`. -/
+theorem final_combine {M N Λ δ P Ñ K : ℝ}
+    (hM : 0 < M) (hN : 1 ≤ N) (hΛ : 0 < Λ) (hδ : 0 < δ) (hδ1 : δ < 1) (hK : 1 ≤ K)
     (hÑpos : 0 < Ñ) (hÑ2N : Ñ ≤ 2 * N) (hP1 : 1 ≤ P)
     (hPbd : P ≤ 8192000 * Ñ ^ 7 / M ^ 7)
-    (hub : M ^ 8 ≤ (16 * Ñ) ^ 7 * ((2 * (P * Λ) * N + 16 * δ + 1) * (16 * δ / (P * Λ) + 1))) :
-    M ^ 8 ≤ 2 ^ 70 * (N ^ 7 + Λ * N ^ 15 / M ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) := by
+    (hub : M ^ 8 ≤ (16 * Ñ) ^ 7 * ((K * (P * Λ) * N + 16 * δ + 1) * (16 * δ / (P * Λ) + 1))) :
+    M ^ 8 ≤ (2 ^ 70 * K) * (N ^ 7 + Λ * N ^ 15 / M ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) := by
   set Q : ℝ := P * Λ with hQdef
   have hQpos : 0 < Q := by rw [hQdef]; positivity
   have hM7 : 0 < M ^ 7 := by positivity
   have hNpos : 0 < N := by linarith
   have hδ0 : (0:ℝ) ≤ δ := le_of_lt hδ
-  -- product expansion ≤ linear bound (uses δ < 1).
-  have hprod : (2 * Q * N + 16 * δ + 1) * (16 * δ / Q + 1)
-      ≤ 2 * Q * N + 48 * N * δ + 272 * δ / Q + 1 := by
-    have hexpand : (2 * Q * N + 16 * δ + 1) * (16 * δ / Q + 1)
-        = 2 * Q * N + 32 * N * δ + 256 * δ ^ 2 / Q + 16 * δ + 16 * δ / Q + 1 := by
+  have hK0 : (0:ℝ) ≤ K := by linarith
+  -- product expansion ≤ linear bound (uses δ < 1 and K ≥ 1).
+  have hprod : (K * Q * N + 16 * δ + 1) * (16 * δ / Q + 1)
+      ≤ K * Q * N + 32 * K * N * δ + 272 * δ / Q + 1 := by
+    have hexpand : (K * Q * N + 16 * δ + 1) * (16 * δ / Q + 1)
+        = K * Q * N + 16 * K * N * δ + 256 * δ ^ 2 / Q + 16 * δ + 16 * δ / Q + 1 := by
       field_simp; ring
     rw [hexpand]
     have hδsq : 256 * δ ^ 2 / Q ≤ 256 * δ / Q := by
       gcongr; nlinarith [hδ1, hδ0]
-    have h16δ : 16 * δ ≤ 16 * N * δ := by nlinarith [hN, hδ0]
-    have e272 : 2 * Q * N + 48 * N * δ + 272 * δ / Q + 1
-        = 2 * Q * N + 32 * N * δ + 16 * N * δ + 256 * δ / Q + 16 * δ / Q + 1 := by
+    have hKN1 : (1:ℝ) ≤ K * N := by nlinarith [hN, hK]
+    have h16δ : 16 * δ ≤ 16 * K * N * δ := by nlinarith [hKN1, hδ0]
+    -- 32*K*N*δ = 16*K*N*δ + 16*K*N*δ ≥ 16*K*N*δ + 16*δ
+    have e272 : K * Q * N + 32 * K * N * δ + 272 * δ / Q + 1
+        = K * Q * N + 16 * K * N * δ + 16 * K * N * δ + 256 * δ / Q + 16 * δ / Q + 1 := by
       rw [show (272:ℝ) * δ / Q = 256 * δ / Q + 16 * δ / Q from by ring]; ring
     rw [e272]; linarith [hδsq, h16δ]
   -- (16Ñ)⁷ ≤ 2^35 N⁷
@@ -55,71 +59,90 @@ theorem final_combine {M N Λ δ P Ñ : ℝ}
     rw [mul_pow]; norm_num [show (32:ℝ) = 2^5 from by norm_num, ← pow_mul]
   have hÑ7pos : 0 < (16 * Ñ) ^ 7 := by positivity
   have hÑ7nn : (0:ℝ) ≤ (16 * Ñ) ^ 7 := le_of_lt hÑ7pos
-  -- bound each of the 4 terms by 2^70 · (a budget term)
-  -- (A) constant: (16Ñ)⁷·1 ≤ 2^70·N⁷
-  have hA : (16 * Ñ) ^ 7 * 1 ≤ 2 ^ 70 * N ^ 7 := by
+  -- bound each of the 4 terms by 2^70·K · (a budget term)
+  -- (A) constant: (16Ñ)⁷·1 ≤ 2^70·K·N⁷  (K ≥ 1)
+  have hA : (16 * Ñ) ^ 7 * 1 ≤ (2 ^ 70 * K) * N ^ 7 := by
     rw [mul_one]; refine le_trans hÑ7bd ?_
-    apply mul_le_mul_of_nonneg_right ?_ (by positivity); norm_num
-  -- (B) 2QN ≤ 2·8192000·Ñ⁷Λ/M⁷·N, and (16Ñ)⁷·that ≤ 2^70·ΛN¹⁵/M⁷
-  have hB : (16 * Ñ) ^ 7 * (2 * Q * N) ≤ 2 ^ 70 * (Λ * N ^ 15 / M ^ 7) := by
+    have hstep : (2:ℝ) ^ 35 * N ^ 7 ≤ 2 ^ 70 * N ^ 7 := by
+      apply mul_le_mul_of_nonneg_right ?_ (by positivity); norm_num
+    refine le_trans hstep ?_
+    have : (2:ℝ) ^ 70 * N ^ 7 = 2 ^ 70 * 1 * N ^ 7 := by ring
+    rw [this, show (2:ℝ) ^ 70 * K * N ^ 7 = 2 ^ 70 * K * N ^ 7 from rfl]
+    apply mul_le_mul_of_nonneg_right ?_ (by positivity)
+    apply mul_le_mul_of_nonneg_left hK (by positivity)
+  -- (B) K·QN: (16Ñ)⁷·(K·QN) ≤ 2^70·K·ΛN¹⁵/M⁷
+  have hB : (16 * Ñ) ^ 7 * (K * Q * N) ≤ (2 ^ 70 * K) * (Λ * N ^ 15 / M ^ 7) := by
     have hQval : Q ≤ 8192000 * Ñ ^ 7 / M ^ 7 * Λ := by
       rw [hQdef]; apply mul_le_mul_of_nonneg_right hPbd (le_of_lt hΛ)
-    have hstep : (16 * Ñ) ^ 7 * (2 * Q * N)
-        ≤ (16 * Ñ) ^ 7 * (2 * (8192000 * Ñ ^ 7 / M ^ 7 * Λ) * N) := by
-      apply mul_le_mul_of_nonneg_left ?_ hÑ7nn
-      apply mul_le_mul_of_nonneg_right ?_ (le_of_lt hNpos)
-      apply mul_le_mul_of_nonneg_left hQval (by norm_num)
-    refine le_trans hstep ?_
-    -- (16Ñ)⁷·2·8192000·Ñ⁷Λ N/M⁷ = 16⁷·2·8192000·Ñ¹⁴·ΛN/M⁷ ≤ 2^70·ΛN¹⁵/M⁷
-    have hexp : (16 * Ñ) ^ 7 * (2 * (8192000 * Ñ ^ 7 / M ^ 7 * Λ) * N)
-        = (16 ^ 7 * 2 * 8192000 * (Ñ ^ 14) * (Λ * N)) / M ^ 7 := by
-      field_simp
-    have hRrw : 2 ^ 70 * (Λ * N ^ 15 / M ^ 7) = (2 ^ 70 * (Λ * N ^ 15)) / M ^ 7 := by ring
-    rw [hexp, hRrw, div_le_div_iff_of_pos_right hM7]
-    have hÑ14 : Ñ ^ 14 ≤ 2 ^ 14 * N ^ 14 := by
-      have : Ñ ^ 14 ≤ (2 * N) ^ 14 := by apply pow_le_pow_left₀ (le_of_lt hÑpos) hÑ2N
-      refine le_trans this (le_of_eq ?_); rw [mul_pow]
-    have hcoef : (16:ℝ) ^ 7 * 2 * 8192000 ≤ 2 ^ 52 := by norm_num
-    have hLNnn : (0:ℝ) ≤ Λ * N := by positivity
-    calc 16 ^ 7 * 2 * 8192000 * Ñ ^ 14 * (Λ * N)
-        ≤ 2 ^ 52 * (2 ^ 14 * N ^ 14) * (Λ * N) := by
-          apply mul_le_mul_of_nonneg_right ?_ hLNnn
-          apply mul_le_mul hcoef hÑ14 (by positivity) (by positivity)
-      _ = 2 ^ 66 * (Λ * N ^ 15) := by ring
-      _ ≤ 2 ^ 70 * (Λ * N ^ 15) := by
-          apply mul_le_mul_of_nonneg_right ?_ (by positivity); norm_num
-  -- (C) 48Nδ: (16Ñ)⁷·48Nδ ≤ 2^70·N⁸δ
-  have hC : (16 * Ñ) ^ 7 * (48 * N * δ) ≤ 2 ^ 70 * (N ^ 8 * δ) := by
-    have hstep : (16 * Ñ) ^ 7 * (48 * N * δ) ≤ 2 ^ 35 * N ^ 7 * (48 * N * δ) := by
+    -- first the K-free bound (16Ñ)⁷·(QN) ≤ 2^70·ΛN¹⁵/M⁷
+    have hBfree : (16 * Ñ) ^ 7 * (Q * N) ≤ 2 ^ 70 * (Λ * N ^ 15 / M ^ 7) := by
+      have hstep : (16 * Ñ) ^ 7 * (Q * N)
+          ≤ (16 * Ñ) ^ 7 * ((8192000 * Ñ ^ 7 / M ^ 7 * Λ) * N) := by
+        apply mul_le_mul_of_nonneg_left ?_ hÑ7nn
+        apply mul_le_mul_of_nonneg_right hQval (le_of_lt hNpos)
+      refine le_trans hstep ?_
+      have hexp : (16 * Ñ) ^ 7 * ((8192000 * Ñ ^ 7 / M ^ 7 * Λ) * N)
+          = (16 ^ 7 * 8192000 * (Ñ ^ 14) * (Λ * N)) / M ^ 7 := by
+        field_simp
+      have hRrw : 2 ^ 70 * (Λ * N ^ 15 / M ^ 7) = (2 ^ 70 * (Λ * N ^ 15)) / M ^ 7 := by ring
+      rw [hexp, hRrw, div_le_div_iff_of_pos_right hM7]
+      have hÑ14 : Ñ ^ 14 ≤ 2 ^ 14 * N ^ 14 := by
+        have : Ñ ^ 14 ≤ (2 * N) ^ 14 := by apply pow_le_pow_left₀ (le_of_lt hÑpos) hÑ2N
+        refine le_trans this (le_of_eq ?_); rw [mul_pow]
+      have hcoef : (16:ℝ) ^ 7 * 8192000 ≤ 2 ^ 52 := by norm_num
+      have hLNnn : (0:ℝ) ≤ Λ * N := by positivity
+      calc 16 ^ 7 * 8192000 * Ñ ^ 14 * (Λ * N)
+          ≤ 2 ^ 52 * (2 ^ 14 * N ^ 14) * (Λ * N) := by
+            apply mul_le_mul_of_nonneg_right ?_ hLNnn
+            apply mul_le_mul hcoef hÑ14 (by positivity) (by positivity)
+        _ = 2 ^ 66 * (Λ * N ^ 15) := by ring
+        _ ≤ 2 ^ 70 * (Λ * N ^ 15) := by
+            apply mul_le_mul_of_nonneg_right ?_ (by positivity); norm_num
+    -- multiply both sides by K
+    have hlhs : (16 * Ñ) ^ 7 * (K * Q * N) = K * ((16 * Ñ) ^ 7 * (Q * N)) := by ring
+    have hrhs : (2 ^ 70 * K) * (Λ * N ^ 15 / M ^ 7) = K * (2 ^ 70 * (Λ * N ^ 15 / M ^ 7)) := by
+      ring
+    rw [hlhs, hrhs]
+    exact mul_le_mul_of_nonneg_left hBfree hK0
+  -- (C) 32·K·Nδ: (16Ñ)⁷·(32·K·Nδ) ≤ 2^70·K·N⁸δ
+  have hC : (16 * Ñ) ^ 7 * (32 * K * N * δ) ≤ (2 ^ 70 * K) * (N ^ 8 * δ) := by
+    have hstep : (16 * Ñ) ^ 7 * (32 * K * N * δ) ≤ 2 ^ 35 * N ^ 7 * (32 * K * N * δ) := by
       apply mul_le_mul_of_nonneg_right hÑ7bd (by positivity)
     refine le_trans hstep ?_
-    have : 2 ^ 35 * N ^ 7 * (48 * N * δ) = 2 ^ 35 * 48 * (N ^ 8 * δ) := by ring
-    rw [this]
-    apply mul_le_mul_of_nonneg_right ?_ (by positivity); norm_num
-  -- (D) 272δ/Q ≤ 272δ/Λ (Q ≥ Λ), (16Ñ)⁷·272δ/Λ ≤ 2^70·N⁷δ/Λ
+    have hrw : 2 ^ 35 * N ^ 7 * (32 * K * N * δ) = (2 ^ 35 * 32 * K) * (N ^ 8 * δ) := by ring
+    rw [hrw]
+    apply mul_le_mul_of_nonneg_right ?_ (by positivity)
+    have : (2:ℝ) ^ 35 * 32 * K = (2 ^ 35 * 32) * K := by ring
+    rw [this, show (2:ℝ) ^ 70 * K = (2 ^ 70) * K from rfl]
+    apply mul_le_mul_of_nonneg_right ?_ hK0; norm_num
+  -- (D) 272δ/Q ≤ 272δ/Λ (Q ≥ Λ), (16Ñ)⁷·272δ/Λ ≤ 2^70·K·N⁷δ/Λ
   have hQΛ : Λ ≤ Q := by
     rw [hQdef]; calc Λ = 1 * Λ := by ring
       _ ≤ P * Λ := mul_le_mul_of_nonneg_right hP1 (le_of_lt hΛ)
-  have hD : (16 * Ñ) ^ 7 * (272 * δ / Q) ≤ 2 ^ 70 * (N ^ 7 * δ / Λ) := by
+  have hD : (16 * Ñ) ^ 7 * (272 * δ / Q) ≤ (2 ^ 70 * K) * (N ^ 7 * δ / Λ) := by
     have hdq : 272 * δ / Q ≤ 272 * δ / Λ := by
       apply div_le_div_of_nonneg_left (by positivity) hΛ hQΛ
     have hstep : (16 * Ñ) ^ 7 * (272 * δ / Q) ≤ 2 ^ 35 * N ^ 7 * (272 * δ / Λ) := by
       apply mul_le_mul hÑ7bd hdq (by positivity) (by positivity)
     refine le_trans hstep ?_
-    have : 2 ^ 35 * N ^ 7 * (272 * δ / Λ) = 2 ^ 35 * 272 * (N ^ 7 * δ / Λ) := by
+    have hrw : 2 ^ 35 * N ^ 7 * (272 * δ / Λ) = (2 ^ 35 * 272) * (N ^ 7 * δ / Λ) := by
       rw [mul_div_assoc]; ring
-    rw [this]
-    apply mul_le_mul_of_nonneg_right ?_ (by positivity); norm_num
+    rw [hrw]
+    apply mul_le_mul_of_nonneg_right ?_ (by positivity)
+    rw [show (2:ℝ) ^ 70 * K = (2 ^ 70) * K from rfl]
+    calc (2:ℝ) ^ 35 * 272 ≤ 2 ^ 70 := by norm_num
+      _ = 2 ^ 70 * 1 := by ring
+      _ ≤ 2 ^ 70 * K := by apply mul_le_mul_of_nonneg_left hK (by positivity)
   -- combine
-  have hfin : (16 * Ñ) ^ 7 * (2 * Q * N + 48 * N * δ + 272 * δ / Q + 1)
-      ≤ 2 ^ 70 * (N ^ 7 + Λ * N ^ 15 / M ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) := by
-    have hexpand : (16 * Ñ) ^ 7 * (2 * Q * N + 48 * N * δ + 272 * δ / Q + 1)
-        = (16 * Ñ) ^ 7 * (2 * Q * N) + (16 * Ñ) ^ 7 * (48 * N * δ)
+  have hfin : (16 * Ñ) ^ 7 * (K * Q * N + 32 * K * N * δ + 272 * δ / Q + 1)
+      ≤ (2 ^ 70 * K) * (N ^ 7 + Λ * N ^ 15 / M ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) := by
+    have hexpand : (16 * Ñ) ^ 7 * (K * Q * N + 32 * K * N * δ + 272 * δ / Q + 1)
+        = (16 * Ñ) ^ 7 * (K * Q * N) + (16 * Ñ) ^ 7 * (32 * K * N * δ)
           + (16 * Ñ) ^ 7 * (272 * δ / Q) + (16 * Ñ) ^ 7 * 1 := by ring
     rw [hexpand]
-    have hRexpand : 2 ^ 70 * (N ^ 7 + Λ * N ^ 15 / M ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ)
-        = 2 ^ 70 * (Λ * N ^ 15 / M ^ 7) + 2 ^ 70 * (N ^ 8 * δ)
-          + 2 ^ 70 * (N ^ 7 * δ / Λ) + 2 ^ 70 * N ^ 7 := by ring
+    have hRexpand : (2 ^ 70 * K) * (N ^ 7 + Λ * N ^ 15 / M ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ)
+        = (2 ^ 70 * K) * (Λ * N ^ 15 / M ^ 7) + (2 ^ 70 * K) * (N ^ 8 * δ)
+          + (2 ^ 70 * K) * (N ^ 7 * δ / Λ) + (2 ^ 70 * K) * N ^ 7 := by ring
     rw [hRexpand]
     exact add_le_add (add_le_add (add_le_add hB hC) hD) hA
   refine le_trans hub ?_
@@ -402,20 +425,20 @@ private theorem hasDerivAt_diff3 {f₀ f₁ : ℝ → ℝ} {h₁ h₂ h₃ x : �
   exact hasDerivAt_diff1 (d2 x le_rfl (by linarith)) (d2 (x + h₁) (by linarith) (by linarith))
 
 /-- **Calculus crux of Lemma 2.1.**  With `1 ≤ hᵢ`, `h₁+h₂+h₃ ≤ N`, `f` of class `C⁴` on the
-open interval `(0, 4N)` and `Λ ≤ |f⁗| ≤ 2Λ` on `[N,3N]`, the third forward difference
-`g = Δ_{h₁,h₂,h₃} f` is `(h₁h₂h₃·Λ)`-expanding on `[N,2N]` with total variation
-`≤ 2(h₁h₂h₃·Λ)·N`. -/
+open interval `(0, 4N)`, `1 ≤ K` and `Λ ≤ |f⁗| ≤ K·Λ` on `[N,3N]`, the third forward
+difference `g = Δ_{h₁,h₂,h₃} f` is `(h₁h₂h₃·Λ)`-expanding on `[N,2N]` with total variation
+`≤ K·(h₁h₂h₃·Λ)·N`. -/
 theorem expanding_and_variation
-    {N Λ h₁ h₂ h₃ : ℝ} {f : ℝ → ℝ}
-    (_hN : 2 ≤ N) (hΛ : 0 < Λ)
+    {N Λ K h₁ h₂ h₃ : ℝ} {f : ℝ → ℝ}
+    (_hN : 2 ≤ N) (hΛ : 0 < Λ) (_hK : 1 ≤ K)
     (hh1 : 1 ≤ h₁) (hh2 : 1 ≤ h₂) (hh3 : 1 ≤ h₃) (hsum : h₁ + h₂ + h₃ ≤ N)
     (hf : ContDiffOn ℝ 4 f (Ioo 0 (4 * N)))
     (hlb : ∀ x ∈ Icc N (3 * N), Λ ≤ |iteratedDeriv 4 f x|)
-    (hub : ∀ x ∈ Icc N (3 * N), |iteratedDeriv 4 f x| ≤ 2 * Λ) :
+    (hub : ∀ x ∈ Icc N (3 * N), |iteratedDeriv 4 f x| ≤ K * Λ) :
     (∀ x ∈ Icc N (2 * N), ∀ y ∈ Icc N (2 * N),
         (h₁ * h₂ * h₃ * Λ) * |x - y| ≤ |diff3 h₁ h₂ h₃ f x - diff3 h₁ h₂ h₃ f y|) ∧
     (∀ x ∈ Icc N (2 * N), ∀ y ∈ Icc N (2 * N),
-        |diff3 h₁ h₂ h₃ f x - diff3 h₁ h₂ h₃ f y| ≤ 2 * (h₁ * h₂ * h₃ * Λ) * N) := by
+        |diff3 h₁ h₂ h₃ f x - diff3 h₁ h₂ h₃ f y| ≤ K * (h₁ * h₂ * h₃ * Λ) * N) := by
   have h1pos : (0:ℝ) < h₁ := by linarith
   have h2pos : (0:ℝ) < h₂ := by linarith
   have h3pos : (0:ℝ) < h₃ := by linarith
@@ -546,14 +569,15 @@ theorem expanding_and_variation
       rw [abs_le]; constructor <;> linarith
     obtain ⟨ζ, hζ, heq⟩ := keyabs x hx y hy
     rw [heq]
-    have hf4ub : |iteratedDeriv 4 f ζ| ≤ 2 * Λ := hub ζ hζ
+    have hf4ub : |iteratedDeriv 4 f ζ| ≤ K * Λ := hub ζ hζ
     have habsxy : (0:ℝ) ≤ |x - y| := abs_nonneg _
     have hP' : (0:ℝ) ≤ h₁ * h₂ * h₃ := le_of_lt hP
     have hNnn : (0:ℝ) ≤ N := by linarith
+    have hKΛnn : (0:ℝ) ≤ K * Λ := by positivity
     calc h₁ * h₂ * h₃ * |iteratedDeriv 4 f ζ| * |x - y|
-        ≤ h₁ * h₂ * h₃ * (2 * Λ) * N := by
+        ≤ h₁ * h₂ * h₃ * (K * Λ) * N := by
           apply mul_le_mul (mul_le_mul_of_nonneg_left hf4ub hP') hxy_le habsxy
           positivity
-      _ = 2 * (h₁ * h₂ * h₃ * Λ) * N := by ring
+      _ = K * (h₁ * h₂ * h₃ * Λ) * N := by ring
 
 end Squarefree.Counting
