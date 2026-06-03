@@ -184,6 +184,84 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
         S.Ω ≤ P.U →
         ∀ D : ℝ, 0 < D → D = S.D →
           DBlock P S D ≤ C * P.H / P.U := by
-  sorry -- STUB: dblock_bound
+  -- shared constants
+  have hC6 := StripAux.C6_pos
+  set C6 : ℝ := StripAux.C6 with hC6def
+  set Cu : ℝ := (3/2) * C6 + 232 with hCudef
+  have hCu_off : (3/2) * StripAux.C6 + 232 ≤ Cu := by rw [hCudef, hC6def]
+  have hCu_on : (1:ℝ) ≤ Cu := by rw [hCudef]; nlinarith [hC6]
+  -- positivity of the denominators / numerators in the witness
+  have hden1 : (0:ℝ) < C6 + 100 := by linarith
+  have hden2 : (0:ℝ) < 16995 + 790 * Cu := by nlinarith [hCu_on]
+  have hg1' : g < 1 / 4000 := by linarith [hg1]
+  have hnum1 : (0:ℝ) < 1/200 - 20 * g := by linarith [hg1']
+  have hnum2 : (0:ℝ) < 2 - 18977 * g := by
+    have : 18977 * g < 2 := by
+      have : g < 2 / 18977 := hg1
+      nlinarith [hg1]
+    linarith
+  -- u witness: half of the min of the three constraints' thresholds
+  set u : ℝ := min ((1/200 - 20 * g) / (C6 + 100))
+      (min ((2 - 18977 * g) / (16995 + 790 * Cu)) (1/100)) / 2 with hudef
+  have hm1 : (0:ℝ) < (1/200 - 20 * g) / (C6 + 100) := div_pos hnum1 hden1
+  have hm2 : (0:ℝ) < (2 - 18977 * g) / (16995 + 790 * Cu) := div_pos hnum2 hden2
+  have hm3 : (0:ℝ) < (1:ℝ)/100 := by norm_num
+  have hminpos : (0:ℝ) < min ((1/200 - 20 * g) / (C6 + 100))
+      (min ((2 - 18977 * g) / (16995 + 790 * Cu)) (1/100)) := lt_min hm1 (lt_min hm2 hm3)
+  have hu0 : 0 < u := by rw [hudef]; linarith [hminpos]
+  -- u ≤ each threshold (half of min ≤ min ≤ each arg)
+  have hule_min : u ≤ min ((1/200 - 20 * g) / (C6 + 100))
+      (min ((2 - 18977 * g) / (16995 + 790 * Cu)) (1/100)) := by
+    rw [hudef]; linarith [hminpos]
+  have hu_off : u ≤ (1/200 - 20 * g) / (C6 + 100) :=
+    le_trans hule_min (min_le_left _ _)
+  have hu_on : u ≤ (2 - 18977 * g) / (16995 + 790 * Cu) :=
+    le_trans hule_min (le_trans (min_le_right _ _) (min_le_left _ _))
+  have hu2 : u ≤ 1 / 100 :=
+    le_trans hule_min (le_trans (min_le_right _ _) (min_le_right _ _))
+  -- off budget: (C6+100)·u ≤ 1/200 - 20g
+  have hubud_off : (StripAux.C6 + 100) * u ≤ 1/200 - 20 * g := by
+    rw [← hC6def]
+    have := (le_div_iff₀ hden1).mp hu_off
+    linarith [this]
+  -- on budget: 18977g + (16995+790Cu)·u ≤ 2
+  have hubud_on : 18977 * g + (16995 + 790 * Cu) * u ≤ 2 := by
+    have := (le_div_iff₀ hden2).mp hu_on
+    nlinarith [this]
+  -- goal opt: 18977g + 15315u < 2  (strict, via 15315 < 16995+790Cu and u>0)
+  have hopt : 18977 * g + 15315 * u < 2 := by
+    have hcoef : 15315 * u < (16995 + 790 * Cu) * u := by
+      apply mul_lt_mul_of_pos_right _ hu0
+      nlinarith [hCu_on]
+    linarith [hubud_on, hcoef]
+  refine ⟨u, hu0, hopt, ?_⟩
+  -- instantiate the two halves
+  obtain ⟨Coff, hCoff, hoff⟩ :=
+    dblock_off_strip g hg0 hg1 u hu0 hopt hu2 1 le_rfl Cu hCu_off hubud_off
+  obtain ⟨Con, hCon, hon⟩ :=
+    dblock_on_strip g hg0 hg1 u hu0 hopt hu2 1 le_rfl Cu hCu_on hubud_on
+  refine ⟨max Coff Con, lt_max_of_lt_left hCoff, 1, one_pos, ?_⟩
+  intro P hPg hPu hX S hΔ hNR hAD hband hΩU D hDpos hDeq
+  have hH := P.H_pos; have hU := P.U_pos
+  have hHU : (0:ℝ) ≤ P.H / P.U := by positivity
+  -- trichotomy on S.x
+  by_cases h1 : S.x ≤ P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u))
+  · have := hoff P hPg hPu hX S hΔ hNR hAD hband hΩU (Or.inl h1) D hDpos hDeq
+    calc DBlock P S D ≤ Coff * P.H / P.U := this
+      _ ≤ max Coff Con * P.H / P.U := by
+          rw [mul_div_assoc, mul_div_assoc]
+          exact mul_le_mul_of_nonneg_right (le_max_left _ _) hHU
+  · by_cases h2 : P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x
+    · have := hoff P hPg hPu hX S hΔ hNR hAD hband hΩU (Or.inr h2) D hDpos hDeq
+      calc DBlock P S D ≤ Coff * P.H / P.U := this
+        _ ≤ max Coff Con * P.H / P.U := by
+            rw [mul_div_assoc, mul_div_assoc]
+            exact mul_le_mul_of_nonneg_right (le_max_left _ _) hHU
+    · push_neg at h1 h2
+      have := hon P hPg hPu hX S hΔ hNR hAD hband hΩU h1.le h2.le D hDpos hDeq
+      calc DBlock P S D ≤ Con * P.H / P.U := this
+        _ ≤ max Coff Con * P.H / P.U := by
+            rw [mul_div_assoc, mul_div_assoc]
+            exact mul_le_mul_of_nonneg_right (le_max_right _ _) hHU
 
 end Squarefree
