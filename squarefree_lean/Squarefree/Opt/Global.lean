@@ -1,24 +1,18 @@
-import Squarefree.Structure.DaSpacing
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Squarefree.Opt.Strip
 
 /-!
-# §9 global optimum: per-Ω budget (layer L?)
+# §9 global assembly
 
-Faithful `sorry`-stubbed statement of the §9 per-Ω optimum from `../explicit_writeup.md`
-(lines 2083–2221). This elaborates but is not yet proved; the `sorry` is tagged `STUB: <name>`.
-See `CLAUDE.md` §3/§4.
+The §9 optimization (`18977g+15315u<2`, the `W_old/W_{≠0}` comparison) now lives *inside*
+`dblock_bound`'s on-strip case (`Opt/Strip.lean`), so there is no separate `section9` lemma.
+The remaining §9/§1 assembly — combining `a_decomposition` (§3), `dblock_bound`/`dblock_small_omega`
+(§8/§9, here), and `prop_2_4` (§2) over the `O(log X)=X^{O(u)}` dyadic Ω-scales — is carried out
+in `key_dyadic_estimate` (`Main.lean`), together with a dyadic-partition plumbing lemma added when
+that proof is written.
+
+(The old `section9_DBlock_le` stub was restated as `dblock_bound` in `Opt/Strip.lean`.)
 -/
 
-open Classical Finset
-
 namespace Squarefree
-
-/-- **§9** per-Ω optimum (writeup 2083–2221): `18977g+15315u<2` ⇒ `𝐃(Ω) ≪ H/U`. -/
-theorem section9_DBlock_le (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
-    ∃ u : ℝ, 0 < u ∧ 18977 * g + 15315 * u < 2 ∧ ∃ C : ℝ, 0 < C ∧
-      ∀ (P : Globals), P.g = g → P.u = u →
-      ∀ (S : Scale P), S.Ω ≤ P.U → ∀ D : ℝ, 0 < D →
-        DBlock P S D ≤ C * P.H / P.U := by
-  sorry -- STUB: section9_DBlock_le
 
 end Squarefree
