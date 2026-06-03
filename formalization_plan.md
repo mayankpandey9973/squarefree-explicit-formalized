@@ -4,6 +4,50 @@ Companion to `math_audit.md` (which verifies the mathematics). This plan covers 
 organize a Lean/mathlib formalization of the theorem
 `θ_* ≤ 1/5 - 2/94885` and the order in which to attack it.
 
+## STATUS — 2026-06-03: PLUMBING COMPLETE, frontier = 6 §4–7 stubs
+
+The clean-room attempt-2 tree (`squarefree_lean/`) now has the **entire Main→`theorem_10_1`
+spine proved** (§1 Möbius, §2 short-Δ, §3 Nair–Roth, §8/§9 optimization, §10). `lake build
+Squarefree` is green; `#print axioms theorem_10_1` reaches only `sorryAx` (the frontier below) +
+`propext`/`Classical.choice`/`Quot.sound`. **Exactly 6 `sorry -- STUB:` remain, all §4–7 analytic
+inputs** (this is the "only sorries in §4–7" target):
+
+| stub | file | § | content |
+|---|---|---|---|
+| `bands_count` | `Counting/Bands.lean` | 4 | Lemma 4.2 derivative-band count |
+| `nearCurve_count` | `Geometry/NearCurve.lean` | 4 | Prop 4.3 points-near-a-curve |
+| `prop_5_1` | `Lower/Prop51.lean` | 5 | small-Δ regime `#ℛ_a` bound |
+| `prop_6_1` | `Upper/Regime.lean` | 6 | large-Δ regime `Σ_a #ℛ_a` bound |
+| `prop_7_1` | `Bracket/BoxSum.lean` | 7 | box-sum bracket count |
+| `prop_7_3` | `Bracket/BoxSum.lean` | 7 | `#ℛ_a ≪ (1+H/A²)R/W` |
+
+**How they wire into the (proved) plumbing** — match these interfaces when proving:
+- `prop_6_1` (small-x edge) + `prop_5_1` (large-x edge) are consumed by `dblock_off_strip`
+  (`Opt/Strip.lean`); the §8 budget closes for their EXACT stated forms — don't change the
+  conclusions.
+- `prop_7_3` is consumed by `dblock_on_strip` (`Opt/Global.lean`) with `W = W_{≠0}` = the `e14`
+  envelope monomial (`Bracket/Admissible.lean`); it takes `Ra` + `dStar` (the `𝒟_a` map) supplied
+  by `prop_3_2_fiber_dStar` (`Structure/Fiber.lean`).
+- `bands_count`/`nearCurve_count` (§4) are the deepest inputs; §5/§6/§7 are their *clients*
+  (currently §5/§6/§7 stubs are black-box statements not yet wired to §4 — wiring is part of
+  proving §5/§6/§7).
+- The §3 fiber threshold was reconciled to `(1/4)·Δ^{4/3}(H⁴/X)^{1/3}` (= `a_decomposition`'s
+  `a_dthr`); `prop_3_2_fiber`/`_dStar`, `lemma_3_1`, and the dblock lemmas all gate there, with an
+  `X ≥ X₀` floor (`16777216 ≤ X^{1/100}`).
+
+**Attack order for §4–7:** §4 first (`bands_count`, `nearCurve_count`) since §5/§6/§7 consume the
+point-near-curve machinery; then §5, §6; §7 last (the genuine crux — see "Phase E" below).
+
+**⚠ AUDIT each stub SIGNATURE before proving** (via `math-auditor`). The plumbing phase repeatedly
+found the early stub statements WRONG: vacuous `∃`-hypotheses (band edge, `dtil`), per-scale `C`
+that's trivially true, a `1≤Δ` that made a lemma false, a `g`-coefficient that secretly capped the
+range, and the 256× threshold mismatch. The §4–7 stubs were written at the same early stage and are
+NOT battle-tested — confirm faithful + provable BEFORE investing (each analytic proof costs
+~35–85 min / 50–470k subagent tokens).
+
+The milestones (M1–M6) and "3 sorries in attempt-1" framing below are SUPERSEDED by the above; the
+§4–7 *math attack* guidance (Phases B/D/E, the §6/§7 frontier analysis) still applies to the 6 stubs.
+
 ## 0. The single most important fact
 
 A first attempt already exists at
