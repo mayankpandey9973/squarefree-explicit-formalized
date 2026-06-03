@@ -1,6 +1,7 @@
 import Mathlib
 import Squarefree.DCard
 import Squarefree.DyadicAssembly
+import Squarefree.Mobius
 
 /-!
 # Top of the proof spine — main statements
