@@ -1,5 +1,5 @@
 import Squarefree.Params
-import Squarefree.Main
+import Squarefree.DCard
 import Squarefree.ShortDeltaAux
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 

@@ -1,5 +1,5 @@
 import Squarefree.Structure.ADecompAux
-import Squarefree.Main
+import Squarefree.DCard
 import Squarefree.ShortDeltaAux
 
 /-!
@@ -105,12 +105,10 @@ theorem a_decomposition (P : Globals) (D : ℝ)
     (hD1 : P.H * P.X ^ (1 / 100 : ℝ) ≤ D) (hD2 : D ≤ P.X ^ (1 / 2 : ℝ))
     (hHD : 8 * P.H * D ≤ P.X) (hDlarge : 1025 * P.H ≤ D)
     (hEps : 64 * P.H ^ 3 ≤ P.X * D ^ 2) (hHU : P.U ≤ P.H) :
-    ∃ C : ℝ, 0 < C ∧
       (dCard P.X P.H D : ℝ) ≤
-        C * (∑ a ∈ Finset.Icc ⌈D ^ (4 / 3 : ℝ) / (4 * P.X ^ (1 / 3 : ℝ))⌉ ⌊(D / P.H) * P.U⌋,
+        6 * (∑ a ∈ Finset.Icc ⌈D ^ (4 / 3 : ℝ) / (4 * P.X ^ (1 / 3 : ℝ))⌉ ⌊(D / P.H) * P.U⌋,
               (DaCard P.X P.H a D : ℝ))
-        + C * (P.H / P.U) := by
-  refine ⟨6, by norm_num, ?_⟩
+        + 6 * (P.H / P.U) := by
   set X := P.X with hXdef
   set H := P.H with hHdef
   set U := P.U with hUdef

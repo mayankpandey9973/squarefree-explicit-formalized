@@ -1,5 +1,5 @@
 import Squarefree.Counting.FourthDeriv
-import Squarefree.Main
+import Squarefree.DCard
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 /-!

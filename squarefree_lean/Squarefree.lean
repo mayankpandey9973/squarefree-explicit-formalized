@@ -6,6 +6,7 @@ import Squarefree.Asymp
 import Squarefree.Params
 import Squarefree.Budget
 import Squarefree.FiniteDiff
+import Squarefree.DCard
 
 -- L1 Analytic engine
 import Squarefree.Counting.PopularDiff
@@ -31,6 +32,9 @@ import Squarefree.Upper.Regime
 -- §8/§9 optimization layer
 import Squarefree.Opt.Strip
 import Squarefree.Opt.Global
+
+-- §1 dyadic assembly
+import Squarefree.DyadicAssembly
 
 -- Top of proof spine
 import Squarefree.Main
