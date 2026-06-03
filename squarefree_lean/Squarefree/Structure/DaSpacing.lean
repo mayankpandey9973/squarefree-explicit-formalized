@@ -71,16 +71,17 @@ set_option maxHeartbeats 1600000 in
 satisfies `|Sab| < 1/2`, `8 b H/Dv² ≤ |Sab|/2`, and `Sab ≠ 0`, in the writeup's regime.
 Factored out to keep the elaboration context of `lemma_3_1` small. -/
 private theorem lemma_3_1_core (X H Δ a b d : ℝ)
-    (hX : 0 < X) (hH : 0 < H) (hΔ : 1 ≤ Δ)
+    (hX : 0 < X) (hH : 0 < H) (hΔ : (16777216 : ℝ) ≤ Δ)
     (ha : 0 < a) (hb : 0 < b) (hb2a : 2 * a ≤ b)
     (hd_lo : H * Δ ≤ d) (hd_hi : d ≤ 2 * (H * Δ))
     (hab_small : a + b ≤ H * Δ) (hbD : b ≤ H * Δ / 2)
-    (ha_lo : (64 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ) ≤ a)
+    (ha_lo : (1/4 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ) ≤ a)
     (b_bound : b < (1 / 10 : ℝ) * a ^ (-1/3 : ℝ) * Δ ^ (5/3 : ℝ) * (H ^ 5 / X) ^ (1/3 : ℝ)) :
     |Sab X a b d| < 1 / 2 ∧
       8 * b * H / (H * Δ) ^ 2 ≤ (1 / 2) * |Sab X a b d| ∧ 0 < |Sab X a b d| := by
   set Dv : ℝ := H * Δ with hDvdef
-  have hΔpos : 0 < Δ := lt_of_lt_of_le one_pos hΔ
+  have hΔ1 : (1:ℝ) ≤ Δ := by linarith
+  have hΔpos : 0 < Δ := lt_of_lt_of_le one_pos hΔ1
   have hDpos : 0 < Dv := by rw [hDvdef]; positivity
   clear_value Dv
   have hdR : (0:ℝ) < d := lt_of_lt_of_le hDpos hd_lo
@@ -219,47 +220,50 @@ private theorem lemma_3_1_core (X H Δ a b d : ℝ)
       linarith [step, hgap]
     exact lt_of_le_of_lt hSub hkey
   · -- error ≤ (1/2)|Sab|, via |Sab| ≥ (2/6561) X a b³/Dv⁵ and ha_lo
-    have ha3 : (64 : ℝ) ^ 3 * Δ ^ (4 : ℕ) * (H ^ 4 / X) ≤ a ^ 3 := by
-      have hcube : ((64 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ)) ^ 3
-          = (64 : ℝ) ^ 3 * Δ ^ (4 : ℕ) * (H ^ 4 / X) := by
+    have ha3 : (1/64 : ℝ) * Δ ^ (4 : ℕ) * (H ^ 4 / X) ≤ a ^ 3 := by
+      have hcube : ((1/4 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ)) ^ 3
+          = (1/64 : ℝ) * Δ ^ (4 : ℕ) * (H ^ 4 / X) := by
         have e2 : (Δ ^ (4/3 : ℝ)) ^ (3:ℕ) = Δ ^ (4 : ℕ) := by
           rw [← Real.rpow_natCast (Δ ^ (4/3 : ℝ)) 3, ← Real.rpow_mul hΔpos.le]
           rw [show (4/3 : ℝ) * (3:ℕ) = (4 : ℕ) by push_cast; ring, Real.rpow_natCast]
         have e3 : ((H ^ 4 / X) ^ (1/3 : ℝ)) ^ (3:ℕ) = H ^ 4 / X := by
           rw [← Real.rpow_natCast ((H ^ 4 / X) ^ (1/3 : ℝ)) 3,
             ← Real.rpow_mul (by positivity)]; norm_num
-        calc ((64 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ)) ^ 3
-            = (64:ℝ) ^ 3 * (Δ ^ (4/3 : ℝ)) ^ (3:ℕ) * ((H ^ 4 / X) ^ (1/3 : ℝ)) ^ (3:ℕ) := by ring
-          _ = (64 : ℝ) ^ 3 * Δ ^ (4 : ℕ) * (H ^ 4 / X) := by rw [e2, e3]
+        calc ((1/4 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ)) ^ 3
+            = (1/4:ℝ) ^ 3 * (Δ ^ (4/3 : ℝ)) ^ (3:ℕ) * ((H ^ 4 / X) ^ (1/3 : ℝ)) ^ (3:ℕ) := by ring
+          _ = (1/64 : ℝ) * Δ ^ (4 : ℕ) * (H ^ 4 / X) := by rw [e2, e3]; norm_num
       rw [← hcube]
-      gcongr <;> first | positivity | exact ha_lo
+      have hb : (0:ℝ) ≤ (1/4 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ) := by
+        have h1 : (0:ℝ) ≤ Δ ^ (4/3 : ℝ) := (Real.rpow_pos_of_pos hΔpos _).le
+        have h2 : (0:ℝ) ≤ (H ^ 4 / X) ^ (1/3 : ℝ) := Real.rpow_nonneg (by positivity) _
+        positivity
+      gcongr
     -- key cross-multiplied inequality: 8 b H Dv³ ≤ (1/6561) X a b³
     have hcross : 8 * b * H * Dv ^ 3 ≤ (1 / 6561 : ℝ) * X * a * b ^ 3 := by
       -- reduce to 8 H Dv³ ≤ (1/6561) X a b²
       have hba2 : a ^ 2 ≤ b ^ 2 := by nlinarith [hb2a, hapos, hbpos]
-      have hXa3 : (262144 : ℝ) * Δ ^ (4 : ℕ) * H ^ 4 ≤ X * a ^ 3 := by
+      have hXa3 : (1/64 : ℝ) * Δ ^ (4 : ℕ) * H ^ 4 ≤ X * a ^ 3 := by
         have hXpos := hX
-        have : (64 : ℝ) ^ 3 * Δ ^ (4 : ℕ) * (H ^ 4 / X) * X ≤ a ^ 3 * X :=
+        have : (1/64 : ℝ) * Δ ^ (4 : ℕ) * (H ^ 4 / X) * X ≤ a ^ 3 * X :=
           mul_le_mul_of_nonneg_right ha3 hX.le
-        have hdiv : (64 : ℝ) ^ 3 * Δ ^ (4 : ℕ) * (H ^ 4 / X) * X = (64:ℝ)^3 * Δ ^ (4:ℕ) * H ^ 4 := by
+        have hdiv : (1/64 : ℝ) * Δ ^ (4 : ℕ) * (H ^ 4 / X) * X = (1/64:ℝ) * Δ ^ (4:ℕ) * H ^ 4 := by
           field_simp
         rw [hdiv] at this
-        norm_num at this ⊢
-        linarith [this]
-      -- 8 H Dv³ ≤ (1/6561) X a³  (uses Δ ≥ 1, Dv = HΔ)
+        nlinarith [this]
+      -- 8 H Dv³ ≤ (1/6561) X a³  (uses Δ ≥ 3359232, Dv = HΔ)
       have hDv3 : Dv ^ 3 = H ^ 3 * Δ ^ 3 := by rw [hDvdef]; ring
       have hstep : 8 * H * Dv ^ 3 ≤ (1 / 6561 : ℝ) * X * a ^ 3 := by
         rw [hDv3]
         have hΔ4 : Δ ^ (4:ℕ) = Δ ^ 3 * Δ := by ring
-        have hub2 : (1 / 6561 : ℝ) * X * a ^ 3 ≥ (1 / 6561 : ℝ) * (262144 * Δ ^ (4:ℕ) * H ^ 4) := by
-          have : (1 / 6561 : ℝ) * (262144 * Δ ^ (4:ℕ) * H ^ 4) ≤ (1 / 6561 : ℝ) * (X * a ^ 3) := by
+        have hub2 : (1 / 6561 : ℝ) * X * a ^ 3 ≥ (1 / 6561 : ℝ) * ((1/64) * Δ ^ (4:ℕ) * H ^ 4) := by
+          have : (1 / 6561 : ℝ) * ((1/64) * Δ ^ (4:ℕ) * H ^ 4) ≤ (1 / 6561 : ℝ) * (X * a ^ 3) := by
             apply mul_le_mul_of_nonneg_left hXa3 (by norm_num)
           linarith [this]
         have hΔ3pos : (0:ℝ) < Δ ^ 3 := by positivity
         have hH4pos : (0:ℝ) < H ^ 4 := by positivity
-        have : (1 / 6561 : ℝ) * (262144 * Δ ^ (4:ℕ) * H ^ 4) - 8 * H * (H ^ 3 * Δ ^ 3)
-            = (Δ ^ 3 * H ^ 4) * ((262144 / 6561 : ℝ) * Δ - 8) := by rw [hΔ4]; ring
-        nlinarith [hub2, mul_nonneg hΔ3pos.le hH4pos.le, hΔ]
+        have hid : (1 / 6561 : ℝ) * ((1/64) * Δ ^ (4:ℕ) * H ^ 4) - 8 * H * (H ^ 3 * Δ ^ 3)
+            = (Δ ^ 3 * H ^ 4) * ((1 / 419904 : ℝ) * Δ - 8) := by rw [hΔ4]; ring
+        nlinarith [hub2, mul_nonneg hΔ3pos.le hH4pos.le, hΔ, hid]
       -- now multiply by b > 0 and use a²·(ab) ≤ b²·(ab)
       have hlast : (1 / 6561 : ℝ) * X * a ^ 3 * b ≤ (1 / 6561 : ℝ) * X * a * b ^ 3 := by
         have hcoef : (0:ℝ) ≤ (1 / 6561 : ℝ) * X * a * b := by positivity
@@ -290,18 +294,24 @@ private theorem lemma_3_1_core (X H Δ a b d : ℝ)
 
 The faithful range hypotheses the writeup proof uses (auditor-flagged) are threaded
 explicitly: `d ≍ D` (`S.D ≤ d ≤ 2 S.D`), the regime bound `b ≤ D/2` (the writeup's `b ≪ D`),
-the lower bound `a ≫ Δ^{4/3}(H⁴/X)^{1/3}`, and `Δ ≥ 1` (a dyadic scale). -/
+the (constant-agnostic) lower bound `a ≫ Δ^{4/3}(H⁴/X)^{1/3}` — here at the writeup-faithful
+constant `1/4`, matching `a_dthr` exactly — together with the dyadic floor `Δ ≥ X^{1/100}` and
+an absolute size floor `X^{1/100} ≥ 16777216` (so `Δ ≥ 16777216`).  Lowering the threshold
+constant from `64` to `1/4` only widens the implied constants; it needs `Δ` bounded below
+because the spacing/Nair–Roth contradiction quantity scales like `1/(Δλ³)`. -/
 theorem lemma_3_1 : ∃ c : ℝ, 0 < c ∧
     ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a →
       ∀ d b : ℤ, 0 < b → inDa P.X P.H a d → inDa P.X P.H a (d + b) →
         (∃ d' : ℤ, d < d' ∧ d' < d + b ∧ inDa P.X P.H a d') →
         (S.D ≤ (d : ℝ) ∧ (d : ℝ) ≤ 2 * S.D) →
         (b : ℝ) ≤ S.D / 2 →
-        (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ (a : ℝ) →
-        1 ≤ S.Δ →
+        (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ (a : ℝ) →
+        P.X ^ (1/100 : ℝ) ≤ S.Δ →
+        (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
         c * (a : ℝ) ^ (-1/3 : ℝ) * S.Δ ^ (5/3 : ℝ) * (P.H ^ 5 / P.X) ^ (1/3 : ℝ) ≤ (b : ℝ) := by
   refine ⟨(1 : ℝ) / 10, by norm_num, ?_⟩
-  intro P S a ha d b hb hDa_d hDa_db ⟨d', hdd', hd'db, hDa_d'⟩ hd hbD ha_lo hΔ
+  intro P S a ha d b hb hDa_d hDa_db ⟨d', hdd', hd'db, hDa_d'⟩ hd hbD ha_lo hΔlo hX0
+  have hΔ : (16777216 : ℝ) ≤ S.Δ := le_trans hX0 hΔlo
   -- abbreviations
   set X := P.X with hXdef
   set H := P.H with hHdef

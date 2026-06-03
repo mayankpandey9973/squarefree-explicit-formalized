@@ -45,6 +45,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
     ∃ C : ℝ, 0 < C ∧
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
+        (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
         (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
         2 * S.A ≤ S.D →
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω → S.Ω ≤ P.U →
@@ -71,7 +72,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
     have h13 := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-13 : ℝ)
     have h14 := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-14 : ℝ)
     positivity
-  intro P hg hu hX S hΔlong hNR hAD hbandlo hΩU hdisj D hDpos hDeq
+  intro P hg hu hX S hΔlong hX0big hNR hAD hbandlo hΩU hdisj D hDpos hDeq
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hG := P.G_pos; have hH := P.H_pos; have hU := P.U_pos
   have hΔ := S.Δ_pos; have hΩ := S.Ω_pos
@@ -83,7 +84,13 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   obtain ⟨RaOf, hapos, hDsum⟩ :=
     StripAux.dblock_le_sum_Ra P S C₂' D
       (fun a ha0 _ hlo hAa ha2A h2AD Dd hDdpos hDdeq => by
-        obtain ⟨Ra, _, hcard⟩ := hfiber' P S a ha0 hΔ1 hlo hAa ha2A h2AD Dd hDdpos hDdeq
+        have hloq : (1/4:ℝ) * S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) ≤ (a:ℝ) := by
+          refine le_trans ?_ hlo
+          have hthr : (0:ℝ) ≤ S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) :=
+            mul_nonneg (Real.rpow_nonneg hΔ.le _) (Real.rpow_nonneg (by positivity) _)
+          nlinarith [hthr]
+        obtain ⟨Ra, _, hcard⟩ :=
+          hfiber' P S a ha0 hΔlong hX0big hloq hAa ha2A h2AD Dd hDdpos hDdeq
         exact ⟨Ra, hcard⟩)
       hΔ1 hNR hAD hDpos hDeq
   -- φ factor + budget abbreviations
@@ -488,6 +495,7 @@ theorem dblock_small_omega (c₀ : ℝ) (hc₀ : 0 < c₀) :
     ∃ C : ℝ, 0 < C ∧
       ∀ (P : Globals), 1 ≤ P.X → 0 < P.g → P.g < 2 / 18977 → 0 < P.u → P.u ≤ 1 / 100 →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
+        (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
         (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
         2 * S.A ≤ S.D →
         S.Ω ≤ c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) →
@@ -498,7 +506,7 @@ theorem dblock_small_omega (c₀ : ℝ) (hc₀ : 0 < c₀) :
   refine ⟨C₂ * (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / 64 ^ 3
       + c₀ ^ (4/3:ℝ) / 64 ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1 + (64:ℝ) ^ (-8/3:ℝ)),
     by positivity, ?_⟩
-  intro P hX hg0 hg hu0 hu' S hΔlong hNR hAD hband D hDpos hDeq
+  intro P hX hg0 hg hu0 hu' S hΔlong hX0big hNR hAD hband D hDpos hDeq
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hH := P.H_pos
   have hU := P.U_pos
@@ -530,8 +538,13 @@ theorem dblock_small_omega (c₀ : ℝ) (hc₀ : 0 < c₀) :
       have : (0:ℤ) < ⌈S.A⌉ := Int.ceil_pos.mpr hApos
       omega
     have h2AD : 2 * S.A ≤ S.D := hAD
+    have hloq : (1/4:ℝ) * S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) ≤ (a:ℝ) := by
+      refine le_trans ?_ (le_trans hNR hAa)
+      have hthr : (0:ℝ) ≤ S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) :=
+        mul_nonneg (Real.rpow_nonneg hΔ.le _) (Real.rpow_nonneg (by positivity) _)
+      nlinarith [hthr]
     obtain ⟨Ra, hRaBand, hRaCard⟩ :=
-      hfiber P S a ha0 hΔ1 (le_trans hNR hAa) hAa ha2A h2AD D hDpos hDeq
+      hfiber P S a ha0 hΔlong hX0big hloq hAa ha2A h2AD D hDpos hDeq
     -- #Ra ≤ C₁·R + 1
     have hRaSub : Ra ⊆ Finset.range (⌊C₁ * S.R⌋₊ + 1) := by
       intro r hr

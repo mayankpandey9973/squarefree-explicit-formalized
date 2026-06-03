@@ -111,6 +111,48 @@ theorem a_cubed_lb (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ) (ha : 0 < a)
     positivity
   gcongr
 
+/-- Lowered-threshold (`λ = 1/4`) cube bound with a `Δ`-floor.
+
+From `a ≥ (1/4)·Δ^{4/3}(H⁴/X)^{1/3}` we only get `a³ ≥ (1/64)·Δ⁴·H⁴/X`; trading one power of
+`Δ` against the floor `Δ ≥ 2²⁴` recovers the same `262144·Δ³·(H⁴/X) ≤ a³` shape the fiber
+proofs consume (now with `Δ³` rather than `Δ⁴`).  Used by `prop_3_2_fiber(_dStar)`. -/
+theorem a_cubed_lb_quarter (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ) (ha : 0 < a)
+    (hΔlb : (16777216 : ℝ) ≤ Δ)
+    (ha_lo : (1/4 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ) ≤ a) :
+    (262144 : ℝ) * Δ ^ (3:ℕ) * (H ^ 4 / X) ≤ a ^ 3 := by
+  -- first the genuine `(1/64) Δ⁴ (H⁴/X) ≤ a³`
+  have hcube : ((1/4 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ)) ^ 3
+      = (1/64 : ℝ) * Δ ^ (4 : ℕ) * (H ^ 4 / X) := by
+    have e2 : (Δ ^ (4/3 : ℝ)) ^ (3:ℕ) = Δ ^ (4 : ℕ) := by
+      rw [← Real.rpow_natCast (Δ ^ (4/3 : ℝ)) 3, ← Real.rpow_mul hΔ.le]
+      rw [show (4/3 : ℝ) * (3:ℕ) = (4 : ℕ) by push_cast; ring, Real.rpow_natCast]
+    have hHX : (0:ℝ) ≤ H ^ 4 / X := by positivity
+    have e3 : ((H ^ 4 / X) ^ (1/3 : ℝ)) ^ (3:ℕ) = H ^ 4 / X := by
+      rw [← Real.rpow_natCast ((H ^ 4 / X) ^ (1/3 : ℝ)) 3,
+        ← Real.rpow_mul hHX]; norm_num
+    calc ((1/4 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ)) ^ 3
+        = (1/4:ℝ) ^ 3 * (Δ ^ (4/3 : ℝ)) ^ (3:ℕ) * ((H ^ 4 / X) ^ (1/3 : ℝ)) ^ (3:ℕ) := by ring
+      _ = (1/64 : ℝ) * Δ ^ (4 : ℕ) * (H ^ 4 / X) := by rw [e2, e3]; norm_num
+  have hquarter : (1/64 : ℝ) * Δ ^ (4 : ℕ) * (H ^ 4 / X) ≤ a ^ 3 := by
+    rw [← hcube]
+    have hb : (0:ℝ) ≤ (1/4 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ) := by
+      have h1 : (0:ℝ) ≤ Δ ^ (4/3 : ℝ) := (Real.rpow_pos_of_pos hΔ _).le
+      have h2 : (0:ℝ) ≤ (H ^ 4 / X) ^ (1/3 : ℝ) := Real.rpow_nonneg (by positivity) _
+      positivity
+    gcongr
+  -- trade a power of Δ: (1/64) Δ⁴ ≥ 262144 Δ³ ⇔ Δ ≥ 2²⁴
+  have hHXpos : (0:ℝ) ≤ H ^ 4 / X := by positivity
+  have hΔ3pos : (0:ℝ) < Δ ^ (3:ℕ) := by positivity
+  have htrade : (262144 : ℝ) * Δ ^ (3:ℕ) * (H ^ 4 / X) ≤ (1/64 : ℝ) * Δ ^ (4 : ℕ) * (H ^ 4 / X) := by
+    have hΔ4 : Δ ^ (4:ℕ) = Δ ^ (3:ℕ) * Δ := by ring
+    rw [hΔ4]
+    have hstep : (262144 : ℝ) * Δ ^ (3:ℕ) ≤ (1/64 : ℝ) * (Δ ^ (3:ℕ) * Δ) := by
+      have : (1/64 : ℝ) * (Δ ^ (3:ℕ) * Δ) - 262144 * Δ ^ (3:ℕ)
+          = Δ ^ (3:ℕ) * ((1/64 : ℝ) * Δ - 262144) := by ring
+      nlinarith [hΔ3pos, hΔlb]
+    nlinarith [mul_le_mul_of_nonneg_right hstep hHXpos]
+  linarith [htrade, hquarter]
+
 /-- The spacing threshold `spc := (1/10) a^{-1/3} Δ^{5/3}(H⁵/X)^{1/3}` is positive with
 cube `(1/1000) Δ⁵(H⁵/X)/a`. -/
 theorem spc_pos_cube (X H Δ a : ℝ) (hX : 0 < X) (hH : 0 < H) (hΔ : 0 < Δ) (ha : 0 < a) :

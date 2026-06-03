@@ -34,6 +34,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
     ∃ C : ℝ, 0 < C ∧
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
+        (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
         (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
         2 * S.A ≤ S.D →
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω →
@@ -47,7 +48,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   refine ⟨C₂' * (C₇ * (4 * (1 + c₀ ^ (-8/3 : ℝ)))), ?_, ?_⟩
   · have := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-8/3 : ℝ)
     positivity
-  intro P hg hu hX S hΔlong hNR hAD hbandlo hΩU hxlo hxhi D hDpos hDeq
+  intro P hg hu hX S hΔlong hX0big hNR hAD hbandlo hΩU hxlo hxhi D hDpos hDeq
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hG := P.G_pos; have hH := P.H_pos; have hU := P.U_pos
   have hΔ := S.Δ_pos; have hΩ := S.Ω_pos
@@ -119,8 +120,13 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
     have ha2A : (a:ℝ) ≤ 2 * S.A := le_trans (by exact_mod_cast haR) (Int.floor_le (2 * S.A))
     have ha0 : 0 < a := by
       have : (0:ℤ) < ⌈S.A⌉ := Int.ceil_pos.mpr hApos; omega
+    have hloq : (1/4:ℝ) * S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) ≤ (a:ℝ) := by
+      refine le_trans ?_ (le_trans hNR hAa)
+      have hthr : (0:ℝ) ≤ S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) :=
+        mul_nonneg (Real.rpow_nonneg hΔ.le _) (Real.rpow_nonneg (by positivity) _)
+      nlinarith [hthr]
     obtain ⟨Ra, dStar, hinDa, _hband, hDaC⟩ :=
-      hfiber' P S a ha0 hΔ1 (le_trans hNR hAa) hAa ha2A hAD D hDpos hDeq
+      hfiber' P S a ha0 hΔlong hX0big hloq hAa ha2A hAD D hDpos hDeq
     have h73 := hp73 P S a ha0 (OnStripAux.Wnz P S) hAdm Ra dStar hinDa
     -- DaCard ≤ C₂'·#Ra·(1+φ) ≤ C₂'·[C₇·(1+H/A²)·(R/Wnz)]·(1+φ)
     have hφeq : (1 + (S.Δ / S.A) ^ (8/3 : ℝ) * P.G ^ (-2/3 : ℝ)) = 1 + StripAux.fiberφ P S := by
@@ -178,6 +184,7 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
     ∃ u : ℝ, 0 < u ∧ 18977 * g + 15315 * u < 2 ∧ ∃ C : ℝ, 0 < C ∧ ∃ c₀ : ℝ, 0 < c₀ ∧
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
+        (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
         (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
         2 * S.A ≤ S.D →
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω →
@@ -241,24 +248,24 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
   obtain ⟨Con, hCon, hon⟩ :=
     dblock_on_strip g hg0 hg1 u hu0 hopt hu2 1 le_rfl Cu hCu_on hubud_on
   refine ⟨max Coff Con, lt_max_of_lt_left hCoff, 1, one_pos, ?_⟩
-  intro P hPg hPu hX S hΔ hNR hAD hband hΩU D hDpos hDeq
+  intro P hPg hPu hX S hΔ hX0big hNR hAD hband hΩU D hDpos hDeq
   have hH := P.H_pos; have hU := P.U_pos
   have hHU : (0:ℝ) ≤ P.H / P.U := by positivity
   -- trichotomy on S.x
   by_cases h1 : S.x ≤ P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u))
-  · have := hoff P hPg hPu hX S hΔ hNR hAD hband hΩU (Or.inl h1) D hDpos hDeq
+  · have := hoff P hPg hPu hX S hΔ hX0big hNR hAD hband hΩU (Or.inl h1) D hDpos hDeq
     calc DBlock P S D ≤ Coff * P.H / P.U := this
       _ ≤ max Coff Con * P.H / P.U := by
           rw [mul_div_assoc, mul_div_assoc]
           exact mul_le_mul_of_nonneg_right (le_max_left _ _) hHU
   · by_cases h2 : P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x
-    · have := hoff P hPg hPu hX S hΔ hNR hAD hband hΩU (Or.inr h2) D hDpos hDeq
+    · have := hoff P hPg hPu hX S hΔ hX0big hNR hAD hband hΩU (Or.inr h2) D hDpos hDeq
       calc DBlock P S D ≤ Coff * P.H / P.U := this
         _ ≤ max Coff Con * P.H / P.U := by
             rw [mul_div_assoc, mul_div_assoc]
             exact mul_le_mul_of_nonneg_right (le_max_left _ _) hHU
     · push_neg at h1 h2
-      have := hon P hPg hPu hX S hΔ hNR hAD hband hΩU h1.le h2.le D hDpos hDeq
+      have := hon P hPg hPu hX S hΔ hX0big hNR hAD hband hΩU h1.le h2.le D hDpos hDeq
       calc DBlock P S D ≤ Con * P.H / P.U := this
         _ ≤ max Coff Con * P.H / P.U := by
             rw [mul_div_assoc, mul_div_assoc]
