@@ -35,7 +35,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
-        (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
+        (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
         2 * S.A ≤ S.D →
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω →
         S.Ω ≤ P.U →
@@ -57,43 +57,15 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   have hPu : 0 < P.u := by rw [hu]; exact hu0
   have hΔ1 : (1:ℝ) ≤ S.Δ := le_trans (Real.one_le_rpow hX (by norm_num)) hΔlong
   have hApos : (0:ℝ) < S.A := by unfold Scale.A; positivity
-  -- derive 1 < P.X from the regime  (128³·Δ·H ≤ X)
+  -- derive 1 < P.X from the `X^{1/100} ≥ 16777216` floor
   have hXgt : 1 < P.X := by
-    -- 128 Δ^{4/3}(H⁴/X)^{1/3} ≤ 2A ≤ D = HΔ  ⟹ cube ⟹ 128³ Δ H ≤ X
-    have hH1 : (1:ℝ) ≤ P.H := by
-      rw [Globals.H]; exact Real.one_le_rpow hX (by rw [hg]; linarith [hg1])
-    have hcube := StripAux.delta_ceiling P S hΔ1 hNR  -- Δ ≤ Ω³X/(64³H⁴)
-    -- alternatively use threshold + 2A ≤ D
-    have h128 : (128:ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.D := by
-      have : (128:ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)
-          = 2 * ((64:ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) := by ring
-      rw [this]; linarith [hNR, hAD]
-    have hDval : S.D = P.H * S.Δ := rfl
-    -- cube both sides:  128³ Δ⁴ H⁴/X ≤ H³Δ³
-    have hLcube : ((128:ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ^ 3
-        = (128:ℝ) ^ 3 * S.Δ ^ 4 * (P.H ^ 4 / P.X) := by
-      rw [mul_pow, mul_pow, ← Real.rpow_natCast (S.Δ ^ (4/3:ℝ)) 3, ← Real.rpow_mul hΔ.le,
-          ← Real.rpow_natCast ((P.H ^ 4 / P.X) ^ (1/3:ℝ)) 3, ← Real.rpow_mul (by positivity)]
-      rw [show (4:ℝ)/3 * (3:ℕ) = (4:ℕ) by push_cast; ring, Real.rpow_natCast,
-          show (1:ℝ)/3 * (3:ℕ) = (1:ℕ) by push_cast; ring, Real.rpow_natCast]; ring
-    have hmono : ((128:ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ^ 3 ≤ S.D ^ 3 :=
-      pow_le_pow_left₀ (by positivity) h128 3
-    rw [hLcube, hDval] at hmono
-    -- 128³ Δ⁴ H⁴/X ≤ H³Δ³  ⟹  X ≥ 128³ Δ H ≥ 128³
-    have hX' : (128:ℝ) ^ 3 * S.Δ ^ 4 * P.H ^ 4 ≤ (P.H * S.Δ) ^ 3 * P.X := by
-      have e : (128:ℝ) ^ 3 * S.Δ ^ 4 * (P.H ^ 4 / P.X) * P.X = 128 ^ 3 * S.Δ ^ 4 * P.H ^ 4 := by
-        field_simp
-      nlinarith [mul_le_mul_of_nonneg_right hmono hX0.le, e]
-    have hge : (128:ℝ) ^ 3 ≤ P.X := by
-      have hΔ3H3 : (0:ℝ) < S.Δ ^ 3 * P.H ^ 3 := by positivity
-      -- hX' : 128³ Δ⁴ H⁴ ≤ (H Δ)³ X = (Δ³H³)·X ;  LHS = (Δ³H³)·(128³ Δ H)
-      have hfac : (128:ℝ) ^ 3 * S.Δ ^ 4 * P.H ^ 4 = (S.Δ ^ 3 * P.H ^ 3) * (128 ^ 3 * S.Δ * P.H) := by
-        ring
-      have hrhs : (P.H * S.Δ) ^ 3 * P.X = (S.Δ ^ 3 * P.H ^ 3) * P.X := by ring
-      rw [hfac, hrhs] at hX'
-      have hmul : (128:ℝ) ^ 3 * S.Δ * P.H ≤ P.X := le_of_mul_le_mul_left hX' hΔ3H3
-      nlinarith [hmul, hΔ1, hH1]
-    nlinarith [hge]
+    -- X^{1/100} ≥ 16777216 > 1 = 1^{1/100}, and t ↦ t^{1/100} is monotone, so X > 1
+    by_contra hle
+    push_neg at hle  -- hle : P.X ≤ 1
+    have hX1 : P.X = 1 := le_antisymm hle hX
+    have : P.X ^ (1/100 : ℝ) = 1 := by rw [hX1, Real.one_rpow]
+    rw [this] at hX0big
+    linarith [hX0big]
   -- StripData
   have SD : OnStripAux.StripData P S c₀ Cu :=
     { hX := hX, hc₀ := hc₀, hCu := hCu, hxlo := hxlo, hxhi := hxhi, hΩlo := hbandlo, hΩhi := hΩU }
@@ -178,14 +150,14 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
 
 /-- **§8/§9 per-Ω block bound** (merger). For `Ω` in the band `[c₀·G^{-1/4}U^{-3/4}, U]`,
 `𝐃(Ω) ≪ H/U`. Picks shared `u, C, c₀, Cu`, splits `S.x` against the strip edges, and dispatches to
-`dblock_off_strip` / `dblock_on_strip`. The regime hypotheses `64·Δ^{4/3}(H⁴/X)^{1/3} ≤ A`, `2A ≤ D`
-are supplied by `a_decomposition`'s sum range. -/
+`dblock_off_strip` / `dblock_on_strip`. The regime hypotheses `(1/4)·Δ^{4/3}(H⁴/X)^{1/3} ≤ A`,
+`2A ≤ D` are supplied by `a_decomposition`'s sum range. -/
 theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
     ∃ u : ℝ, 0 < u ∧ 18977 * g + 15315 * u < 2 ∧ ∃ C : ℝ, 0 < C ∧ ∃ c₀ : ℝ, 0 < c₀ ∧
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
-        (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
+        (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
         2 * S.A ≤ S.D →
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω →
         S.Ω ≤ P.U →

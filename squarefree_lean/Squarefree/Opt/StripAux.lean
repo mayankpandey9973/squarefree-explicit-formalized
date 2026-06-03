@@ -110,12 +110,12 @@ theorem fiber_factor_budget (P : Globals) (S : Scale P) (c : ℝ) (hc : 0 < c)
 Also returns `0 < a` for each `a` in the block (needed by `prop_5_1`). -/
 theorem dblock_le_sum_Ra (P : Globals) (S : Scale P) (C₂ : ℝ) (D' : ℝ)
     (hfiber : ∀ (a : ℤ), 0 < a → 1 ≤ S.Δ →
-      (64:ℝ) * S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) ≤ (a:ℝ) →
+      (1/4:ℝ) * S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) ≤ (a:ℝ) →
       S.A ≤ (a:ℝ) → (a:ℝ) ≤ 2*S.A → 2*S.A ≤ S.D → ∀ (Dd : ℝ), 0 < Dd → Dd = S.D →
       ∃ Ra : Finset ℕ,
         ((DaCard P.X P.H a Dd : ℝ) ≤ C₂ * (Ra.card:ℝ) * (1 + (S.Δ/S.A)^(8/3:ℝ) * P.G^(-2/3:ℝ))))
     (hΔ1 : 1 ≤ S.Δ)
-    (hNR : (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A)
+    (hNR : (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A)
     (h2AD : 2 * S.A ≤ S.D)
     (hDpos : 0 < D') (hDeq : D' = S.D) :
     ∃ (RaOf : ℤ → Finset ℕ),
@@ -213,11 +213,11 @@ theorem band_rpow (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 0 < c₀) {p
     _ = c₀ ^ p * P.X ^ ((-P.g/4 - 3*P.u/4) * p) := by
         rw [Real.mul_rpow hc₀.le (Real.rpow_nonneg hX.le _), ← Real.rpow_mul hX.le]
 
-/-- The Nair–Roth Ω lower bound: `64·Δ^{4/3}(H⁴/X)^{1/3} ≤ A = ΔΩ` with `Δ ≥ 1` gives
-`Ω ≥ 64·(H⁴/X)^{1/3}`.  Used to upper-bound the bare `Ω^{-8/3}` term. -/
+/-- The Nair–Roth Ω lower bound: `(1/4)·Δ^{4/3}(H⁴/X)^{1/3} ≤ A = ΔΩ` with `Δ ≥ 1` gives
+`Ω ≥ (1/4)·(H⁴/X)^{1/3}`.  Used to upper-bound the bare `Ω^{-8/3}` term. -/
 theorem omega_lb (P : Globals) (S : Scale P) (hΔ1 : 1 ≤ S.Δ)
-    (hNR : (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A) :
-    (64 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.Ω := by
+    (hNR : (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A) :
+    (1/4 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.Ω := by
   have hΔ := S.Δ_pos
   have hH := P.H_pos
   have hX := P.X_pos
@@ -228,30 +228,31 @@ theorem omega_lb (P : Globals) (S : Scale P) (hΔ1 : 1 ≤ S.Δ)
   have hΔ43 : S.Δ * 1 ≤ S.Δ ^ (4/3 : ℝ) := by
     rw [show (4:ℝ)/3 = 1 + 1/3 by norm_num, Real.rpow_add hΔ, Real.rpow_one]
     exact mul_le_mul_of_nonneg_left hΔ13 hΔ.le
-  have hstep : (64:ℝ) * S.Δ * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.Δ * S.Ω := by
+  have hstep : (1/4:ℝ) * S.Δ * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.Δ * S.Ω := by
     rw [← hAeq]
-    calc (64:ℝ) * S.Δ * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)
-        ≤ 64 * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) := by
-          have : (64:ℝ) * S.Δ ≤ 64 * S.Δ ^ (4/3 : ℝ) := by nlinarith [hΔ43]
+    calc (1/4:ℝ) * S.Δ * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)
+        ≤ (1/4) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) := by
+          have : (1/4:ℝ) * S.Δ ≤ (1/4) * S.Δ ^ (4/3 : ℝ) := by nlinarith [hΔ43]
           exact mul_le_mul_of_nonneg_right this hy
       _ ≤ S.A := hNR
   -- cancel Δ > 0
   have := le_of_mul_le_mul_left (by linarith [hstep] :
-    S.Δ * ((64:ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ≤ S.Δ * S.Ω) hΔ
+    S.Δ * ((1/4:ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ≤ S.Δ * S.Ω) hΔ
   exact this
 
-/-- The Nair–Roth Δ-ceiling: `64·Δ^{4/3}(H⁴/X)^{1/3} ≤ A = ΔΩ` gives `Δ ≤ Ω³·X/(64³·H⁴)`. -/
+/-- The Nair–Roth Δ-ceiling: `(1/4)·Δ^{4/3}(H⁴/X)^{1/3} ≤ A = ΔΩ` gives
+`Δ ≤ Ω³·X/((1/4)³·H⁴)`. -/
 theorem delta_ceiling (P : Globals) (S : Scale P) (hΔ1 : 1 ≤ S.Δ)
-    (hNR : (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A) :
-    S.Δ ≤ S.Ω ^ 3 * P.X / ((64:ℝ) ^ 3 * P.H ^ 4) := by
+    (hNR : (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A) :
+    S.Δ ≤ S.Ω ^ 3 * P.X / ((1/4:ℝ) ^ 3 * P.H ^ 4) := by
   have hΔ := S.Δ_pos
   have hΩ := S.Ω_pos
   have hH := P.H_pos
   have hX := P.X_pos
   -- cube both sides of the threshold; A³ = Δ³Ω³, and (64 Δ^{4/3} y^{1/3})³ = 64³ Δ⁴ (H⁴/X)
   have hApos : (0:ℝ) < S.A := by unfold Scale.A; positivity
-  have hcube : ((64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ^ 3
-      = (64:ℝ) ^ 3 * S.Δ ^ 4 * (P.H ^ 4 / P.X) := by
+  have hcube : ((1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ^ 3
+      = (1/4:ℝ) ^ 3 * S.Δ ^ 4 * (P.H ^ 4 / P.X) := by
     rw [mul_pow, mul_pow, ← Real.rpow_natCast (S.Δ ^ (4/3:ℝ)) 3,
         ← Real.rpow_mul hΔ.le, ← Real.rpow_natCast ((P.H ^ 4 / P.X) ^ (1/3:ℝ)) 3,
         ← Real.rpow_mul (by positivity)]
@@ -259,18 +260,18 @@ theorem delta_ceiling (P : Globals) (S : Scale P) (hΔ1 : 1 ≤ S.Δ)
         show (1:ℝ)/3 * (3:ℕ) = (1:ℕ) by push_cast; ring, Real.rpow_natCast]
     ring
   have hAcube : S.A ^ 3 = S.Δ ^ 3 * S.Ω ^ 3 := by unfold Scale.A; ring
-  have hmono : ((64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ^ 3 ≤ S.A ^ 3 :=
+  have hmono : ((1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ^ 3 ≤ S.A ^ 3 :=
     pow_le_pow_left₀ (by positivity) hNR 3
   rw [hcube, hAcube] at hmono
-  -- 64³ Δ⁴ H⁴/X ≤ Δ³ Ω³  ⟹  Δ ≤ Ω³ X /(64³ H⁴)
+  -- (1/4)³ Δ⁴ H⁴/X ≤ Δ³ Ω³  ⟹  Δ ≤ Ω³ X /((1/4)³ H⁴)
   rw [le_div_iff₀ (by positivity)]
-  have hkey : (64:ℝ) ^ 3 * S.Δ ^ 4 * P.H ^ 4 ≤ S.Δ ^ 3 * S.Ω ^ 3 * P.X := by
-    have e : (64:ℝ) ^ 3 * S.Δ ^ 4 * (P.H ^ 4 / P.X) * P.X = (64:ℝ) ^ 3 * S.Δ ^ 4 * P.H ^ 4 := by
+  have hkey : (1/4:ℝ) ^ 3 * S.Δ ^ 4 * P.H ^ 4 ≤ S.Δ ^ 3 * S.Ω ^ 3 * P.X := by
+    have e : (1/4:ℝ) ^ 3 * S.Δ ^ 4 * (P.H ^ 4 / P.X) * P.X = (1/4:ℝ) ^ 3 * S.Δ ^ 4 * P.H ^ 4 := by
       field_simp
     nlinarith [mul_le_mul_of_nonneg_right hmono hX.le, e]
-  -- cancel Δ³ > 0 from hkey : Δ³·(64³ΔH⁴) ≤ Δ³·(Ω³X)
+  -- cancel Δ³ > 0 from hkey : Δ³·((1/4)³ΔH⁴) ≤ Δ³·(Ω³X)
   have hΔ3 : (0:ℝ) < S.Δ ^ 3 := by positivity
-  have hkey' : S.Δ ^ 3 * (S.Δ * ((64:ℝ) ^ 3 * P.H ^ 4)) ≤ S.Δ ^ 3 * (S.Ω ^ 3 * P.X) := by
+  have hkey' : S.Δ ^ 3 * (S.Δ * ((1/4:ℝ) ^ 3 * P.H ^ 4)) ≤ S.Δ ^ 3 * (S.Ω ^ 3 * P.X) := by
     nlinarith [hkey]
   have := le_of_mul_le_mul_left hkey' hΔ3
   nlinarith [this]
@@ -393,35 +394,35 @@ private theorem Hinv4_xpow (P : Globals) : (P.H ^ 4)⁻¹ = P.X ^ (-(4 * ((1 - P
 /-- **Term 3** `A·1·1 = A = ΔΩ ≤ (c₀⁴/64³)·H/U` via the Δ-ceiling (`exp = -3u`). -/
 theorem term3_le (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 0 < c₀)
     (hX : 1 ≤ P.X) (hu : 0 < P.u) (hΔ1 : 1 ≤ S.Δ)
-    (hNR : (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A)
+    (hNR : (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A)
     (hband : S.Ω ≤ c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ))) :
-    S.A ≤ (c₀ ^ (4:ℝ) / 64 ^ 3) * (P.H / P.U) := by
+    S.A ≤ (c₀ ^ (4:ℝ) / (1/4) ^ 3) * (P.H / P.U) := by
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hΩ := S.Ω_pos
   have hH := P.H_pos
   have hceil := delta_ceiling P S hΔ1 hNR
-  -- A = ΔΩ ≤ Ω⁴ X/(64³H⁴)
-  have hAbound : S.A ≤ S.Ω ^ (4:ℝ) * (P.X / ((64:ℝ)^3 * P.H ^ 4)) := by
+  -- A = ΔΩ ≤ Ω⁴ X/((1/4)³H⁴)
+  have hAbound : S.A ≤ S.Ω ^ (4:ℝ) * (P.X / ((1/4:ℝ)^3 * P.H ^ 4)) := by
     have hΩ4eq : S.Ω ^ (4:ℝ) = S.Ω ^ 3 * S.Ω := by
       rw [show (4:ℝ) = ((4:ℕ):ℝ) by norm_num, Real.rpow_natCast]; ring
     have : S.A = S.Δ * S.Ω := rfl
     rw [this, hΩ4eq]
     have := mul_le_mul_of_nonneg_right hceil hΩ.le
-    calc S.Δ * S.Ω ≤ S.Ω ^ 3 * P.X / ((64:ℝ)^3 * P.H ^ 4) * S.Ω := this
-      _ = S.Ω ^ 3 * S.Ω * (P.X / ((64:ℝ)^3 * P.H ^ 4)) := by ring
-  refine term_le_HU P hX (c := c₀ ^ (4:ℝ) / 64 ^ 3)
+    calc S.Δ * S.Ω ≤ S.Ω ^ 3 * P.X / ((1/4:ℝ)^3 * P.H ^ 4) * S.Ω := this
+      _ = S.Ω ^ 3 * S.Ω * (P.X / ((1/4:ℝ)^3 * P.H ^ 4)) := by ring
+  refine term_le_HU P hX (c := c₀ ^ (4:ℝ) / (1/4) ^ 3)
     (e := (-P.g/4 - 3*P.u/4) * 4 + (1 + (-(4 * ((1 - P.g)/5))))) (by positivity) ?_ ?_
   · have : (-P.g/4 - 3*P.u/4) * 4 + (1 + (-(4 * ((1 - P.g)/5)))) = (1 - P.g)/5 - 3*P.u := by ring
     rw [this]; linarith [hu]
   · have hb := band_rpow P S c₀ hc₀ (by norm_num : (0:ℝ) ≤ (4:ℝ)) hband
-    have hXpos : (0:ℝ) < P.X / ((64:ℝ)^3 * P.H ^ 4) := by positivity
-    calc S.A ≤ S.Ω ^ (4:ℝ) * (P.X / ((64:ℝ)^3 * P.H ^ 4)) := hAbound
-      _ ≤ (c₀ ^ (4:ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * 4)) * (P.X / ((64:ℝ)^3 * P.H ^ 4)) :=
+    have hXpos : (0:ℝ) < P.X / ((1/4:ℝ)^3 * P.H ^ 4) := by positivity
+    calc S.A ≤ S.Ω ^ (4:ℝ) * (P.X / ((1/4:ℝ)^3 * P.H ^ 4)) := hAbound
+      _ ≤ (c₀ ^ (4:ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * 4)) * (P.X / ((1/4:ℝ)^3 * P.H ^ 4)) :=
           mul_le_mul_of_nonneg_right hb hXpos.le
-      _ = (c₀ ^ (4:ℝ) / 64 ^ 3) *
+      _ = (c₀ ^ (4:ℝ) / (1/4) ^ 3) *
             (P.X ^ ((-P.g/4 - 3*P.u/4) * 4) * (P.X * (P.H ^ 4)⁻¹)) := by
           field_simp; try ring
-      _ = (c₀ ^ (4:ℝ) / 64 ^ 3) *
+      _ = (c₀ ^ (4:ℝ) / (1/4) ^ 3) *
             P.X ^ ((-P.g/4 - 3*P.u/4) * 4 + (1 + (-(4 * ((1 - P.g)/5))))) := by
           rw [Hinv4_xpow]
           rw [show P.X * P.X ^ (-(4 * ((1 - P.g)/5))) = P.X ^ (1 + (-(4 * ((1 - P.g)/5)))) by
@@ -432,9 +433,9 @@ theorem term3_le (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 0 < c₀)
 (band saturates, `exp = -u`). -/
 theorem term4_le (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 0 < c₀)
     (hX : 1 ≤ P.X) (hΔ1 : 1 ≤ S.Δ)
-    (hNR : (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A)
+    (hNR : (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A)
     (hband : S.Ω ≤ c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ))) :
-    S.A * fiberφ P S ≤ (c₀ ^ (4/3:ℝ) / 64 ^ 3) * (P.H / P.U) := by
+    S.A * fiberφ P S ≤ (c₀ ^ (4/3:ℝ) / (1/4) ^ 3) * (P.H / P.U) := by
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hΩ := S.Ω_pos
   have hΔ := S.Δ_pos
@@ -454,7 +455,7 @@ theorem term4_le (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 0 < c₀)
   have hG23pos : (0:ℝ) < P.G ^ (-2/3:ℝ) := Real.rpow_pos_of_pos hG _
   have hΩ53pos : (0:ℝ) < S.Ω ^ (-5/3:ℝ) := Real.rpow_pos_of_pos hΩ _
   have hsub : S.Δ * S.Ω ^ (-5/3:ℝ) * P.G ^ (-2/3:ℝ)
-      ≤ (S.Ω ^ 3 * P.X / ((64:ℝ)^3 * P.H ^ 4)) * S.Ω ^ (-5/3:ℝ) * P.G ^ (-2/3:ℝ) := by
+      ≤ (S.Ω ^ 3 * P.X / ((1/4:ℝ)^3 * P.H ^ 4)) * S.Ω ^ (-5/3:ℝ) * P.G ^ (-2/3:ℝ) := by
     have := mul_le_mul_of_nonneg_right
       (mul_le_mul_of_nonneg_right hceil hΩ53pos.le) hG23pos.le
     linarith [this]
@@ -462,7 +463,7 @@ theorem term4_le (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 0 < c₀)
   have hΩcol : S.Ω ^ 3 * S.Ω ^ (-5/3:ℝ) = S.Ω ^ (4/3:ℝ) := by
     rw [show S.Ω ^ 3 = S.Ω ^ ((3:ℕ):ℝ) by rw [Real.rpow_natCast], ← Real.rpow_add hΩ]
     congr 1; push_cast; norm_num
-  refine term_le_HU P hX (c := c₀ ^ (4/3:ℝ) / 64 ^ 3)
+  refine term_le_HU P hX (c := c₀ ^ (4/3:ℝ) / (1/4) ^ 3)
     (e := (-P.g/4 - 3*P.u/4) * (4/3) + (1 + (-(4 * ((1 - P.g)/5))) + P.g * (-2/3)))
     (by positivity) ?_ ?_
   · have : (-P.g/4 - 3*P.u/4) * (4/3) + (1 + (-(4 * ((1 - P.g)/5))) + P.g * (-2/3))
@@ -470,16 +471,16 @@ theorem term4_le (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 0 < c₀)
     rw [this]
   · have hb := band_rpow P S c₀ hc₀ (by norm_num : (0:ℝ) ≤ (4/3:ℝ)) hband
     calc S.Δ * S.Ω ^ (-5/3:ℝ) * P.G ^ (-2/3:ℝ)
-        ≤ (S.Ω ^ 3 * P.X / ((64:ℝ)^3 * P.H ^ 4)) * S.Ω ^ (-5/3:ℝ) * P.G ^ (-2/3:ℝ) := hsub
-      _ = S.Ω ^ (4/3:ℝ) * (P.X / ((64:ℝ)^3 * P.H ^ 4) * P.G ^ (-2/3:ℝ)) := by
+        ≤ (S.Ω ^ 3 * P.X / ((1/4:ℝ)^3 * P.H ^ 4)) * S.Ω ^ (-5/3:ℝ) * P.G ^ (-2/3:ℝ) := hsub
+      _ = S.Ω ^ (4/3:ℝ) * (P.X / ((1/4:ℝ)^3 * P.H ^ 4) * P.G ^ (-2/3:ℝ)) := by
           rw [← hΩcol]; ring
       _ ≤ (c₀ ^ (4/3:ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (4/3)))
-            * (P.X / ((64:ℝ)^3 * P.H ^ 4) * P.G ^ (-2/3:ℝ)) :=
+            * (P.X / ((1/4:ℝ)^3 * P.H ^ 4) * P.G ^ (-2/3:ℝ)) :=
           mul_le_mul_of_nonneg_right hb (by positivity)
-      _ = (c₀ ^ (4/3:ℝ) / 64 ^ 3) *
+      _ = (c₀ ^ (4/3:ℝ) / (1/4) ^ 3) *
             (P.X ^ ((-P.g/4 - 3*P.u/4) * (4/3)) * (P.X * (P.H ^ 4)⁻¹) * P.G ^ (-2/3:ℝ)) := by
           field_simp; try ring
-      _ = (c₀ ^ (4/3:ℝ) / 64 ^ 3) *
+      _ = (c₀ ^ (4/3:ℝ) / (1/4) ^ 3) *
             P.X ^ ((-P.g/4 - 3*P.u/4) * (4/3) + (1 + (-(4 * ((1 - P.g)/5))) + P.g * (-2/3))) := by
           rw [Hinv4_xpow, G_xpow,
               show P.X * P.X ^ (-(4 * ((1 - P.g)/5))) = P.X ^ (1 + (-(4 * ((1 - P.g)/5)))) by
@@ -597,12 +598,12 @@ theorem term7_le (P : Globals) (hX : 1 ≤ P.X) (hg : P.g < 2 / 18977) (hu' : P.
   · nlinarith [hg, hu']
   · rw [Real.rpow_zero]; norm_num
 
-/-- **Term 8** `1·1·φ = Ω^{-8/3}·G^{-2/3} ≤ 64^{-8/3}·H/U`.  Killed by the Ω lower bound
-`Ω ≥ 64(H⁴/X)^{1/3}` plus `H/U → ∞` (`exp - exp(H/U) = u + 11g/45 - 1/45 ≤ 0`). -/
+/-- **Term 8** `1·1·φ = Ω^{-8/3}·G^{-2/3} ≤ (1/4)^{-8/3}·H/U`.  Killed by the Ω lower bound
+`Ω ≥ (1/4)(H⁴/X)^{1/3}` plus `H/U → ∞` (`exp - exp(H/U) = u + 11g/45 - 1/45 ≤ 0`). -/
 theorem term8_le (P : Globals) (S : Scale P)
     (hX : 1 ≤ P.X) (hg : P.g < 2 / 18977) (hu' : P.u ≤ 1 / 100) (hΔ1 : 1 ≤ S.Δ)
-    (hNR : (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A) :
-    fiberφ P S ≤ ((64:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U) := by
+    (hNR : (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A) :
+    fiberφ P S ≤ ((1/4:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U) := by
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hG := P.G_pos
   have hH := P.H_pos
@@ -613,11 +614,11 @@ theorem term8_le (P : Globals) (S : Scale P)
   rw [hφ]
   -- lower bound on Ω; (H⁴/X)^{1/3} > 0
   have hL := omega_lb P S hΔ1 hNR
-  have hLpos : (0:ℝ) < (64:ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) := by
+  have hLpos : (0:ℝ) < (1/4:ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) := by
     have : (0:ℝ) < (P.H ^ 4 / P.X) ^ (1/3 : ℝ) := Real.rpow_pos_of_pos (by positivity) _
     positivity
-  -- Ω^{-8/3} ≤ (64·(H⁴/X)^{1/3})^{-8/3}
-  have hΩbd : S.Ω ^ (-8/3:ℝ) ≤ ((64:ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ^ (-8/3:ℝ) :=
+  -- Ω^{-8/3} ≤ ((1/4)·(H⁴/X)^{1/3})^{-8/3}
+  have hΩbd : S.Ω ^ (-8/3:ℝ) ≤ ((1/4:ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ^ (-8/3:ℝ) :=
     Real.rpow_le_rpow_of_nonpos hLpos hL (by norm_num)
   have hG23pos : (0:ℝ) < P.G ^ (-2/3:ℝ) := Real.rpow_pos_of_pos hG _
   -- expand the bound into an X-power
@@ -625,20 +626,20 @@ theorem term8_le (P : Globals) (S : Scale P)
   have hinner : ((P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ^ (-8/3:ℝ)
       = P.X ^ ((4 * ((1 - P.g)/5) - 1) * ((1/3 : ℝ) * (-8/3 : ℝ))) := by
     rw [← Real.rpow_mul hHX0.le (1/3 : ℝ) (-8/3 : ℝ), H4X_xpow]
-  have hexp : ((64:ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ^ (-8/3:ℝ) * P.G ^ (-2/3:ℝ)
-      = ((64:ℝ) ^ (-8/3:ℝ)) *
+  have hexp : ((1/4:ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ)) ^ (-8/3:ℝ) * P.G ^ (-2/3:ℝ)
+      = ((1/4:ℝ) ^ (-8/3:ℝ)) *
         P.X ^ ((4 * ((1 - P.g)/5) - 1) * ((1/3) * (-8/3)) + P.g * (-2/3)) := by
     rw [Real.mul_rpow (by norm_num) (Real.rpow_nonneg hHX0.le _),
         hinner, G_xpow,
         Real.rpow_add hX0 ((4 * ((1 - P.g)/5) - 1) * ((1/3) * (-8/3))) (P.g * (-2/3))]
     ring
-  -- bound the goal by 64^{-8/3}·X^e, then convert X^e to H/U
+  -- bound the goal by (1/4)^{-8/3}·X^e, then convert X^e to H/U
   have hbound : S.Ω ^ (-8/3:ℝ) * P.G ^ (-2/3:ℝ)
-      ≤ ((64:ℝ) ^ (-8/3:ℝ)) *
+      ≤ ((1/4:ℝ) ^ (-8/3:ℝ)) *
         P.X ^ ((4 * ((1 - P.g)/5) - 1) * ((1/3) * (-8/3)) + P.g * (-2/3)) := by
     rw [← hexp]
     exact mul_le_mul_of_nonneg_right hΩbd hG23pos.le
-  refine term_le_HU P hX (c := (64:ℝ) ^ (-8/3:ℝ))
+  refine term_le_HU P hX (c := (1/4:ℝ) ^ (-8/3:ℝ))
     (e := (4 * ((1 - P.g)/5) - 1) * ((1/3) * (-8/3)) + P.g * (-2/3))
     (Real.rpow_nonneg (by norm_num) _) ?_ hbound
   · have : (4 * ((1 - P.g)/5) - 1) * ((1/3) * (-8/3)) + P.g * (-2/3)

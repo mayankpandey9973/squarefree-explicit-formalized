@@ -46,7 +46,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
-        (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
+        (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
         2 * S.A ≤ S.D →
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω → S.Ω ≤ P.U →
         ( S.x ≤ P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u))
@@ -496,15 +496,15 @@ theorem dblock_small_omega (c₀ : ℝ) (hc₀ : 0 < c₀) :
       ∀ (P : Globals), 1 ≤ P.X → 0 < P.g → P.g < 2 / 18977 → 0 < P.u → P.u ≤ 1 / 100 →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
-        (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
+        (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
         2 * S.A ≤ S.D →
         S.Ω ≤ c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) →
         ∀ D : ℝ, 0 < D → D = S.D →
           DBlock P S D ≤ C * P.H / P.U := by
   obtain ⟨c₁, C₁, C₂, hc₁, hC₁, hC₂, hfiber⟩ := prop_3_2_fiber
   -- the absolute constant: sum of the eight monomial constants, times C₂
-  refine ⟨C₂ * (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / 64 ^ 3
-      + c₀ ^ (4/3:ℝ) / 64 ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1 + (64:ℝ) ^ (-8/3:ℝ)),
+  refine ⟨C₂ * (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / (1/4) ^ 3
+      + c₀ ^ (4/3:ℝ) / (1/4) ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1 + (1/4:ℝ) ^ (-8/3:ℝ)),
     by positivity, ?_⟩
   intro P hX hg0 hg hu0 hu' S hΔlong hX0big hNR hAD hband D hDpos hDeq
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
@@ -595,9 +595,9 @@ theorem dblock_small_omega (c₀ : ℝ) (hc₀ : 0 < c₀) :
     exact hsum.trans (mul_le_mul_of_nonneg_right hcardR hMnn)
   -- expand (A+1)·M = C₂·[8 monomials], bound each
   have hbody : (S.A + 1) * M
-      ≤ C₂ * (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / 64 ^ 3
-        + c₀ ^ (4/3:ℝ) / 64 ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1
-        + (64:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U) := by
+      ≤ C₂ * (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / (1/4) ^ 3
+        + c₀ ^ (4/3:ℝ) / (1/4) ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1
+        + (1/4:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U) := by
     -- the eight per-term bounds (φ = StripAux.fiberφ P S)
     have hφeq : φ = StripAux.fiberφ P S := hφdef
     have t1 := StripAux.term1_le P S c₀ C₁ hC₁ hc₀ hX hu0 hband
@@ -614,34 +614,34 @@ theorem dblock_small_omega (c₀ : ℝ) (hc₀ : 0 < c₀) :
         = C₂ * (S.A * (C₁ * S.R) + S.A * (C₁ * S.R) * φ + S.A + S.A * φ
           + C₁ * S.R + C₁ * S.R * φ + 1 + φ) := by
       rw [hMdef]; ring
-    rw [hexpand, show C₂ * (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / 64 ^ 3
-        + c₀ ^ (4/3:ℝ) / 64 ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1
-        + (64:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U)
-        = C₂ * ((C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / 64 ^ 3
-          + c₀ ^ (4/3:ℝ) / 64 ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1
-          + (64:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U)) by ring]
+    rw [hexpand, show C₂ * (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / (1/4) ^ 3
+        + c₀ ^ (4/3:ℝ) / (1/4) ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1
+        + (1/4:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U)
+        = C₂ * ((C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / (1/4) ^ 3
+          + c₀ ^ (4/3:ℝ) / (1/4) ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1
+          + (1/4:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U)) by ring]
     apply mul_le_mul_of_nonneg_left _ hC₂.le
     -- sum the eight bounds (all RHS share factor (H/U)); collect
     have hsum8 : S.A * (C₁ * S.R) + S.A * (C₁ * S.R) * φ + S.A + S.A * φ
           + C₁ * S.R + C₁ * S.R * φ + 1 + φ
-        ≤ (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / 64 ^ 3
-          + c₀ ^ (4/3:ℝ) / 64 ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1
-          + (64:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U) := by
-      have hrhs : (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / 64 ^ 3
-          + c₀ ^ (4/3:ℝ) / 64 ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1
-          + (64:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U)
+        ≤ (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / (1/4) ^ 3
+          + c₀ ^ (4/3:ℝ) / (1/4) ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1
+          + (1/4:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U) := by
+      have hrhs : (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / (1/4) ^ 3
+          + c₀ ^ (4/3:ℝ) / (1/4) ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1
+          + (1/4:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U)
           = (C₁ * c₀ ^ (4:ℝ)) * (P.H / P.U) + (C₁ * c₀ ^ (4/3:ℝ)) * (P.H / P.U)
-            + (c₀ ^ (4:ℝ) / 64 ^ 3) * (P.H / P.U) + (c₀ ^ (4/3:ℝ) / 64 ^ 3) * (P.H / P.U)
+            + (c₀ ^ (4:ℝ) / (1/4) ^ 3) * (P.H / P.U) + (c₀ ^ (4/3:ℝ) / (1/4) ^ 3) * (P.H / P.U)
             + (C₁ * c₀ ^ (3:ℝ)) * (P.H / P.U) + (C₁ * c₀ ^ (1/3:ℝ)) * (P.H / P.U)
-            + (1:ℝ) * (P.H / P.U) + ((64:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U) := by ring
+            + (1:ℝ) * (P.H / P.U) + ((1/4:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U) := by ring
       rw [hrhs]
       linarith [t1, t2, t3, t4, t5, t6, t7, t8]
     exact hsum8
   -- chain and rewrite C * H / U = C * (H/U)
   have hfin : DBlock P S D
-      ≤ C₂ * (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / 64 ^ 3
-        + c₀ ^ (4/3:ℝ) / 64 ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1
-        + (64:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U) := hDle.trans hbody
+      ≤ C₂ * (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / (1/4) ^ 3
+        + c₀ ^ (4/3:ℝ) / (1/4) ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1
+        + (1/4:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U) := hDle.trans hbody
   -- C * P.H / P.U = C * (P.H / P.U)
   rw [mul_div_assoc]
   exact hfin
