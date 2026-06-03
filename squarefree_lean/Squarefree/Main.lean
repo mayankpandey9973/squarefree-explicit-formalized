@@ -2,6 +2,7 @@ import Mathlib
 import Squarefree.DCard
 import Squarefree.DyadicAssembly
 import Squarefree.Mobius
+import Squarefree.MobiusAssembly
 
 /-!
 # Top of the proof spine — main statements
@@ -32,8 +33,8 @@ theorem squarefree_count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18
       |(∑ n ∈ Finset.Icc ⌈X⌉ ⌊X + X ^ ((1 - g) / 5)⌋,
             (if Squarefree n.toNat then (1 : ℝ) else 0))
           - 6 / Real.pi ^ 2 * X ^ ((1 - g) / 5)|
-        ≤ C * X ^ ((1 - g) / 5) / X ^ u := by
-  sorry -- STUB: squarefree_count_short_interval
+        ≤ C * X ^ ((1 - g) / 5) / X ^ u :=
+  Squarefree.Mob.count_short_interval g hg hg'
 
 /-- Theorem 10.1: a squarefree number in `[X, X + X^{1/5 − 2/94885 + ε}]` for large `X`. -/
 theorem theorem_10_1 (ε : ℝ) (hε : 0 < ε) :

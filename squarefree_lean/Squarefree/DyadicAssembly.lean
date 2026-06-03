@@ -27,7 +27,7 @@ namespace DyadicAssembly
 over `[⌈t⌉, ⌊t·2^{K+1}⌋]` is at most the sum of the `K+1` dyadic blocks `[⌈t·2^k⌉, ⌊t·2^{k+1}⌋]`.
 The blocks adjoin with no integer gap because `2·(t·2^k) = t·2^{k+1}` and
 `⌈y⌉ ≤ ⌊y⌋ + 1`. -/
-private theorem dyadic_cover_sum (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t : ℝ) (ht : 0 < t) :
+theorem dyadic_cover_sum (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t : ℝ) (ht : 0 < t) :
     ∀ K : ℕ,
       ∑ a ∈ Finset.Icc ⌈t⌉ ⌊t * 2 ^ (K + 1)⌋, f a ≤
         ∑ k ∈ Finset.range (K + 1),
@@ -76,7 +76,7 @@ private theorem dyadic_cover_sum (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t : 
               ∑ a ∈ Finset.Icc ⌈t * 2 ^ k⌉ ⌊t * 2 ^ (k + 1)⌋, f a) (K + 1)]
 
 /-- A dyadic covering exponent: for `0 < t ≤ b` there is `n` with `b ≤ t·2^{n+1} ≤ 2b`. -/
-private theorem exists_cover_exp (t b : ℝ) (ht : 0 < t) (hb : t ≤ b) :
+theorem exists_cover_exp (t b : ℝ) (ht : 0 < t) (hb : t ≤ b) :
     ∃ n : ℕ, b ≤ t * 2 ^ (n + 1) ∧ t * 2 ^ (n + 1) ≤ 2 * b ∧ (2 : ℝ) ^ (n + 1) ≤ 2 * b / t := by
   have hbt : (1 : ℝ) ≤ b / t := (one_le_div ht).mpr hb
   obtain ⟨n, hn1, hn2⟩ := exists_nat_pow_near hbt (by norm_num : (1 : ℝ) < 2)
@@ -133,7 +133,7 @@ private theorem two_bb_le_sq_t {H X U D : ℝ} (hH : 1 ≤ H) (hX : 0 < X) (hD :
 
 /-- Cover-and-count: if the dyadic blocks of `f` are each `≤ B ≥ 0` and `[⌈t⌉,⌊bb⌋]` is covered by
 the first `n+1` blocks, then `∑_{[⌈t⌉,⌊bb⌋]} f ≤ (n+1)·B`. -/
-private theorem cover_sum_le (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t bb B : ℝ) (ht : 0 < t)
+theorem cover_sum_le (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t bb B : ℝ) (ht : 0 < t)
     (n : ℕ) (hcov : bb ≤ t * 2 ^ (n + 1)) (hB : 0 ≤ B)
     (hblock : ∀ k ∈ Finset.range (n + 1),
         ∑ a ∈ Finset.Icc ⌈t * 2 ^ k⌉ ⌊t * 2 ^ (k + 1)⌋, f a ≤ B) :
@@ -151,7 +151,7 @@ private theorem cover_sum_le (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t bb B :
 
 /-- `Real.log X ≤ ε⁻¹ · X^ε` for `X ≥ 1` and `ε > 0`.  (From `log_le_sub_one_of_pos` applied to
 `X^ε`: `ε·log X = log (X^ε) ≤ X^ε - 1 ≤ X^ε`.) -/
-private theorem log_le_rpow {ε : ℝ} (hε : 0 < ε) {X : ℝ} (hX : 1 ≤ X) :
+theorem log_le_rpow {ε : ℝ} (hε : 0 < ε) {X : ℝ} (hX : 1 ≤ X) :
     Real.log X ≤ ε⁻¹ * X ^ ε := by
   have hX0 : 0 < X := lt_of_lt_of_le one_pos hX
   have hxe : 0 < X ^ ε := Real.rpow_pos_of_pos hX0 _
