@@ -21,12 +21,16 @@ namespace Squarefree
 set_option maxHeartbeats 1600000 in
 /-- **On-strip case** of `dblock_bound` (§9 core, writeup 2083–2221). Shared params `u, c₀, Cu`.
 On the strip `G^{-2}Ω^{-11/2}X^{-Cu·u} ≤ x ≤ G^{17}Ω^{-26}X^{Cu·u}`, `𝐃(Ω) ≪ H/U` via Prop 7.3 with
-`W = W_{≠0}` and `18977g+15315u<2`. Added hypothesis `hubudget : 35g+(2Cu+31)u ≤ 1/800`
-(the writeup's "shrink `u`"; implies `hopt` and the on-strip envelope/closing budgets). -/
+`W = W_{≠0}` and `18977g+15315u<2`. Added hypothesis `hubudget : 18977g+(16995+790·Cu)u ≤ 2`
+(the writeup's "shrink `u`"): the **sharp** `g`-coefficient `18977` keeps the full range
+`g < 2/18977`, while all `X^{O(u)}` bookkeeping (`2u` fiber, Prop 7.3's `X^{O(u)}`, strip-edge
+`X^{±Cu·u}`) sits in the `u`-coefficient `16995+790·Cu`.  Implies `hopt` and the on-strip
+envelope/closing budgets; for any `g < 2/18977`, `u := (2 − 18977g)/(2(16995+790·Cu)) > 0`
+satisfies it (the budget value is then `(2 + 18977g)/2 < 2`). -/
 theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
     (u : ℝ) (hu0 : 0 < u) (hopt : 18977 * g + 15315 * u < 2) (hu2 : u ≤ 1 / 100)
     (c₀ : ℝ) (hc₀ : 1 ≤ c₀) (Cu : ℝ) (hCu : 1 ≤ Cu)
-    (hubudget : 35 * g + (2 * Cu + 31) * u ≤ 1/800) :
+    (hubudget : 18977 * g + (16995 + 790 * Cu) * u ≤ 2) :
     ∃ C : ℝ, 0 < C ∧
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
@@ -95,8 +99,8 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   -- admissibility envelope at Wnz
   have hgP : P.g = g := hg
   have hbudP : OnStripAux.Budget P.g P.u Cu := by
-    show 3 * P.g + (Cu + 4) * P.u ≤ 1/800
-    rw [hg, hu]; nlinarith [hubudget, hg0.le, hu0.le, hCu]
+    show 18977 * P.g + (16995 + 790 * Cu) * P.u ≤ 2
+    rw [hg, hu]; exact hubudget
   have hAdm : AdmissibleW P S (OnStripAux.Wnz P S) :=
     OnStripAux.admissibleW_Wnz P S c₀ Cu SD hXgt hg0' hPu.le hbudP
   -- per-a bound:  DaCard ≤ C₂'·C₇·(1+φ)·(1+H/A²)·(R/Wnz)
@@ -155,7 +159,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       _ = ((Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋).card : ℝ) * M := by rw [nsmul_eq_mul]
       _ ≤ (S.A + 1) * M := mul_le_mul_of_nonneg_right hcardR hMnn
   -- closing LP
-  have hclose := OnStripAux.closing_bound P S c₀ Cu SD hg0' hPu (by rw [hg, hu]; linarith [hubudget])
+  have hclose := OnStripAux.closing_bound P S c₀ Cu SD hg0' hPu (by rw [hg, hu]; exact hubudget)
   -- assemble
   rw [mul_div_assoc]
   calc DBlock P S D ≤ (S.A + 1) * M := hSM

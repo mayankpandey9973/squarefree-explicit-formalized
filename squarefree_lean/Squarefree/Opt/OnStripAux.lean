@@ -271,19 +271,28 @@ theorem T1_mono (P : Globals) (S : Scale P) :
         = (P.H ^ (1/2:ℝ) * P.H ^ (-3/2:ℝ)) * S.Δ ^ 3 * P.G⁻¹ * S.Ω⁻¹ by ring, hHinv]
   field_simp
 
-/-- The uniform on-strip `(g,u,Cu)`-budget that discharges every monomial comparison and the
-`R>1`/`T₁>1` exponents.  RHS `1/800 > 0`; mirrors `dblock_off_strip`'s `hubudget`. -/
-def Budget (g u Cu : ℝ) : Prop := 3 * g + (Cu + 4) * u ≤ 1/800
+/-- The uniform on-strip `(g,u,Cu)`-budget that discharges every monomial comparison, the
+`R>1`/`T₁>1` exponents, and the closing LP.  The `g`-coefficient is the sharp `18977` (so the
+range is the full `g < 2/18977`); all `X^{O(u)}` bookkeeping (the `2u` fiber factor, Prop 7.3's
+`X^{O(u)}`, and the strip-edge `X^{±Cu·u}`) lives purely in the `u`-coefficient `16995 + 790·Cu`.
+The RHS is the sharp `2` (the binding `H·A` closing term needs exactly `≤ 2`), so the budget
+admits every `g < 2/18977` via a small `u > 0`. -/
+def Budget (g u Cu : ℝ) : Prop := 18977 * g + (16995 + 790 * Cu) * u ≤ 2
 
 /-- **The §7 admissibility envelope at the §9 bottleneck `Wnz`** (with constant `c = 1`).
 Every entry `e0k` is `Wnz ≤ m_k` (the strip minimum), via `Wnz_le_mono`; `R>1`, `T₁>1` via
-`one_le_mono`.  All 22 facts close from the single uniform budget `3g + (Cu+4)u ≤ 1/800`. -/
+`one_le_mono`.  All 22 facts close from the single uniform budget
+`18977g + (16995 + 790·Cu)u ≤ 199/100`.  For the 20 non-binding comparisons this is far stronger
+than needed: each has an affine exponent `α_k − β_k·g − (γ_k + δ_k·Cu)·u ≥ 0` with `β_k ≥ 0` and
+corner slack `α_k − β_k·(2/18977) ≥ 0.00122 > 0`, so `g ≤ 2/18977` (implied, since the `u`-term is
+`≥ 0`) plus the resulting pure-`u` bound suffices. -/
 noncomputable def admissibleW_Wnz (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripData P S c₀ Cu)
     (hXgt : 1 < P.X) (hg : 0 ≤ P.g) (hu : 0 ≤ P.u) (hbud : Budget P.g P.u Cu) :
     AdmissibleW P S (Wnz P S) := by
   have hCu := D.hCu
-  have hbud' : 3 * P.g + (Cu + 4) * P.u ≤ 1/800 := hbud
+  have hbud' : 18977 * P.g + (16995 + 790 * Cu) * P.u ≤ 2 := hbud
   have huCu : (0:ℝ) ≤ P.u * Cu := mul_nonneg hu (by linarith)
+  have huCu1 : (0:ℝ) ≤ P.u * (Cu - 1) := mul_nonneg hu (by linarith)
   -- master discharger for one comparison `Wnz ≤ H^a x^b G^c Ω^d`
   have wle : ∀ a b c d : ℝ,
       0 ≤ ratioExp P.g P.u Cu (a - 1/84) (b - 5/84) (c - 1/7) (d - 11/21) →
@@ -305,42 +314,42 @@ noncomputable def admissibleW_Wnz (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D
   · rw [one_mul, show P.H ^ (1/16:ℝ) * S.x ^ (5/16:ℝ) * S.Ω ^ (1/4:ℝ)
           = P.H ^ (1/16:ℝ) * S.x ^ (5/16:ℝ) * P.G ^ (0:ℝ) * S.Ω ^ (1/4:ℝ) by
         rw [Real.rpow_zero]; ring]
-    exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
+    exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
   -- e06: no G factor
   · rw [one_mul, show P.H ^ (1/30:ℝ) * S.x ^ (1/30:ℝ) * S.Ω ^ (-2/15:ℝ)
           = P.H ^ (1/30:ℝ) * S.x ^ (1/30:ℝ) * P.G ^ (0:ℝ) * S.Ω ^ (-2/15:ℝ) by
         rw [Real.rpow_zero]; ring]
-    exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
+    exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
   -- e14: Wnz itself
   · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num)
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
   -- e18: no G, no Ω factor
   · rw [one_mul, show P.H ^ (1/16:ℝ) * S.x ^ (-1/16:ℝ)
           = P.H ^ (1/16:ℝ) * S.x ^ (-1/16:ℝ) * P.G ^ (0:ℝ) * S.Ω ^ (0:ℝ) by
         rw [Real.rpow_zero, Real.rpow_zero]; ring]
-    exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
+    exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
   -- R > 1
   · rw [R_mono]
-    exact ole (1/2) (1/2) 1 3 (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
+    exact ole (1/2) (1/2) 1 3 (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
   -- T₁ > 1
   · rw [T1_mono]
-    exact ole (1/2) (-3/2) (-1) (-1) (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu])
+    exact ole (1/2) (-3/2) (-1) (-1) (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
 
 /-! ### Closing-LP upper bounds (Step D) -/
 
@@ -532,18 +541,21 @@ private theorem RW_mul (P : Globals) (S : Scale P) (a₂ b₂ c₂ d₂ : ℝ) :
   have hH := P.H_pos; have hG := P.G_pos; have hΩ := S.Ω_pos; have hx := x_pos P S
   rw [Real.rpow_add hH, Real.rpow_add hx, Real.rpow_add hG, Real.rpow_add hΩ]; ring
 
-/-- **Closing LP** (Step D): on the strip, with the uniform `u`-budget
-`35g + (2Cu+31)u ≤ 1/420`, the per-scale envelope
-`(A+1)·(1+φ)·(1+H/A²)·(R/Wnz)` is `≤ 4·(1+c₀^{-8/3})·(H/U)`. -/
+/-- **Closing LP** (Step D): on the strip, with the uniform budget
+`18977g + (16995 + 790·Cu)u ≤ 2`, the per-scale envelope
+`(A+1)·(1+φ)·(1+H/A²)·(R/Wnz)` is `≤ 4·(1+c₀^{-8/3})·(H/U)`.  The binding `H·A` term has the
+sharp `g`-coefficient `18977` (writeup (9.3): `840·(9.3) = 18977g + 15315u − 2`, plus the `+2u`
+fiber factor and the `±Cu·u` strip edges absorbed into the `u`-coefficient). -/
 theorem closing_bound (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripData P S c₀ Cu)
     (hg : 0 ≤ P.g) (hu : 0 < P.u)
-    (hbud : 35 * P.g + (2 * Cu + 31) * P.u ≤ 1/420) :
+    (hbud : 18977 * P.g + (16995 + 790 * Cu) * P.u ≤ 2) :
     (S.A + 1) * (1 + StripAux.fiberφ P S) * ((1 + P.H / S.A ^ 2) * (S.R / Wnz P S))
       ≤ (4 * (1 + c₀ ^ (-8/3 : ℝ))) * (P.H / P.U) := by
   have hX := P.X_pos; have hH := P.H_pos; have hG := P.G_pos; have hΩ := S.Ω_pos
   have hx := x_pos P S; have hΔ := S.Δ_pos
   have hCu := D.hCu
   have huCu : (0:ℝ) ≤ P.u * Cu := mul_nonneg hu.le (by linarith)
+  have huCu1 : (0:ℝ) ≤ P.u * (Cu - 1) := mul_nonneg hu.le (by linarith)
   have hApos : (0:ℝ) < S.A := by unfold Scale.A; positivity
   have hRWpos : 0 < S.R / Wnz P S := by
     have : 0 < S.R := by unfold Scale.R; positivity
@@ -582,13 +594,13 @@ theorem closing_bound (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripData
     rw [hRWm, HA2_mono, RW_mul]; norm_num
   -- bound each X^{2u}·term ≤ H/U
   have bA := closing_term P S c₀ Cu D _ _ _ _ _ htA
-    (by unfold ratioExpU; norm_num; nlinarith [hbud, hg, hu, hCu, huCu])
+    (by unfold ratioExpU; norm_num; nlinarith [hbud, hg, hu, hCu, huCu, huCu1])
   have bHA := closing_term P S c₀ Cu D _ _ _ _ _ htHA
-    (by unfold ratioExpU; norm_num; nlinarith [hbud, hg, hu, hCu, huCu])
+    (by unfold ratioExpU; norm_num; nlinarith [hbud, hg, hu, hCu, huCu, huCu1])
   have b1 := closing_term P S c₀ Cu D _ _ _ _ _ ht1
-    (by unfold ratioExpU; norm_num; nlinarith [hbud, hg, hu, hCu, huCu])
+    (by unfold ratioExpU; norm_num; nlinarith [hbud, hg, hu, hCu, huCu, huCu1])
   have bHA2 := closing_term P S c₀ Cu D _ _ _ _ _ htHA2
-    (by unfold ratioExpU; norm_num; nlinarith [hbud, hg, hu, hCu, huCu])
+    (by unfold ratioExpU; norm_num; nlinarith [hbud, hg, hu, hCu, huCu, huCu1])
   -- assemble
   have hsum_nn : 0 ≤ (S.R / Wnz P S) * S.A + (S.R / Wnz P S) * (P.H / S.A)
       + (S.R / Wnz P S) * 1 + (S.R / Wnz P S) * (P.H / S.A ^ 2) := by
