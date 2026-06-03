@@ -26,22 +26,6 @@ open Classical Finset
 
 namespace Squarefree
 
-/-- **§8/§9 per-Ω block bound.** For `Ω` in the band `[c₀·G^{-1/4}U^{-3/4}, U]` (with `c₀` chosen
-here), `𝐃(Ω) ≪ H/U`. Strip dichotomy internal (off-strip: Props 5.1/6.1; on-strip: Prop 7.3 +
-`18977g+15315u<2`). The regime hypotheses `64·Δ^{4/3}(H⁴/X)^{1/3} ≤ A`, `2A ≤ D` are supplied by
-`a_decomposition`'s sum range. -/
-theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
-    ∃ u : ℝ, 0 < u ∧ 18977 * g + 15315 * u < 2 ∧ ∃ C : ℝ, 0 < C ∧ ∃ c₀ : ℝ, 0 < c₀ ∧
-      ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
-      ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
-        (64 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
-        2 * S.A ≤ S.D →
-        c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω →
-        S.Ω ≤ P.U →
-        ∀ D : ℝ, 0 < D → D = S.D →
-          DBlock P S D ≤ C * P.H / P.U := by
-  sorry -- STUB: dblock_bound
-
 set_option maxHeartbeats 1600000 in
 /-- **Off-strip case** of `dblock_bound` (Prop 8.1, writeup 2020–2079). `u, c₀, Cu` are shared
 parameters (the merger `dblock_bound` picks them). Small-x edge `x ≤ G^{-2}Ω^{-11/2}X^{-Cu·u}` via
