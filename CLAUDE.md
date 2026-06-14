@@ -103,7 +103,23 @@ Refresh after landing each lemma. (Borrow the *idea* from attempt 1's `tools/`, 
 - Formalize the *stated* bounds, including the two benign non-sharp ones flagged in
   `math_audit.md` (Prop 3.2 fiber bound; Lemma 4.2 log) — don't chase sharper forms.
 
-## 8. Git
+## 8. Lessons paid for in §5 (binding practice)
+
+- **Contract-first.** Before building a section's lemmas, state its frontier proposition with the FULL
+  hypothesis pack and land the caller discharging that pack against the stub. A hypothesis no caller can
+  discharge must fail a build immediately — never let a sorried stub make hypotheses free.
+- **No ad-hoc ambient hypotheses.** The standing regime is the writeup's (line 406: G^{-1/4}U^{-3/4} ≤ Ω ≤ U;
+  no Ω≥1, no G≤U). Convenience facts must be derived lemmas, not new binders; template-copied hypothesis
+  blocks are how Ω≥1 infected 130 signatures.
+- **Freeze shapes, not numbers.** In delegated interfaces fix statement shapes; constants are re-derived by
+  sympy at the point of use. Keep the constant/budget bookkeeping in ONE place and re-check it after any bump.
+- **Audit at section entry, not exit:** statement-vs-md, call-site dischargeability, constants, boundary
+  coherence — before proving.
+- **Subagent turns >32k output tokens die with zero disk output** (thinking explosion on monomial algebra).
+  Mitigate: sympy-via-Bash for all exponent arithmetic, ≤200 words prose/turn, first Write within 6 actions,
+  one decl per edit, build per decl, half-scope units, final report ≤15 lines.
+
+## 9. Git
 
 - Branch off `main` before committing; commit/push only when the user asks.
 - **Never** add a `Co-Authored-By: Claude/Anthropic` trailer to commits.

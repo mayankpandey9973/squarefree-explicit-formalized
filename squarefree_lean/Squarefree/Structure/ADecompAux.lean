@@ -1,4 +1,5 @@
 import Squarefree.Structure.DaSpacing
+import Squarefree.Counting.Preimage
 
 /-!
 # §3 A-decomposition — analytic helpers (self-contained, no §4)
@@ -16,14 +17,14 @@ Two pieces, both at the level of the `inD` membership predicate:
 Both are kept `private` to this and the `ADecomp` module.
 -/
 
-open Classical Finset
+open Classical Finset Squarefree.Counting
 
 namespace Squarefree
 
 set_option maxHeartbeats 1000000
 
 /-- `F_a(d) = X/d² − X/(d+a)²`, the first difference of `X/d²`. -/
-private noncomputable def Ffun (X a d : ℝ) : ℝ := X / d ^ 2 - X / (d + a) ^ 2
+noncomputable def Ffun (X a d : ℝ) : ℝ := X / d ^ 2 - X / (d + a) ^ 2
 
 /-- Exact factorization of `F_a(d)` (sympy-verified). -/
 private theorem Ffun_factor (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
@@ -41,6 +42,60 @@ private theorem err_bound (X H : ℝ) (m : ℤ) (r : ℝ) (hr : 0 < r ^ 2)
   · have h0 : 0 ≤ ((m : ℝ) - X / r ^ 2) * r ^ 2 := by rw [key]; linarith
     exact (mul_nonneg_iff_of_pos_right hr).mp h0
   · rw [le_div_iff₀ hr, key]; linarith
+
+/-- **B1 step** of the §3→§6 near-curve bridge: a popular `d` (one belonging to a `𝒟_a`-gap,
+so both `d` and `d+a` lie in `𝒟`) makes `F_a(d) = X/d² − X/(d+a)²` lie within `2H/d²` of an
+integer.  The witnessing integer is `m − m'`, where `m·d²` and `m'·(d+a)²` lie in `[X,X+H]`. -/
+theorem inDa_distInt_Ffun {X H : ℝ} {a d : ℤ} (hX : 0 < X) (hd : 0 < (d : ℝ)) (ha : 0 < a)
+    (hin : inDa X H a d) :
+    distInt (Ffun X (a : ℝ) (d : ℝ)) ≤ 2 * H / (d : ℝ) ^ 2 := by
+  obtain ⟨-, hD, hDa, -⟩ := hin
+  -- the two points and their squares
+  set p : ℝ := (d : ℝ) with hp
+  set q : ℝ := (d : ℝ) + (a : ℝ) with hq
+  have haR : (0 : ℝ) < (a : ℝ) := by exact_mod_cast ha
+  have hppos : 0 < p := hd
+  have hqpos : 0 < q := by rw [hq]; positivity
+  have hpsq : (0 : ℝ) < p ^ 2 := by positivity
+  have hqsq : (0 : ℝ) < q ^ 2 := by positivity
+  have hqcast : ((d + a : ℤ) : ℝ) = q := by rw [hq]; push_cast; ring
+  -- extract the multipliers
+  obtain ⟨m, hmlo, hmhi⟩ := hD
+  obtain ⟨m', hm'lo, hm'hi⟩ := hDa
+  rw [hqcast] at hm'lo hm'hi
+  obtain ⟨hmlo', hmhi'⟩ := err_bound X H m p hpsq hmlo hmhi
+  obtain ⟨hm'lo', hm'hi'⟩ := err_bound X H m' q hqsq hm'lo hm'hi
+  -- `H ≥ 0` from `X ≤ m·p² ≤ X+H`
+  have hH0 : (0 : ℝ) ≤ H := by linarith [hmlo, hmhi]
+  -- `H/q² ≤ H/p²` since `p² ≤ q²`
+  have hpq2 : p ^ 2 ≤ q ^ 2 := by
+    apply pow_le_pow_left₀ hppos.le; rw [hp, hq]; linarith
+  have hHpq : H / q ^ 2 ≤ H / p ^ 2 := by
+    apply div_le_div_of_nonneg_left hH0 hpsq hpq2
+  -- `Ffun = (m - m') - ((m - X/p²) - (m' - X/q²))`
+  set n : ℤ := m - m' with hn
+  have hFval : Ffun X (a : ℝ) p = (n : ℝ)
+      - (((m : ℝ) - X / p ^ 2) - ((m' : ℝ) - X / q ^ 2)) := by
+    rw [hn]; push_cast
+    rw [show Ffun X (a : ℝ) p = X / p ^ 2 - X / q ^ 2 by unfold Ffun; rw [hq]]
+    ring
+  -- distance to the integer `n`
+  have hbound : |Ffun X (a : ℝ) p - (n : ℝ)| ≤ 2 * H / p ^ 2 := by
+    rw [hFval, show ((n : ℝ) - (((m : ℝ) - X / p ^ 2) - ((m' : ℝ) - X / q ^ 2))) - (n : ℝ)
+        = -(((m : ℝ) - X / p ^ 2) - ((m' : ℝ) - X / q ^ 2)) by ring, abs_neg, abs_le]
+    constructor
+    · have : (0 : ℝ) ≤ ((m' : ℝ) - X / q ^ 2) := hm'lo'
+      have hub : ((m' : ℝ) - X / q ^ 2) ≤ H / p ^ 2 := le_trans hm'hi' hHpq
+      rw [show -(2 * H / p ^ 2) = -(H / p ^ 2) - (H / p ^ 2) by ring]
+      linarith [hmlo', hmhi']
+    · rw [show 2 * H / p ^ 2 = H / p ^ 2 + H / p ^ 2 by ring]
+      have hub' : ((m' : ℝ) - X / q ^ 2) ≤ H / p ^ 2 := le_trans hm'hi' hHpq
+      linarith [hmhi', hm'lo']
+  calc distInt (Ffun X (a : ℝ) (d : ℝ))
+      = distInt (Ffun X (a : ℝ) p) := by rw [hp]
+    _ ≤ |Ffun X (a : ℝ) p - (n : ℝ)| := round_le _ n
+    _ ≤ 2 * H / p ^ 2 := hbound
+    _ = 2 * H / (d : ℝ) ^ 2 := by rw [hp]
 
 /-- **Tiny gaps impossible.** If `d, d+a ∈ 𝒟` (window `[X, X+H]`), `0 < a`, `D ≤ d ≤ 2D`, and the
 `X`-large regime `8 H D ≤ X`, `D² ≤ X`, `1 ≤ H`, `2 ≤ D` holds, then the gap is `≥ D³/(6X)`.

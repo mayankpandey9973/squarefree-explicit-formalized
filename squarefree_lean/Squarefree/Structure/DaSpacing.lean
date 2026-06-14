@@ -26,6 +26,13 @@ def inDa (X H : ℝ) (a d : ℤ) : Prop :=
 noncomputable def Rfun (X : ℝ) (a d : ℝ) : ℝ :=
   -(2 * d - a) * X / d ^ 2 + (2 * d + 3 * a) * X / (d + a) ^ 2
 
+/-- The d-side structural data witnessing `r ∈ ℛ_a`: a popular `d` at the `D`-scale with
+`r ≈ R_a(d)`. -/
+def RaWitness (P : Globals) (S : Scale P) (a : ℤ) (r : ℕ) : Prop :=
+  ∃ d : ℤ, inDa P.X P.H a d ∧ S.D ≤ (d : ℝ) ∧ (d : ℝ) ≤ 2 * S.D ∧
+    |Rfun P.X (a : ℝ) (d : ℝ) - (r : ℝ)| ≤ 14 * P.H / S.D ∧
+    (1/72) * S.R ≤ (r : ℝ) ∧ (r : ℝ) ≤ 16 * S.R
+
 /-- `#𝒟_a[D,2D]`. -/
 noncomputable def DaCard (X H : ℝ) (a : ℤ) (D : ℝ) : ℕ :=
   ((Finset.Icc ⌈D⌉ ⌊2 * D⌋).filter (fun d => inDa X H a d)).card

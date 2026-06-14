@@ -1,5 +1,7 @@
 import Squarefree.Opt.Strip
 import Squarefree.Opt.OnStripAux
+import Squarefree.Opt.OnStripEnvelope
+import Squarefree.Bracket.BoxSum
 
 /-!
 # §9 on-strip case + the merged per-Ω block bound
@@ -21,20 +23,22 @@ namespace Squarefree
 set_option maxHeartbeats 1600000 in
 /-- **On-strip case** of `dblock_bound` (§9 core, writeup 2083–2221). Shared params `u, c₀, Cu`.
 On the strip `G^{-2}Ω^{-11/2}X^{-Cu·u} ≤ x ≤ G^{17}Ω^{-26}X^{Cu·u}`, `𝐃(Ω) ≪ H/U` via Prop 7.3 with
-`W = W_{≠0}` and `18977g+15315u<2`. Added hypothesis `hubudget : 18977g+(16995+790·Cu)u ≤ 2`
+`W = W_{≠0}` and `18977g+15315u<2`. Added hypothesis `hubudget : 18977g+(18675+790·Cu)u ≤ 2`
 (the writeup's "shrink `u`"): the **sharp** `g`-coefficient `18977` keeps the full range
-`g < 2/18977`, while all `X^{O(u)}` bookkeeping (`2u` fiber, Prop 7.3's `X^{O(u)}`, strip-edge
-`X^{±Cu·u}`) sits in the `u`-coefficient `16995+790·Cu`.  Implies `hopt` and the on-strip
-envelope/closing budgets; for any `g < 2/18977`, `u := (2 − 18977g)/(2(16995+790·Cu)) > 0`
-satisfies it (the budget value is then `(2 + 18977g)/2 < 2`). -/
+`g < 2/18977`, while all `X^{O(u)}` bookkeeping (`2u` fiber, the AM-7 `X^{-2u}` envelope
+deflation, Prop 7.3's `X^{O(u)}`, strip-edge `X^{±Cu·u}`) sits in the `u`-coefficient
+`18675+790·Cu`.  Implies `hopt` and the on-strip envelope/closing budgets; for any
+`g < 2/18977`, `u := (2 − 18977g)/(2(18675+790·Cu)) > 0` satisfies it (the budget value is
+then `(2 + 18977g)/2 < 2`).  AM-8: threads `hlog : log X ≤ X^u` to Prop 7.3's pack. -/
 theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
     (u : ℝ) (hu0 : 0 < u) (hopt : 18977 * g + 15315 * u < 2) (hu2 : u ≤ 1 / 100)
     (c₀ : ℝ) (hc₀ : 1 ≤ c₀) (Cu : ℝ) (hCu : 1 ≤ Cu)
-    (hubudget : 18977 * g + (16995 + 790 * Cu) * u ≤ 2) :
+    (hubudget : 18977 * g + (18675 + 790 * Cu) * u ≤ 2) :
     ∃ C : ℝ, 0 < C ∧
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+        Real.log P.X ≤ P.X ^ P.u →
         (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
         2 * S.A ≤ S.D →
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω →
@@ -44,17 +48,18 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
         ∀ D : ℝ, 0 < D → D = S.D → DBlock P S D ≤ C * P.H / P.U := by
   obtain ⟨c₁', C₁', C₂', hc₁', hC₁', hC₂', hfiber'⟩ := prop_3_2_fiber_dStar
   obtain ⟨C₇, hC₇, hp73⟩ := prop_7_3
-  -- output constant
-  refine ⟨C₂' * (C₇ * (4 * (1 + c₀ ^ (-8/3 : ℝ)))), ?_, ?_⟩
+  -- output constant (the 10²⁵ absorbs `W = 10⁻²⁵·Wnz` in Prop 7.3's `R/W` denominator)
+  refine ⟨C₂' * (C₇ * 10 ^ 25 * (4 * (1 + c₀ ^ (-8/3 : ℝ)))), ?_, ?_⟩
   · have := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-8/3 : ℝ)
     positivity
-  intro P hg hu hX S hΔlong hX0big hNR hAD hbandlo hΩU hxlo hxhi D hDpos hDeq
+  intro P hg hu hX S hΔlong hX0big hlog hNR hAD hbandlo hΩU hxlo hxhi D hDpos hDeq
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hG := P.G_pos; have hH := P.H_pos; have hU := P.U_pos
   have hΔ := S.Δ_pos; have hΩ := S.Ω_pos
   have hc₀0 : 0 < c₀ := lt_of_lt_of_le one_pos hc₀
   have hg0' : 0 ≤ P.g := by rw [hg]; exact hg0.le
   have hPu : 0 < P.u := by rw [hu]; exact hu0
+  have hG1 : 1 ≤ P.G := Real.one_le_rpow hX hg0'
   have hΔ1 : (1:ℝ) ≤ S.Δ := le_trans (Real.one_le_rpow hX (by norm_num)) hΔlong
   have hApos : (0:ℝ) < S.A := by unfold Scale.A; positivity
   -- derive 1 < P.X from the `X^{1/100} ≥ 16777216` floor
@@ -72,13 +77,35 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   -- admissibility envelope at Wnz
   have hgP : P.g = g := hg
   have hbudP : OnStripAux.Budget P.g P.u Cu := by
-    show 18977 * P.g + (16995 + 790 * Cu) * P.u ≤ 2
+    show 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2
     rw [hg, hu]; exact hubudget
-  have hAdm : AdmissibleW P S (OnStripAux.Wnz P S) :=
-    OnStripAux.admissibleW_Wnz P S c₀ Cu SD hXgt hg0' hPu.le hbudP
-  -- per-a bound:  DaCard ≤ C₂'·C₇·(1+φ)·(1+H/A²)·(R/Wnz)
-  set M : ℝ := C₂' * (C₇ * ((1 + StripAux.fiberφ P S)
-      * ((1 + P.H / S.A ^ 2) * (S.R / OnStripAux.Wnz P S)))) with hMdef
+  have hEnv : Sec7Envelope P S
+      ((10:ℝ) ^ (-25 : ℤ) * P.X ^ (-(2:ℝ) * P.u) * OnStripAux.Wnz P S) :=
+    OnStripAux.sec7Envelope_Wnz P S c₀ Cu SD hXgt hg0' hPu.le hbudP hX0big hlog
+  have hX2upos : (0:ℝ) < P.X ^ (2 * P.u) := Real.rpow_pos_of_pos hX0 _
+  have hAD10 : 10 * S.A ≤ S.D := by
+    have hexp : (1/100 : ℝ) ≤ (1 - P.g) / 5 - P.u := by
+      rw [hg, hu]
+      linarith [hg1, hu2]
+    have hXpow10 : (10 : ℝ) ≤ P.X ^ (1/100 : ℝ) := by
+      linarith [hX0big]
+    have hXpow_le : P.X ^ (1/100 : ℝ) ≤ P.X ^ ((1 - P.g) / 5 - P.u) :=
+      Real.rpow_le_rpow_of_exponent_le hX hexp
+    have hratio : P.H / P.U = P.X ^ ((1 - P.g) / 5 - P.u) := by
+      rw [Globals.H, Globals.U, Real.rpow_sub P.X_pos]
+    have hHU : 10 * P.U ≤ P.H := by
+      have h10 : (10 : ℝ) ≤ P.H / P.U := by
+        rw [hratio]
+        exact le_trans hXpow10 hXpow_le
+      exact (le_div_iff₀ P.U_pos).mp h10
+    have hΩH : 10 * S.Ω ≤ P.H := by
+      exact le_trans (mul_le_mul_of_nonneg_left hΩU (by norm_num : (0:ℝ) ≤ 10)) hHU
+    rw [show S.A = S.Δ * S.Ω from rfl, show S.D = P.H * S.Δ from rfl]
+    nlinarith [S.Δ_pos, hΩH]
+  -- per-a bound:  DaCard ≤ C₂'·(C₇·10²⁵)·(1+φ)·(1+H/A²)·(X^{2u}·R/Wnz)
+  set M : ℝ := C₂' * (C₇ * 10 ^ 25 * ((1 + StripAux.fiberφ P S)
+      * ((1 + P.H / S.A ^ 2)
+        * (P.X ^ (2 * P.u) * (S.R / OnStripAux.Wnz P S))))) with hMdef
   have hWnzpos := OnStripAux.Wnz_pos P S
   have hRpos : (0:ℝ) < S.R := by unfold Scale.R; positivity
   have hφnn : (0:ℝ) ≤ StripAux.fiberφ P S := by
@@ -97,9 +124,22 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       have hthr : (0:ℝ) ≤ S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) :=
         mul_nonneg (Real.rpow_nonneg hΔ.le _) (Real.rpow_nonneg (by positivity) _)
       nlinarith [hthr]
-    obtain ⟨Ra, dStar, hinDa, _hband, hDaC⟩ :=
+    obtain ⟨Ra, _dStar, _hinDa, _hband, _hnear, hwit, hDaC⟩ :=
       hfiber' P S a ha0 hΔlong hX0big hloq hAa ha2A hAD D hDpos hDeq
-    have h73 := hp73 P S a ha0 (OnStripAux.Wnz P S) hAdm Ra dStar hinDa
+    have h73raw := hp73 P S a ha0 hAD10 hG1 hAa ha2A
+      ((10:ℝ) ^ (-25 : ℤ) * P.X ^ (-(2:ℝ) * P.u) * OnStripAux.Wnz P S) hEnv
+      c₀ Cu SD hbudP hg0' hPu hX0big hlog Ra hwit
+    have h73 : (Ra.card : ℝ)
+        ≤ C₇ * 10 ^ 25 * ((1 + P.H / S.A ^ 2)
+            * (P.X ^ (2 * P.u) * (S.R / OnStripAux.Wnz P S))) := by
+      refine le_trans h73raw (le_of_eq ?_)
+      rw [show S.R / ((10:ℝ) ^ (-25 : ℤ) * P.X ^ (-(2:ℝ) * P.u) * OnStripAux.Wnz P S)
+            = 10 ^ 25 * (P.X ^ (2 * P.u) * (S.R / OnStripAux.Wnz P S)) by
+          rw [show ((10:ℝ) ^ (-25 : ℤ)) = ((10:ℝ) ^ 25)⁻¹ by norm_num,
+              show P.X ^ (-(2:ℝ) * P.u) = (P.X ^ (2 * P.u))⁻¹ by
+                rw [← Real.rpow_neg hX0.le]; congr 1; ring]
+          field_simp [hWnzpos.ne', hX2upos.ne']]
+      ring
     -- DaCard ≤ C₂'·#Ra·(1+φ) ≤ C₂'·[C₇·(1+H/A²)·(R/Wnz)]·(1+φ)
     have hφeq : (1 + (S.Δ / S.A) ^ (8/3 : ℝ) * P.G ^ (-2/3 : ℝ)) = 1 + StripAux.fiberφ P S := by
       rw [StripAux.fiberφ_def]
@@ -107,17 +147,22 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
     calc (DaCard P.X P.H a D : ℝ)
         ≤ C₂' * (Ra.card : ℝ) * (1 + (S.Δ / S.A) ^ (8/3 : ℝ) * P.G ^ (-2/3 : ℝ)) := hDaC
       _ = C₂' * ((1 + StripAux.fiberφ P S) * (Ra.card : ℝ)) := by rw [hφeq]; ring
-      _ ≤ C₂' * ((1 + StripAux.fiberφ P S) * (C₇ * ((1 + P.H / S.A ^ 2) * (S.R / OnStripAux.Wnz P S)))) := by
+      _ ≤ C₂' * ((1 + StripAux.fiberφ P S) * (C₇ * 10 ^ 25
+            * ((1 + P.H / S.A ^ 2)
+              * (P.X ^ (2 * P.u) * (S.R / OnStripAux.Wnz P S))))) := by
           apply mul_le_mul_of_nonneg_left _ hC₂'.le
           exact mul_le_mul_of_nonneg_left h73 (by linarith [hφnn])
-      _ = C₂' * (C₇ * ((1 + StripAux.fiberφ P S)
-            * ((1 + P.H / S.A ^ 2) * (S.R / OnStripAux.Wnz P S)))) := by ring
+      _ = C₂' * (C₇ * 10 ^ 25 * ((1 + StripAux.fiberφ P S)
+            * ((1 + P.H / S.A ^ 2)
+              * (P.X ^ (2 * P.u) * (S.R / OnStripAux.Wnz P S))))) := by ring
   -- sum: DBlock ≤ #Icc · M ≤ (A+1)·M
   have hMnn : 0 ≤ M := by
     rw [hMdef]
-    have : 0 ≤ (1 + P.H / S.A ^ 2) * (S.R / OnStripAux.Wnz P S) := by positivity
-    have : 0 ≤ (1 + StripAux.fiberφ P S) * ((1 + P.H / S.A ^ 2) * (S.R / OnStripAux.Wnz P S)) := by
-      apply mul_nonneg (by linarith [hφnn]) this
+    have h1 : 0 ≤ (1 + P.H / S.A ^ 2)
+        * (P.X ^ (2 * P.u) * (S.R / OnStripAux.Wnz P S)) := by positivity
+    have h2 : 0 ≤ (1 + StripAux.fiberφ P S) * ((1 + P.H / S.A ^ 2)
+        * (P.X ^ (2 * P.u) * (S.R / OnStripAux.Wnz P S))) :=
+      mul_nonneg (by linarith [hφnn]) h1
     positivity
   have hSM : DBlock P S D ≤ (S.A + 1) * M := by
     have hsum : DBlock P S D ≤ (Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋).card • M := by
@@ -141,12 +186,12 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   -- assemble
   rw [mul_div_assoc]
   calc DBlock P S D ≤ (S.A + 1) * M := hSM
-    _ = C₂' * (C₇ * ((S.A + 1) * (1 + StripAux.fiberφ P S)
-          * ((1 + P.H / S.A ^ 2) * (S.R / OnStripAux.Wnz P S)))) := by rw [hMdef]; ring
-    _ ≤ C₂' * (C₇ * ((4 * (1 + c₀ ^ (-8/3 : ℝ))) * (P.H / P.U))) := by
+    _ = C₂' * (C₇ * 10 ^ 25 * (P.X ^ (2 * P.u) * ((S.A + 1) * (1 + StripAux.fiberφ P S)
+          * ((1 + P.H / S.A ^ 2) * (S.R / OnStripAux.Wnz P S))))) := by rw [hMdef]; ring
+    _ ≤ C₂' * (C₇ * 10 ^ 25 * ((4 * (1 + c₀ ^ (-8/3 : ℝ))) * (P.H / P.U))) := by
         apply mul_le_mul_of_nonneg_left _ hC₂'.le
-        exact mul_le_mul_of_nonneg_left hclose hC₇.le
-    _ = C₂' * (C₇ * (4 * (1 + c₀ ^ (-8/3 : ℝ)))) * (P.H / P.U) := by ring
+        exact mul_le_mul_of_nonneg_left hclose (by positivity)
+    _ = C₂' * (C₇ * 10 ^ 25 * (4 * (1 + c₀ ^ (-8/3 : ℝ)))) * (P.H / P.U) := by ring
 
 /-- **§8/§9 per-Ω block bound** (merger). For `Ω` in the band `[c₀·G^{-1/4}U^{-3/4}, U]`,
 `𝐃(Ω) ≪ H/U`. Picks shared `u, C, c₀, Cu`, splits `S.x` against the strip edges, and dispatches to
@@ -157,6 +202,8 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+        Real.log P.X ≤ P.X ^ P.u →
+        (10:ℝ) ^ 33 ≤ P.U →
         (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
         2 * S.A ≤ S.D →
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω →
@@ -171,7 +218,7 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
   have hCu_on : (1:ℝ) ≤ Cu := by rw [hCudef]; nlinarith [hC6]
   -- positivity of the denominators / numerators in the witness
   have hden1 : (0:ℝ) < C6 + 100 := by linarith
-  have hden2 : (0:ℝ) < 16995 + 790 * Cu := by nlinarith [hCu_on]
+  have hden2 : (0:ℝ) < 18675 + 790 * Cu := by nlinarith [hCu_on]
   have hg1' : g < 1 / 4000 := by linarith [hg1]
   have hnum1 : (0:ℝ) < 1/200 - 20 * g := by linarith [hg1']
   have hnum2 : (0:ℝ) < 2 - 18977 * g := by
@@ -181,20 +228,20 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
     linarith
   -- u witness: half of the min of the three constraints' thresholds
   set u : ℝ := min ((1/200 - 20 * g) / (C6 + 100))
-      (min ((2 - 18977 * g) / (16995 + 790 * Cu)) (1/100)) / 2 with hudef
+      (min ((2 - 18977 * g) / (18675 + 790 * Cu)) (1/100)) / 2 with hudef
   have hm1 : (0:ℝ) < (1/200 - 20 * g) / (C6 + 100) := div_pos hnum1 hden1
-  have hm2 : (0:ℝ) < (2 - 18977 * g) / (16995 + 790 * Cu) := div_pos hnum2 hden2
+  have hm2 : (0:ℝ) < (2 - 18977 * g) / (18675 + 790 * Cu) := div_pos hnum2 hden2
   have hm3 : (0:ℝ) < (1:ℝ)/100 := by norm_num
   have hminpos : (0:ℝ) < min ((1/200 - 20 * g) / (C6 + 100))
-      (min ((2 - 18977 * g) / (16995 + 790 * Cu)) (1/100)) := lt_min hm1 (lt_min hm2 hm3)
+      (min ((2 - 18977 * g) / (18675 + 790 * Cu)) (1/100)) := lt_min hm1 (lt_min hm2 hm3)
   have hu0 : 0 < u := by rw [hudef]; linarith [hminpos]
   -- u ≤ each threshold (half of min ≤ min ≤ each arg)
   have hule_min : u ≤ min ((1/200 - 20 * g) / (C6 + 100))
-      (min ((2 - 18977 * g) / (16995 + 790 * Cu)) (1/100)) := by
+      (min ((2 - 18977 * g) / (18675 + 790 * Cu)) (1/100)) := by
     rw [hudef]; linarith [hminpos]
   have hu_off : u ≤ (1/200 - 20 * g) / (C6 + 100) :=
     le_trans hule_min (min_le_left _ _)
-  have hu_on : u ≤ (2 - 18977 * g) / (16995 + 790 * Cu) :=
+  have hu_on : u ≤ (2 - 18977 * g) / (18675 + 790 * Cu) :=
     le_trans hule_min (le_trans (min_le_right _ _) (min_le_left _ _))
   have hu2 : u ≤ 1 / 100 :=
     le_trans hule_min (le_trans (min_le_right _ _) (min_le_right _ _))
@@ -203,13 +250,13 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
     rw [← hC6def]
     have := (le_div_iff₀ hden1).mp hu_off
     linarith [this]
-  -- on budget: 18977g + (16995+790Cu)·u ≤ 2
-  have hubud_on : 18977 * g + (16995 + 790 * Cu) * u ≤ 2 := by
+  -- on budget: 18977g + (18675+790Cu)·u ≤ 2
+  have hubud_on : 18977 * g + (18675 + 790 * Cu) * u ≤ 2 := by
     have := (le_div_iff₀ hden2).mp hu_on
     nlinarith [this]
-  -- goal opt: 18977g + 15315u < 2  (strict, via 15315 < 16995+790Cu and u>0)
+  -- goal opt: 18977g + 15315u < 2  (strict, via 15315 < 18675+790Cu and u>0)
   have hopt : 18977 * g + 15315 * u < 2 := by
-    have hcoef : 15315 * u < (16995 + 790 * Cu) * u := by
+    have hcoef : 15315 * u < (18675 + 790 * Cu) * u := by
       apply mul_lt_mul_of_pos_right _ hu0
       nlinarith [hCu_on]
     linarith [hubud_on, hcoef]
@@ -220,24 +267,24 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
   obtain ⟨Con, hCon, hon⟩ :=
     dblock_on_strip g hg0 hg1 u hu0 hopt hu2 1 le_rfl Cu hCu_on hubud_on
   refine ⟨max Coff Con, lt_max_of_lt_left hCoff, 1, one_pos, ?_⟩
-  intro P hPg hPu hX S hΔ hX0big hNR hAD hband hΩU D hDpos hDeq
+  intro P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU D hDpos hDeq
   have hH := P.H_pos; have hU := P.U_pos
   have hHU : (0:ℝ) ≤ P.H / P.U := by positivity
   -- trichotomy on S.x
   by_cases h1 : S.x ≤ P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u))
-  · have := hoff P hPg hPu hX S hΔ hX0big hNR hAD hband hΩU (Or.inl h1) D hDpos hDeq
+  · have := hoff P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU (Or.inl h1) D hDpos hDeq
     calc DBlock P S D ≤ Coff * P.H / P.U := this
       _ ≤ max Coff Con * P.H / P.U := by
           rw [mul_div_assoc, mul_div_assoc]
           exact mul_le_mul_of_nonneg_right (le_max_left _ _) hHU
   · by_cases h2 : P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x
-    · have := hoff P hPg hPu hX S hΔ hX0big hNR hAD hband hΩU (Or.inr h2) D hDpos hDeq
+    · have := hoff P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU (Or.inr h2) D hDpos hDeq
       calc DBlock P S D ≤ Coff * P.H / P.U := this
         _ ≤ max Coff Con * P.H / P.U := by
             rw [mul_div_assoc, mul_div_assoc]
             exact mul_le_mul_of_nonneg_right (le_max_left _ _) hHU
     · push_neg at h1 h2
-      have := hon P hPg hPu hX S hΔ hX0big hNR hAD hband hΩU h1.le h2.le D hDpos hDeq
+      have := hon P hPg hPu hX S hΔ hX0big hlog hNR hAD hband hΩU h1.le h2.le D hDpos hDeq
       calc DBlock P S D ≤ Con * P.H / P.U := this
         _ ≤ max Coff Con * P.H / P.U := by
             rw [mul_div_assoc, mul_div_assoc]

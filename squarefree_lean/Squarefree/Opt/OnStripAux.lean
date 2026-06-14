@@ -1,4 +1,5 @@
 import Squarefree.Opt.StripAux
+import Squarefree.Bracket.Admissible
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 /-!
@@ -274,10 +275,12 @@ theorem T1_mono (P : Globals) (S : Scale P) :
 /-- The uniform on-strip `(g,u,Cu)`-budget that discharges every monomial comparison, the
 `R>1`/`T₁>1` exponents, and the closing LP.  The `g`-coefficient is the sharp `18977` (so the
 range is the full `g < 2/18977`); all `X^{O(u)}` bookkeeping (the `2u` fiber factor, Prop 7.3's
-`X^{O(u)}`, and the strip-edge `X^{±Cu·u}`) lives purely in the `u`-coefficient `16995 + 790·Cu`.
+`X^{O(u)}`, and the strip-edge `X^{±Cu·u}`) lives purely in the `u`-coefficient `18675 + 790·Cu`
+(G1 ruling AM-7: the envelope's `(1+log X)` is killed by an extra `X^{-2u}` in the caller's `W`,
+whose `X^{+2u}` re-enters the closing LP — `+1680` on the `u`-coefficient, sympy-verified).
 The RHS is the sharp `2` (the binding `H·A` closing term needs exactly `≤ 2`), so the budget
 admits every `g < 2/18977` via a small `u > 0`. -/
-def Budget (g u Cu : ℝ) : Prop := 18977 * g + (16995 + 790 * Cu) * u ≤ 2
+def Budget (g u Cu : ℝ) : Prop := 18977 * g + (18675 + 790 * Cu) * u ≤ 2
 
 /-- **The §7 admissibility envelope at the §9 bottleneck `Wnz`** (with constant `c = 1`).
 Every entry `e0k` is `Wnz ≤ m_k` (the strip minimum), via `Wnz_le_mono`; `R>1`, `T₁>1` via
@@ -290,7 +293,10 @@ noncomputable def admissibleW_Wnz (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D
     (hXgt : 1 < P.X) (hg : 0 ≤ P.g) (hu : 0 ≤ P.u) (hbud : Budget P.g P.u Cu) :
     AdmissibleW P S (Wnz P S) := by
   have hCu := D.hCu
-  have hbud' : 18977 * P.g + (16995 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hbud' : 18977 * P.g + (16995 + 790 * Cu) * P.u ≤ 2 := by
+    have h := hbud
+    unfold Budget at h
+    nlinarith [mul_nonneg (by norm_num : (0:ℝ) ≤ 1680) hu]
   have huCu : (0:ℝ) ≤ P.u * Cu := mul_nonneg hu (by linarith)
   have huCu1 : (0:ℝ) ≤ P.u * (Cu - 1) := mul_nonneg hu (by linarith)
   -- master discharger for one comparison `Wnz ≤ H^a x^b G^c Ω^d`
@@ -516,19 +522,19 @@ private theorem HU_xpow (P : Globals) : P.H / P.U = P.X ^ ((1 - P.g)/5 - P.u) :=
   rw [Globals.H, Globals.U, ← Real.rpow_sub P.X_pos]
 
 /-- A single closing-LP monomial term: if `(R/Wnz)·M = H^a x^b G^c Ω^d` and the worst-case
-exponent (plus the `2u` fiber factor) is `≤ (1-g)/5 - u`, then `X^{2u}·(R/Wnz)·M ≤ X^{(1-g)/5-u}`
-`= H/U`. -/
+exponent (plus the `2u` fiber factor and the `2u` of the AM-7 envelope `W`-deflation) is
+`≤ (1-g)/5 - u`, then `X^{4u}·(R/Wnz)·M ≤ X^{(1-g)/5-u} = H/U`. -/
 private theorem closing_term (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripData P S c₀ Cu)
     (term a b c d : ℝ) (hterm : term = P.H ^ a * S.x ^ b * P.G ^ c * S.Ω ^ d)
-    (hExp : ratioExpU P.g P.u Cu a b c d + 2 * P.u ≤ (1 - P.g)/5 - P.u) :
-    P.X ^ (2 * P.u) * term ≤ P.H / P.U := by
+    (hExp : ratioExpU P.g P.u Cu a b c d + 4 * P.u ≤ (1 - P.g)/5 - P.u) :
+    P.X ^ (4 * P.u) * term ≤ P.H / P.U := by
   have hX := P.X_pos
   rw [HU_xpow, hterm]
   have h1 := mono_ub P S c₀ Cu D a b c d
-  calc P.X ^ (2 * P.u) * (P.H ^ a * S.x ^ b * P.G ^ c * S.Ω ^ d)
-      ≤ P.X ^ (2 * P.u) * P.X ^ (ratioExpU P.g P.u Cu a b c d) :=
+  calc P.X ^ (4 * P.u) * (P.H ^ a * S.x ^ b * P.G ^ c * S.Ω ^ d)
+      ≤ P.X ^ (4 * P.u) * P.X ^ (ratioExpU P.g P.u Cu a b c d) :=
         mul_le_mul_of_nonneg_left h1 (Real.rpow_nonneg hX.le _)
-    _ = P.X ^ (2 * P.u + ratioExpU P.g P.u Cu a b c d) := by rw [← Real.rpow_add hX]
+    _ = P.X ^ (4 * P.u + ratioExpU P.g P.u Cu a b c d) := by rw [← Real.rpow_add hX]
     _ ≤ P.X ^ ((1 - P.g)/5 - P.u) :=
         Real.rpow_le_rpow_of_exponent_le D.hX (by linarith [hExp])
 
@@ -542,14 +548,17 @@ private theorem RW_mul (P : Globals) (S : Scale P) (a₂ b₂ c₂ d₂ : ℝ) :
   rw [Real.rpow_add hH, Real.rpow_add hx, Real.rpow_add hG, Real.rpow_add hΩ]; ring
 
 /-- **Closing LP** (Step D): on the strip, with the uniform budget
-`18977g + (16995 + 790·Cu)u ≤ 2`, the per-scale envelope
-`(A+1)·(1+φ)·(1+H/A²)·(R/Wnz)` is `≤ 4·(1+c₀^{-8/3})·(H/U)`.  The binding `H·A` term has the
+`18977g + (18675 + 790·Cu)u ≤ 2`, the per-scale envelope
+`X^{2u}·(A+1)·(1+φ)·(1+H/A²)·(R/Wnz)` is `≤ 4·(1+c₀^{-8/3})·(H/U)`.  The leading `X^{2u}` is
+the AM-7 envelope `W`-deflation re-entering through `R/W`.  The binding `H·A` term has the
 sharp `g`-coefficient `18977` (writeup (9.3): `840·(9.3) = 18977g + 15315u − 2`, plus the `+2u`
-fiber factor and the `±Cu·u` strip edges absorbed into the `u`-coefficient). -/
+fiber factor, the `+2u` deflation, and the `±Cu·u` strip edges absorbed into the
+`u`-coefficient: `15315 + 1680 + 1680 = 18675`, sympy-verified). -/
 theorem closing_bound (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripData P S c₀ Cu)
     (hg : 0 ≤ P.g) (hu : 0 < P.u)
-    (hbud : 18977 * P.g + (16995 + 790 * Cu) * P.u ≤ 2) :
-    (S.A + 1) * (1 + StripAux.fiberφ P S) * ((1 + P.H / S.A ^ 2) * (S.R / Wnz P S))
+    (hbud : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2) :
+    P.X ^ (2 * P.u)
+        * ((S.A + 1) * (1 + StripAux.fiberφ P S) * ((1 + P.H / S.A ^ 2) * (S.R / Wnz P S)))
       ≤ (4 * (1 + c₀ ^ (-8/3 : ℝ))) * (P.H / P.U) := by
   have hX := P.X_pos; have hH := P.H_pos; have hG := P.G_pos; have hΩ := S.Ω_pos
   have hx := x_pos P S; have hΔ := S.Δ_pos
@@ -610,16 +619,27 @@ theorem closing_bound (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripData
     have h4 : 0 ≤ (S.R / Wnz P S) * (P.H / S.A ^ 2) := by positivity
     linarith
   have hX2upos : (0:ℝ) < P.X ^ (2 * P.u) := Real.rpow_pos_of_pos hX _
-  calc (S.A + 1) * (1 + StripAux.fiberφ P S) * ((1 + P.H / S.A ^ 2) * (S.R / Wnz P S))
-      = (1 + StripAux.fiberφ P S) * ((S.A + 1) * ((1 + P.H / S.A ^ 2) * (S.R / Wnz P S))) := by ring
-    _ ≤ (Bφ * P.X ^ (2 * P.u)) * ((S.A + 1) * ((1 + P.H / S.A ^ 2) * (S.R / Wnz P S))) := by
-        apply mul_le_mul_of_nonneg_right _ (by rw [hexp]; exact hsum_nn)
+  have hX44 : P.X ^ (2 * P.u) * P.X ^ (2 * P.u) = P.X ^ (4 * P.u) := by
+    rw [← Real.rpow_add hX]; congr 1; ring
+  calc P.X ^ (2 * P.u)
+          * ((S.A + 1) * (1 + StripAux.fiberφ P S) * ((1 + P.H / S.A ^ 2) * (S.R / Wnz P S)))
+      = (1 + StripAux.fiberφ P S)
+          * (P.X ^ (2 * P.u) * ((S.A + 1) * ((1 + P.H / S.A ^ 2) * (S.R / Wnz P S)))) := by ring
+    _ ≤ (Bφ * P.X ^ (2 * P.u))
+          * (P.X ^ (2 * P.u) * ((S.A + 1) * ((1 + P.H / S.A ^ 2) * (S.R / Wnz P S)))) := by
+        apply mul_le_mul_of_nonneg_right _
+          (mul_nonneg hX2upos.le (by rw [hexp]; exact hsum_nn))
         rw [show (1 + c₀^(-8/3:ℝ)) * P.X ^ (2*P.u) = Bφ * P.X ^ (2 * P.u) from by rw [hBφ]] at hφ
         exact hφ
-    _ = Bφ * (P.X ^ (2*P.u) * ((S.R / Wnz P S) * S.A)
-          + P.X ^ (2*P.u) * ((S.R / Wnz P S) * (P.H / S.A))
-          + P.X ^ (2*P.u) * ((S.R / Wnz P S) * 1)
-          + P.X ^ (2*P.u) * ((S.R / Wnz P S) * (P.H / S.A ^ 2))) := by rw [hexp]; ring
+    _ = Bφ * ((P.X ^ (2*P.u) * P.X ^ (2*P.u)) * ((S.R / Wnz P S) * S.A)
+          + (P.X ^ (2*P.u) * P.X ^ (2*P.u)) * ((S.R / Wnz P S) * (P.H / S.A))
+          + (P.X ^ (2*P.u) * P.X ^ (2*P.u)) * ((S.R / Wnz P S) * 1)
+          + (P.X ^ (2*P.u) * P.X ^ (2*P.u)) * ((S.R / Wnz P S) * (P.H / S.A ^ 2))) := by
+        rw [hexp]; ring
+    _ = Bφ * (P.X ^ (4*P.u) * ((S.R / Wnz P S) * S.A)
+          + P.X ^ (4*P.u) * ((S.R / Wnz P S) * (P.H / S.A))
+          + P.X ^ (4*P.u) * ((S.R / Wnz P S) * 1)
+          + P.X ^ (4*P.u) * ((S.R / Wnz P S) * (P.H / S.A ^ 2))) := by rw [hX44]
     _ ≤ Bφ * (P.H / P.U + P.H / P.U + P.H / P.U + P.H / P.U) :=
         mul_le_mul_of_nonneg_left (by linarith [bA, bHA, b1, bHA2]) hBφpos.le
     _ = (4 * (1 + c₀ ^ (-8/3 : ℝ))) * (P.H / P.U) := by rw [hBφ]; ring

@@ -867,6 +867,8 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
         ∃ (Ra : Finset ℕ) (dStar : ℕ → ℤ),
           (∀ r ∈ Ra, inDa P.X P.H a (dStar r)) ∧
           (∀ r ∈ Ra, c₁*S.R ≤ (r:ℝ) ∧ (r:ℝ) ≤ C₁*S.R) ∧
+          (∀ r ∈ Ra, |Rfun P.X (a:ℝ) ((dStar r : ℤ):ℝ) - (r:ℝ)| ≤ 14 * P.H / S.D) ∧
+          (∀ r ∈ Ra, RaWitness P S a r) ∧
           ((DaCard P.X P.H a D : ℝ) ≤ C₂ * (Ra.card:ℝ) * (1 + (S.Δ/S.A)^(8/3:ℝ) * P.G^(-2/3:ℝ))) := by
   obtain ⟨c, hc_pos, hc⟩ := lemma_3_1
   refine ⟨1/72, 16, 18144 / c + 2, by norm_num, by norm_num, by positivity, ?_⟩
@@ -1112,7 +1114,7 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
       have hfac : (0:ℝ) ≤ 5973090729984 * S.Δ ^ 15 * P.G ^ 3 * P.H ^ 15 * (a:ℝ) := by positivity
       nlinarith [mul_le_mul_of_nonneg_left hDa8 hfac]
     rw [div_le_iff₀ hspc_pos]; exact hmain
-  refine ⟨Ra, dStar, ?_, ?_, ?_⟩
+  refine ⟨Ra, dStar, ?_, ?_, ?_, ?_, ?_⟩
   · -- (1) dStar r ∈ 𝒟_a
     intro r hr
     obtain ⟨hmem, -⟩ := hdStar_spec r hr
@@ -1125,7 +1127,26 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
       have h := hrNcast (dStar r) hmem; rw [heq] at h; push_cast at h; linarith [h]
     rw [hcast]
     exact ⟨by linarith [hlo], by linarith [hhi]⟩
-  · -- (3) the fiber bound
+  · -- (3) the defining relation  r ≈ R_a(dStar r)
+    intro r hr
+    obtain ⟨hmem, heq⟩ := hdStar_spec r hr
+    obtain ⟨hind, hdlo, hdhi⟩ := hmemS₀ (dStar r) hmem
+    have hcast : (r : ℝ) = (rStar (dStar r) : ℝ) := by
+      have h := hrNcast (dStar r) hmem; rw [heq] at h; push_cast at h; linarith [h]
+    rw [hcast]
+    exact hnear (dStar r) hind hdlo hdhi
+  · -- (3') RaWitness: witness d := dStar r
+    intro r hr
+    obtain ⟨hmem, heq⟩ := hdStar_spec r hr
+    obtain ⟨hind, hdlo, hdhi⟩ := hmemS₀ (dStar r) hmem
+    have hcast : (r : ℝ) = (rStar (dStar r) : ℝ) := by
+      have h := hrNcast (dStar r) hmem; rw [heq] at h; push_cast at h; linarith [h]
+    obtain ⟨hbandlo, hbandhi⟩ := hrStar_band (dStar r) hmem
+    refine ⟨dStar r, hind, hdlo, hdhi, ?_, ?_, ?_⟩
+    · rw [hcast]; exact hnear (dStar r) hind hdlo hdhi
+    · rw [hcast]; linarith [hbandlo]
+    · rw [hcast]; exact hbandhi
+  · -- (4) the fiber bound
     rw [hDaCard]
     have hmaps : (↑S₀ : Set ℤ).MapsTo rN ↑Ra := by
       intro d hd; rw [hRa]; exact Finset.mem_image_of_mem rN hd

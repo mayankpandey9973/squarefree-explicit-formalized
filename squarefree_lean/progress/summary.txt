@@ -1,0 +1,23 @@
+SQUAREFREE FORMALIZATION — PROGRESS SUMMARY (2026-06-11)
+=========================================================
+
+BUILD: GREEN, full tree (8513 jobs). Tracked stubs: exactly 6, all §7:
+  - Squarefree/Bracket/BoxSum.lean:40,49   prop_7_1, prop_7_3
+  - Squarefree/Bracket/BoxPowerSums.lean   box_sum_* (4 power-sum helpers)
+
+✅ prop_5_1 PROVED 2026-06-11 (Prop51.lean:37) — axiom-clean [propext, Classical.choice, Quot.sound].
+   Chain: prop51_perpair (Prop51Assembly.lean:30 — fiber_le_sum_ranges partition at V₁/10⁶⁰·V₂ +
+   the four range counts + producer packs Prop51Step4Pack/Step4WindowFacts/RaWitness)
+   → Ra_card_le_popular + markov_discharge (Wnat = ⌈128W⌉) → prop51_combine (C₀=10⁴⁰⁹ Bcombine,
+   8→3 collapse) → prop_5_1 with C = 10⁴¹⁵.
+   Regime: the faithful band G^{-1/4}U^{-3/4} ≤ Ω ≤ U (NO Ω≥1, NO G≤U anywhere); pack discharged
+   end-to-end at Opt/Strip→Global→DyadicAssembly→Main X₀.
+
+DONE: §1 (Möbius), §4 (counting engines), §5 (Prop 5.1 COMPLETE), §6 (prop_6_1), §8/§9 spine.
+NEXT: §7 (prop_7_1, prop_7_3 + the 4 BoxPowerSums stubs) — the LAST remaining section.
+
+HOUSEKEEPING ✅ 2026-06-11: 14 dead legacy files pruned (crude Step-4 route, Diam2 Vmax-form,
+Confinement, PervCount, …; kept-as-live verified: SmoothConf/SsumAdd/Confine/Diam/Prop51Step4Prime/
+UpsilonMag chain). Oversize files split: FitEA 855→273(+Core,+Cap), FitEB 544→234(+Cap),
+Capstone 565→390(+Aux), Step4Pack 423→264(+Facts), Step3FsumTight 446→336(+Mon);
+UpsilonErrSharp 434 left (single-theorem, unsplittable). Full build green.

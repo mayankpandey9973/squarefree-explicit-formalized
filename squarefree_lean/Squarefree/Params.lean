@@ -79,6 +79,34 @@ private theorem F_pos : 0 < S.F := by
   unfold Scale.F
   positivity
 
+/-- `D > 0`. -/
+theorem D_pos : 0 < S.D := by
+  have := P.H_pos; have := S.Δ_pos; unfold Scale.D; positivity
+
+/-- ε-window glue: the exact lower window implies the `(1−10⁻⁹)`-relaxed one. -/
+theorem D_eps_lo {d : ℝ} (h : S.D ≤ d) : S.D * (1 - 1/10 ^ 9) ≤ d := by
+  nlinarith [S.D_pos, h]
+
+/-- ε-window glue: the exact upper window implies the `(1+10⁻⁹)`-relaxed one. -/
+theorem D_eps_hi {d : ℝ} (h : d ≤ 2 * S.D) : d ≤ 2 * S.D * (1 + 1/10 ^ 9) := by
+  nlinarith [S.D_pos, h]
+
+/-- Positivity through the relaxed lower window. -/
+theorem D_pos_of_eps {d : ℝ} (h : S.D * (1 - 1/10 ^ 9) ≤ d) : 0 < d :=
+  lt_of_lt_of_le (by nlinarith [S.D_pos]) h
+
+/-- Half-window through the relaxed lower window. -/
+theorem D_half_of_eps {d : ℝ} (h : S.D * (1 - 1/10 ^ 9) ≤ d) : S.D / 2 ≤ d :=
+  le_trans (by nlinarith [S.D_pos]) h
+
+/-- Half-window glue from the exact lower window. -/
+theorem D_half_of_win {d : ℝ} (h : S.D ≤ d) : S.D / 2 ≤ d :=
+  le_trans (by nlinarith [S.D_pos]) h
+
+/-- Triple-window through the relaxed upper window. -/
+theorem D_three_of_eps {d : ℝ} (h : d ≤ 2 * S.D * (1 + 1/10 ^ 9)) : d ≤ 3 * S.D :=
+  le_trans h (by nlinarith [S.D_pos])
+
 /-- `R` agrees with its writeup definition `X·A³/(Δ⁴·H⁴)`. -/
 theorem R_eq_orig : S.R = P.X * S.A ^ 3 / (S.Δ ^ 4 * P.H ^ 4) := by
   have hH := P.H_pos; have hΔ := S.Δ_pos

@@ -1,0 +1,522 @@
+import Squarefree.Bracket.Sec7ErrPieces
+
+/-!
+# §7 N11 factor bounds — value bounds of the error/monomial families
+
+N11-internal (only `Sec7ErrBound.lean` should use these): the count-window value bounds
+of the graded families of `Sec7ErrPieces.lean` — the five error families against the
+pointwise graded fields of `Sec7MonExp` (chain identification), the explicit power
+monomials against the banked numeric caps, and the composite second factors `gB`/`gK`
+with their envelope-damped collapse.
+-/
+
+open Classical Finset Set Real Squarefree.FiniteDiff
+
+namespace Squarefree
+
+set_option maxHeartbeats 1600000
+
+section Factors
+
+variable {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ} {Ph : Sec7Phase P S W a}
+  {j h₁ h₂ h₃ : ℤ} {ξ₁ ξ₂ ξ₃ : ℝ}
+
+variable (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
+
+section Chains
+
+variable (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃)
+  (hW : 0 < W)
+  (hpad : 6 * (W + W ^ 2 + W ^ 4) ≤ S.R / 288)
+  (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
+
+include hh₁ hh₂ hh₃ hW hpad hshift
+
+/-! ## Value bounds of the error families on the count window
+(chain identification + the pointwise graded fields of `Sec7MonExp`) -/
+
+theorem sec7E_eA_bound : ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
+    |sec7E_eA ME k r| ≤
+      sec7_cExp * ((sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2 +
+        S.T₁ * sec7_relErr P S) / S.R ^ k := by
+  intro k hk r hr
+  have h0 : ∀ x ∈ sec7_rWinMid S W,
+      (fun t => Ph.f1D j 0 (t + sec7_hSum h₁ h₂ h₃) -
+        (ME.c₁ * S.T₁ * (t / S.R) ^ (-(1:ℝ)) -
+          ME.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R) * (t / S.R) ^ (-(2:ℝ)))) x =
+      sec7E_eA ME 0 x := by
+    intro x _
+    simp only [sec7E_eA, sec7E_M1, sec7_powMonD_zero, sec7_powMon]
+    rw [show Ph.f1D j 0 (x + sec7_hSum h₁ h₂ h₃) =
+      ME.f1C 0 (x + sec7_hSum h₁ h₂ h₃) from (ME.f1C_zero _).symm]
+    ring
+  have hid := sec7_iteratedDeriv_eq_of_chain_eqOn (sec7_rWinMid_isOpen S W) h0
+    (sec7E_eA_chain ME hh₁ hh₂ hh₃ hpad hshift) k hk r (sec7_rWin_subset_mid S hW hr)
+  rw [← hid]
+  exact ME.f1_exp k hk r hr
+
+theorem sec7E_eQ_bound {h : ℤ} (hh : 1 ≤ h) (hhle : (h:ℝ) ≤ sec7_hSum h₁ h₂ h₃)
+    (hfield : ∀ m ≤ 2, ∀ r ∈ sec7_rWin S W,
+      |iteratedDeriv m (fun t =>
+          diff1 (h : ℝ) (Ph.f1D j 0) (t + sec7_hSum h₁ h₂ h₃ - h) -
+            (-(ME.c₁ * h * (S.T₁ / S.R)) * (t / S.R) ^ (-(2:ℝ)))) r| ≤
+        sec7_cExp * ((h : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
+          (h : ℝ) * (S.T₁ / S.R) * sec7_relErr P S) / S.R ^ m) :
+    ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
+      |sec7E_eQ ME h k r| ≤
+        sec7_cExp * ((h : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
+          (h : ℝ) * (S.T₁ / S.R) * sec7_relErr P S) / S.R ^ k := by
+  intro k hk r hr
+  have h0 : ∀ x ∈ sec7_rWinMid S W,
+      (fun t => diff1 (h : ℝ) (Ph.f1D j 0) (t + sec7_hSum h₁ h₂ h₃ - h) -
+        (-(ME.c₁ * h * (S.T₁ / S.R)) * (t / S.R) ^ (-(2:ℝ)))) x =
+      sec7E_eQ ME h 0 x := by
+    intro x _
+    simp only [sec7E_eQ, sec7E_N, sec7_powMonD_zero, sec7_powMon]
+    rw [show Ph.f1D j 0 = ME.f1C 0 from (funext ME.f1C_zero).symm]
+  have hid := sec7_iteratedDeriv_eq_of_chain_eqOn (sec7_rWinMid_isOpen S W) h0
+    (sec7E_eQ_chain ME hh₁ hh₂ hh₃ hpad hshift hh hhle) k hk r (sec7_rWin_subset_mid S hW hr)
+  rw [← hid]
+  exact hfield k hk r hr
+
+theorem sec7E_eK_bound {g h : ℤ} (hg : 1 ≤ g) (hh : 1 ≤ h)
+    (hgle : (g:ℝ) ≤ sec7_hSum h₁ h₂ h₃) (hhle : (h:ℝ) ≤ sec7_hSum h₁ h₂ h₃)
+    {ξ : ℝ} (hξ : |ξ| ≤ sec7_hSum h₁ h₂ h₃)
+    (hfield : ∀ m ≤ 2, ∀ r ∈ sec7_rWin S W,
+      |iteratedDeriv m (fun t =>
+          diff1 (g : ℝ) (diff1 (h : ℝ) (Ph.f2D 0)) (t + ξ) -
+            (-(3/16) * ME.c₂ * g * h * (S.T₂ / S.R ^ 2) * (t / S.R) ^ (-(5:ℝ)/4))) r| ≤
+        sec7_cExp * ((g : ℝ) * h * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
+          (g : ℝ) * h * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3) / S.R ^ m) :
+    ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
+      |sec7E_eK ME g h ξ k r| ≤
+        sec7_cExp * ((g : ℝ) * h * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
+          (g : ℝ) * h * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3) / S.R ^ k := by
+  intro k hk r hr
+  have h0 : ∀ x ∈ sec7_rWinMid S W,
+      (fun t => diff1 (g : ℝ) (diff1 (h : ℝ) (Ph.f2D 0)) (t + ξ) -
+        (-(3/16) * ME.c₂ * g * h * (S.T₂ / S.R ^ 2) * (t / S.R) ^ (-(5:ℝ)/4))) x =
+      sec7E_eK ME g h ξ 0 x := by
+    intro x _
+    simp only [sec7E_eK, sec7E_L, sec7_powMonD_zero, sec7_powMon]
+    rw [show Ph.f2D 0 = ME.f2C 0 from (funext ME.f2C_zero).symm]
+  have hid := sec7_iteratedDeriv_eq_of_chain_eqOn (sec7_rWinMid_isOpen S W) h0
+    (sec7E_eK_chain ME hh₁ hh₂ hh₃ hpad hshift hg hh hgle hhle hξ) k hk r
+    (sec7_rWin_subset_mid S hW hr)
+  rw [← hid]
+  exact hfield k hk r hr
+
+theorem sec7E_eB0_bound : ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
+    |sec7E_eB0 ME k r| ≤
+      sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) * sec7_relErr P S +
+        sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 4) / S.R ^ k := by
+  intro k hk r hr
+  have h0 : ∀ x ∈ sec7_rWinMid S W,
+      (fun t => diff3 (h₁ : ℝ) h₂ h₃ (Ph.f2D 0) t -
+        (15/64) * ME.c₂ * sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) *
+          (t / S.R) ^ (-(9:ℝ)/4)) x = sec7E_eB0 ME 0 x := by
+    intro x _
+    simp only [sec7E_eB0, sec7E_M0, sec7_powMonD_zero, sec7_powMon]
+    rw [show Ph.f2D 0 = ME.f2C 0 from (funext ME.f2C_zero).symm]
+  have hid := sec7_iteratedDeriv_eq_of_chain_eqOn (sec7_rWinMid_isOpen S W) h0
+    (sec7E_eB0_chain ME hh₁ hh₂ hh₃ hpad hshift) k hk r (sec7_rWin_subset_mid S hW hr)
+  rw [← hid]
+  exact ME.B03_exp k hk r hr
+
+theorem sec7E_eP3_bound : ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
+    |sec7E_eP3 ME k r| ≤
+      sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S +
+        sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₃ / S.R ^ 4) / S.R ^ k := by
+  intro k hk r hr
+  have h0 : ∀ x ∈ sec7_rWinMid S W,
+      (fun t => diff3 (h₁ : ℝ) h₂ h₃ (Ph.f3D j 0) t -
+        (-(45/64) * ME.c₃ * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) *
+          (t / S.R) ^ (-(13:ℝ)/4))) x = sec7E_eP3 ME 0 x := by
+    intro x _
+    simp only [sec7E_eP3, sec7E_M3, sec7_powMonD_zero, sec7_powMon]
+    rw [show Ph.f3D j 0 = ME.f3C 0 from (funext ME.f3C_zero).symm]
+  have hid := sec7_iteratedDeriv_eq_of_chain_eqOn (sec7_rWinMid_isOpen S W) h0
+    (sec7E_eP3_chain ME hh₁ hh₂ hh₃ hpad hshift) k hk r (sec7_rWin_subset_mid S hW hr)
+  rw [← hid]
+  exact ME.d3f3_exp k hk r hr
+
+/-! ## Value bounds of the monomial factors (banked caps; uniform in `k ≤ 2`) -/
+
+omit hshift in
+theorem sec7E_M1_bound (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R) :
+    ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
+      |sec7E_M1 ME k r| ≤ 10 ^ 11 * S.T₁ / S.R ^ k := by
+  intro k hk r hr
+  have hR := sec7_R_pos S
+  have hT1 := sec7_T₁_pos S
+  have hwide := sec7E_rWin_subset_wide (S := S) hW hr
+  have hSv3 : (3:ℝ) ≤ sec7_hSum h₁ h₂ h₃ := sec7_hSum_ge3 hh₁ hh₂ hh₃
+  have hk0 : (0:ℝ) ≤ (k:ℝ) := Nat.cast_nonneg k
+  have b1 := sec7_powMonD_val_bound (S := S) (c := ME.c₁ * S.T₁)
+    (by linarith : (-(1:ℝ)) - (k:ℝ) ≤ 0) (sec7E_cap1 k hk) hpad hwide
+  have b2 := sec7_powMonD_val_bound (S := S)
+    (c := -(ME.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R)))
+    (by linarith : (-(2:ℝ)) - (k:ℝ) ≤ 0) (sec7E_cap2 k hk) hpad hwide
+  have hc1 : |ME.c₁| ≤ 4 := ME.c₁_window.2
+  have hc10 : 0 ≤ |ME.c₁| := abs_nonneg _
+  have hTR : 0 < S.T₁ / S.R := div_pos hT1 hR
+  have habs1 : |ME.c₁ * S.T₁| ≤ 4 * S.T₁ := by
+    rw [abs_mul, abs_of_pos hT1]
+    nlinarith
+  have habs2 : |-(ME.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R))| ≤
+      4 * (sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R)) := by
+    rw [abs_neg, abs_mul, abs_mul, abs_of_nonneg (by linarith : (0:ℝ) ≤ sec7_hSum h₁ h₂ h₃),
+      abs_of_pos hTR]
+    nlinarith [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc1
+      (by linarith : (0:ℝ) ≤ sec7_hSum h₁ h₂ h₃)) hTR.le]
+  have hsmall : 4 * (sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R)) * 10 ^ 14 ≤ S.T₁ := by
+    rw [show 4 * (sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R)) * 10 ^ 14
+        = 4 * 10 ^ 14 * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R from by ring,
+      div_le_iff₀ hR]
+    have h1 : (4 * 10 ^ 14 : ℝ) * sec7_hSum h₁ h₂ h₃ ≤ S.R := by
+      calc (4 * 10 ^ 14 : ℝ) * sec7_hSum h₁ h₂ h₃
+          ≤ 10 ^ 149 * sec7_hSum h₁ h₂ h₃ :=
+            mul_le_mul_of_nonneg_right (by norm_num) (by linarith)
+        _ = sec7_hSum h₁ h₂ h₃ * 10 ^ 149 := by ring
+        _ ≤ S.R := hSR
+    nlinarith
+  have hnum : |ME.c₁ * S.T₁| * (2 * 10 ^ 10) +
+      |-(ME.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R))| * 10 ^ 14 ≤ 10 ^ 11 * S.T₁ := by
+    have p1 : |ME.c₁ * S.T₁| * (2 * 10 ^ 10) ≤ 4 * S.T₁ * (2 * 10 ^ 10) :=
+      mul_le_mul_of_nonneg_right habs1 (by norm_num)
+    have p2 : |-(ME.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R))| * 10 ^ 14 ≤
+        4 * (sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R)) * 10 ^ 14 :=
+      mul_le_mul_of_nonneg_right habs2 (by norm_num)
+    nlinarith
+  calc |sec7E_M1 ME k r|
+      ≤ |sec7_powMonD S.R (ME.c₁ * S.T₁) (-(1:ℝ)) k r| +
+        |sec7_powMonD S.R (-(ME.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R))) (-(2:ℝ)) k r| := by
+        simp only [sec7E_M1]
+        exact abs_add_le _ _
+    _ ≤ |ME.c₁ * S.T₁| * (2 * 10 ^ 10) / S.R ^ k +
+        |-(ME.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R))| * 10 ^ 14 / S.R ^ k :=
+        add_le_add b1 b2
+    _ = (|ME.c₁ * S.T₁| * (2 * 10 ^ 10) +
+        |-(ME.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R))| * 10 ^ 14) / S.R ^ k :=
+        (add_div _ _ _).symm
+    _ ≤ 10 ^ 11 * S.T₁ / S.R ^ k := by gcongr
+
+omit hh₁ hh₂ hh₃ hshift in
+theorem sec7E_N_bound {h : ℤ} (hh : 1 ≤ h) :
+    ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
+      |sec7E_N ME h k r| ≤ 4 * 10 ^ 14 * ((h:ℝ) * (S.T₁ / S.R)) / S.R ^ k := by
+  intro k hk r hr
+  have hR := sec7_R_pos S
+  have hT1 := sec7_T₁_pos S
+  have hwide := sec7E_rWin_subset_wide (S := S) hW hr
+  have hk0 : (0:ℝ) ≤ (k:ℝ) := Nat.cast_nonneg k
+  have hv1 : (1:ℝ) ≤ (h:ℝ) := by exact_mod_cast hh
+  have hTR : 0 < S.T₁ / S.R := div_pos hT1 hR
+  have b := sec7_powMonD_val_bound (S := S) (c := -(ME.c₁ * (h:ℝ) * (S.T₁ / S.R)))
+    (by linarith : (-(2:ℝ)) - (k:ℝ) ≤ 0) (sec7E_cap2 k hk) hpad hwide
+  have hc1 : |ME.c₁| ≤ 4 := ME.c₁_window.2
+  have hc10 : 0 ≤ |ME.c₁| := abs_nonneg _
+  have habs : |-(ME.c₁ * (h:ℝ) * (S.T₁ / S.R))| ≤ 4 * ((h:ℝ) * (S.T₁ / S.R)) := by
+    rw [abs_neg, abs_mul, abs_mul, abs_of_nonneg (by linarith : (0:ℝ) ≤ (h:ℝ)),
+      abs_of_pos hTR]
+    nlinarith [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc1
+      (by linarith : (0:ℝ) ≤ (h:ℝ))) hTR.le]
+  calc |sec7E_N ME h k r| = |sec7_powMonD S.R (-(ME.c₁ * (h:ℝ) * (S.T₁ / S.R)))
+        (-(2:ℝ)) k r| := by rw [sec7E_N]
+    _ ≤ |-(ME.c₁ * (h:ℝ) * (S.T₁ / S.R))| * 10 ^ 14 / S.R ^ k := b
+    _ ≤ 4 * ((h:ℝ) * (S.T₁ / S.R)) * 10 ^ 14 / S.R ^ k := by gcongr
+    _ = 4 * 10 ^ 14 * ((h:ℝ) * (S.T₁ / S.R)) / S.R ^ k := by ring_nf
+
+omit hshift in
+theorem sec7E_M0_bound :
+    ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
+      |sec7E_M0 ME k r| ≤
+        9 * 10 ^ 14 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) / S.R ^ k := by
+  intro k hk r hr
+  have hR := sec7_R_pos S
+  have hT2 := sec7_T₂_pos S
+  have hwide := sec7E_rWin_subset_wide (S := S) hW hr
+  have hk0 : (0:ℝ) ≤ (k:ℝ) := Nat.cast_nonneg k
+  have hPv : (1:ℝ) ≤ sec7_Pprod h₁ h₂ h₃ := by
+    have a1 : (1:ℝ) ≤ (h₁:ℝ) := by exact_mod_cast hh₁
+    have a2 : (1:ℝ) ≤ (h₂:ℝ) := by exact_mod_cast hh₂
+    have a3 : (1:ℝ) ≤ (h₃:ℝ) := by exact_mod_cast hh₃
+    unfold sec7_Pprod
+    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith
+    nlinarith [h12, a3]
+  have hTR : 0 < S.T₂ / S.R ^ 3 := by positivity
+  have b := sec7_powMonD_val_bound (S := S)
+    (c := (15/64) * ME.c₂ * sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3))
+    (by linarith : (-(9:ℝ)/4) - (k:ℝ) ≤ 0) (sec7E_cap9 k hk) hpad hwide
+  have hc2 : |ME.c₂| ≤ 4 := ME.c₂_window.2
+  have hc20 : 0 ≤ |ME.c₂| := abs_nonneg _
+  have habs : |(15/64) * ME.c₂ * sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)| ≤
+      (15/16) * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) := by
+    rw [abs_mul, abs_mul, abs_mul,
+      abs_of_nonneg (by linarith : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃), abs_of_pos hTR,
+      abs_of_nonneg (by norm_num : (0:ℝ) ≤ (15:ℝ)/64)]
+    nlinarith [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc2
+      (by linarith : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃)) hTR.le]
+  calc |sec7E_M0 ME k r| = |sec7_powMonD S.R
+        ((15/64) * ME.c₂ * sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) (-(9:ℝ)/4) k r| := by
+        rw [sec7E_M0]
+    _ ≤ |(15/64) * ME.c₂ * sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)| *
+        (9 * 10 ^ 14) / S.R ^ k := b
+    _ ≤ (15/16) * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) * (9 * 10 ^ 14) / S.R ^ k := by
+        gcongr
+    _ ≤ 9 * 10 ^ 14 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) / S.R ^ k := by
+        gcongr ?_ / _
+        nlinarith [mul_pos (lt_of_lt_of_le one_pos hPv) hTR,
+          mul_nonneg (by linarith : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃) hTR.le]
+
+omit hh₁ hh₂ hh₃ hshift in
+theorem sec7E_L_bound {g h : ℤ} (hg : 1 ≤ g) (hh : 1 ≤ h) :
+    ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
+      |sec7E_L ME g h k r| ≤
+        12 * 10 ^ 10 * ((g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) / S.R ^ k := by
+  intro k hk r hr
+  have hR := sec7_R_pos S
+  have hT2 := sec7_T₂_pos S
+  have hwide := sec7E_rWin_subset_wide (S := S) hW hr
+  have hk0 : (0:ℝ) ≤ (k:ℝ) := Nat.cast_nonneg k
+  have hv1 : (1:ℝ) ≤ (g:ℝ) := by exact_mod_cast hg
+  have hv2 : (1:ℝ) ≤ (h:ℝ) := by exact_mod_cast hh
+  have hTR : 0 < S.T₂ / S.R ^ 2 := by positivity
+  have b := sec7_powMonD_val_bound (S := S)
+    (c := -(3/16) * ME.c₂ * (g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2))
+    (by linarith : (-(5:ℝ)/4) - (k:ℝ) ≤ 0) (sec7E_cap5 k hk) hpad hwide
+  have hc2 : |ME.c₂| ≤ 4 := ME.c₂_window.2
+  have hc20 : 0 ≤ |ME.c₂| := abs_nonneg _
+  have habs : |-(3/16) * ME.c₂ * (g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)| ≤
+      (3/4) * ((g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) := by
+    rw [abs_mul, abs_mul, abs_mul, abs_mul,
+      abs_of_nonneg (by linarith : (0:ℝ) ≤ (g:ℝ)),
+      abs_of_nonneg (by linarith : (0:ℝ) ≤ (h:ℝ)), abs_of_pos hTR,
+      show |(-((3:ℝ)/16))| = (3:ℝ)/16 from by norm_num]
+    nlinarith [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
+      (mul_le_mul_of_nonneg_right hc2 (by linarith : (0:ℝ) ≤ (g:ℝ)))
+      (by linarith : (0:ℝ) ≤ (h:ℝ))) hTR.le]
+  calc |sec7E_L ME g h k r| = |sec7_powMonD S.R
+        (-(3/16) * ME.c₂ * (g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) (-(5:ℝ)/4) k r| := by
+        rw [sec7E_L]
+    _ ≤ |-(3/16) * ME.c₂ * (g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)| *
+        (16 * 10 ^ 10) / S.R ^ k := b
+    _ ≤ (3/4) * ((g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) * (16 * 10 ^ 10) / S.R ^ k := by gcongr
+    _ = 12 * 10 ^ 10 * ((g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) / S.R ^ k := by ring_nf
+
+omit hshift in
+theorem sec7E_T6_bound :
+    ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
+      |sec7E_T6 ME k r| ≤
+        4 * 10 ^ 22 * (sec7_hSum h₁ h₂ h₃ * sec7_Pprod h₁ h₂ h₃ *
+          (S.T₁ * S.T₂ / S.R ^ 4)) / S.R ^ k := by
+  intro k hk r hr
+  have hR := sec7_R_pos S
+  have hT1 := sec7_T₁_pos S
+  have hT2 := sec7_T₂_pos S
+  have hwide := sec7E_rWin_subset_wide (S := S) hW hr
+  have hk0 : (0:ℝ) ≤ (k:ℝ) := Nat.cast_nonneg k
+  have hSv3 : (3:ℝ) ≤ sec7_hSum h₁ h₂ h₃ := sec7_hSum_ge3 hh₁ hh₂ hh₃
+  have hPv : (1:ℝ) ≤ sec7_Pprod h₁ h₂ h₃ := by
+    have a1 : (1:ℝ) ≤ (h₁:ℝ) := by exact_mod_cast hh₁
+    have a2 : (1:ℝ) ≤ (h₂:ℝ) := by exact_mod_cast hh₂
+    have a3 : (1:ℝ) ≤ (h₃:ℝ) := by exact_mod_cast hh₃
+    unfold sec7_Pprod
+    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith
+    nlinarith [h12, a3]
+  have hTR : 0 < S.T₁ * S.T₂ / S.R ^ 4 := by positivity
+  have b := sec7_powMonD_val_bound (S := S)
+    (c := -((15/64) * ME.c₁ * ME.c₂ * sec7_hSum h₁ h₂ h₃ * sec7_Pprod h₁ h₂ h₃ *
+      (S.T₁ * S.T₂ / S.R ^ 4)))
+    (by linarith : (-(17:ℝ)/4) - (k:ℝ) ≤ 0) (sec7E_cap17 k hk) hpad hwide
+  have hc1 : |ME.c₁| ≤ 4 := ME.c₁_window.2
+  have hc2 : |ME.c₂| ≤ 4 := ME.c₂_window.2
+  have hc10 : 0 ≤ |ME.c₁| := abs_nonneg _
+  have hc20 : 0 ≤ |ME.c₂| := abs_nonneg _
+  have habs : |-((15/64) * ME.c₁ * ME.c₂ * sec7_hSum h₁ h₂ h₃ * sec7_Pprod h₁ h₂ h₃ *
+      (S.T₁ * S.T₂ / S.R ^ 4))| ≤
+      4 * (sec7_hSum h₁ h₂ h₃ * sec7_Pprod h₁ h₂ h₃ * (S.T₁ * S.T₂ / S.R ^ 4)) := by
+    rw [abs_neg, abs_mul, abs_mul, abs_mul, abs_mul, abs_mul,
+      abs_of_nonneg (by linarith : (0:ℝ) ≤ sec7_hSum h₁ h₂ h₃),
+      abs_of_nonneg (by linarith : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃), abs_of_pos hTR,
+      abs_of_nonneg (by norm_num : (0:ℝ) ≤ (15:ℝ)/64)]
+    have hq : |ME.c₁| * |ME.c₂| ≤ 16 := by nlinarith
+    nlinarith [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
+      (mul_le_mul_of_nonneg_right hq (by linarith : (0:ℝ) ≤ sec7_hSum h₁ h₂ h₃))
+      (by linarith : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃)) hTR.le,
+      mul_nonneg (mul_nonneg
+        (by linarith : (0:ℝ) ≤ sec7_hSum h₁ h₂ h₃)
+        (by linarith : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃)) hTR.le]
+  calc |sec7E_T6 ME k r| ≤ |-((15/64) * ME.c₁ * ME.c₂ * sec7_hSum h₁ h₂ h₃ *
+        sec7_Pprod h₁ h₂ h₃ * (S.T₁ * S.T₂ / S.R ^ 4))| * 10 ^ 22 / S.R ^ k := by
+        rw [sec7E_T6]
+        exact b
+    _ ≤ 4 * (sec7_hSum h₁ h₂ h₃ * sec7_Pprod h₁ h₂ h₃ * (S.T₁ * S.T₂ / S.R ^ 4)) *
+        10 ^ 22 / S.R ^ k := by gcongr
+    _ = 4 * 10 ^ 22 * (sec7_hSum h₁ h₂ h₃ * sec7_Pprod h₁ h₂ h₃ *
+        (S.T₁ * S.T₂ / S.R ^ 4)) / S.R ^ k := by ring_nf
+
+/-! ## Composite second-factor bounds (envelope-damped collapse) -/
+
+omit hh₁ hh₂ hh₃ hW hpad hshift in
+/-- `cExp·relErr ≤ 1` from the envelope smallness `relErr·10¹⁵⁰ ≤ 1`. -/
+theorem sec7E_cExp_rel (hrel : sec7_relErr P S * 10 ^ 150 ≤ 1) :
+    sec7_cExp * sec7_relErr P S ≤ 1 := by
+  have h0 : 0 ≤ sec7_relErr P S := (sec7_relErr_pos P S).le
+  calc sec7_cExp * sec7_relErr P S ≤ 10 ^ 150 * sec7_relErr P S := by
+        apply mul_le_mul_of_nonneg_right _ h0
+        norm_num [sec7_cExp]
+    _ = sec7_relErr P S * 10 ^ 150 := by ring
+    _ ≤ 1 := hrel
+
+omit hW hpad hshift in
+/-- `cExp·h_Σ ≤ R` from the envelope smallness `h_Σ·10¹⁴⁹ ≤ R`. -/
+theorem sec7E_cExp_hS (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R) :
+    sec7_cExp * sec7_hSum h₁ h₂ h₃ ≤ S.R := by
+  have hSv3 : (3:ℝ) ≤ sec7_hSum h₁ h₂ h₃ := sec7_hSum_ge3 hh₁ hh₂ hh₃
+  calc sec7_cExp * sec7_hSum h₁ h₂ h₃ ≤ 10 ^ 149 * sec7_hSum h₁ h₂ h₃ := by
+        apply mul_le_mul_of_nonneg_right _ (by linarith)
+        norm_num [sec7_cExp]
+    _ = sec7_hSum h₁ h₂ h₃ * 10 ^ 149 := by ring
+    _ ≤ S.R := hSR
+
+theorem sec7E_gB_bound (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R)
+    (hcrel : sec7_cExp * sec7_relErr P S ≤ 1) {ρ₀ : ℤ}
+    (hρ₀ : |(ρ₀:ℝ)| ≤ sec7_cCarry) :
+    ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
+      |sec7E_gB ME ρ₀ k r| ≤
+        (10 ^ 15 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) +
+          (if ρ₀ = 0 then 0 else 1) * sec7_cCarry) / S.R ^ k := by
+  intro k hk r hr
+  have hR := sec7_R_pos S
+  have hT2 := sec7_T₂_pos S
+  have hrel0 : 0 ≤ sec7_relErr P S := (sec7_relErr_pos P S).le
+  have hSv3 : (3:ℝ) ≤ sec7_hSum h₁ h₂ h₃ := sec7_hSum_ge3 hh₁ hh₂ hh₃
+  have hPv : (1:ℝ) ≤ sec7_Pprod h₁ h₂ h₃ := by
+    have a1 : (1:ℝ) ≤ (h₁:ℝ) := by exact_mod_cast hh₁
+    have a2 : (1:ℝ) ≤ (h₂:ℝ) := by exact_mod_cast hh₂
+    have a3 : (1:ℝ) ≤ (h₃:ℝ) := by exact_mod_cast hh₃
+    unfold sec7_Pprod
+    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith
+    nlinarith [h12, a3]
+  have hPT : (0:ℝ) < sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) := by
+    have : (0:ℝ) < S.T₂ / S.R ^ 3 := by positivity
+    nlinarith
+  have hcc : |(ρ₀:ℝ)| ≤ (if ρ₀ = 0 then 0 else 1) * sec7_cCarry := by
+    by_cases h0 : ρ₀ = 0
+    · subst h0; simp
+    · rw [if_neg h0, one_mul]; exact hρ₀
+  have hcb := sec7_constF_bound hcc hR k r
+  have heb := sec7E_eB0_bound ME hh₁ hh₂ hh₃ hW hpad hshift k hk r hr
+  have hmb := sec7E_M0_bound ME hh₁ hh₂ hh₃ hW hpad k hk r hr
+  have hcoll : sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) * sec7_relErr P S +
+      sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 4) ≤
+      2 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) := by
+    have p1 : sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) * sec7_relErr P S) ≤
+        sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) := by
+      nlinarith [mul_le_mul_of_nonneg_right hcrel hPT.le]
+    have p2 : sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 4) ≤
+        sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) := by
+      have hce := sec7E_cExp_hS hh₁ hh₂ hh₃ hSR
+      rw [show sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 4) =
+          sec7_cExp * sec7_hSum h₁ h₂ h₃ * (sec7_Pprod h₁ h₂ h₃ * S.T₂) / S.R ^ 4
+          from by ring,
+        show sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) =
+          S.R * (sec7_Pprod h₁ h₂ h₃ * S.T₂) / S.R ^ 4 from by
+            rw [pow_succ]
+            field_simp]
+      have hPT2 : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃ * S.T₂ := by nlinarith
+      gcongr
+    nlinarith
+  have hsplit : sec7E_gB ME ρ₀ k r =
+      (sec7E_eB0 ME k r + sec7E_M0 ME k r) + sec7_constF (ρ₀:ℝ) k r := by
+    simp only [sec7E_gB, sec7E_eB0]
+    ring
+  calc |sec7E_gB ME ρ₀ k r|
+      ≤ |sec7E_eB0 ME k r| + |sec7E_M0 ME k r| + |sec7_constF (ρ₀:ℝ) k r| := by
+        rw [hsplit]
+        exact le_trans (abs_add_le _ _)
+          (by linarith [abs_add_le (sec7E_eB0 ME k r) (sec7E_M0 ME k r)])
+    _ ≤ (sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) * sec7_relErr P S +
+          sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 4) +
+        9 * 10 ^ 14 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) +
+        (if ρ₀ = 0 then 0 else 1) * sec7_cCarry) / S.R ^ k := by
+        rw [add_div, add_div]
+        exact add_le_add (add_le_add heb hmb) hcb
+    _ ≤ (10 ^ 15 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) +
+        (if ρ₀ = 0 then 0 else 1) * sec7_cCarry) / S.R ^ k := by
+        gcongr (?_ : ℝ) / _
+        nlinarith [hcoll, hPT]
+
+theorem sec7E_gK_bound (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R)
+    (hcrel : sec7_cExp * sec7_relErr P S ≤ 1) {g h : ℤ} (hg : 1 ≤ g) (hh : 1 ≤ h)
+    (hgle : (g:ℝ) ≤ sec7_hSum h₁ h₂ h₃) (hhle : (h:ℝ) ≤ sec7_hSum h₁ h₂ h₃)
+    {ξ : ℝ} (hξ : |ξ| ≤ sec7_hSum h₁ h₂ h₃) {c : ℝ}
+    (hc : |c| ≤ sec7_cFib * (1 + (g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)))
+    (hfield : ∀ m ≤ 2, ∀ r ∈ sec7_rWin S W,
+      |iteratedDeriv m (fun t =>
+          diff1 (g : ℝ) (diff1 (h : ℝ) (Ph.f2D 0)) (t + ξ) -
+            (-(3/16) * ME.c₂ * g * h * (S.T₂ / S.R ^ 2) * (t / S.R) ^ (-(5:ℝ)/4))) r| ≤
+        sec7_cExp * ((g : ℝ) * h * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
+          (g : ℝ) * h * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3) / S.R ^ m) :
+    ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
+      |sec7E_gK ME g h ξ c k r| ≤
+        (14 * 10 ^ 10 * ((g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) + sec7_cFib) / S.R ^ k := by
+  intro k hk r hr
+  have hR := sec7_R_pos S
+  have hT2 := sec7_T₂_pos S
+  have hrel0 : 0 ≤ sec7_relErr P S := (sec7_relErr_pos P S).le
+  have hSv3 : (3:ℝ) ≤ sec7_hSum h₁ h₂ h₃ := sec7_hSum_ge3 hh₁ hh₂ hh₃
+  have hv1 : (1:ℝ) ≤ (g:ℝ) := by exact_mod_cast hg
+  have hv2 : (1:ℝ) ≤ (h:ℝ) := by exact_mod_cast hh
+  have hgT : (0:ℝ) < (g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2) := by
+    have ht : (0:ℝ) < S.T₂ / S.R ^ 2 := by positivity
+    exact mul_pos (mul_pos (lt_of_lt_of_le one_pos hv1) (lt_of_lt_of_le one_pos hv2)) ht
+  have hcb := sec7_constF_bound hc hR k r
+  have heb := sec7E_eK_bound ME hh₁ hh₂ hh₃ hW hpad hshift hg hh hgle hhle hξ hfield k hk r hr
+  have hlb := sec7E_L_bound ME hW hpad hg hh k hk r hr
+  have hcoll : sec7_cExp * ((g:ℝ) * h * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
+      (g:ℝ) * h * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3) ≤
+      2 * ((g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) := by
+    have p1 : sec7_cExp * ((g:ℝ) * h * (S.T₂ / S.R ^ 2) * sec7_relErr P S) ≤
+        (g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2) := by
+      nlinarith [mul_le_mul_of_nonneg_right hcrel hgT.le]
+    have p2 : sec7_cExp * ((g:ℝ) * h * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3) ≤
+        (g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2) := by
+      have hce := sec7E_cExp_hS hh₁ hh₂ hh₃ hSR
+      rw [show sec7_cExp * ((g:ℝ) * h * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3) =
+          sec7_cExp * sec7_hSum h₁ h₂ h₃ * ((g:ℝ) * h * S.T₂) / S.R ^ 3 from by ring,
+        show (g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2) =
+          S.R * ((g:ℝ) * h * S.T₂) / S.R ^ 3 from by
+            rw [pow_succ]
+            field_simp]
+      have hgT2 : (0:ℝ) ≤ (g:ℝ) * h * S.T₂ :=
+        mul_nonneg (mul_nonneg (by linarith) (by linarith)) hT2.le
+      gcongr
+    nlinarith
+  have hsplit : sec7E_gK ME g h ξ c k r =
+      (sec7E_eK ME g h ξ k r + sec7E_L ME g h k r) + sec7_constF c k r := by
+    simp only [sec7E_gK, sec7E_eK]
+    ring
+  calc |sec7E_gK ME g h ξ c k r|
+      ≤ |sec7E_eK ME g h ξ k r| + |sec7E_L ME g h k r| + |sec7_constF c k r| := by
+        rw [hsplit]
+        exact le_trans (abs_add_le _ _)
+          (by linarith [abs_add_le (sec7E_eK ME g h ξ k r) (sec7E_L ME g h k r)])
+    _ ≤ (sec7_cExp * ((g:ℝ) * h * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
+          (g:ℝ) * h * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3) +
+        12 * 10 ^ 10 * ((g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) +
+        sec7_cFib * (1 + (g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2))) / S.R ^ k := by
+        rw [add_div, add_div]
+        exact add_le_add (add_le_add heb hlb) hcb
+    _ ≤ (14 * 10 ^ 10 * ((g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) + sec7_cFib) / S.R ^ k := by
+        gcongr (?_ : ℝ) / _
+        have hFib : sec7_cFib = 10 ^ 10 := by norm_num [sec7_cFib]
+        nlinarith [hcoll, hgT]
+
+
+end Chains
+
+end Factors
+
+end Squarefree

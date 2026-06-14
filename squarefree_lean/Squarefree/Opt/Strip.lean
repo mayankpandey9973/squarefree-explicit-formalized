@@ -1,4 +1,5 @@
 import Squarefree.Opt.StripAux
+import Squarefree.Opt.StripRegimePack
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 /-!
@@ -26,7 +27,88 @@ open Classical Finset
 
 namespace Squarefree
 
-set_option maxHeartbeats 1600000 in
+/-- In the §6 range, `10U ≤ H`: with `H = X^{(1-g)/5}`, `U = X^u`, the exponent gap
+`(1-g)/5 - u ≥ 1/100` and `X^{1/100} ≥ 16777216 ≥ 10`. -/
+private theorem five_U_le_H (P : Globals) (hX : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ))
+    (hg : P.g < 2 / 18977) (hu : P.u ≤ 1 / 100) (hg0 : 0 ≤ P.g) : 10 * P.U ≤ P.H := by
+  have hX0 : 0 < P.X := P.X_pos
+  -- X > 1 (else X^{1/100} ≤ 1 < 16777216)
+  have hX1 : (1:ℝ) ≤ P.X := by
+    by_contra h
+    push_neg at h
+    have hle1 : P.X ^ (1/100 : ℝ) ≤ 1 :=
+      Real.rpow_le_one hX0.le h.le (by norm_num : (0:ℝ) ≤ 1/100)
+    linarith
+  -- exponent gap ≥ 1/100
+  have hexp : (1/100 : ℝ) ≤ (1 - P.g) / 5 - P.u := by nlinarith [hg, hu, hg0]
+  -- X^{(1-g)/5 - u} ≥ X^{1/100} ≥ 16777216 ≥ 5
+  have hmono : P.X ^ (1/100 : ℝ) ≤ P.X ^ ((1 - P.g) / 5 - P.u) :=
+    Real.rpow_le_rpow_of_exponent_le hX1 hexp
+  have hge5 : (10:ℝ) ≤ P.X ^ ((1 - P.g) / 5 - P.u) := by linarith
+  -- H = U · X^{(1-g)/5 - u}
+  have hHU : P.H = P.U * P.X ^ ((1 - P.g) / 5 - P.u) := by
+    rw [Globals.H, Globals.U, ← Real.rpow_add hX0]
+    congr 1; ring
+  have hUpos : 0 < P.U := P.U_pos
+  calc 10 * P.U = P.U * 10 := by ring
+    _ ≤ P.U * P.X ^ ((1 - P.g) / 5 - P.u) := by
+        exact mul_le_mul_of_nonneg_left hge5 hUpos.le
+    _ = P.H := hHU.symm
+
+/-- The §6 Ω-floor: in the band `Ω ≥ c₀·G^{-1/4}U^{-3/4}` (with `c₀ ≥ 1`), the curvature scale
+`G·H·Ω³ ≥ 500`.  `G·H·Ω³ ≥ G·H·e₀³` where `e₀ = c₀·G^{-1/4}U^{-3/4}`, and
+`G·H·e₀³ = c₀³·X^{1/5+g/20-9u/4} ≥ X^{71/400} ≥ X^{1/100} ≥ 16777216 ≥ 500`. -/
+private theorem ghΩ3_ge_500 (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 1 ≤ c₀)
+    (hX : 1 ≤ P.X) (hg0 : 0 ≤ P.g) (hu2 : P.u ≤ 1/100)
+    (hband : c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω)
+    (hX0big : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ)) :
+    (16777216 : ℝ) ≤ P.G * P.H * S.Ω ^ 3 := by
+  have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
+  have hG := P.G_pos; have hH := P.H_pos; have hU := P.U_pos; have hΩ := S.Ω_pos
+  have hc₀0 : 0 < c₀ := lt_of_lt_of_le one_pos hc₀
+  set e0 : ℝ := c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) with he0def
+  have he0pos : 0 < e0 := by
+    rw [he0def]
+    have := Real.rpow_pos_of_pos hG (-1/4 : ℝ)
+    have := Real.rpow_pos_of_pos hU (-3/4 : ℝ); positivity
+  -- Ω³ ≥ e0³
+  have hΩ3 : e0 ^ 3 ≤ S.Ω ^ 3 := pow_le_pow_left₀ he0pos.le hband 3
+  -- e0³ in X-power form
+  have he03 : e0 ^ 3 = c₀ ^ 3 * P.X ^ (-3*P.g/4 - 9*P.u/4) := by
+    rw [he0def, mul_pow, mul_pow,
+        ← Real.rpow_natCast (P.G ^ (-1/4 : ℝ)) 3, ← Real.rpow_natCast (P.U ^ (-3/4 : ℝ)) 3,
+        ← Real.rpow_mul hG.le, ← Real.rpow_mul hU.le, Globals.G, Globals.U,
+        ← Real.rpow_mul hX0.le, ← Real.rpow_mul hX0.le, ← Real.rpow_add hX0]
+    push_cast
+    rw [show P.g * (-1/4 * 3) + P.u * (-3/4 * 3) = -3*P.g/4 - 9*P.u/4 by ring]
+  -- G·H in X-power form
+  have hGH : P.G * P.H = P.X ^ (P.g + (1 - P.g)/5) := by
+    rw [Globals.G, Globals.H, ← Real.rpow_add hX0]
+  -- G·H·e0³ = c₀³·X^{1/5+g/20-9u/4}
+  have hghe : P.G * P.H * e0 ^ 3 = c₀ ^ 3 * P.X ^ (1/5 + P.g/20 - 9*P.u/4) := by
+    rw [hGH, he03,
+        show P.X ^ (P.g + (1 - P.g)/5) * (c₀ ^ 3 * P.X ^ (-3*P.g/4 - 9*P.u/4))
+            = c₀ ^ 3 * (P.X ^ (P.g + (1 - P.g)/5) * P.X ^ (-3*P.g/4 - 9*P.u/4)) by ring,
+        ← Real.rpow_add hX0,
+        show P.g + (1 - P.g)/5 + (-3*P.g/4 - 9*P.u/4) = 1/5 + P.g/20 - 9*P.u/4 by ring]
+  -- lower bound the X-power: exponent ≥ 1/100
+  have hexp : (1/100 : ℝ) ≤ 1/5 + P.g/20 - 9*P.u/4 := by
+    have : 9*P.u/4 ≤ 9/400 := by linarith [hu2]
+    linarith [hg0]
+  have hmono : P.X ^ (1/100 : ℝ) ≤ P.X ^ (1/5 + P.g/20 - 9*P.u/4) :=
+    Real.rpow_le_rpow_of_exponent_le hX hexp
+  calc (16777216:ℝ) ≤ P.X ^ (1/100 : ℝ) := hX0big
+    _ ≤ P.X ^ (1/5 + P.g/20 - 9*P.u/4) := hmono
+    _ ≤ c₀ ^ 3 * P.X ^ (1/5 + P.g/20 - 9*P.u/4) := by
+        have hxp : (0:ℝ) < P.X ^ (1/5 + P.g/20 - 9*P.u/4) := Real.rpow_pos_of_pos hX0 _
+        have hc3 : (1:ℝ) ≤ c₀ ^ 3 := one_le_pow₀ hc₀
+        nlinarith [hxp, hc3]
+    _ = P.G * P.H * e0 ^ 3 := hghe.symm
+    _ ≤ P.G * P.H * S.Ω ^ 3 := by
+        apply mul_le_mul_of_nonneg_left hΩ3
+        positivity
+
+set_option maxHeartbeats 6400000 in
 /-- **Off-strip case** of `dblock_bound` (Prop 8.1, writeup 2020–2079). `u, c₀, Cu` are shared
 parameters (the merger `dblock_bound` picks them). Small-x edge `x ≤ G^{-2}Ω^{-11/2}X^{-Cu·u}` via
 `prop_6_1` (binding term `x^{2/3}G^{4/3}Ω^{11/3}`); large-x edge `x ≥ G^{17}Ω^{-26}X^{Cu·u}` via
@@ -46,6 +128,8 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+        Real.log P.X ≤ P.X ^ P.u →
+        (10:ℝ) ^ 33 ≤ P.U →
         (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
         2 * S.A ≤ S.D →
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω → S.Ω ≤ P.U →
@@ -56,7 +140,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   have hC5 := StripAux.C5_pos
   set C6 : ℝ := StripAux.C6 with hC6def
   set C5 : ℝ := StripAux.C5 with hC5def
-  obtain ⟨c₁', C₁', C₂', hc₁', hC₁', hC₂', hfiber'⟩ := prop_3_2_fiber
+  obtain ⟨c₁', C₁', C₂', hc₁', hC₁', hC₂', hfiber'⟩ := prop_3_2_fiber_dStar
   set Bf : ℝ := 1 + c₀ ^ (-8/3 : ℝ) with hBfdef
   have hBf1 : (1:ℝ) ≤ Bf := by
     rw [hBfdef]; have := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-8/3 : ℝ); linarith
@@ -72,7 +156,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
     have h13 := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-13 : ℝ)
     have h14 := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-14 : ℝ)
     positivity
-  intro P hg hu hX S hΔlong hX0big hNR hAD hbandlo hΩU hdisj D hDpos hDeq
+  intro P hg hu hX S hΔlong hX0big hlog hUbig hNR hAD hbandlo hΩU hdisj D hDpos hDeq
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hG := P.G_pos; have hH := P.H_pos; have hU := P.U_pos
   have hΔ := S.Δ_pos; have hΩ := S.Ω_pos
@@ -81,7 +165,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   have hPu : 0 < P.u := by rw [hu]; exact hu0
   have hΔ1 : (1:ℝ) ≤ S.Δ := le_trans (Real.one_le_rpow hX (by norm_num)) hΔlong
   -- key: DBlock ≤ C₂'·(1+φ)·∑#RaOf
-  obtain ⟨RaOf, hapos, hDsum⟩ :=
+  obtain ⟨RaOf, hapos, hwit, hDsum⟩ :=
     StripAux.dblock_le_sum_Ra P S C₂' D
       (fun a ha0 _ hlo hAa ha2A h2AD Dd hDdpos hDdeq => by
         have hloq : (1/4:ℝ) * S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) ≤ (a:ℝ) := by
@@ -89,9 +173,9 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
           have hthr : (0:ℝ) ≤ S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) :=
             mul_nonneg (Real.rpow_nonneg hΔ.le _) (Real.rpow_nonneg (by positivity) _)
           nlinarith [hthr]
-        obtain ⟨Ra, _, hcard⟩ :=
+        obtain ⟨Ra, _dStar, _hinDa, _hband, _hnear, hRaWit, hcard⟩ :=
           hfiber' P S a ha0 hΔlong hX0big hloq hAa ha2A h2AD Dd hDdpos hDdeq
-        exact ⟨Ra, hcard⟩)
+        exact ⟨Ra, hRaWit, hcard⟩)
       hΔ1 hNR hAD hDpos hDeq
   -- φ factor + budget abbreviations
   have hφnn : (0:ℝ) ≤ StripAux.fiberφ P S := by
@@ -105,7 +189,25 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   have hbu : (C6 + 100) * P.u ≤ 1/200 - 20 * P.g := by rw [hu, hg]; exact hubudget
   have hCuP : (3/2) * C6 + 232 ≤ Cu := hCu
   -- C6, C5 are the prop budget constants
-  have hprop6 := StripAux.prop_6_1_spec P S RaOf
+  have hwit' : ∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, (0 < a) ∧ ∀ r ∈ RaOf a, RaWitness P S a r :=
+    fun a ha => ⟨hapos a ha, hwit a ha⟩
+  -- regime hyp for Prop 6.1: 10A ≤ D, i.e. 10·(ΔΩ) ≤ H·Δ, from 10Ω ≤ 10U ≤ H
+  have hAD5 : 10 * S.A ≤ S.D := by
+    have h5UH : 10 * P.U ≤ P.H :=
+      five_U_le_H P hX0big (by rw [hg]; exact hg1) (by rw [hu]; exact hu2) hg0'
+    have h5ΩH : 10 * S.Ω ≤ P.H := le_trans (by nlinarith [hΩU, hU.le]) h5UH
+    unfold Scale.A Scale.D
+    nlinarith [h5ΩH, hΔ.le, hΔ]
+  have hΩfloor : (16777216 : ℝ) ≤ P.G * P.H * S.Ω ^ 3 :=
+    ghΩ3_ge_500 P S c₀ hc₀ hX hg0' (by rw [hu]; exact hu2) hbandlo hX0big
+  have hg1' : P.g ≤ 1 := by rw [hg]; linarith [hg1]
+  have hband6 : P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) ≤ S.Ω := by
+    refine le_trans ?_ hbandlo
+    have hbpos : (0:ℝ) < P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) := by
+      have := Real.rpow_pos_of_pos hG (-1/4 : ℝ)
+      have := Real.rpow_pos_of_pos hU (-3/4 : ℝ); positivity
+    nlinarith [hbpos, hc₀]
+  have hprop6 := StripAux.prop_6_1_spec P S hX hPu hg1' hAD5 hband6 hΩfloor hlog RaOf hwit'
   rw [← hC6def] at hprop6
   -- rewrite the target  C * P.H / P.U = C * (P.H / P.U)
   rw [mul_div_assoc]
@@ -246,9 +348,8 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
     have hGUe : P.G * P.U ^ 10 = P.X ^ (P.g + P.u * 10) := by
       rw [Globals.G, hUpow10, ← Real.rpow_add hX0]
     have hxval : S.x = P.H / S.Δ ^ 2 := rfl
-    have hi : ∃ c : ℝ, 0 < c ∧ c * (P.G * P.U ^ 10) ≤ P.H / S.Δ ^ 2 := by
-      refine ⟨1, one_pos, ?_⟩
-      rw [one_mul, ← hxval]
+    have hG10 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2 := by
+      rw [← hxval]
       refine le_trans ?_ hlarge
       -- GU^10 ≤ G^17 Ω^{-26} X^{Cu u}  ⟸  X^{g+10u} ≤ X^{17g + 26u + Cu u}  (Ω ≤ U, exp≥0)
       have hΩ26 : S.Ω ^ (-26 : ℝ) ≥ P.U ^ (-26 : ℝ) := by
@@ -271,10 +372,8 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
         _ ≤ P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) := by
             apply mul_le_mul_of_nonneg_right _ (by positivity)
             apply mul_le_mul_of_nonneg_left hΩ26 (by positivity)
-    -- prop_5_1 hyp (ii): ∃c>0, c·G²U^5 ≤ Δ.  Use c = 1 via Δ ≥ X^{1/100} ≥ G²U^5.
-    have hii : ∃ c : ℝ, 0 < c ∧ c * (P.G ^ 2 * P.U ^ 5) ≤ S.Δ := by
-      refine ⟨1, one_pos, ?_⟩
-      rw [one_mul]
+    -- prop_5_1 hyp (ii): G²U^5 ≤ Δ via Δ ≥ X^{1/100} ≥ G²U^5.
+    have hG25 : P.G ^ 2 * P.U ^ 5 ≤ S.Δ := by
       refine le_trans ?_ hΔlong
       have hG2e : (P.G : ℝ) ^ 2 = P.X ^ (P.g * 2) := by
         rw [Globals.G, ← Real.rpow_natCast (P.X ^ P.g) 2, ← Real.rpow_mul hX0.le]; norm_num
@@ -287,6 +386,25 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
         linarith [hbu, this]
       have hC6u : 0 ≤ C6 * P.u := mul_nonneg hC6.le hPu.le
       linarith [hbu', hC6u, hg0']
+    -- ===== AUDITED-FAITHFUL regime pack for prop_5_1 (regime ruling 2026-06-10) =====
+    have hG1 : 1 ≤ P.G := Real.one_le_rpow hX hg0'
+    have hU1 : 1 ≤ P.U := Real.one_le_rpow hX hPu.le
+    have hH1 : 1 ≤ P.H := Real.one_le_rpow hX (by rw [hg]; linarith [hg1])
+    have hu2P : P.u ≤ 1/100 := by rw [hu]; exact hu2
+    have hbu100 : 100 * P.u + 20 * P.g ≤ 1/200 := by nlinarith [hbu, mul_pos hC6 hPu]
+    have hgq : P.g ≤ 1/4000 := by linarith [hbu100, hPu.le]
+    have hCu232 : (232:ℝ) ≤ Cu := by linarith [hCuP, hC6.le]
+    have hband1 : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4 := StripAux.regime_band_one P S hband6
+    have hUH : P.U ^ 9 ≤ P.G ^ 7 * P.H ^ 2 := StripAux.regime_UH P hX hg0' hu2P
+    have hDeW : 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) ≤ S.Δ :=
+      StripAux.regime_DeW P S hX hg0' hPu hbu100 hUbig hΔlong
+    have hHbig : 10 ^ 121 * (S.Δ ^ 4 * P.G ^ 5 * P.U ^ 45) ≤ P.H ^ 2 * S.Ω ^ 14 :=
+      StripAux.regime_Hbig P S Cu hCu232 hX hPu hG1 hΩU hUbig hlarge
+    have hδbud : 10 ^ 70 * ((1 / S.Δ) * P.G ^ 4 * P.U ^ 15 / S.Ω ^ 5) ≤ 1 / 2 :=
+      StripAux.regime_delta_bud P S hX hg0' hPu hbu100 hband6 hUbig hΔlong
+    have hΩH60 : 60 * S.Ω ≤ P.H := StripAux.regime_omega_H P S hX hgq hu2P hΩU hUbig
+    have hlogcap := StripAux.regime_logcap P S hX hg0' hgq hPu hu2P hG1 hU1
+      hband6 hΩU hΔ1 hUbig hlog
     -- abbreviations for the three prop-5.1 terms
     set P1 : ℝ := P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω) with hP1def
     set P2 : ℝ := P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13) with hP2def
@@ -311,14 +429,25 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       by_cases hcase : ((RaOf a).card : ℝ) ≤ RW
       · linarith [hcase, mul_nonneg hC5.le hPnn]
       · push_neg at hcase
-        have h3 : ∃ c : ℝ, 0 < c ∧ c * (S.R / P.Wval) ≤ ((RaOf a).card : ℝ) :=
-          ⟨1, one_pos, by rw [one_mul, ← hRWdef]; exact hcase.le⟩
-        have hp5 := StripAux.prop_5_1_spec P S a ha0 (RaOf a) hi hii h3
+        have hpop : S.R / P.Wval ≤ ((RaOf a).card : ℝ) := by
+          rw [← hRWdef]; exact hcase.le
+        -- the a-window `A/5 ≤ a ≤ 11A` from `a ∈ Icc ⌈A⌉ ⌊2A⌋`
+        have hamem := Finset.mem_Icc.mp ha
+        have hApos : (0:ℝ) < S.A := by unfold Scale.A; positivity
+        have haA : S.A ≤ (a:ℝ) := le_trans (Int.le_ceil S.A) (by exact_mod_cast hamem.1)
+        have ha2A : (a:ℝ) ≤ 2 * S.A :=
+          le_trans (by exact_mod_cast hamem.2) (Int.floor_le (2 * S.A))
+        have ha_lo : S.A / 5 ≤ (a:ℝ) := le_trans (by linarith) haA
+        have ha_hi : (a:ℝ) ≤ 11 * S.A := le_trans ha2A (by linarith)
+        have hp5 := StripAux.prop_5_1_spec P S a ha0 hAD5 hΩfloor (RaOf a) (hwit a ha) hG10 hG25 hpop
+          hG1 hU1 hΔ1 hH1 hΩU hband1 hUbig hUH hDeW hHbig hδbud ha_lo ha_hi hΩH60 hlogcap
         rw [← hC5def, ← hP1def, ← hP2def, ← hP3def] at hp5
         calc ((RaOf a).card : ℝ)
             ≤ C5 * (P.H / S.Δ) * (P1 + P2 + P3) := hp5
           _ = C5 * (P.H / S.Δ * (P1 + P2 + P3)) := by ring
           _ ≤ RW + C5 * (P.H / S.Δ * (P1 + P2 + P3)) := by linarith [hRWnn]
+    -- drop the (literal-heavy) regime-pack facts: only `hper` consumes them
+    clear hlogcap hΩH60 hδbud hHbig hDeW hUH hband1 hCu232 hgq hbu100 hu2P hH1 hU1 hG1
     -- Sr ≤ #Icc • M ≤ (A+1)·M
     have hSM : Sr ≤ (S.A + 1) * M := by
       have hsum : Sr ≤ (Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋).card • M := by

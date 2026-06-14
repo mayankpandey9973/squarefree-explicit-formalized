@@ -1,7 +1,6 @@
 import Squarefree.Structure.Fiber
 import Squarefree.Lower.Prop51
 import Squarefree.Upper.Regime
-import Squarefree.Bracket.BoxSum
 import Squarefree.Budget
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
@@ -112,7 +111,7 @@ theorem dblock_le_sum_Ra (P : Globals) (S : Scale P) (C₂ : ℝ) (D' : ℝ)
     (hfiber : ∀ (a : ℤ), 0 < a → 1 ≤ S.Δ →
       (1/4:ℝ) * S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) ≤ (a:ℝ) →
       S.A ≤ (a:ℝ) → (a:ℝ) ≤ 2*S.A → 2*S.A ≤ S.D → ∀ (Dd : ℝ), 0 < Dd → Dd = S.D →
-      ∃ Ra : Finset ℕ,
+      ∃ Ra : Finset ℕ, (∀ r ∈ Ra, RaWitness P S a r) ∧
         ((DaCard P.X P.H a Dd : ℝ) ≤ C₂ * (Ra.card:ℝ) * (1 + (S.Δ/S.A)^(8/3:ℝ) * P.G^(-2/3:ℝ))))
     (hΔ1 : 1 ≤ S.Δ)
     (hNR : (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A)
@@ -120,6 +119,7 @@ theorem dblock_le_sum_Ra (P : Globals) (S : Scale P) (C₂ : ℝ) (D' : ℝ)
     (hDpos : 0 < D') (hDeq : D' = S.D) :
     ∃ (RaOf : ℤ → Finset ℕ),
       (∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, 0 < a) ∧
+      (∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, ∀ r ∈ RaOf a, RaWitness P S a r) ∧
       DBlock P S D' ≤ C₂ * (1 + fiberφ P S) *
         (∑ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, ((RaOf a).card : ℝ)) := by
   have hΔp := S.Δ_pos
@@ -127,7 +127,7 @@ theorem dblock_le_sum_Ra (P : Globals) (S : Scale P) (C₂ : ℝ) (D' : ℝ)
   have hApos : (0:ℝ) < S.A := by unfold Scale.A; positivity
   -- per-a: pick Ra from prop_3_2_fiber via choice
   have hpera : ∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, 0 < a ∧
-      ∃ Ra : Finset ℕ, (DaCard P.X P.H a D' : ℝ)
+      ∃ Ra : Finset ℕ, (∀ r ∈ Ra, RaWitness P S a r) ∧ (DaCard P.X P.H a D' : ℝ)
         ≤ C₂ * (Ra.card : ℝ) * (1 + (S.Δ / S.A) ^ (8/3 : ℝ) * P.G ^ (-2/3 : ℝ)) := by
     intro a ha
     rw [Finset.mem_Icc] at ha
@@ -137,25 +137,32 @@ theorem dblock_le_sum_Ra (P : Globals) (S : Scale P) (C₂ : ℝ) (D' : ℝ)
     have ha0 : 0 < a := by
       have : (0:ℤ) < ⌈S.A⌉ := Int.ceil_pos.mpr hApos
       omega
-    obtain ⟨Ra, hRaCard⟩ :=
+    obtain ⟨Ra, hRaWit, hRaCard⟩ :=
       hfiber a ha0 hΔ1 (le_trans hNR hAa) hAa ha2A h2AD D' hDpos hDeq
-    exact ⟨ha0, Ra, hRaCard⟩
+    exact ⟨ha0, Ra, hRaWit, hRaCard⟩
   have hapos : ∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, 0 < a := fun a ha => (hpera a ha).1
   -- build RaOf
   classical
   let RaOf : ℤ → Finset ℕ := fun a =>
     if h : a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋ then (hpera a h).2.choose else ∅
-  refine ⟨RaOf, hapos, ?_⟩
+  have hRaeq : ∀ (a : ℤ) (ha : a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋), (hpera a ha).2.choose = RaOf a := by
+    intro a ha
+    show (hpera a ha).2.choose = (if h : a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋ then (hpera a h).2.choose else ∅)
+    rw [dif_pos ha]
+  -- RaWitness for each RaOf a
+  have hwitOut : ∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, ∀ r ∈ RaOf a, RaWitness P S a r := by
+    intro a ha r hr
+    have hWit := (hpera a ha).2.choose_spec.1
+    rw [hRaeq a ha] at hWit
+    exact hWit r hr
+  refine ⟨RaOf, hapos, hwitOut, ?_⟩
   -- per-a bound: DaCard ≤ C₂·(1+φ)·#(RaOf a)
   have hper : ∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋,
       (DaCard P.X P.H a D' : ℝ)
         ≤ (C₂ * (1 + fiberφ P S)) * ((RaOf a).card : ℝ) := by
     intro a ha
-    have hRaSpec := (hpera a ha).2.choose_spec
-    have hRaeq : (hpera a ha).2.choose = RaOf a := by
-      show (hpera a ha).2.choose = (if h : a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋ then (hpera a h).2.choose else ∅)
-      rw [dif_pos ha]
-    rw [hRaeq] at hRaSpec
+    have hRaSpec := (hpera a ha).2.choose_spec.2
+    rw [hRaeq a ha] at hRaSpec
     calc (DaCard P.X P.H a D' : ℝ)
         ≤ C₂ * ((RaOf a).card : ℝ) * (1 + (S.Δ / S.A) ^ (8/3 : ℝ) * P.G ^ (-2/3 : ℝ)) := hRaSpec
       _ = (C₂ * (1 + fiberφ P S)) * ((RaOf a).card : ℝ) := by rw [fiberφ_def]; ring
@@ -659,13 +666,19 @@ noncomputable def C6 : ℝ := prop_6_1.choose
 theorem C6_pos : 0 < C6 := prop_6_1.choose_spec.1
 
 /-- Prop 6.1, specialised to `RaOf` with its budget constant named `C6`. -/
-theorem prop_6_1_spec (P : Globals) (S : Scale P) (RaOf : ℤ → Finset ℕ) :
+theorem prop_6_1_spec (P : Globals) (S : Scale P) (hX1 : 1 ≤ P.X) (hu0 : 0 < P.u)
+    (hg1 : P.g ≤ 1) (hAD5 : 10 * S.A ≤ S.D)
+    (hband : P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) ≤ S.Ω)
+    (hΩfloor : (16777216 : ℝ) ≤ P.G * P.H * S.Ω ^ 3)
+    (hlog : Real.log P.X ≤ P.X ^ P.u)
+    (RaOf : ℤ → Finset ℕ)
+    (hwit : ∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, (0 < a) ∧ ∀ r ∈ RaOf a, RaWitness P S a r) :
     (∑ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, ((RaOf a).card : ℝ)) ≤
       C6 * P.H * P.X ^ (C6 * P.u) *
         ( S.x * P.G * S.Ω ^ 2
         + S.x ^ (2/3 : ℝ) * P.G ^ (4/3 : ℝ) * S.Ω ^ (11/3 : ℝ)
         + P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ) ) :=
-  prop_6_1.choose_spec.2 P S RaOf
+  prop_6_1.choose_spec.2 P S hX1 hu0 hg1 hAD5 hband hΩfloor hlog RaOf hwit
 
 /-- Band edge for negative `Ω`-powers: for `p ≤ 0`, `Ω^p ≤ c₀^p·X^{(-g/4-3u/4)·p}`
 (the lower band gives an *upper* bound on a negative power of `Ω`). -/
@@ -798,16 +811,32 @@ noncomputable def C5 : ℝ := prop_5_1.choose
 
 theorem C5_pos : 0 < C5 := prop_5_1.choose_spec.1
 
-/-- Prop 5.1, specialised with its constant named `C5`. -/
-theorem prop_5_1_spec (P : Globals) (S : Scale P) (a : ℤ) (ha : 0 < a) (Ra : Finset ℕ)
-    (h1 : ∃ c : ℝ, 0 < c ∧ c * (P.G * P.U ^ 10) ≤ P.H / S.Δ ^ 2)
-    (h2 : ∃ c : ℝ, 0 < c ∧ c * (P.G ^ 2 * P.U ^ 5) ≤ S.Δ)
-    (h3 : ∃ c : ℝ, 0 < c ∧ c * (S.R / P.Wval) ≤ (Ra.card : ℝ)) :
+/-- Prop 5.1, specialised with its constant named `C5` (carries the AUDITED-FAITHFUL regime
+pack of `prop_5_1`, regime ruling 2026-06-10). -/
+theorem prop_5_1_spec (P : Globals) (S : Scale P) (a : ℤ) (ha : 0 < a)
+    (hAD : 10 * S.A ≤ S.D) (hΩfloor : (16777216 : ℝ) ≤ P.G * P.H * S.Ω ^ 3) (Ra : Finset ℕ)
+    (hwit : ∀ r ∈ Ra, RaWitness P S a r)
+    (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
+    (h2 : P.G ^ 2 * P.U ^ 5 ≤ S.Δ)
+    (h3 : S.R / P.Wval ≤ (Ra.card : ℝ))
+    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H)
+    (hΩU : S.Ω ≤ P.U) (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
+    (hUH : P.U ^ 9 ≤ P.G ^ 7 * P.H ^ 2)
+    (hDeW : 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) ≤ S.Δ)
+    (hHbig : 10 ^ 121 * (S.Δ ^ 4 * P.G ^ 5 * P.U ^ 45) ≤ P.H ^ 2 * S.Ω ^ 14)
+    (hδbud : 10 ^ 70 * ((1 / S.Δ) * P.G ^ 4 * P.U ^ 15 / S.Ω ^ 5) ≤ 1 / 2)
+    (ha_lo : S.A / 5 ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 11 * S.A)
+    (hΩH : 60 * S.Ω ≤ P.H)
+    (hlogcap : Real.log (10 ^ 90 * (P.G ^ ((9 : ℝ) / 2) * P.U ^ ((55 : ℝ) / 2) / S.Ω ^ 5)
+          + 10 ^ 90 * (P.H * P.G ^ 4 * S.Ω ^ 2 * P.U ^ 15 / S.Δ ^ ((5 : ℝ) / 2))
+          + 10 ^ 90 * (P.G ^ 2 * P.U ^ 15 / S.Ω ^ 5)) + 1
+        ≤ P.G ^ 3 * P.U ^ 15 * Real.sqrt S.Δ * S.Ω) :
     (Ra.card : ℝ) ≤ C5 * (P.H / S.Δ) *
       ( P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
       + P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
       + (S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27 ) :=
-  prop_5_1.choose_spec.2 P S a ha Ra h1 h2 h3
+  prop_5_1.choose_spec.2 P S a ha hAD hΩfloor Ra hwit h1 h2 h3
+    hG1 hU1 hΔ1 hH1 hΩU hband hUbig hUH hDeW hHbig hδbud ha_lo ha_hi hΩH hlogcap
 
 /-- For nonpositive `p`, `Δ^p ≤ X^{(1/100)·p}` from `Δ ≥ X^{1/100}`. -/
 theorem deltaPow_neg_le (P : Globals) (S : Scale P) (hX : 1 ≤ P.X)

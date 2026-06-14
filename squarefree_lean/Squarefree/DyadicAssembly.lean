@@ -216,10 +216,14 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
   set t64 : ℝ := 64 ^ ((1 + 1/50 - a)⁻¹) with ht64def
   set t2  : ℝ := 2 ^ ((a - u_b)⁻¹) with ht2def
   set tbig : ℝ := 16777216 ^ ((1/100 : ℝ)⁻¹) with htbigdef
+  -- threshold for the threaded `X`-largeness `10³³ ≤ U` (the prop_5_1 regime pack)
+  set tU : ℝ := ((10:ℝ) ^ 33) ^ (u_b⁻¹) with htUdef
   set X₀ : ℝ := max X_2 (max tbig (max t8 (max t1025
       (max t64 (max t2 (max Tlog 8)))))) with hX₀def
-  refine ⟨X₀, ?_⟩
-  intro X hXX₀ D hDlo hDhi
+  refine ⟨max X₀ tU, ?_⟩
+  intro X hXfull D hDlo hDhi
+  have hXX₀ : X₀ ≤ X := le_trans (le_max_left _ _) hXfull
+  have hXtU : tU ≤ X := le_trans (le_max_right _ _) hXfull
   -- extract each threshold from X₀ ≤ X
   have hXX2 : X_2 ≤ X := le_trans (le_max_left _ _) hXX₀
   have hXtbig : tbig ≤ X := le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hXX₀
@@ -244,6 +248,31 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
   -- basic facts about X
   have hX1 : (1 : ℝ) ≤ X := by linarith
   have hX0 : (0 : ℝ) < X := lt_of_lt_of_le one_pos hX1
+  -- §6 log budget: `log X ≤ X^{u_b}` (the `X^{o(1)}` absorption, via the `Tlog` threshold)
+  have hlogP : Real.log X ≤ X ^ u_b := by
+    have hlogX : Real.log X ≤ (u_b / 4)⁻¹ * X ^ (u_b / 4) :=
+      log_le_rpow (ε := u_b / 4) (by linarith) hX1
+    have hmid : (2 / Real.log 2) * Real.log X ≤ (8 / (u_b * Real.log 2)) * X ^ (u_b / 4) := by
+      have h2log : (0:ℝ) < 2 / Real.log 2 := by positivity
+      calc (2 / Real.log 2) * Real.log X
+          ≤ (2 / Real.log 2) * ((u_b / 4)⁻¹ * X ^ (u_b / 4)) :=
+            mul_le_mul_of_nonneg_left hlogX h2log.le
+        _ = (8 / (u_b * Real.log 2)) * X ^ (u_b / 4) := by rw [inv_div]; field_simp; ring
+    have hdom : (8 / (u_b * Real.log 2)) * X ^ (u_b / 4) ≤ X ^ (u_b / 2) :=
+      rpow_dominate (c := 8 / (u_b * Real.log 2)) (α := u_b / 4) (β := u_b / 2)
+        (by positivity) (by linarith) hX1
+        (by rw [hTlogdef] at hXTlog
+            rw [show (u_b / 2 - u_b / 4) = u_b / 4 by ring]; exact hXTlog)
+    have hcomb : (2 / Real.log 2) * Real.log X ≤ X ^ (u_b / 2) := le_trans hmid hdom
+    have hmono : X ^ (u_b / 2) ≤ X ^ u_b := Real.rpow_le_rpow_of_exponent_le hX1 (by linarith)
+    have hlog2_le1 : Real.log 2 ≤ 1 := by
+      nlinarith [Real.log_le_sub_one_of_pos (show (0:ℝ) < 2 by norm_num)]
+    have h2log_ge1 : (1:ℝ) ≤ 2 / Real.log 2 := by
+      rw [le_div_iff₀ (Real.log_pos (by norm_num))]; linarith [hlog2_le1]
+    have hlogXnn : 0 ≤ Real.log X := Real.log_nonneg hX1
+    have hself : Real.log X ≤ (2 / Real.log 2) * Real.log X := by
+      nlinarith [mul_nonneg hlogXnn (show (0:ℝ) ≤ 2 / Real.log 2 - 1 by linarith [h2log_ge1])]
+    linarith [hself, hcomb, hmono]
   -- the global parameter pack (with u = u_b)
   set P : Globals := ⟨X, g, u_b, hX0⟩ with hPdef
   have hPH : P.H = X ^ a := by rw [hPdef, Globals.H, hadef]
@@ -252,6 +281,12 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
   have hHpos : 0 < P.H := P.H_pos
   have hH1 : (1 : ℝ) ≤ P.H := by rw [hPH]; exact Real.one_le_rpow hX1 ha0.le
   have hUpos : 0 < P.U := P.U_pos
+  -- the threaded `X`-largeness `10³³ ≤ U` (prop_5_1 regime pack), from the `tU` threshold
+  have hUbigP : (10:ℝ) ^ 33 ≤ P.U := by
+    have h := rpow_dominate (c := (10:ℝ) ^ 33) (α := 0) (β := u_b) (by positivity) hu_b hX1
+      (by rw [htUdef] at hXtU; rw [show (u_b - 0) = u_b by ring]; exact hXtU)
+    rw [Real.rpow_zero, mul_one] at h
+    rw [hPU]; exact h
   -- target rewrite: dCard X (X^a) D = dCard P.X P.H D
   have hgoalcast : (dCard X (X ^ a) D : ℝ) = (dCard P.X P.H D : ℝ) := by rw [hPH, hPdef]
   rw [hgoalcast]
@@ -405,7 +440,7 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
       -- case split on Ω vs the band edge
       rcases le_or_gt (c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ))) (Sk k).Ω with hband | hband
       · -- on/above band edge: dblock_bound
-        have := hbound P rfl rfl hX1 (Sk k) hΔlong h16M hNR hAD hband hΩUle D hDpos hDeq
+        have := hbound P rfl rfl hX1 (Sk k) hΔlong h16M hlogP hUbigP hNR hAD hband hΩUle D hDpos hDeq
         calc DBlock P (Sk k) D ≤ C_b * P.H / P.U := this
           _ ≤ C_blk * P.H / P.U := by
               gcongr
