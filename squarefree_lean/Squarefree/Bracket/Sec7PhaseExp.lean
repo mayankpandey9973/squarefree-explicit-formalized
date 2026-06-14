@@ -5,7 +5,8 @@ import Squarefree.FiniteDiff
 # §7 phase expansion (plan nodes N9–N11) — Phase-1c SIGNATURES ONLY
 
 md 1589–1682: the monomial expansions of `f₁, f₂, f₃, B_i, B_{03}, Δ_{h₁,h₂,h₃}f₃` with
-relative error `≪ A/D = Ω/H` (N9, md 1589–1633), the eq-(7.5) principal-part decomposition
+relative error `≪ A/D = Ω/H` (N9, md 1589–1633), plus the faithful `U^3` budget for the
+`+j` shift, the eq-(7.5) principal-part decomposition
 with `C* = −(21/16)c₁c₂ ≠ 0` (N10, md 1634–65; sympy-banked, tools/sec7_ledger.py), and the
 `Err^{(m)}` bound (N11, md 1666–82).
 
@@ -25,9 +26,8 @@ with `C* = −(21/16)c₁c₂ ≠ 0` (N10, md 1634–65; sympy-banked, tools/sec
   It multiplies the N7 cover COUNT (`Sec7Branch.sec7_carry_fiber_cover`); for the
   per-triple chain vs `sec7_cTriple = 10⁵⁶` see `Bracket/Sec7Harvest.lean` and
   tools/sec7_ledger.py (ARB-2 block).
-* All errors are stated with the EXACT relative-error scale `sec7_relErr = Ω/H = A/D`
-  (md 1604–06: `a/d̃_a(r) ≪ A/D = Ω/H = X^{-(1-g)/5+O(u)}`); no `X^{O(u)}` budget enters
-  the statements (TRAP-3 discipline).
+* All errors are stated with the faithful relative-error scale `sec7_relErr = (Ω/H)·U^3`,
+  reflecting md 1604–06 together with the uniform `+j`-shift distortion over the band.
 -/
 
 open Classical Finset Squarefree.FiniteDiff
@@ -60,10 +60,6 @@ theorem sec7_cExp_pos : (0:ℝ) < sec7_cExp := by norm_num [sec7_cExp]
 theorem sec7_cErr_pos : (0:ℝ) < sec7_cErr := by norm_num [sec7_cErr]
 theorem sec7_cMult_pos : (0:ℝ) < sec7_cMult := by norm_num [sec7_cMult]
 
-/- md 1604–06: "a/d̃_a(r) ≪ A/D = Ω/H = X^{-(1-g)/5+O(u)} = o(1)". -/
-/-- The §7 relative-error scale `Ω/H` (`= A/D` exactly; md 1604–06). -/
-noncomputable def sec7_relErr (P : Globals) (S : Scale P) : ℝ := S.Ω / P.H
-
 /- md 1463–66 (Lemma 7.2): "integer shifts 1 ≤ h₁ ≤ ⌊W⌋, 1 ≤ h₂ ≤ ⌊W²⌋, 1 ≤ h₃ ≤ ⌊W⁴⌋". -/
 /-- The §7 rectangular shift box (md 1463–66). -/
 def sec7_shiftBox (W : ℝ) (h₁ h₂ h₃ : ℤ) : Prop :=
@@ -93,14 +89,15 @@ def sec7_Ssym (h₁ h₂ h₃ : ℤ) : ℝ := (h₁ : ℝ) * h₂ + (h₁ : ℝ)
    β₀ = (15/64)c₂; third difference of c₃T₃y^{-1/4}: "Δf₃ = −(45/64)c₃P(T₃/R³)y^{-13/4}+⋯"),
    and the inverse-function relation md 1662–63 "implies c₃ = 3c₁c₂" is carried as the exact
    field `c₃_eq` (it is exact for the leading asymptotic constants of §3). `X^{-(1-g)/5+O(u)}`
-   is transcribed as the exact scale `sec7_relErr = Ω/H` (md 1604–06).
+   is transcribed as the faithful scale `sec7_relErr = (Ω/H)·U^3` after the shift audit.
    GRADED FORM (Phase-1f): md 1666–76 bounds "Err^{(m)}(r) ≪ (1/Rᵐ)(…)" for the derivative
    orders m ≤ 2, which N11 cannot extract from value-level (m = 0) expansions alone; per
    md 1509–14 (`f_i^{(m)} ≍ T_i/Rᵐ`) each expansion differentiates with its error divided by
    `Rᵐ`, so every field is stated for `m ≤ 2` as `|iteratedDeriv m (piece − monomial)| ≤
    (m = 0 bound)/Rᵐ`; `m = 0` (`iteratedDeriv_zero`) is the md display verbatim. -/
 /-- **N9 data bundle** (md 1589–1633 + leading coefficients md 1648–63): the §7 monomial
-expansions of the differenced phase pieces, with relative-error scale `Ω/H`.  `B_i` is the
+expansions of the differenced phase pieces, with faithful relative-error scale `(Ω/H)·U^3`.
+`B_i` is the
 double difference of `f₂` at the `ξ_i`-shifted point (md 1547–53), `B_{03}` the triple
 difference. -/
 structure Sec7MonExp (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (Ph : Sec7Phase P S W a)
@@ -312,7 +309,7 @@ end N10
    Here the terms of size Ph_ΣT₃/R⁴ from the Taylor remainders have been absorbed into
    P(T₃/R³)X^{-(1-g)/5+O(u)}, since h_Σ/R ≤ W⁴/R ≪ X^{-c} in the displayed W-range.
    Thus in the branch ρ₀ = 0 there is no stand-alone T₁X^{-(1-g)/5+O(u)} error term."
-   `X^{-(1-g)/5+O(u)}` is transcribed as `sec7_relErr = Ω/H` (md 1604–06); the absorption
+   `X^{-(1-g)/5+O(u)}` is transcribed as the faithful `sec7_relErr = (Ω/H)·U^3`; the absorption
    needs `h_Σ/R ≤ (Ω/H)`-smallness, carried hypothesis-side below (TRAP-3 form). -/
 /-- **N11 error scale** (md 1666–74): the `m = 0` size of `Err`.  ARB-1 (A2): the Taylor
 remainder `P·h_Σ·T₃/R⁴` is KEPT as an explicit term (the md-1675–80 absorption into

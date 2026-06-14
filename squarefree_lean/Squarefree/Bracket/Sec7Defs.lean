@@ -16,6 +16,8 @@ admissibility envelope `Sec7Envelope` (md 1421–1451), and the scale identities
 * `sec7_cPh = 10¹²` — the two-sided `≍` comparability constant in all `Sec7Phase` scale
   facts (the md uses bare `≍`; CLAUDE.md §7 → named generous absolute constant).
 * `sec7_cWin = 10³` — window aperture for the `t ≍ F` window `[F/10³, 10³F]`.
+* `sec7_cExpIn = 10¹⁶` — input-side residual-expansion constant for the concrete §3
+  residuals, bounded by the output expansion budget `sec7_cExp = 10²⁵`.
 * `sec7_cJ = 10²⁰` — the `j`-band constant in `|j| ≪ 1 + H/A²` (md 1307–09).  G1+U3 bump:
   N3's `hprox` is discharged by `ftil_prox` (Sec7Prox.lean) at `10¹⁸·(H/A²)`, so the band
   needs `≥ 2·10¹⁸` (sympy-banked, tools/sec7_ledger.py U4).
@@ -56,6 +58,9 @@ def sec7_cPh : ℝ := 10 ^ 10
 /-- Window aperture for the §7 `t ≍ F` range (ledger). -/
 def sec7_cWin : ℝ := 10 ^ 3
 
+/-- Input-side residual-expansion constant for the §3→§7 monomial package. -/
+def sec7_cExpIn : ℝ := 10 ^ 16
+
 /-- `j`-band constant: the §7 shifts satisfy `|j| ≤ sec7_cJ·(1 + H/A²)` (md 1307–09).
 G1+U3: `10²⁰ ≥ 2·10¹⁸`, the `ftil_prox` discharge level (ledger U4). -/
 def sec7_cJ : ℝ := 10 ^ 20
@@ -82,12 +87,18 @@ def sec7_envC2 : ℝ := 10 ^ 300
 
 theorem sec7_cPh_pos : (0:ℝ) < sec7_cPh := by norm_num [sec7_cPh]
 theorem sec7_cWin_pos : (0:ℝ) < sec7_cWin := by norm_num [sec7_cWin]
+theorem sec7_cExpIn_pos : (0:ℝ) < sec7_cExpIn := by norm_num [sec7_cExpIn]
 theorem sec7_cJ_pos : (0:ℝ) < sec7_cJ := by norm_num [sec7_cJ]
 theorem sec7_cTay_pos : (0:ℝ) < sec7_cTay := by norm_num [sec7_cTay]
 theorem sec7_cdMar_pos : (0:ℝ) < sec7_cdMar := by norm_num [sec7_cdMar]
 theorem sec7_cN6_pos : (0:ℝ) < sec7_cN6 := by norm_num [sec7_cN6]
 theorem sec7_envC_pos : (0:ℝ) < sec7_envC := by norm_num [sec7_envC]
 theorem sec7_envC2_pos : (0:ℝ) < sec7_envC2 := by norm_num [sec7_envC2]
+
+/- md 1604–06: "a/d̃_a(r) ≪ A/D = Ω/H = X^{-(1-g)/5+O(u)} = o(1)".
+   The §7 `+j` shift audit adds the uniform `U^3` budget over the band. -/
+/-- The §7 faithful relative-error scale `(Ω/H)·U^3`. -/
+noncomputable def sec7_relErr (P : Globals) (S : Scale P) : ℝ := (S.Ω / P.H) * P.U ^ 3
 
 /- md 1358–1361 (display, TRAP-1: use AS DISPLAYED, the larger `Δ⁵/(H³Ω²)` form, NOT the
    md-1352 `G²`-identity):
@@ -270,11 +281,11 @@ structure Sec7Phase (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) where
   ra_e₃D_deriv : ∀ j, sec7_jBand P S j → ∀ m < 5, ∀ r ∈ sec7_rWinWide S W,
     HasDerivAt (ra_e₃D j m) (ra_e₃D j (m + 1) r) r
   ra_e₁D_bound : ∀ j, sec7_jBand P S j → ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
-    |ra_e₁D j m r| ≤ 10 ^ 2 * (S.T₁ / S.R ^ m) * (S.Ω / P.H)
+    |ra_e₁D j m r| ≤ sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErr P S
   ra_e₂D_bound : ∀ j, sec7_jBand P S j → ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
-    |ra_e₂D j m r| ≤ 10 ^ 2 * (S.T₂ / S.R ^ m) * (S.Ω / P.H)
+    |ra_e₂D j m r| ≤ sec7_cExpIn * (S.T₂ / S.R ^ m) * sec7_relErr P S
   ra_e₃D_bound : ∀ j, sec7_jBand P S j → ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
-    |ra_e₃D j m r| ≤ 10 ^ 2 * (S.T₃ / S.R ^ m) * (S.Ω / P.H)
+    |ra_e₃D j m r| ≤ sec7_cExpIn * (S.T₃ / S.R ^ m) * sec7_relErr P S
   /-- Global `C²` regularity of the branch phase used by the counting engines. -/
   phiContDiff : ∀ (j h₁ h₂ h₃ : ℤ) (ξ₁ ξ₂ ξ₃ : ℝ)
       (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ),

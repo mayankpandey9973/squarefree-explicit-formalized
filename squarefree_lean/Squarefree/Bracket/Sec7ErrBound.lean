@@ -177,6 +177,7 @@ theorem sec7_err_deriv_bound {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
     (hW : 0 < W)
     (hpad : 6 * (W + W ^ 2 + W ^ 4) ≤ S.R / 288)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
+    (hrel143 : sec7_relErr P S * 10 ^ 143 ≤ 1)
     (hξ₁ : |ξ₁| ≤ sec7_hSum h₁ h₂ h₃) (hξ₂ : |ξ₂| ≤ sec7_hSum h₁ h₂ h₃)
     (hξ₃ : |ξ₃| ≤ sec7_hSum h₁ h₂ h₃)
     (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ)
@@ -194,15 +195,13 @@ theorem sec7_err_deriv_bound {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
   have hh₂ : 1 ≤ h₂ := hbox.2.1.1
   have hh₃ : 1 ≤ h₃ := hbox.2.2.1
   have hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R := sec7_hSum_R_small Env hbox
-  have hrel150 : sec7_relErr P S * 10 ^ 150 ≤ 1 :=
-    sec7_relErr_le Env (sec7_W_ge_one hbox)
   have hSv3 : (3:ℝ) ≤ sec7_hSum h₁ h₂ h₃ := sec7_hSum_ge3 hh₁ hh₂ hh₃
   have hR : 0 < S.R := sec7_R_pos S
   have hT1 : 0 < S.T₁ := sec7_T₁_pos S
   have hT2 : 0 < S.T₂ := sec7_T₂_pos S
   have hrel0 : 0 ≤ sec7_relErr P S := (sec7_relErr_pos P S).le
   have hcrel : sec7_cExp * sec7_relErr P S ≤ 1 :=
-    sec7E_cExp_rel hrel150
+    sec7E_cExp_rel hrel143
   have a1 : (1:ℝ) ≤ (h₁:ℝ) := by exact_mod_cast hh₁
   have a2 : (1:ℝ) ≤ (h₂:ℝ) := by exact_mod_cast hh₂
   have a3 : (1:ℝ) ≤ (h₃:ℝ) := by exact_mod_cast hh₃

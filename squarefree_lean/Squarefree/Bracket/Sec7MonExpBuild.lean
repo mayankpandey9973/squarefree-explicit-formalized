@@ -22,7 +22,8 @@ The constructor `sec7_monExp_build` derives the nine differenced N9 fields (md 1
 by differencing the leading monomials: MVT/Taylor on the explicit `sec7_powMonD` families
 plus the graded error chains.  Constant ledger (sympy-banked, 2026-06-12): worst field
 `d3f3_exp` at `m = 2` costs `|c₃|·|aprod(−1/4,6)|·(2·cWin)^{25/4} ≈ 1.05·10²⁴ ≤ sec7_cExp
-= 10²⁵` (9.5× margin); `sec7_cExpIn = 10²` covers all error-part terms.
+= 10²⁵` (9.5× margin); `sec7_cExpIn = 10¹⁶` covers the concrete residual input terms and
+still satisfies `sec7_cExpIn ≤ sec7_cExp`.
 
 Hypothesis discharge at the §7 call site: `1 ≤ hᵢ` and `|ξᵢ| ≤ h_Σ` from the shift box /
 N6 realignment (md 1528–29); the additive window hypotheses keep all displaced points

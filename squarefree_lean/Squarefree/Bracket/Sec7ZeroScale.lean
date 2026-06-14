@@ -13,7 +13,7 @@ evaluations and (7.6) (md 1740–81; sympy-banked, tools/sec7_ledger.py).
 
 TRAP-3 (plan): md 1717's ambient `x ≫ GU¹⁰` is NOT available on the strip.  All
 subordination inputs are stated as `X^{-c}`-smallness hypotheses in monomial form
-(`sec7_cSub·(W⁴Ω²) ≤ √(Hx)`, `sec7_cSub·(GΩ⁶) ≤ H`, …), never the literal.
+(`sec7_cSub·(W⁴Ω²) ≤ √(Hx)`, `sec7_cSub·(GΩ⁶U³) ≤ H`, …), never the literal.
 
 ## Constant ledger additions (absolute constants; tools/sec7_ledger.py)
 * `sec7_cCal = 10⁹` (ARB-1: role NARROWED) — the N8-conclusion / N13 `hδ`-threshold
@@ -326,7 +326,7 @@ private theorem sec7_sqrt_Hx_mul_GΩ3_eq_R {P : Globals} (S : Scale P) :
   field_simp
 
 private theorem sec7_GΩ5_relErr_le_inv_cSub {P : Globals} {S : Scale P}
-    (hsub2 : sec7_cSub * (P.G * S.Ω ^ 6) ≤ P.H) :
+    (hsub2 : sec7_cSub * (P.G * S.Ω ^ 6 * P.U ^ 3) ≤ P.H) :
     P.G * S.Ω ^ 5 * sec7_relErr P S ≤ 1 / sec7_cSub := by
   have hH := P.H_pos
   have hc : 0 < sec7_cSub := sec7_cSub_pos
@@ -334,7 +334,7 @@ private theorem sec7_GΩ5_relErr_le_inv_cSub {P : Globals} {S : Scale P}
     have hdiv := div_le_div_of_nonneg_right hsub2 hH.le
     calc
       sec7_cSub * (P.G * S.Ω ^ 5 * sec7_relErr P S)
-          = sec7_cSub * (P.G * S.Ω ^ 6) / P.H := by
+          = sec7_cSub * (P.G * S.Ω ^ 6 * P.U ^ 3) / P.H := by
             unfold sec7_relErr
             field_simp
       _ ≤ P.H / P.H := hdiv
@@ -366,12 +366,10 @@ private theorem sec7_W4_GΩ5_div_R_le_inv_cSub {P : Globals} {S : Scale P} {W : 
   rw [le_div_iff₀ hc]
   simpa [mul_comm, mul_left_comm, mul_assoc] using hdiv
 
-private theorem sec7_relErr_le_inv_10_150 {P : Globals} {S : Scale P} {W : ℝ}
-    {h₁ h₂ h₃ : ℤ}
-    (Env : Sec7Envelope P S W) (hbox : sec7_shiftBox W h₁ h₂ h₃) :
-    sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 150 := by
-  have hrel := sec7_relErr_le Env (sec7_W_ge_one hbox)
-  have hpow : 0 < (10 : ℝ) ^ 150 := by positivity
+private theorem sec7_relErr_le_inv_10_143 {P : Globals} {S : Scale P}
+    (hrel : sec7_relErr P S * 10 ^ 143 ≤ 1) :
+    sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 143 := by
+  have hpow : 0 < (10 : ℝ) ^ 143 := by positivity
   rw [le_div_iff₀ hpow]
   simpa [mul_comm] using hrel
 
@@ -397,8 +395,9 @@ noncomputable def Sec7MonExp.Tscale {P : Globals} {S : Scale P} {a : ℤ} {W : �
    md 1705–17: "h_Σ²T₁/R² ≪ PT₃/R³ because (h_Σ²T₁/R²)/(PT₃/R³) ≪ W⁴Ω²(Hx)^{-1/2} ≪ X^{-c}"
      — transcribed as `sec7_cSub·(W⁴Ω²) ≤ √(Hx)` (ratio identity sympy-banked);
    md 1718–29: "(h_ΣT₁R⁻¹)/(PT₃R⁻³) ≤ (h_Σ/P)GΩ⁵ ≪ GΩ⁵ and hence
-     h_Σ(T₁/R)X^{-(1-g)/5+O(u)} ≪ PT₃/R³" — needs `GΩ⁵·(Ω/H)` small, transcribed as
-     `sec7_cSub·(GΩ⁶) ≤ H`; plus `sec7_cSub·Ω ≤ H` (relErr itself is `X^{-c}`, md 1604–06). -/
+     h_Σ(T₁/R)X^{-(1-g)/5+O(u)} ≪ PT₃/R³" — needs `GΩ⁵·relErr` small, transcribed as
+     `sec7_cSub·(GΩ⁶U³) ≤ H` in the current TRAP-3 field, plus the strip-dispatched
+     `relErr·10¹⁴³ ≤ 1` for absolute relErr terms. -/
 /-- **Zero-branch hypothesis bundle** (md 1686–1729; TRAP-3 smallness forms). -/
 structure Sec7ZeroHyp (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (Ph : Sec7Phase P S W a)
     (j h₁ h₂ h₃ : ℤ) (ξ₁ ξ₂ ξ₃ : ℝ) (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ) : Prop where
@@ -422,10 +421,10 @@ structure Sec7ZeroHyp (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (Ph : Sec7
   hcd : ContDiff ℝ 2 (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃)
   /-- md 1705–17 in TRAP-3 form: `W⁴Ω²(Hx)^{-1/2} ≪ X^{-c}`. -/
   hsub1 : sec7_cSub * (W ^ 4 * S.Ω ^ 2) ≤ Real.sqrt (P.H * S.x)
-  /-- md 1718–29 in TRAP-3 form: `GΩ⁵·(Ω/H) ≪ X^{-c}`. -/
-  hsub2 : sec7_cSub * (P.G * S.Ω ^ 6) ≤ P.H
-  /-- md 1604–06 in TRAP-3 form: `Ω/H ≪ X^{-c}`. -/
-  hrel : sec7_cSub * S.Ω ≤ P.H
+  /-- md 1718–29 in TRAP-3 form for `relErr = (Ω/H)·U³`: `GΩ⁵·relErr ≪ X^{-c}`. -/
+  hsub2 : sec7_cSub * (P.G * S.Ω ^ 6 * P.U ^ 3) ≤ P.H
+  /-- Strip smallness for the faithful `relErr = (Ω/H)·U³` scale. -/
+  hrel : sec7_relErr P S * 10 ^ 143 ≤ 1
   /-- **N12c** (md 1735–38; ARB-1, A4: a FIELD, produced at the concrete call site):
   `Φ'_{ρ,u}` and `Φ''_{ρ,u}` have at most `sec7_KZero` zeros on each dyadic sub-window
   of the wide count range. -/
@@ -519,16 +518,16 @@ private theorem sec7_zero_errScale_subordinate {P : Globals} {S : Scale P} {a : 
             (S.T₃ / S.R ^ 3) := by
             gcongr
       _ = (3 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by ring
-  have hrel := sec7_relErr_le_inv_10_150 (Env := Hyp.env) Hyp.hbox
+  have hrel := sec7_relErr_le_inv_10_143 Hyp.hrel
   have hCrel :
       sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S ≤
-        (1 / (10 : ℝ) ^ 150) *
+        (1 / (10 : ℝ) ^ 143) *
           (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by
     calc
       sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S
-          ≤ sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * (1 / (10 : ℝ) ^ 150) := by
+          ≤ sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * (1 / (10 : ℝ) ^ 143) := by
             gcongr
-      _ = (1 / (10 : ℝ) ^ 150) *
+      _ = (1 / (10 : ℝ) ^ 143) *
           (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by ring
   have hSsq := sec7_hSum_sq_le_nine_W4_Pprod Hyp.hbox
   have hWsub := sec7_W4_GΩ5_div_R_le_inv_cSub (P := P) (S := S) Hyp.hsub1
@@ -586,7 +585,7 @@ private theorem sec7_zero_errScale_subordinate {P : Globals} {S : Scale P} {a : 
           ring_nf
     _ ≤ sec7_cErr *
           ((3 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
-            (1 / (10 : ℝ) ^ 150) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
+            (1 / (10 : ℝ) ^ 143) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
             (9 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
             (1 / (10 : ℝ) ^ 149) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) := by
           apply mul_le_mul_of_nonneg_left
@@ -1035,16 +1034,16 @@ private theorem sec7_zero_errScale_subordinate_tiny {P : Globals} {S : Scale P} 
             (S.T₃ / S.R ^ 3) := by
             gcongr
       _ = (3 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by ring
-  have hrel := sec7_relErr_le_inv_10_150 (Env := Hyp.env) Hyp.hbox
+  have hrel := sec7_relErr_le_inv_10_143 Hyp.hrel
   have hCrel :
       sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S ≤
-        (1 / (10 : ℝ) ^ 150) *
+        (1 / (10 : ℝ) ^ 143) *
           (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by
     calc
       sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S
-          ≤ sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * (1 / (10 : ℝ) ^ 150) := by
+          ≤ sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * (1 / (10 : ℝ) ^ 143) := by
             gcongr
-      _ = (1 / (10 : ℝ) ^ 150) *
+      _ = (1 / (10 : ℝ) ^ 143) *
           (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by ring
   have hSsq := sec7_hSum_sq_le_nine_W4_Pprod Hyp.hbox
   have hWsub := sec7_W4_GΩ5_div_R_le_inv_cSub (P := P) (S := S) Hyp.hsub1
@@ -1102,7 +1101,7 @@ private theorem sec7_zero_errScale_subordinate_tiny {P : Globals} {S : Scale P} 
           ring_nf
     _ ≤ sec7_cErr *
           ((3 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
-            (1 / (10 : ℝ) ^ 150) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
+            (1 / (10 : ℝ) ^ 143) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
             (9 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
             (1 / (10 : ℝ) ^ 149) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) := by
           apply mul_le_mul_of_nonneg_left
@@ -1126,7 +1125,7 @@ private theorem sec7_zero_err_combo_subordinate {P : Globals} {S : Scale P} {a :
     rw [Hyp.hρ₀]
     norm_num [sec7_cCarry]
   have hErr1raw := sec7_err_deriv_bound (ME := ME) Hyp.env Hyp.hj Hyp.hbox
-    Hyp.hW Hyp.hpad Hyp.hshift
+    Hyp.hW Hyp.hpad Hyp.hshift Hyp.hrel
     Hyp.hξ₁ Hyp.hξ₂ Hyp.hξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ0abs Hyp.hρ₁ Hyp.hρ₂ Hyp.hρ₃
     Hyp.hu₁ Hyp.hu₂ Hyp.hu₃ 1 (by norm_num) r hrWin
   have hErr1 :
@@ -1134,7 +1133,7 @@ private theorem sec7_zero_err_combo_subordinate {P : Globals} {S : Scale P} {a :
         sec7_cErr * sec7_errScale P S h₁ h₂ h₃ ρ₀ / S.R := by
     simpa [iteratedDeriv_one] using hErr1raw
   have hErr2 := sec7_err_deriv_bound (ME := ME) Hyp.env Hyp.hj Hyp.hbox
-    Hyp.hW Hyp.hpad Hyp.hshift
+    Hyp.hW Hyp.hpad Hyp.hshift Hyp.hrel
     Hyp.hξ₁ Hyp.hξ₂ Hyp.hξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ0abs Hyp.hρ₁ Hyp.hρ₂ Hyp.hρ₃
     Hyp.hu₁ Hyp.hu₂ Hyp.hu₃ 2 (by norm_num) r hrWin
   have hTiny := sec7_zero_errScale_subordinate_tiny (ME := ME) Hyp
@@ -1204,7 +1203,7 @@ theorem sec7_zero_deriv_upper (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁
     rw [Hyp.hρ₀]
     norm_num [sec7_cCarry]
   have hErrBound := sec7_err_deriv_bound (ME := ME) Hyp.env Hyp.hj Hyp.hbox
-    Hyp.hW Hyp.hpad Hyp.hshift
+    Hyp.hW Hyp.hpad Hyp.hshift Hyp.hrel
     Hyp.hξ₁ Hyp.hξ₂ Hyp.hξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ0abs Hyp.hρ₁ Hyp.hρ₂ Hyp.hρ₃
     Hyp.hu₁ Hyp.hu₂ Hyp.hu₃ 1 (by norm_num) r hrWin
   have hErrBound' :

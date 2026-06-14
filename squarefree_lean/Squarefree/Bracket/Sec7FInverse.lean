@@ -34,6 +34,9 @@ private noncomputable def F₃ (X a d : ℝ) : ℝ :=
 private noncomputable def F₄ (X a d : ℝ) : ℝ :=
   120 * X / d ^ 6 - 120 * X / (d + a) ^ 6
 
+private noncomputable def F₅ (X a d : ℝ) : ℝ :=
+  -720 * X / d ^ 7 + 720 * X / (d + a) ^ 7
+
 private theorem F₁_hasDerivAt {X a d : ℝ} (hd : d ≠ 0) (hda : d + a ≠ 0) :
     HasDerivAt (fun t => F₁ X a t) (F₂ X a d) d := by
   simpa [F₁, F₂] using Ffun_hasDerivAt2_d X a d hd hda
@@ -45,6 +48,10 @@ private theorem F₂_hasDerivAt {X a d : ℝ} (hd : d ≠ 0) (hda : d + a ≠ 0)
 private theorem F₃_hasDerivAt {X a d : ℝ} (hd : d ≠ 0) (hda : d + a ≠ 0) :
     HasDerivAt (fun t => F₃ X a t) (F₄ X a d) d := by
   simpa [F₃, F₄] using Ffun_hasDerivAt4_d X a d hd hda
+
+private theorem F₄_hasDerivAt {X a d : ℝ} (hd : d ≠ 0) (hda : d + a ≠ 0) :
+    HasDerivAt (fun t => F₄ X a t) (F₅ X a d) d := by
+  simpa [F₄, F₅] using Ffun_hasDerivAt5_d X a d hd hda
 
 private theorem F₁_eq_deriv {X a d : ℝ} (hd : d ≠ 0) (hda : d + a ≠ 0) :
     F₁ X a d = deriv (fun t => Ffun X a t) d := by
@@ -122,6 +129,16 @@ noncomputable def dBreve'''' (X a : ℝ) (t : ℝ) : ℝ :=
     + 10 * F₂ X a (dBreve X a t) * F₃ X a (dBreve X a t) /
         (F₁ X a (dBreve X a t)) ^ 6
     - F₄ X a (dBreve X a t) / (F₁ X a (dBreve X a t)) ^ 5
+
+/-- Fifth derivative of `dBreve`, in inverse-function form. -/
+noncomputable def dBreve''''' (X a : ℝ) (t : ℝ) : ℝ :=
+  105 * (F₂ X a (dBreve X a t)) ^ 4 / (F₁ X a (dBreve X a t)) ^ 9
+    - 105 * (F₂ X a (dBreve X a t)) ^ 2 * F₃ X a (dBreve X a t) /
+        (F₁ X a (dBreve X a t)) ^ 8
+    + 10 * (F₃ X a (dBreve X a t)) ^ 2 / (F₁ X a (dBreve X a t)) ^ 7
+    + 15 * F₂ X a (dBreve X a t) * F₄ X a (dBreve X a t) /
+        (F₁ X a (dBreve X a t)) ^ 7
+    - F₅ X a (dBreve X a t) / (F₁ X a (dBreve X a t)) ^ 6
 
 /-- `dBreve` is a left inverse of `Ffun X a` on the positive branch. -/
 theorem dBreve_spec {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) :
@@ -319,6 +336,94 @@ theorem dBreve_deriv3_hasDerivAt_Ffun {X a d : ℝ}
   field_simp [hA_ne]
   ring
 
+/-- The fourth inverse-derivative expression has derivative `dBreve'''''` at image points. -/
+theorem dBreve_deriv4_hasDerivAt_Ffun {X a d : ℝ}
+    (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) :
+    HasDerivAt (dBreve'''' X a) (dBreve''''' X a (Ffun X a d)) (Ffun X a d) := by
+  set t0 := Ffun X a d with ht0
+  set A := F₁ X a d with hA_def
+  set B := F₂ X a d with hB_def
+  set C := F₃ X a d with hC_def
+  set E := F₄ X a d with hE_def
+  set G := F₅ X a d with hG_def
+  have hda : d + a ≠ 0 := by positivity
+  have hA_ne : A ≠ 0 := by
+    rw [hA_def]
+    exact ne_of_lt (F₁_neg hX ha hd)
+  have hDval : dBreve X a t0 = d := by
+    rw [ht0]
+    exact dBreve_spec hX ha hd
+  have hD : HasDerivAt (dBreve X a) A⁻¹ t0 := by
+    have h := dBreve_hasDerivAt_Ffun hX ha hd
+    rw [dBreve', dBreve_spec hX ha hd] at h
+    simpa [ht0, hA_def] using h
+  have hAcomp : HasDerivAt (fun t => F₁ X a (dBreve X a t)) (B * A⁻¹) t0 := by
+    have hF₁ : HasDerivAt (fun t => F₁ X a t) B (dBreve X a t0) := by
+      rw [hDval]
+      simpa [hB_def] using F₁_hasDerivAt (X := X) (a := a) (d := d) (ne_of_gt hd) hda
+    simpa using hF₁.comp t0 hD
+  have hBcomp : HasDerivAt (fun t => F₂ X a (dBreve X a t)) (C * A⁻¹) t0 := by
+    have hF₂ : HasDerivAt (fun t => F₂ X a t) C (dBreve X a t0) := by
+      rw [hDval]
+      simpa [hC_def] using F₂_hasDerivAt (X := X) (a := a) (d := d) (ne_of_gt hd) hda
+    simpa using hF₂.comp t0 hD
+  have hCcomp : HasDerivAt (fun t => F₃ X a (dBreve X a t)) (E * A⁻¹) t0 := by
+    have hF₃ : HasDerivAt (fun t => F₃ X a t) E (dBreve X a t0) := by
+      rw [hDval]
+      simpa [hE_def] using F₃_hasDerivAt (X := X) (a := a) (d := d) (ne_of_gt hd) hda
+    simpa using hF₃.comp t0 hD
+  have hEcomp : HasDerivAt (fun t => F₄ X a (dBreve X a t)) (G * A⁻¹) t0 := by
+    have hF₄ : HasDerivAt (fun t => F₄ X a t) G (dBreve X a t0) := by
+      rw [hDval]
+      simpa [hG_def] using F₄_hasDerivAt (X := X) (a := a) (d := d) (ne_of_gt hd) hda
+    simpa using hF₄.comp t0 hD
+  have hA7_ne : (F₁ X a (dBreve X a t0)) ^ 7 ≠ 0 := by
+    rw [hDval, ← hA_def]
+    exact pow_ne_zero 7 hA_ne
+  have hA6_ne : (F₁ X a (dBreve X a t0)) ^ 6 ≠ 0 := by
+    rw [hDval, ← hA_def]
+    exact pow_ne_zero 6 hA_ne
+  have hA5_ne : (F₁ X a (dBreve X a t0)) ^ 5 ≠ 0 := by
+    rw [hDval, ← hA_def]
+    exact pow_ne_zero 5 hA_ne
+  have hBcube : HasDerivAt (fun t => (F₂ X a (dBreve X a t)) ^ 3)
+      (3 * (F₂ X a (dBreve X a t0)) ^ 2 * (C * A⁻¹)) t0 := by
+    simpa using hBcomp.pow 3
+  have hnum1 : HasDerivAt (fun t => -15 * (F₂ X a (dBreve X a t)) ^ 3)
+      (-15 * (3 * (F₂ X a (dBreve X a t0)) ^ 2 * (C * A⁻¹))) t0 := by
+    simpa using hBcube.const_mul (-15)
+  have hden1 : HasDerivAt (fun t => (F₁ X a (dBreve X a t)) ^ 7)
+      (7 * (F₁ X a (dBreve X a t0)) ^ 6 * (B * A⁻¹)) t0 := by
+    simpa using hAcomp.pow 7
+  have hterm1 := hnum1.div hden1 hA7_ne
+  have hBC : HasDerivAt
+      (fun t => F₂ X a (dBreve X a t) * F₃ X a (dBreve X a t))
+      ((C * A⁻¹) * F₃ X a (dBreve X a t0)
+        + F₂ X a (dBreve X a t0) * (E * A⁻¹)) t0 := by
+    simpa using hBcomp.mul hCcomp
+  have hnum2 : HasDerivAt
+      (fun t => 10 * (F₂ X a (dBreve X a t) * F₃ X a (dBreve X a t)))
+      (10 * ((C * A⁻¹) * F₃ X a (dBreve X a t0)
+        + F₂ X a (dBreve X a t0) * (E * A⁻¹))) t0 := by
+    simpa using hBC.const_mul 10
+  have hden2 : HasDerivAt (fun t => (F₁ X a (dBreve X a t)) ^ 6)
+      (6 * (F₁ X a (dBreve X a t0)) ^ 5 * (B * A⁻¹)) t0 := by
+    simpa using hAcomp.pow 6
+  have hterm2 := hnum2.div hden2 hA6_ne
+  have hden3 : HasDerivAt (fun t => (F₁ X a (dBreve X a t)) ^ 5)
+      (5 * (F₁ X a (dBreve X a t0)) ^ 4 * (B * A⁻¹)) t0 := by
+    simpa using hAcomp.pow 5
+  have hterm3 := hEcomp.div hden3 hA5_ne
+  have hraw0 := (hterm1.add hterm2).sub hterm3
+  convert hraw0 using 1
+  · funext t
+    simp [dBreve'''']
+    ring
+  · rw [hDval, dBreve''''', ht0, dBreve_spec hX ha hd,
+      hA_def, hB_def, hC_def, hE_def, hG_def]
+    field_simp [hA_ne]
+    ring
+
 /-! ## Sympy-verified high-order closed forms -/
 
 /-- Factored closed form for the third inverse derivative at image points.
@@ -373,6 +478,37 @@ theorem dBreve_deriv4_factor_image {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd :
   field_simp [hXne, hane, hdne, hda, hP]
   ring
 
+/-- Factored closed form for the fifth inverse derivative at image points.
+
+Sympy check:
+`105(F'')⁴/(F')⁹ - 105(F'')²F'''/(F')⁸ + 10(F''')²/(F')⁷
+  + 15F''F''''/(F')⁷ - F'''''/(F')⁶`
+factors to the displayed expression after substituting the factored `F`-derivatives. -/
+theorem dBreve_deriv5_factor_image {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) :
+    dBreve''''' X a (Ffun X a d) =
+      -45 * d ^ 11 * (d + a) ^ 11
+        * (21 * a ^ 12 + 336 * a ^ 11 * d + 2520 * a ^ 10 * d ^ 2
+          + 11852 * a ^ 9 * d ^ 3 + 39104 * a ^ 8 * d ^ 4
+          + 95348 * a ^ 7 * d ^ 5 + 175964 * a ^ 6 * d ^ 6
+          + 247424 * a ^ 5 * d ^ 7 + 262988 * a ^ 4 * d ^ 8
+          + 206160 * a ^ 3 * d ^ 9 + 113304 * a ^ 2 * d ^ 10
+          + 39312 * a * d ^ 11 + 6552 * d ^ 12)
+        / (32 * X ^ 5 * a ^ 5 * (a ^ 2 + 3 * a * d + 3 * d ^ 2) ^ 9) := by
+  have hda : d + a ≠ 0 := by positivity
+  have hXne : X ≠ 0 := ne_of_gt hX
+  have hane : a ≠ 0 := ne_of_gt ha
+  have hdne : d ≠ 0 := ne_of_gt hd
+  have hP : a ^ 2 + 3 * a * d + 3 * d ^ 2 ≠ 0 := by positivity
+  rw [dBreve''''', dBreve_spec hX ha hd]
+  unfold F₁ F₂ F₃ F₄ F₅
+  rw [Ffun_deriv1_factor X a d hdne hda,
+    Ffun_deriv2_factor X a d hdne hda,
+    Ffun_deriv3_factor X a d hdne hda,
+    Ffun_deriv4_factor X a d hdne hda,
+    Ffun_deriv5_factor X a d hdne hda]
+  field_simp [hXne, hane, hdne, hda, hP]
+  ring
+
 /-- Exact magnitude of the third inverse derivative at image points. -/
 theorem dBreve_deriv3_abs_factor_image {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) :
     |dBreve''' X a (Ffun X a d)| =
@@ -405,6 +541,37 @@ theorem dBreve_deriv4_abs_factor_image {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (
           + 1008 * a * d ^ 7 + 252 * d ^ 8)
         / (16 * X ^ 4 * a ^ 4 * (a ^ 2 + 3 * a * d + 3 * d ^ 2) ^ 7) := by
   rw [dBreve_deriv4_factor_image hX ha hd, abs_of_nonneg]
+  positivity
+
+/-- Exact magnitude of the fifth inverse derivative at image points. -/
+theorem dBreve_deriv5_abs_factor_image {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) :
+    |dBreve''''' X a (Ffun X a d)| =
+      45 * d ^ 11 * (d + a) ^ 11
+        * (21 * a ^ 12 + 336 * a ^ 11 * d + 2520 * a ^ 10 * d ^ 2
+          + 11852 * a ^ 9 * d ^ 3 + 39104 * a ^ 8 * d ^ 4
+          + 95348 * a ^ 7 * d ^ 5 + 175964 * a ^ 6 * d ^ 6
+          + 247424 * a ^ 5 * d ^ 7 + 262988 * a ^ 4 * d ^ 8
+          + 206160 * a ^ 3 * d ^ 9 + 113304 * a ^ 2 * d ^ 10
+          + 39312 * a * d ^ 11 + 6552 * d ^ 12)
+        / (32 * X ^ 5 * a ^ 5 * (a ^ 2 + 3 * a * d + 3 * d ^ 2) ^ 9) := by
+  rw [dBreve_deriv5_factor_image hX ha hd]
+  rw [show -45 * d ^ 11 * (d + a) ^ 11
+        * (21 * a ^ 12 + 336 * a ^ 11 * d + 2520 * a ^ 10 * d ^ 2
+          + 11852 * a ^ 9 * d ^ 3 + 39104 * a ^ 8 * d ^ 4
+          + 95348 * a ^ 7 * d ^ 5 + 175964 * a ^ 6 * d ^ 6
+          + 247424 * a ^ 5 * d ^ 7 + 262988 * a ^ 4 * d ^ 8
+          + 206160 * a ^ 3 * d ^ 9 + 113304 * a ^ 2 * d ^ 10
+          + 39312 * a * d ^ 11 + 6552 * d ^ 12)
+        / (32 * X ^ 5 * a ^ 5 * (a ^ 2 + 3 * a * d + 3 * d ^ 2) ^ 9)
+      = -(45 * d ^ 11 * (d + a) ^ 11
+        * (21 * a ^ 12 + 336 * a ^ 11 * d + 2520 * a ^ 10 * d ^ 2
+          + 11852 * a ^ 9 * d ^ 3 + 39104 * a ^ 8 * d ^ 4
+          + 95348 * a ^ 7 * d ^ 5 + 175964 * a ^ 6 * d ^ 6
+          + 247424 * a ^ 5 * d ^ 7 + 262988 * a ^ 4 * d ^ 8
+          + 206160 * a ^ 3 * d ^ 9 + 113304 * a ^ 2 * d ^ 10
+          + 39312 * a * d ^ 11 + 6552 * d ^ 12)
+        / (32 * X ^ 5 * a ^ 5 * (a ^ 2 + 3 * a * d + 3 * d ^ 2) ^ 9)) by ring]
+  rw [abs_neg, abs_of_nonneg]
   positivity
 
 /-! ## Image-window scale bounds -/
@@ -810,13 +977,6 @@ theorem dBreve_deriv1_scale_wide_image {P : Globals} {S : Scale P} {a d : ℝ}
     unfold Scale.A
     exact mul_pos S.Δ_pos S.Ω_pos
   have hDpos : 0 < S.D := S.D_pos
-  have hFpos : 0 < S.F := by
-    have hH := P.H_pos
-    have hG := P.G_pos
-    have hΔ := S.Δ_pos
-    have hΩ := S.Ω_pos
-    unfold Scale.F
-    positivity
   have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
   have hd0 : 0 < d := lt_of_lt_of_le (by positivity : 0 < S.D / 10) hd_lo
   set A₁ := F₁ P.X a d with hA₁_def
@@ -978,5 +1138,196 @@ theorem dBreve_deriv2_scale_wide_image {P : Globals} {S : Scale P} {a d : ℝ}
           _ ≤ (10 ^ 40 : ℝ) * (S.D * |A₁| ^ 3) := by
               exact mul_le_mul_of_nonneg_left hAlo_div (by positivity)
           _ = (10 ^ 40 : ℝ) * S.D * |A₁| ^ 3 := by ring
+
+/-- Fifth inverse-derivative scale on the wide image window:
+`F⁵·|d̆ₐ⁽⁵⁾(F_a(d))| ≍ HΔ`.  The constants are deliberately generous; this is an
+additive grade-5 comparability lemma for the residual layer. -/
+theorem dBreve_deriv5_scale_wide_image {P : Globals} {S : Scale P} {a d : ℝ}
+    (hAD : 10 * S.A ≤ S.D) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (hd_lo : S.D / 16 ≤ d) (hd_hi : d ≤ 30 * S.D) :
+    (1 / 10 ^ 100 : ℝ) * (P.H * S.Δ) ≤
+        S.F ^ 5 * |dBreve''''' P.X a (Ffun P.X a d)| ∧
+      S.F ^ 5 * |dBreve''''' P.X a (Ffun P.X a d)| ≤
+        (10 ^ 100 : ℝ) * (P.H * S.Δ) := by
+  have hApos : 0 < S.A := by
+    unfold Scale.A
+    exact mul_pos S.Δ_pos S.Ω_pos
+  have hDpos : 0 < S.D := S.D_pos
+  have hFpos : 0 < S.F := by
+    have hH := P.H_pos
+    have hG := P.G_pos
+    have hΔ := S.Δ_pos
+    have hΩ := S.Ω_pos
+    unfold Scale.F
+    positivity
+  have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
+  have hd0 : 0 < d := lt_of_lt_of_le (by positivity : 0 < S.D / 16) hd_lo
+  have ha_le_19d : a ≤ 19 * d := by nlinarith [ha_hi, hAD, hd_lo]
+  set Q : ℝ :=
+    21 * a ^ 12 + 336 * a ^ 11 * d + 2520 * a ^ 10 * d ^ 2
+      + 11852 * a ^ 9 * d ^ 3 + 39104 * a ^ 8 * d ^ 4
+      + 95348 * a ^ 7 * d ^ 5 + 175964 * a ^ 6 * d ^ 6
+      + 247424 * a ^ 5 * d ^ 7 + 262988 * a ^ 4 * d ^ 8
+      + 206160 * a ^ 3 * d ^ 9 + 113304 * a ^ 2 * d ^ 10
+      + 39312 * a * d ^ 11 + 6552 * d ^ 12 with hQ_def
+  set R : ℝ := a ^ 2 + 3 * a * d + 3 * d ^ 2 with hR_def
+  have hQpos : 0 < Q := by
+    rw [hQ_def]
+    positivity
+  have hRpos : 0 < R := by
+    rw [hR_def]
+    positivity
+  have hnorm :
+      (S.F ^ 5 * |dBreve''''' P.X a (Ffun P.X a d)|) / S.D =
+        (45 / 32 : ℝ) * (S.A / a) ^ 5 * (d / S.D) ^ 16 *
+          ((d + a) / d) ^ 11 * ((Q / d ^ 12) / ((R / d ^ 2) ^ 9)) := by
+    rw [dBreve_deriv5_abs_factor_image P.X_pos ha0 hd0, ← XA_div_D3_eq_F S]
+    rw [hQ_def, hR_def]
+    field_simp [P.X_pos.ne', hApos.ne', ha0.ne', hd0.ne', hDpos.ne']
+  have hSA_lo : (1 / 11 : ℝ) ≤ S.A / a := by
+    rw [le_div_iff₀ ha0]
+    nlinarith [ha_hi]
+  have hSA_hi : S.A / a ≤ (5 : ℝ) := by
+    rw [div_le_iff₀ ha0]
+    nlinarith [ha_lo]
+  have hSA_nonneg : 0 ≤ S.A / a := (div_pos hApos ha0).le
+  have hSA5_lo : (1 / 11 : ℝ) ^ 5 ≤ (S.A / a) ^ 5 :=
+    pow_le_pow_left₀ (by norm_num : (0 : ℝ) ≤ 1 / 11) hSA_lo 5
+  have hSA5_hi : (S.A / a) ^ 5 ≤ (5 : ℝ) ^ 5 :=
+    pow_le_pow_left₀ hSA_nonneg hSA_hi 5
+  have hy_lo : (1 / 16 : ℝ) ≤ d / S.D := by
+    rw [le_div_iff₀ hDpos]
+    calc (1 / 16 : ℝ) * S.D = S.D / 16 := by ring
+      _ ≤ d := hd_lo
+  have hy_hi : d / S.D ≤ (30 : ℝ) := by
+    rw [div_le_iff₀ hDpos]
+    exact hd_hi
+  have hy_nonneg : 0 ≤ d / S.D := (div_pos hd0 hDpos).le
+  have hy16_lo : (1 / 16 : ℝ) ^ 16 ≤ (d / S.D) ^ 16 :=
+    pow_le_pow_left₀ (by norm_num : (0 : ℝ) ≤ 1 / 16) hy_lo 16
+  have hy16_hi : (d / S.D) ^ 16 ≤ (30 : ℝ) ^ 16 :=
+    pow_le_pow_left₀ hy_nonneg hy_hi 16
+  have hda_lo : (1 : ℝ) ≤ (d + a) / d := by
+    rw [le_div_iff₀ hd0]
+    nlinarith [ha0]
+  have hda_hi : (d + a) / d ≤ (20 : ℝ) := by
+    rw [div_le_iff₀ hd0]
+    nlinarith [ha_le_19d]
+  have hda_nonneg : 0 ≤ (d + a) / d := by positivity
+  have hda11_lo : (1 : ℝ) ^ 11 ≤ ((d + a) / d) ^ 11 :=
+    pow_le_pow_left₀ (by norm_num : (0 : ℝ) ≤ 1) hda_lo 11
+  have hda11_hi : ((d + a) / d) ^ 11 ≤ (20 : ℝ) ^ 11 :=
+    pow_le_pow_left₀ hda_nonneg hda_hi 11
+  have hRlo_base : 3 * d ^ 2 ≤ R := by
+    rw [hR_def]
+    nlinarith [sq_nonneg a, mul_pos ha0 hd0]
+  have hRhi_base : R ≤ 421 * d ^ 2 := by
+    have ha2 : a ^ 2 ≤ (19 * d) ^ 2 := pow_le_pow_left₀ ha0.le ha_le_19d 2
+    have had : a * d ≤ (19 * d) * d := mul_le_mul_of_nonneg_right ha_le_19d hd0.le
+    rw [hR_def]
+    nlinarith [ha2, had]
+  have hRnorm_lo : (3 : ℝ) ≤ R / d ^ 2 := by
+    rw [le_div_iff₀ (by positivity : 0 < d ^ 2)]
+    simpa using hRlo_base
+  have hRnorm_hi : R / d ^ 2 ≤ (421 : ℝ) := by
+    rw [div_le_iff₀ (by positivity : 0 < d ^ 2)]
+    simpa using hRhi_base
+  have hRnorm_pos : 0 < R / d ^ 2 := div_pos hRpos (pow_pos hd0 2)
+  have hRpow_lo : (3 : ℝ) ^ 9 ≤ (R / d ^ 2) ^ 9 :=
+    pow_le_pow_left₀ (by norm_num : (0 : ℝ) ≤ 3) hRnorm_lo 9
+  have hRpow_hi : (R / d ^ 2) ^ 9 ≤ (421 : ℝ) ^ 9 :=
+    pow_le_pow_left₀ hRnorm_pos.le hRnorm_hi 9
+  have hQlo_base : 6552 * d ^ 12 ≤ Q := by
+    rw [hQ_def]
+    have h1 : 0 ≤ 21 * a ^ 12 := by positivity
+    have h2 : 0 ≤ 336 * a ^ 11 * d := by positivity
+    have h3 : 0 ≤ 2520 * a ^ 10 * d ^ 2 := by positivity
+    have h4 : 0 ≤ 11852 * a ^ 9 * d ^ 3 := by positivity
+    have h5 : 0 ≤ 39104 * a ^ 8 * d ^ 4 := by positivity
+    have h6 : 0 ≤ 95348 * a ^ 7 * d ^ 5 := by positivity
+    have h7 : 0 ≤ 175964 * a ^ 6 * d ^ 6 := by positivity
+    have h8 : 0 ≤ 247424 * a ^ 5 * d ^ 7 := by positivity
+    have h9 : 0 ≤ 262988 * a ^ 4 * d ^ 8 := by positivity
+    have h10 : 0 ≤ 206160 * a ^ 3 * d ^ 9 := by positivity
+    have h11 : 0 ≤ 113304 * a ^ 2 * d ^ 10 := by positivity
+    have h12 : 0 ≤ 39312 * a * d ^ 11 := by positivity
+    nlinarith
+  have hQhi_base : Q ≤ (10 ^ 18 : ℝ) * d ^ 12 := by
+    have hQmono : Q ≤
+        21 * (19 * d) ^ 12 + 336 * (19 * d) ^ 11 * d
+          + 2520 * (19 * d) ^ 10 * d ^ 2
+          + 11852 * (19 * d) ^ 9 * d ^ 3
+          + 39104 * (19 * d) ^ 8 * d ^ 4
+          + 95348 * (19 * d) ^ 7 * d ^ 5
+          + 175964 * (19 * d) ^ 6 * d ^ 6
+          + 247424 * (19 * d) ^ 5 * d ^ 7
+          + 262988 * (19 * d) ^ 4 * d ^ 8
+          + 206160 * (19 * d) ^ 3 * d ^ 9
+          + 113304 * (19 * d) ^ 2 * d ^ 10
+          + 39312 * (19 * d) * d ^ 11 + 6552 * d ^ 12 := by
+      rw [hQ_def]
+      gcongr
+    have hd12_nonneg : 0 ≤ d ^ 12 := by positivity
+    nlinarith [hQmono, hd12_nonneg]
+  have hQnorm_lo : (6552 : ℝ) ≤ Q / d ^ 12 := by
+    rw [le_div_iff₀ (pow_pos hd0 12)]
+    simpa using hQlo_base
+  have hQnorm_hi : Q / d ^ 12 ≤ (10 ^ 18 : ℝ) := by
+    rw [div_le_iff₀ (pow_pos hd0 12)]
+    simpa using hQhi_base
+  have hQnorm_nonneg : 0 ≤ Q / d ^ 12 := (div_pos hQpos (pow_pos hd0 12)).le
+  have hquot_lo :
+      (6552 : ℝ) / (421 : ℝ) ^ 9 ≤ (Q / d ^ 12) / ((R / d ^ 2) ^ 9) := by
+    calc (6552 : ℝ) / (421 : ℝ) ^ 9
+        ≤ (Q / d ^ 12) / (421 : ℝ) ^ 9 := by
+            gcongr
+      _ ≤ (Q / d ^ 12) / ((R / d ^ 2) ^ 9) := by
+            exact div_le_div_of_nonneg_left hQnorm_nonneg (pow_pos hRnorm_pos 9) hRpow_hi
+  have hquot_hi :
+      (Q / d ^ 12) / ((R / d ^ 2) ^ 9) ≤ (10 ^ 18 : ℝ) / (3 : ℝ) ^ 9 := by
+    calc (Q / d ^ 12) / ((R / d ^ 2) ^ 9)
+        ≤ (10 ^ 18 : ℝ) / ((R / d ^ 2) ^ 9) := by
+            gcongr
+      _ ≤ (10 ^ 18 : ℝ) / (3 : ℝ) ^ 9 := by
+            exact div_le_div_of_nonneg_left (by norm_num : (0 : ℝ) ≤ 10 ^ 18)
+              (by norm_num : (0 : ℝ) < (3 : ℝ) ^ 9) hRpow_lo
+  have hmain_lo :
+      (1 / 10 ^ 100 : ℝ) ≤
+        (45 / 32 : ℝ) * (S.A / a) ^ 5 * (d / S.D) ^ 16 *
+          ((d + a) / d) ^ 11 * ((Q / d ^ 12) / ((R / d ^ 2) ^ 9)) := by
+    have hconst : (1 / 10 ^ 100 : ℝ) ≤
+        (45 / 32 : ℝ) * (1 / 11 : ℝ) ^ 5 * (1 / 16 : ℝ) ^ 16 *
+          (1 : ℝ) ^ 11 * ((6552 : ℝ) / (421 : ℝ) ^ 9) := by
+      norm_num
+    calc (1 / 10 ^ 100 : ℝ)
+        ≤ (45 / 32 : ℝ) * (1 / 11 : ℝ) ^ 5 * (1 / 16 : ℝ) ^ 16 *
+          (1 : ℝ) ^ 11 * ((6552 : ℝ) / (421 : ℝ) ^ 9) := hconst
+      _ ≤ (45 / 32 : ℝ) * (S.A / a) ^ 5 * (d / S.D) ^ 16 *
+          ((d + a) / d) ^ 11 * ((Q / d ^ 12) / ((R / d ^ 2) ^ 9)) := by
+            gcongr
+  have hmain_hi :
+      (45 / 32 : ℝ) * (S.A / a) ^ 5 * (d / S.D) ^ 16 *
+          ((d + a) / d) ^ 11 * ((Q / d ^ 12) / ((R / d ^ 2) ^ 9)) ≤
+        (10 ^ 100 : ℝ) := by
+    have hconst :
+        (45 / 32 : ℝ) * (5 : ℝ) ^ 5 * (30 : ℝ) ^ 16 *
+            (20 : ℝ) ^ 11 * ((10 ^ 18 : ℝ) / (3 : ℝ) ^ 9) ≤
+          (10 ^ 100 : ℝ) := by
+      norm_num
+    calc (45 / 32 : ℝ) * (S.A / a) ^ 5 * (d / S.D) ^ 16 *
+          ((d + a) / d) ^ 11 * ((Q / d ^ 12) / ((R / d ^ 2) ^ 9))
+        ≤ (45 / 32 : ℝ) * (5 : ℝ) ^ 5 * (30 : ℝ) ^ 16 *
+            (20 : ℝ) ^ 11 * ((10 ^ 18 : ℝ) / (3 : ℝ) ^ 9) := by
+            gcongr
+      _ ≤ (10 ^ 100 : ℝ) := hconst
+  constructor
+  · rw [show P.H * S.Δ = S.D by rfl]
+    rw [← le_div_iff₀ hDpos]
+    rw [hnorm]
+    exact hmain_lo
+  · rw [show P.H * S.Δ = S.D by rfl]
+    rw [← div_le_iff₀ hDpos]
+    rw [hnorm]
+    exact hmain_hi
 
 end Squarefree

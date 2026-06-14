@@ -1,4 +1,5 @@
 import Squarefree.Bracket.Sec7MonExpData
+import Squarefree.Opt.OnStripAux
 
 /-!
 # §7 N11 support layer — Leibniz-graded families and envelope smallness
@@ -9,7 +10,8 @@ their chains and value bounds, a uniform value bound for the graded power monomi
 the two envelope-derived smallness facts the N11 ledger uses:
 * `sec7_hSum_R_small` — `h_Σ·10¹⁴⁹ ≤ R`, from `n6·n7 = R⁴` (exact monomial identity;
   log-free entries only, so no `X ≥ 1` is needed);
-* `sec7_relErr_le` — `(Ω/H)·10¹⁵⁰ ≤ 1`, from `n6` and `R·T₁ = A² > 1`.
+* `sec7_relErr_le` — `sec7_relErr·10¹⁴³ ≤ 1`, from the strip budget after the `U^3`
+  relErr enlargement.
 -/
 
 open Classical Finset Set Real Squarefree.FiniteDiff
@@ -251,61 +253,109 @@ theorem sec7_hSum_R_small {P : Globals} {S : Scale P} {W : ℝ} {h₁ h₂ h₃ 
               linarith
     _ ≤ S.R := hroot
 
-/-- **N11 smallness 2** (envelope `n6` + `R·T₁ = A² > 1`): `(Ω/H) · 10¹⁵⁰ ≤ 1`. -/
+/-- **N11 smallness 2**: the faithful relErr scale is small on the strip.  The
+`10^143` level is a clean strip-derived level needed by the current `cErr = 10^42`
+absorptions under the `X ≥ 2^2400` floor after the `U^3` enlargement. -/
 theorem sec7_relErr_le {P : Globals} {S : Scale P} {W : ℝ}
-    (Env : Sec7Envelope P S W) (hW : 1 ≤ W) :
-    sec7_relErr P S * 10 ^ 150 ≤ 1 := by
-  have hH := P.H_pos; have hΔ := S.Δ_pos; have hΩ := S.Ω_pos
-  have hC : 0 < sec7_envC2 := sec7_envC2_pos
-  -- n6 with W³⁰ ≥ 1: envC2·Ω⁴ ≤ Hx
-  have hn6 : sec7_envC2 * S.Ω ^ 4 ≤ P.H * S.x := by
-    have h6 := Env.n6
-    have hW30 : (1:ℝ) ≤ W ^ 30 := one_le_pow₀ hW
-    have h0 : 0 ≤ sec7_envC2 * S.Ω ^ 4 :=
-      mul_nonneg hC.le (pow_nonneg hΩ.le 4)
-    calc sec7_envC2 * S.Ω ^ 4 ≤ sec7_envC2 * S.Ω ^ 4 * W ^ 30 :=
-          le_mul_of_one_le_right h0 hW30
-      _ = sec7_envC2 * (W ^ 30 * S.Ω ^ 4) := by ring
-      _ ≤ P.H * S.x := h6
-  -- Hx·Δ² = H²
-  have hHx : P.H * S.x * S.Δ ^ 2 = P.H ^ 2 := by
-    unfold Scale.x
-    field_simp
-  -- Δ²Ω² = R·T₁ > 1
-  have hA : 1 < S.Δ ^ 2 * S.Ω ^ 2 := by
-    have h1 := Env.R_gt_one
-    have h2 := Env.T1_gt_one
-    have h3 : 1 < S.R * S.T₁ := by nlinarith
-    have h4 : S.R * S.T₁ = S.Δ ^ 2 * S.Ω ^ 2 := by
-      rw [sec7_R_mul_T₁ S]; unfold Scale.A; ring
-    rw [h4] at h3; exact h3
-  -- envC2·Ω² ≤ envC2·Ω⁴Δ² ≤ H²
-  have hkey : sec7_envC2 * S.Ω ^ 2 ≤ P.H ^ 2 := by
-    have h1 : S.Ω ^ 2 ≤ S.Ω ^ 4 * S.Δ ^ 2 := by
-      have h0 : (0:ℝ) ≤ S.Ω ^ 2 := pow_nonneg hΩ.le 2
-      have := le_mul_of_one_le_right h0 hA.le
-      calc S.Ω ^ 2 ≤ S.Ω ^ 2 * (S.Δ ^ 2 * S.Ω ^ 2) := this
-        _ = S.Ω ^ 4 * S.Δ ^ 2 := by ring
-    have h2 : sec7_envC2 * (S.Ω ^ 4 * S.Δ ^ 2) ≤ P.H ^ 2 := by
-      have := mul_le_mul_of_nonneg_right hn6 (pow_nonneg hΔ.le 2)
-      calc sec7_envC2 * (S.Ω ^ 4 * S.Δ ^ 2) = sec7_envC2 * S.Ω ^ 4 * S.Δ ^ 2 := by
-            ring
-        _ ≤ P.H * S.x * S.Δ ^ 2 := this
-        _ = P.H ^ 2 := hHx
-    calc sec7_envC2 * S.Ω ^ 2 ≤ sec7_envC2 * (S.Ω ^ 4 * S.Δ ^ 2) :=
-          mul_le_mul_of_nonneg_left h1 hC.le
-      _ ≤ P.H ^ 2 := h2
-  -- square root
-  have hΩH : (10:ℝ) ^ 150 * S.Ω ≤ P.H := by
-    have hsq : ((10:ℝ) ^ 150 * S.Ω) ^ 2 ≤ P.H ^ 2 := by
-      have hCid : sec7_envC2 = ((10:ℝ) ^ 150) ^ 2 := by
-        rw [sec7_envC2, ← pow_mul]
-      calc ((10:ℝ) ^ 150 * S.Ω) ^ 2 = sec7_envC2 * S.Ω ^ 2 := by rw [hCid]; ring
-        _ ≤ P.H ^ 2 := hkey
-    exact le_of_pow_le_pow_left₀ (by norm_num) hH.le hsq
-  -- conclude for relErr = Ω/H
+    (_Env : Sec7Envelope P S W) (_hW : 1 ≤ W)
+    {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
+    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ)) :
+    sec7_relErr P S * 10 ^ 143 ≤ 1 := by
+  have hH := P.H_pos
+  have hG := P.G_pos
+  have hΩ := S.Ω_pos
+  have hXgt : 1 < P.X := by
+    by_contra h
+    have h' : P.X ≤ 1 := not_lt.mp h
+    have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
+    linarith
+  have hbud' : 18977 * P.g + 18675 * P.u ≤ 2 := by
+    have hCu0 : 0 ≤ Cu := le_trans zero_le_one hsd.hCu
+    have hextra : 0 ≤ 790 * Cu * P.u := by
+      nlinarith [mul_nonneg hCu0 hu0.le]
+    unfold OnStripAux.Budget at hbud
+    nlinarith [hbud, hextra]
+  have hbig0 : (10:ℝ) ^ 143 ≤ (2 ^ 24 : ℝ) ^ ((198:ℝ) / 10) := by
+    have hpow : ((10:ℝ) ^ 143) ^ (10:ℝ) ≤ (2 ^ 24 : ℝ) ^ (198:ℝ) := by norm_num
+    rw [show ((198:ℝ) / 10) = (198:ℝ) * (10:ℝ)⁻¹ by norm_num]
+    rw [Real.rpow_mul (by norm_num : (0:ℝ) ≤ 2 ^ 24)]
+    exact (Real.le_rpow_inv_iff_of_pos (by positivity) (by positivity)
+      (by norm_num : (0:ℝ) < 10)).mpr hpow
+  have hbig : (10:ℝ) ^ 143 ≤ P.X ^ (198/1000 : ℝ) := by
+    have hX24' : (2 ^ 24 : ℝ) ≤ P.X ^ (1/100 : ℝ) := by
+      norm_num
+      exact hX24
+    have hpow : (2 ^ 24 : ℝ) ^ ((198:ℝ) / 10) ≤
+        (P.X ^ (1/100 : ℝ)) ^ ((198:ℝ) / 10) :=
+      Real.rpow_le_rpow (by norm_num) hX24' (by norm_num)
+    calc
+      (10:ℝ) ^ 143 ≤ (2 ^ 24 : ℝ) ^ ((198:ℝ) / 10) := hbig0
+      _ ≤ (P.X ^ (1/100 : ℝ)) ^ ((198:ℝ) / 10) := hpow
+      _ = P.X ^ (198/1000 : ℝ) := by
+          rw [← Real.rpow_mul P.X_pos.le]
+          congr 1
+          norm_num
+  have hkey : (1:ℝ) <
+      P.H ^ (1 - 5 * (198/1000 : ℝ) - 15 * P.u) * S.x ^ (0:ℝ) *
+        P.G ^ (-(198/1000 : ℝ) - 3 * P.u) * S.Ω ^ (-1:ℝ) :=
+    OnStripAux.one_lt_mono P S c₀ Cu hsd hXgt
+      (1 - 5 * (198/1000 : ℝ) - 15 * P.u) 0
+      (-(198/1000 : ℝ) - 3 * P.u) (-1)
+      (by
+        unfold OnStripAux.ratioExp
+        norm_num
+        nlinarith [hbud', hg0, hu0.le])
+  have hXU :
+      P.X ^ (198/1000 : ℝ) * P.U ^ 3 =
+        P.H ^ (5 * (198/1000 : ℝ) + 15 * P.u) *
+          P.G ^ ((198/1000 : ℝ) + 3 * P.u) := by
+    unfold Globals.U Globals.H Globals.G
+    rw [← Real.rpow_natCast (P.X ^ P.u) 3, ← Real.rpow_mul P.X_pos.le]
+    rw [← Real.rpow_add P.X_pos]
+    rw [← Real.rpow_mul P.X_pos.le, ← Real.rpow_mul P.X_pos.le, ← Real.rpow_add P.X_pos]
+    congr 1
+    ring
+  have hsplit :
+      (P.H ^ (5 * (198/1000 : ℝ) + 15 * P.u) *
+          P.G ^ ((198/1000 : ℝ) + 3 * P.u)) *
+        (P.H ^ (1 - 5 * (198/1000 : ℝ) - 15 * P.u) * S.x ^ (0:ℝ) *
+          P.G ^ (-(198/1000 : ℝ) - 3 * P.u) * S.Ω ^ (-1:ℝ)) = P.H / S.Ω := by
+    rw [Real.rpow_zero]
+    rw [show (P.H ^ (5 * (198/1000 : ℝ) + 15 * P.u) *
+          P.G ^ ((198/1000 : ℝ) + 3 * P.u)) *
+        (P.H ^ (1 - 5 * (198/1000 : ℝ) - 15 * P.u) * 1 *
+          P.G ^ (-(198/1000 : ℝ) - 3 * P.u) * S.Ω ^ (-1:ℝ)) =
+        (P.H ^ (5 * (198/1000 : ℝ) + 15 * P.u) *
+          P.H ^ (1 - 5 * (198/1000 : ℝ) - 15 * P.u)) *
+        (P.G ^ ((198/1000 : ℝ) + 3 * P.u) *
+          P.G ^ (-(198/1000 : ℝ) - 3 * P.u)) * S.Ω ^ (-1:ℝ) by ring]
+    rw [← Real.rpow_add hH, ← Real.rpow_add hG, Real.rpow_neg hΩ.le]
+    rw [show 5 * (198/1000 : ℝ) + 15 * P.u +
+          (1 - 5 * (198/1000 : ℝ) - 15 * P.u) = 1 by ring,
+      show ((198/1000 : ℝ) + 3 * P.u) + (-(198/1000 : ℝ) - 3 * P.u) = 0 by ring,
+      Real.rpow_one, Real.rpow_zero, Real.rpow_one]
+    field_simp [hΩ.ne']
+  have htarget : (10:ℝ) ^ 143 * P.U ^ 3 ≤ P.H / S.Ω := by
+    calc
+      (10:ℝ) ^ 143 * P.U ^ 3 ≤ P.X ^ (198/1000 : ℝ) * P.U ^ 3 := by
+        exact mul_le_mul_of_nonneg_right hbig (pow_nonneg P.U_pos.le 3)
+      _ = P.H ^ (5 * (198/1000 : ℝ) + 15 * P.u) *
+            P.G ^ ((198/1000 : ℝ) + 3 * P.u) := hXU
+      _ ≤ (P.H ^ (5 * (198/1000 : ℝ) + 15 * P.u) *
+            P.G ^ ((198/1000 : ℝ) + 3 * P.u)) *
+          (P.H ^ (1 - 5 * (198/1000 : ℝ) - 15 * P.u) * S.x ^ (0:ℝ) *
+            P.G ^ (-(198/1000 : ℝ) - 3 * P.u) * S.Ω ^ (-1:ℝ)) := by
+          exact le_mul_of_one_le_right (by positivity) hkey.le
+      _ = P.H / S.Ω := hsplit
+  have hmain : ((10:ℝ) ^ 143 * P.U ^ 3) * S.Ω ≤ P.H := by
+    rwa [le_div_iff₀ hΩ] at htarget
   unfold sec7_relErr
-  rw [div_mul_eq_mul_div, div_le_one hH]
-  linarith
+  calc
+    (S.Ω / P.H * P.U ^ 3) * (10:ℝ) ^ 143
+        = (((10:ℝ) ^ 143 * P.U ^ 3) * S.Ω) / P.H := by
+            field_simp [hH.ne']
+    _ ≤ P.H / P.H := div_le_div_of_nonneg_right hmain hH.le
+    _ = 1 := by field_simp [hH.ne']
 
 end Squarefree

@@ -5,7 +5,7 @@ import Mathlib
 # Higher `d`-derivatives of `F_a`
 
 This leaf extends `Structure/PhaseDeriv.lean` from the first two `d`-derivatives of
-`Ffun X a d = X/d² - X/(d+a)²` to the third and fourth derivatives.  It also records
+`Ffun X a d = X/d² - X/(d+a)²` to the third, fourth, and fifth derivatives.  It also records
 closed absolute-value formulas and scale bounds on the wide inverse window used by the
 forthcoming inverse-phase module.
 -/
@@ -16,7 +16,7 @@ namespace Squarefree
 
 set_option maxHeartbeats 1000000
 
-/-! ## Third and fourth derivatives -/
+/-! ## Third, fourth, and fifth derivatives -/
 
 /-- `HasDerivAt` of `s ↦ 6X/s⁴` at `s ≠ 0`, derivative `-24X/s⁵`. -/
 private theorem hasDerivAt_6_inv_four (X s : ℝ) (hs : s ≠ 0) :
@@ -92,6 +92,45 @@ theorem Ffun_hasDerivAt4_d (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
   convert h using 1
   ring
 
+/-- `HasDerivAt` of `s ↦ 120X/s⁶` at `s ≠ 0`, derivative `-720X/s⁷`. -/
+private theorem hasDerivAt_120_inv_six (X s : ℝ) (hs : s ≠ 0) :
+    HasDerivAt (fun t => 120 * X / t ^ 6) (-720 * X / s ^ 7) s := by
+  have hpow : HasDerivAt (fun t : ℝ => t ^ 6) (6 * s ^ 5) s := by
+    simpa using (hasDerivAt_pow 6 s)
+  have h := (hasDerivAt_const s (120 * X)).div hpow (pow_ne_zero 6 hs)
+  convert h using 1
+  field_simp
+  ring
+
+/-- `HasDerivAt` of `s ↦ -120X/(s+a)⁶` at `s+a ≠ 0`, derivative
+`720X/(s+a)⁷`. -/
+private theorem hasDerivAt_neg120_inv_six_shift (X a s : ℝ) (hsa : s + a ≠ 0) :
+    HasDerivAt (fun t => -120 * X / (t + a) ^ 6) (720 * X / (s + a) ^ 7) s := by
+  have hshift : HasDerivAt (fun t : ℝ => t + a) (1 : ℝ) s := by
+    simpa using (hasDerivAt_id s).add_const a
+  have hpow : HasDerivAt (fun t : ℝ => (t + a) ^ 6) (6 * (s + a) ^ 5 * 1) s := by
+    simpa using (hasDerivAt_pow 6 (s + a)).comp s hshift
+  have h := (hasDerivAt_const s (-120 * X)).div hpow (pow_ne_zero 6 hsa)
+  convert h using 1
+  field_simp
+  ring
+
+/-- **Fifth `d`-derivative of `F_a`** (as the derivative of the fourth-derivative
+function).
+`(d/dt)(120X/t⁶ - 120X/(t+a)⁶)|_{t=d} = -720X/d⁷ + 720X/(d+a)⁷`. -/
+theorem Ffun_hasDerivAt5_d (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
+    HasDerivAt (fun t => 120 * X / t ^ 6 - 120 * X / (t + a) ^ 6)
+      (-720 * X / d ^ 7 + 720 * X / (d + a) ^ 7) d := by
+  have h := (hasDerivAt_120_inv_six X d hd).add
+    (hasDerivAt_neg120_inv_six_shift X a d hda)
+  have hfun : (fun t => 120 * X / t ^ 6 - 120 * X / (t + a) ^ 6)
+      = (fun t => 120 * X / t ^ 6) + (fun t => -120 * X / (t + a) ^ 6) := by
+    funext t
+    simp only [Pi.add_apply, sub_eq_add_neg]
+    ring
+  rw [hfun]
+  exact h
+
 /-! ## Iterated-derivative identities -/
 
 /-- The second derivative function `iteratedDeriv 2 (fun t => Ffun X a t)` agrees locally
@@ -136,6 +175,27 @@ theorem Ffun_iteratedDeriv4_d (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
   rw [(iteratedDeriv3_Ffun_eventuallyEq X a d hd hda).deriv_eq]
   exact (Ffun_hasDerivAt4_d X a d hd hda).deriv
 
+/-- The fourth derivative function `iteratedDeriv 4 (fun t => Ffun X a t)` agrees
+locally with the explicit fourth-derivative expression near any pole-free point. -/
+private theorem iteratedDeriv4_Ffun_eventuallyEq (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
+    iteratedDeriv 4 (fun t => Ffun X a t)
+      =ᶠ[nhds d] (fun t => 120 * X / t ^ 6 - 120 * X / (t + a) ^ 6) := by
+  have hopen : IsOpen {t : ℝ | t ≠ 0 ∧ t + a ≠ 0} :=
+    (isOpen_ne.preimage continuous_id).inter (isOpen_ne.preimage (continuous_id.add continuous_const))
+  have hmem : d ∈ {t : ℝ | t ≠ 0 ∧ t + a ≠ 0} := ⟨hd, hda⟩
+  refine Filter.eventuallyEq_of_mem (hopen.mem_nhds hmem) ?_
+  intro t ht
+  exact Ffun_iteratedDeriv4_d X a t ht.1 ht.2
+
+/-- **`iteratedDeriv 5` value of `F_a`** on the pole-free set:
+`iteratedDeriv 5 (fun t => Ffun X a t) d = -720X/d⁷ + 720X/(d+a)⁷`. -/
+theorem Ffun_iteratedDeriv5_d (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
+    iteratedDeriv 5 (fun t => Ffun X a t) d =
+      -720 * X / d ^ 7 + 720 * X / (d + a) ^ 7 := by
+  rw [show (5 : ℕ) = 4 + 1 by rfl, iteratedDeriv_succ]
+  rw [(iteratedDeriv4_Ffun_eventuallyEq X a d hd hda).deriv_eq]
+  exact (Ffun_hasDerivAt5_d X a d hd hda).deriv
+
 /-! ## Smoothness away from poles -/
 
 /-- `Ffun X a` is `C⁴` (indeed `C^∞`) at any pole-free point. -/
@@ -144,6 +204,20 @@ theorem Ffun_contDiffAt4 {X a d : ℝ} (hd : d ≠ 0) (hda : d + a ≠ 0) :
   have h1 : ContDiffAt ℝ 4 (fun t : ℝ => X / t ^ 2) d :=
     (contDiffAt_const).div (contDiffAt_id.pow 2) (pow_ne_zero 2 hd)
   have h2 : ContDiffAt ℝ 4 (fun t : ℝ => X / (t + a) ^ 2) d :=
+    (contDiffAt_const).div ((contDiffAt_id.add contDiffAt_const).pow 2) (pow_ne_zero 2 hda)
+  have h := h1.sub h2
+  have hfun : (fun t => Ffun X a t) = (fun t : ℝ => X / t ^ 2) - (fun t : ℝ => X / (t + a) ^ 2) := by
+    funext t
+    simp [Ffun, Pi.sub_apply]
+  rw [hfun]
+  exact h
+
+/-- `Ffun X a` is `C⁵` (indeed `C^∞`) at any pole-free point. -/
+theorem Ffun_contDiffAt5 {X a d : ℝ} (hd : d ≠ 0) (hda : d + a ≠ 0) :
+    ContDiffAt ℝ 5 (fun t => Ffun X a t) d := by
+  have h1 : ContDiffAt ℝ 5 (fun t : ℝ => X / t ^ 2) d :=
+    (contDiffAt_const).div (contDiffAt_id.pow 2) (pow_ne_zero 2 hd)
+  have h2 : ContDiffAt ℝ 5 (fun t : ℝ => X / (t + a) ^ 2) d :=
     (contDiffAt_const).div ((contDiffAt_id.add contDiffAt_const).pow 2) (pow_ne_zero 2 hda)
   have h := h1.sub h2
   have hfun : (fun t => Ffun X a t) = (fun t : ℝ => X / t ^ 2) - (fun t : ℝ => X / (t + a) ^ 2) := by
@@ -187,6 +261,17 @@ theorem Ffun_deriv4_factor (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
     120 * X / d ^ 6 - 120 * X / (d + a) ^ 6 =
       120 * X * a * (a + 2 * d) * (a ^ 2 + a * d + d ^ 2) *
         (a ^ 2 + 3 * a * d + 3 * d ^ 2) / (d ^ 6 * (d + a) ^ 6) := by
+  field_simp
+  ring
+
+/-- Factored fifth `d`-derivative:
+`F_a⁽⁵⁾(d) = -720X a(a⁶+7a⁵d+21a⁴d²+35a³d³+35a²d⁴+21ad⁵+7d⁶)/(d⁷(d+a)⁷)`. -/
+theorem Ffun_deriv5_factor (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
+    -720 * X / d ^ 7 + 720 * X / (d + a) ^ 7 =
+      -720 * X * a *
+        (a ^ 6 + 7 * a ^ 5 * d + 21 * a ^ 4 * d ^ 2 + 35 * a ^ 3 * d ^ 3
+          + 35 * a ^ 2 * d ^ 4 + 21 * a * d ^ 5 + 7 * d ^ 6) /
+          (d ^ 7 * (d + a) ^ 7) := by
   field_simp
   ring
 
@@ -239,6 +324,27 @@ theorem Ffun_deriv4_abs_eq {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) 
   rw [Ffun_iteratedDeriv4_d X a d (ne_of_gt hd) hda,
     Ffun_deriv4_factor X a d (ne_of_gt hd) hda]
   rw [abs_of_nonneg]
+  positivity
+
+/-- Exact magnitude of `F_a⁽⁵⁾(d)` at positive inputs. -/
+theorem Ffun_deriv5_abs_eq {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) :
+    |iteratedDeriv 5 (fun t => Ffun X a t) d| =
+      720 * X * a *
+        (a ^ 6 + 7 * a ^ 5 * d + 21 * a ^ 4 * d ^ 2 + 35 * a ^ 3 * d ^ 3
+          + 35 * a ^ 2 * d ^ 4 + 21 * a * d ^ 5 + 7 * d ^ 6) /
+          (d ^ 7 * (d + a) ^ 7) := by
+  have hda : d + a ≠ 0 := by positivity
+  rw [Ffun_iteratedDeriv5_d X a d (ne_of_gt hd) hda,
+    Ffun_deriv5_factor X a d (ne_of_gt hd) hda]
+  rw [show -720 * X * a *
+        (a ^ 6 + 7 * a ^ 5 * d + 21 * a ^ 4 * d ^ 2 + 35 * a ^ 3 * d ^ 3
+          + 35 * a ^ 2 * d ^ 4 + 21 * a * d ^ 5 + 7 * d ^ 6) /
+          (d ^ 7 * (d + a) ^ 7)
+      = -(720 * X * a *
+        (a ^ 6 + 7 * a ^ 5 * d + 21 * a ^ 4 * d ^ 2 + 35 * a ^ 3 * d ^ 3
+          + 35 * a ^ 2 * d ^ 4 + 21 * a * d ^ 5 + 7 * d ^ 6) /
+          (d ^ 7 * (d + a) ^ 7)) by ring]
+  rw [abs_neg, abs_of_nonneg]
   positivity
 
 /-! ## Local magnitude bounds in the natural `X*a/d^(k+3)` scale -/
@@ -472,6 +578,73 @@ theorem Ffun_deriv4_abs_bounds {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 <
       nlinarith [hmul]
     linarith
 
+/-- Local two-sided fifth-derivative bound for `0 < a ≤ 11d`:
+`|F_a⁽⁵⁾(d)| ≍ X a/d⁸`. -/
+theorem Ffun_deriv5_abs_bounds {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 < d)
+    (had : a ≤ 11 * d) :
+    X * a / (10000 * d ^ 8) ≤ |iteratedDeriv 5 (fun t => Ffun X a t) d| ∧
+      |iteratedDeriv 5 (fun t => Ffun X a t) d| ≤ 2345354640 * X * a / d ^ 8 := by
+  rw [Ffun_deriv5_abs_eq hX ha hd]
+  have hda_pos : 0 < d + a := by positivity
+  have hden_pos : 0 < d ^ 7 * (d + a) ^ 7 := by positivity
+  set Q : ℝ := a ^ 6 + 7 * a ^ 5 * d + 21 * a ^ 4 * d ^ 2 + 35 * a ^ 3 * d ^ 3
+          + 35 * a ^ 2 * d ^ 4 + 21 * a * d ^ 5 + 7 * d ^ 6
+  have hQlo : 7 * d ^ 6 ≤ Q := by
+    have h1 : 0 ≤ a ^ 6 := by positivity
+    have h2 : 0 ≤ 7 * a ^ 5 * d := by positivity
+    have h3 : 0 ≤ 21 * a ^ 4 * d ^ 2 := by positivity
+    have h4 : 0 ≤ 35 * a ^ 3 * d ^ 3 := by positivity
+    have h5 : 0 ≤ 35 * a ^ 2 * d ^ 4 := by positivity
+    have h6 : 0 ≤ 21 * a * d ^ 5 := by positivity
+    nlinarith
+  have hQhi : Q ≤ 3257437 * d ^ 6 := by
+    have ha6 : a ^ 6 ≤ (11 * d) ^ 6 := pow_le_pow_left₀ ha.le had 6
+    have ha5 : a ^ 5 ≤ (11 * d) ^ 5 := pow_le_pow_left₀ ha.le had 5
+    have ha5d : a ^ 5 * d ≤ (11 * d) ^ 5 * d :=
+      mul_le_mul_of_nonneg_right ha5 hd.le
+    have ha4 : a ^ 4 ≤ (11 * d) ^ 4 := pow_le_pow_left₀ ha.le had 4
+    have ha4d2 : a ^ 4 * d ^ 2 ≤ (11 * d) ^ 4 * d ^ 2 :=
+      mul_le_mul_of_nonneg_right ha4 (by positivity)
+    have ha3 : a ^ 3 ≤ (11 * d) ^ 3 := pow_le_pow_left₀ ha.le had 3
+    have ha3d3 : a ^ 3 * d ^ 3 ≤ (11 * d) ^ 3 * d ^ 3 :=
+      mul_le_mul_of_nonneg_right ha3 (by positivity)
+    have ha2 : a ^ 2 ≤ (11 * d) ^ 2 := pow_le_pow_left₀ ha.le had 2
+    have ha2d4 : a ^ 2 * d ^ 4 ≤ (11 * d) ^ 2 * d ^ 4 :=
+      mul_le_mul_of_nonneg_right ha2 (by positivity)
+    have had5 : a * d ^ 5 ≤ (11 * d) * d ^ 5 :=
+      mul_le_mul_of_nonneg_right had (by positivity)
+    nlinarith [ha6, ha5d, ha4d2, ha3d3, ha2d4, had5]
+  have hden_lo : d ^ 14 ≤ d ^ 7 * (d + a) ^ 7 := by
+    have hpow : d ^ 7 ≤ (d + a) ^ 7 := pow_le_pow_left₀ hd.le (by linarith) 7
+    nlinarith [hpow, pow_pos hd 7]
+  have hden_hi : d ^ 7 * (d + a) ^ 7 ≤ 35831808 * d ^ 14 := by
+    have hda_le : d + a ≤ 12 * d := by linarith
+    have hpow : (d + a) ^ 7 ≤ (12 * d) ^ 7 := pow_le_pow_left₀ hda_pos.le hda_le 7
+    nlinarith [hpow, pow_pos hd 7]
+  constructor
+  · rw [div_le_div_iff₀ (by positivity : 0 < 10000 * d ^ 8) hden_pos]
+    have h1 : X * a * (d ^ 7 * (d + a) ^ 7) ≤ X * a * (35831808 * d ^ 14) :=
+      mul_le_mul_of_nonneg_left hden_hi (by positivity)
+    have h2 : X * a * (35831808 * d ^ 14) ≤ 720 * X * a * Q * (10000 * d ^ 8) := by
+      have hmul : (720 * X * a * (10000 * d ^ 8)) * (7 * d ^ 6) ≤
+          (720 * X * a * (10000 * d ^ 8)) * Q :=
+        mul_le_mul_of_nonneg_left hQlo (by positivity)
+      nlinarith [hmul]
+    linarith
+  · rw [div_le_div_iff₀ hden_pos (by positivity : 0 < d ^ 8)]
+    have h1 : 720 * X * a * Q * d ^ 8 ≤ 720 * X * a * (3257437 * d ^ 6) * d ^ 8 := by
+      have hmul : (720 * X * a * d ^ 8) * Q ≤
+          (720 * X * a * d ^ 8) * (3257437 * d ^ 6) :=
+        mul_le_mul_of_nonneg_left hQhi (by positivity)
+      nlinarith [hmul]
+    have h2 : 720 * X * a * (3257437 * d ^ 6) * d ^ 8 ≤
+        2345354640 * X * a * (d ^ 7 * (d + a) ^ 7) := by
+      have hmul : (2345354640 * X * a) * d ^ 14 ≤
+          (2345354640 * X * a) * (d ^ 7 * (d + a) ^ 7) :=
+        mul_le_mul_of_nonneg_left hden_lo (by positivity)
+      nlinarith [hmul]
+    linarith
+
 /-! ## Wide-window scale bounds in the dyadic `F/D^k` scale -/
 
 private theorem XA_div_D4_eq_F_div_D {P : Globals} (S : Scale P) :
@@ -494,6 +667,12 @@ private theorem XA_div_D6_eq_F_div_D3 {P : Globals} (S : Scale P) :
 
 private theorem XA_div_D7_eq_F_div_D4 {P : Globals} (S : Scale P) :
     P.X * S.A / S.D ^ 7 = S.F / S.D ^ 4 := by
+  have hH := P.H_pos; have hG := P.G_pos; have hΔ := S.Δ_pos; have hΩ := S.Ω_pos
+  rw [Scale.A, Scale.D, Scale.F, P.X_eq_G_mul_H_pow_five]
+  field_simp
+
+private theorem XA_div_D8_eq_F_div_D5 {P : Globals} (S : Scale P) :
+    P.X * S.A / S.D ^ 8 = S.F / S.D ^ 5 := by
   have hH := P.H_pos; have hG := P.G_pos; have hΔ := S.Δ_pos; have hΩ := S.Ω_pos
   rw [Scale.A, Scale.D, Scale.F, P.X_eq_G_mul_H_pow_five]
   field_simp
@@ -664,6 +843,48 @@ theorem Ffun_deriv4_scale_wide {P : Globals} {S : Scale P} {a d : ℝ}
     have hD7 : S.D ^ 7 ≤ 10 ^ 7 * d ^ 7 := by nlinarith [hd7, hDpos]
     have hprod : a * S.D ^ 7 ≤ (11 * S.A) * (10 ^ 7 * d ^ 7) :=
       mul_le_mul ha_hi hD7 (by positivity) (by positivity)
+    nlinarith [hprod, hX, hApos, hDpos]
+
+/-- Wide inverse-window fifth-derivative scale:
+if `10A ≤ D`, `a ∈ [A/5,11A]`, and `d ∈ [D/10,18D]`, then
+`|F_a⁽⁵⁾(d)| ≍ F/D⁵` with explicit constants. -/
+theorem Ffun_deriv5_scale_wide {P : Globals} {S : Scale P} {a d : ℝ}
+    (hAD : 10 * S.A ≤ S.D) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (hd_lo : S.D / 10 ≤ d) (hd_hi : d ≤ 18 * S.D) :
+    (1 / (10000 * 5 * 18 ^ 8) : ℝ) * (S.F / S.D ^ 5) ≤
+        |iteratedDeriv 5 (fun t => Ffun P.X a t) d| ∧
+      |iteratedDeriv 5 (fun t => Ffun P.X a t) d| ≤
+        (2345354640 * 11 * 10 ^ 8 : ℝ) * (S.F / S.D ^ 5) := by
+  have hX := P.X_pos
+  have hApos : 0 < S.A := by
+    rw [show S.A = S.Δ * S.Ω from rfl]
+    exact mul_pos S.Δ_pos S.Ω_pos
+  have hDpos : 0 < S.D := S.D_pos
+  have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
+  have hd0 : 0 < d := lt_of_lt_of_le (by positivity : 0 < S.D / 10) hd_lo
+  have had : a ≤ 11 * d := by nlinarith [ha_hi, hAD, hd_lo]
+  obtain ⟨hloc, hloc_hi⟩ := Ffun_deriv5_abs_bounds hX ha0 hd0 had
+  constructor
+  · refine le_trans ?_ hloc
+    rw [← XA_div_D8_eq_F_div_D5 S]
+    rw [show (1 / (10000 * 5 * 18 ^ 8) : ℝ) * (P.X * S.A / S.D ^ 8)
+        = P.X * S.A / ((10000 * 5 * 18 ^ 8) * S.D ^ 8) by field_simp]
+    rw [div_le_div_iff₀ (by positivity : 0 < (10000 * 5 * 18 ^ 8 : ℝ) * S.D ^ 8)
+      (by positivity : 0 < 10000 * d ^ 8)]
+    have hd8 : d ^ 8 ≤ (18 * S.D) ^ 8 := pow_le_pow_left₀ hd0.le hd_hi 8
+    have ha5 : S.A ≤ 5 * a := by linarith
+    have hprod : S.A * d ^ 8 ≤ (5 * a) * (18 * S.D) ^ 8 :=
+      mul_le_mul ha5 hd8 (by positivity) (by positivity)
+    nlinarith [hprod, hX, hApos, hDpos]
+  · refine le_trans hloc_hi ?_
+    rw [← XA_div_D8_eq_F_div_D5 S]
+    rw [show (2345354640 * 11 * 10 ^ 8 : ℝ) * (P.X * S.A / S.D ^ 8)
+        = (2345354640 * 11 * 10 ^ 8) * P.X * S.A / S.D ^ 8 by ring]
+    rw [div_le_div_iff₀ (by positivity : 0 < d ^ 8) (by positivity : 0 < S.D ^ 8)]
+    have hd8 : (S.D / 10) ^ 8 ≤ d ^ 8 := pow_le_pow_left₀ (by positivity) hd_lo 8
+    have hD8 : S.D ^ 8 ≤ 10 ^ 8 * d ^ 8 := by nlinarith [hd8, hDpos]
+    have hprod : a * S.D ^ 8 ≤ (11 * S.A) * (10 ^ 8 * d ^ 8) :=
+      mul_le_mul ha_hi hD8 (by positivity) (by positivity)
     nlinarith [hprod, hX, hApos, hDpos]
 
 end Squarefree

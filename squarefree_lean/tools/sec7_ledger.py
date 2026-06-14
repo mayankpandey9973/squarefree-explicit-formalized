@@ -120,9 +120,12 @@ print("AM-3/A4 cSub ledger OK (cSub=10^55 >= 2.6*cErr, capacity 10^64.3; margins
       " -0.089/-0.199/-0.200; capacity ~10^64.3)")
 
 # A3: cExp = 10^25 (N9 O(.)-constant; content cWin^{29/4} ~ 5.6e21).
+# The concrete §3 residual-input constant is intentionally larger than the old placeholder
+# but remains subordinate to the output expansion budget.
 assert (29/4)*math.log10(10**3) <= 25.0                # cWin^{29/4} = 10^21.75 <= 10^25
 assert 5.6e21 <= 10**25
-print("A3 cExp ledger OK (cExp=10^25 >= cWin^{29/4} ~ 5.6e21)")
+assert 10**16 <= 10**25                                # cExpIn <= cExp
+print("A3 cExp ledger OK (cExpIn=10^16 <= cExp=10^25 >= cWin^{29/4} ~ 5.6e21)")
 
 # ---- N11 re-pin block (2026-06-12, Sec7MonExp-interface ruling; proof = Sec7ErrBound) ----
 # Tight coefficient windows [1/16,4] (|c_i| <= 4, |c1c2| <= 16); aperture lam = 2*cWin = 2000.
@@ -142,16 +145,17 @@ s2a = 3*4e35
 s1  = 4e31
 floor = max(s1, s2a, s2b, s3, s4)
 assert floor <= 1e41 and 10*floor <= 1e42              # cErr = 10^42 with >= decade margin
-# Envelope-derived smallness (log-free entries only; Lean: Sec7ErrAux):
+# Envelope and strip-derived smallness (Lean: Sec7ErrAux):
 import sympy as _sp
 _H,_x,_G,_Om = _sp.symbols('H x G Omega', positive=True)
 assert _sp.simplify((_H*_x)*(_H*_x*_G**4*_Om**16)/_Om**4
                     - (_H**_sp.Rational(1,2)*_x**_sp.Rational(1,2)*_G*_Om**3)**4) == 0
                                                        # n6*n7 = R^4 exact (hSum*10^149 <= R)
-# n6 + R*T1 = (Delta*Omega)^2 > 1  ==>  Omega*10^150 <= H  (relErr*10^150 <= 1)
+# envC2 exactness remains for the hSum/R route; faithful relErr is strip-dispatched:
+# sec7_relErr = (Omega/H)*U^3 and sec7_relErr*10^143 <= 1 under X >= 2^2400.
 assert 10**150 * 10**150 == 10**300                   # envC2 = (10^150)^2 exact
-# damped terms: 4e40*hS <= 10^149*hS <= R; cExp*rel <= 10^25*10^-150 <= 1
-assert 4e40 <= 1e149 and 1e25 <= 1e150
+# damped terms: 4e40*hS <= 10^149*hS <= R; cExp*rel <= 10^25*10^-143 <= 1
+assert 4e40 <= 1e149 and 1e25 <= 1e143
 print("N11 ledger OK (caps banked; slot floor ~ 8.80e40; cErr=10^42 >= 10x floor;"
       " coupled cSub=10^55; cN13/envelope chains unchanged)")
 

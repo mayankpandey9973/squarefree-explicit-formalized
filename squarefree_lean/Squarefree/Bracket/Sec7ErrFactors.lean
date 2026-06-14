@@ -359,14 +359,15 @@ theorem sec7E_T6_bound :
 /-! ## Composite second-factor bounds (envelope-damped collapse) -/
 
 omit hh₁ hh₂ hh₃ hW hpad hshift in
-/-- `cExp·relErr ≤ 1` from the envelope smallness `relErr·10¹⁵⁰ ≤ 1`. -/
-theorem sec7E_cExp_rel (hrel : sec7_relErr P S * 10 ^ 150 ≤ 1) :
+/-- `cExp·relErr ≤ 1` from the strip smallness `relErr·10¹⁴³ ≤ 1`. -/
+theorem sec7E_cExp_rel (hrel : sec7_relErr P S * 10 ^ 143 ≤ 1) :
     sec7_cExp * sec7_relErr P S ≤ 1 := by
   have h0 : 0 ≤ sec7_relErr P S := (sec7_relErr_pos P S).le
-  calc sec7_cExp * sec7_relErr P S ≤ 10 ^ 150 * sec7_relErr P S := by
-        apply mul_le_mul_of_nonneg_right _ h0
-        norm_num [sec7_cExp]
-    _ = sec7_relErr P S * 10 ^ 150 := by ring
+  have hc : sec7_cExp ≤ (10 : ℝ) ^ 143 := by norm_num [sec7_cExp]
+  calc
+    sec7_cExp * sec7_relErr P S ≤ 10 ^ 143 * sec7_relErr P S :=
+      mul_le_mul_of_nonneg_right hc h0
+    _ = sec7_relErr P S * 10 ^ 143 := by ring
     _ ≤ 1 := hrel
 
 omit hW hpad hshift in

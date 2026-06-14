@@ -534,11 +534,14 @@ private theorem sec7_nonzero_hSum_div_R_small {P : Globals} {S : Scale P} {W : �
     _ = 1 := by field_simp [hR.ne']
 
 private theorem sec7_nonzero_relErr_small {P : Globals} {S : Scale P} {W : ℝ}
-    {h₁ h₂ h₃ : ℤ} (Env : Sec7Envelope P S W) (hbox : sec7_shiftBox W h₁ h₂ h₃) :
-    sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 150 := by
-  have hpow : 0 < (10 : ℝ) ^ 150 := by positivity
+    {h₁ h₂ h₃ : ℤ} (Env : Sec7Envelope P S W) (hbox : sec7_shiftBox W h₁ h₂ h₃)
+    (c₀ Cu : ℝ) (D : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg : 0 ≤ P.g) (hu : 0 < P.u)
+    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ)) :
+    sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 143 := by
+  have hpow : 0 < (10 : ℝ) ^ 143 := by positivity
   rw [le_div_iff₀ hpow]
-  exact sec7_relErr_le Env (sec7_W_ge_one hbox)
+  exact sec7_relErr_le Env (sec7_W_ge_one hbox) D hbud hg hu hX24
 
 private theorem Sec7MonExp.nonzero_Cstar_upper_tight {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ}
     {Ph : Sec7Phase P S W a} {j h₁ h₂ h₃ : ℤ} {ξ₁ ξ₂ ξ₃ : ℝ}
@@ -756,15 +759,15 @@ private theorem sec7_Ccoef_nonzero_subordinate {P : Globals} {S : Scale P} {a : 
 
 private theorem sec7_errScale_nonzero_subordinate {P : Globals} {S : Scale P} {W : ℝ}
     {h₁ h₂ h₃ ρ₀ : ℤ} (Env : Sec7Envelope P S W)
-    (hbox : sec7_shiftBox W h₁ h₂ h₃) (hρ₀ne : ρ₀ ≠ 0) (hX1 : 1 ≤ P.X) :
+    (hbox : sec7_shiftBox W h₁ h₂ h₃) (hrel : sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 143)
+    (hρ₀ne : ρ₀ ≠ 0) (hX1 : 1 ≤ P.X) :
     sec7_cErr * sec7_errScale P S h₁ h₂ h₃ ρ₀ ≤ S.T₁ / (10 : ℝ) ^ 100 := by
   have hR : 0 < S.R := sec7_R_pos S
   have hT1 : 0 < S.T₁ := sec7_T₁_pos S
   have hT3 : 0 < S.T₃ := sec7_T₃_pos S
   have hrel0 : 0 ≤ sec7_relErr P S := (sec7_relErr_pos P S).le
-  have hrel := sec7_nonzero_relErr_small Env hbox
   have hrel1 : sec7_relErr P S ≤ 1 := by
-    calc sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 150 := hrel
+    calc sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 143 := hrel
       _ ≤ 1 := by norm_num
   have hA := sec7_nonzero_hSum_T1_R_small Env hbox
   have hSdiv := sec7_nonzero_hSum_div_R_small Env hbox
@@ -782,12 +785,10 @@ private theorem sec7_errScale_nonzero_subordinate {P : Globals} {S : Scale P} {W
   have hA0 : 0 ≤ sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R) := by positivity
   have hC0 : 0 ≤ sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) := by positivity
   have hTrel :
-      S.T₁ * sec7_relErr P S ≤ S.T₁ / (10 : ℝ) ^ 149 := by
+      S.T₁ * sec7_relErr P S ≤ S.T₁ / (10 : ℝ) ^ 143 := by
     calc
-      S.T₁ * sec7_relErr P S ≤ S.T₁ * (1 / (10 : ℝ) ^ 150) := by gcongr
-      _ ≤ S.T₁ / (10 : ℝ) ^ 149 := by
-          norm_num
-          nlinarith [hT1.le]
+      S.T₁ * sec7_relErr P S ≤ S.T₁ * (1 / (10 : ℝ) ^ 143) := by gcongr
+      _ = S.T₁ / (10 : ℝ) ^ 143 := by ring
   have hACrel :
       (sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R) +
           sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) * sec7_relErr P S
@@ -827,7 +828,7 @@ private theorem sec7_errScale_nonzero_subordinate {P : Globals} {S : Scale P} {W
             norm_num [sec7_envC]
             nlinarith [hT1.le]
   have herr :
-      sec7_errScale P S h₁ h₂ h₃ ρ₀ ≤ 5 * (S.T₁ / (10 : ℝ) ^ 149) := by
+      sec7_errScale P S h₁ h₂ h₃ ρ₀ ≤ S.T₁ / (10 : ℝ) ^ 142 := by
     calc
       sec7_errScale P S h₁ h₂ h₃ ρ₀ =
           S.T₁ * sec7_relErr P S +
@@ -838,13 +839,15 @@ private theorem sec7_errScale_nonzero_subordinate {P : Globals} {S : Scale P} {W
             unfold sec7_errScale
             rw [if_neg hρ₀ne]
             ring
-      _ ≤ S.T₁ / (10 : ℝ) ^ 149 + 2 * (S.T₁ / (10 : ℝ) ^ 149) +
+      _ ≤ S.T₁ / (10 : ℝ) ^ 143 + 2 * (S.T₁ / (10 : ℝ) ^ 149) +
             S.T₁ / (10 : ℝ) ^ 149 + S.T₁ / (10 : ℝ) ^ 149 := by
             nlinarith
-      _ = 5 * (S.T₁ / (10 : ℝ) ^ 149) := by ring
+      _ ≤ S.T₁ / (10 : ℝ) ^ 142 := by
+            norm_num
+            nlinarith [hT1.le]
   calc
     sec7_cErr * sec7_errScale P S h₁ h₂ h₃ ρ₀
-        ≤ sec7_cErr * (5 * (S.T₁ / (10 : ℝ) ^ 149)) := by
+        ≤ sec7_cErr * (S.T₁ / (10 : ℝ) ^ 142) := by
           exact mul_le_mul_of_nonneg_left herr sec7_cErr_pos.le
     _ ≤ S.T₁ / (10 : ℝ) ^ 100 := by
           norm_num [sec7_cErr]
@@ -1158,6 +1161,7 @@ private theorem sec7_nonzero_piece_curvature {P : Globals} {S : Scale P} {W : �
     {ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ}
     (Env : Sec7Envelope P S W) (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (hbox : sec7_shiftBox W h₁ h₂ h₃)
+    (hrel : sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 143)
     (hpad : 6 * (W + W ^ 2 + W ^ 4) ≤ S.R / 288)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4)) (hX1 : 1 ≤ P.X)
     (hξ₁ : |ξ₁| ≤ sec7_hSum h₁ h₂ h₃) (hξ₂ : |ξ₂| ≤ sec7_hSum h₁ h₂ h₃)
@@ -1200,7 +1204,7 @@ private theorem sec7_nonzero_piece_curvature {P : Globals} {S : Scale P} {W : �
   have hTpos : 0 < T := lt_of_lt_of_le (div_pos hT1 sec7_cBand_pos) hTband.1
   have hBcoef := sec7_Bcoef_nonzero_subordinate Env ME hbox hX1 hρ₀abs hu₁ hu₂ hu₃
   have hCcoef := sec7_Ccoef_nonzero_subordinate Env ME hbox hX1
-  have hErrSub := sec7_errScale_nonzero_subordinate Env hbox hρ₀ne hX1
+  have hErrSub := sec7_errScale_nonzero_subordinate Env hbox hrel hρ₀ne hX1
   have hBterm : S.R ^ 2 * |B| ≤ S.T₁ / (10 : ℝ) ^ 80 := by
     dsimp [B]
     exact sec7_nonzero_Bterm_two_small hBcoef hrb
@@ -1352,7 +1356,7 @@ theorem sec7_nonzero_pieces :
               S.R ^ 2 *
                 |iteratedDeriv 2
                   (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r| ≤ 2 * Tq i := by
-  intro P S W Env _hW _c₀ _Cu _D _hbud _hg _hu hX24
+  intro P S W Env _hW c₀ Cu D hbud hg hu hX24
   intro a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ME _hj hbox hpad hshift hξ₁ hξ₂ hξ₃
   intro ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ₀ne hρ₀abs _hρ₁ _hρ₂ _hρ₃ hu₁ hu₂ hu₃ hErr
   intro p q hwin hdyad hpq
@@ -1362,6 +1366,7 @@ theorem sec7_nonzero_pieces :
     have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
     linarith
   have hX1 : 1 ≤ P.X := hXgt.le
+  have hrel := sec7_nonzero_relErr_small Env hbox c₀ Cu D hbud hg hu hX24
   let K : ℕ := 100
   let pt : ℕ → ℝ := fun i => (p : ℝ) + (i : ℝ) * (((q : ℝ) - (p : ℝ)) / 100)
   let Tq : ℕ → ℝ := fun i =>
@@ -1428,7 +1433,7 @@ theorem sec7_nonzero_pieces :
           pt (i + 1) = pt i + step := hstep_eq
           _ ≤ r + r / 100 := add_le_add hr.1 hstep_le_r100
           _ = (101 / 100 : ℝ) * r := by ring
-      have hcurv := sec7_nonzero_piece_curvature Env ME hbox hpad hshift hX1 hξ₁ hξ₂ hξ₃
+      have hcurv := sec7_nonzero_piece_curvature Env ME hbox hrel hpad hshift hX1 hξ₁ hξ₂ hξ₃
         hρ₀ne hρ₀abs hu₁ hu₂ hu₃ hErr hrb hrefb hrWin hr.2 hratio
       simpa [Tq] using hcurv
 
@@ -1589,6 +1594,7 @@ private theorem sec7_nonzero_block_curvature {P : Globals} {S : Scale P} {W : �
     {ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ}
     (Env : Sec7Envelope P S W) (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (hbox : sec7_shiftBox W h₁ h₂ h₃)
+    (hrel : sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 143)
     (hpad : 6 * (W + W ^ 2 + W ^ 4) ≤ S.R / 288)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4)) (hX1 : 1 ≤ P.X)
     (hξ₁ : |ξ₁| ≤ sec7_hSum h₁ h₂ h₃) (hξ₂ : |ξ₂| ≤ sec7_hSum h₁ h₂ h₃)
@@ -1630,7 +1636,7 @@ private theorem sec7_nonzero_block_curvature {P : Globals} {S : Scale P} {W : �
   have hTpos : 0 < T := lt_of_lt_of_le (div_pos hT1 (by norm_num)) hTband.1
   have hBcoef := sec7_Bcoef_nonzero_subordinate Env ME hbox hX1 hρ₀abs hu₁ hu₂ hu₃
   have hCcoef := sec7_Ccoef_nonzero_subordinate Env ME hbox hX1
-  have hErrSub := sec7_errScale_nonzero_subordinate Env hbox hρ₀ne hX1
+  have hErrSub := sec7_errScale_nonzero_subordinate Env hbox hrel hρ₀ne hX1
   have hBterm : S.R ^ 2 * |B| ≤ S.T₁ / (10 : ℝ) ^ 80 := by
     dsimp [B]
     exact sec7_nonzero_Bterm_two_small_wide hBcoef hrb
@@ -2012,6 +2018,7 @@ theorem sec7_nonzero_count_78 :
   intro a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ME _hj hbox hpad hshift hξ₁ hξ₂ hξ₃
   intro ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ₀ne hρ₀abs _hρ₁ _hρ₂ _hρ₃ hu₁ hu₂ hu₃ hErr hcd
   intro p q hwin hdyad hcover δ₁ hδpos hδlt
+  have hrel := sec7_nonzero_relErr_small Env hbox c₀ Cu D hbud hg hu hX24
   let f : ℝ → ℝ :=
     sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃
   by_cases hpq : p ≤ q
@@ -2081,7 +2088,7 @@ theorem sec7_nonzero_count_78 :
             dsimp [ref]
             ring
           _ ≤ 5 * x := mul_le_mul_of_nonneg_left hx.1 (by norm_num)
-      have hcurv := sec7_nonzero_block_curvature Env ME hbox hpad hshift D.hX hξ₁ hξ₂ hξ₃
+      have hcurv := sec7_nonzero_block_curvature Env ME hbox hrel hpad hshift D.hX hξ₁ hξ₂ hξ₃
         hρ₀ne hρ₀abs hu₁ hu₂ hu₃ hErr hb hrefb hxwin hxref hrefLocal
       have hscaled : T / S.R ^ 2 ≤ |iteratedDeriv 2 f x| := by
         rw [div_le_iff₀ (pow_pos hR 2)]
@@ -2103,7 +2110,7 @@ theorem sec7_nonzero_count_78 :
             dsimp [ref]
             ring
           _ ≤ 5 * x := mul_le_mul_of_nonneg_left hx.1 (by norm_num)
-      have hcurv := sec7_nonzero_block_curvature Env ME hbox hpad hshift D.hX hξ₁ hξ₂ hξ₃
+      have hcurv := sec7_nonzero_block_curvature Env ME hbox hrel hpad hshift D.hX hξ₁ hξ₂ hξ₃
         hρ₀ne hρ₀abs hu₁ hu₂ hu₃ hErr hb hrefb hxwin hxref hrefLocal
       have hscaled :
           |iteratedDeriv 2 f x| ≤ (256 * T) / S.R ^ 2 := by

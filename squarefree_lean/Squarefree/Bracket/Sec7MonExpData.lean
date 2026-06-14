@@ -24,12 +24,6 @@ set_option maxHeartbeats 1600000
 
 set_option maxHeartbeats 1600000
 
-/-- `O(·)` constant of the §3 value-level monomial expansions (input side of N9′;
-ledger: the output budget is `sec7_cExp = 10²⁵`, worst window content `≈ 1.05·10²⁴`). -/
-def sec7_cExpIn : ℝ := 10 ^ 2
-
-theorem sec7_cExpIn_pos : (0:ℝ) < sec7_cExpIn := by norm_num [sec7_cExpIn]
-
 /-! ### Shared private helpers for the family lemmas
 (The wide/mid window layer `sec7_rWinWide`/`sec7_rWinMid` and its membership lemmas
 moved to `Sec7Defs.lean` so the `Sec7MonExp` chain fields can state against them.) -/
@@ -46,7 +40,7 @@ theorem sec7_T₃_pos {P : Globals} (S : Scale P) : 0 < S.T₃ := by
   have := P.H_pos; have := S.Δ_pos; unfold Scale.T₃; positivity
 
 theorem sec7_relErr_pos (P : Globals) (S : Scale P) : 0 < sec7_relErr P S := by
-  have := P.H_pos; have := S.Ω_pos; unfold sec7_relErr; positivity
+  have := P.H_pos; have := S.Ω_pos; have := P.U_pos; unfold sec7_relErr; positivity
 
 theorem sec7_hSum_ge3 {h₁ h₂ h₃ : ℤ} (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃) :
     (3:ℝ) ≤ sec7_hSum h₁ h₂ h₃ := by
