@@ -27,12 +27,12 @@ private theorem build_diff3_generic {P : Globals} {S : Scale P} {W : ℝ} {h₁ 
     (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃)
     (hW : 0 < W) (hpad : 6 * (W + W ^ 2 + W ^ 4) ≤ S.R / 288)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
-    {f : ℝ → ℝ} {e : ℕ → ℝ → ℝ} {c α T Ap Kb : ℝ}
-    (hT : 0 < T) (hα1 : α ≤ 1)
+    {f : ℝ → ℝ} {e : ℕ → ℝ → ℝ} {c α T Ap Kb rel : ℝ}
+    (hT : 0 < T) (hα1 : α ≤ 1) (hrel : 0 < rel)
     (he0 : ∀ t, e 0 t = f t - c * T * (t / S.R) ^ α)
     (hed : ∀ m < 5, ∀ x ∈ sec7_rWinWide S W, HasDerivAt (e m) (e (m + 1) x) x)
     (heb : ∀ m ≤ 5, ∀ x ∈ sec7_rWinWide S W,
-      |e m x| ≤ sec7_cExpIn * (T / S.R ^ m) * sec7_relErr P S)
+      |e m x| ≤ sec7_cExpIn * (T / S.R ^ m) * rel)
     (hap : ∀ k ≤ 6, |sec7_aprod α k| ≤ Ap)
     (hKb : (2 * sec7_cWin) ^ ((6:ℝ) - α) ≤ Kb)
     (hcoefb : |c| * Ap * Kb ≤ sec7_cExp) :
@@ -40,11 +40,10 @@ private theorem build_diff3_generic {P : Globals} {S : Scale P} {W : ℝ} {h₁ 
       |iteratedDeriv m (fun t => diff3 (h₁:ℝ) h₂ h₃ f t -
           c * sec7_aprod α 3 * sec7_Pprod h₁ h₂ h₃ * (T / S.R ^ 3) *
             (t / S.R) ^ (α - 3)) r| ≤
-        sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (T / S.R ^ 3) * sec7_relErr P S +
+        sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (T / S.R ^ 3) * rel +
           sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * T / S.R ^ 4) / S.R ^ m := by
   intro m hm r hr
   have hR : 0 < S.R := sec7_R_pos S
-  have hrel : 0 < sec7_relErr P S := sec7_relErr_pos P S
   have hcWpos : (0:ℝ) < 2 * sec7_cWin := by norm_num [sec7_cWin]
   set hSv : ℝ := sec7_hSum h₁ h₂ h₃ with hSv_def
   have hSv3 : (3:ℝ) ≤ hSv := sec7_hSum_ge3 hh₁ hh₂ hh₃
@@ -119,7 +118,7 @@ private theorem build_diff3_generic {P : Globals} {S : Scale P} {W : ℝ} {h₁ 
   have hsegr : ∀ y : ℝ, 0 ≤ y - r → y - r ≤ hSv → y ∈ sec7_rWinWide S W :=
     hseg r hrmid
   -- e-part bound: three nested first-difference MVT inequalities
-  set C : ℝ := sec7_cExpIn * (T / S.R ^ (m + 3)) * sec7_relErr P S with hC
+  set C : ℝ := sec7_cExpIn * (T / S.R ^ (m + 3)) * rel with hC
   have hCnn : 0 ≤ C := by
     rw [hC]
     exact mul_nonneg (mul_nonneg sec7_cExpIn_pos.le
@@ -259,21 +258,21 @@ private theorem build_diff3_generic {P : Globals} {S : Scale P} {W : ℝ} {h₁ 
   refine le_trans hsplit ?_
   -- numerics
   have hkey1 : C * h₃ * h₂ * h₁ ≤
-      sec7_cExp * (PP * (T / S.R ^ 3) * sec7_relErr P S) / S.R ^ m := by
+      sec7_cExp * (PP * (T / S.R ^ 3) * rel) / S.R ^ m := by
     have hIn : sec7_cExpIn ≤ sec7_cExp := by norm_num [sec7_cExpIn, sec7_cExp]
-    have hmono : (0:ℝ) ≤ PP * (T / S.R ^ 3) * sec7_relErr P S / S.R ^ m := by
-      have h0 : (0:ℝ) ≤ PP * (T / S.R ^ 3) * sec7_relErr P S :=
+    have hmono : (0:ℝ) ≤ PP * (T / S.R ^ 3) * rel / S.R ^ m := by
+      have h0 : (0:ℝ) ≤ PP * (T / S.R ^ 3) * rel :=
         mul_nonneg (mul_nonneg hPP0.le
           (div_nonneg hT.le (pow_nonneg hR.le _))) hrel.le
       exact div_nonneg h0 (pow_nonneg hR.le _)
     calc C * h₃ * h₂ * h₁
-        = sec7_cExpIn * (PP * (T / S.R ^ 3) * sec7_relErr P S / S.R ^ m) := by
+        = sec7_cExpIn * (PP * (T / S.R ^ 3) * rel / S.R ^ m) := by
           rw [hC, hPPval, pow_add]
           field_simp
           try ring
-      _ ≤ sec7_cExp * (PP * (T / S.R ^ 3) * sec7_relErr P S / S.R ^ m) :=
+      _ ≤ sec7_cExp * (PP * (T / S.R ^ 3) * rel / S.R ^ m) :=
           mul_le_mul_of_nonneg_right hIn hmono
-      _ = sec7_cExp * (PP * (T / S.R ^ 3) * sec7_relErr P S) / S.R ^ m := by ring
+      _ = sec7_cExp * (PP * (T / S.R ^ 3) * rel) / S.R ^ m := by ring
   have hkey2 : PP * (B * hSv) ≤ sec7_cExp * (PP * hSv * T / S.R ^ 4) / S.R ^ m := by
     have hmono : (0:ℝ) ≤ PP * hSv * T / S.R ^ (m + 4) := by
       have h0 : (0:ℝ) ≤ PP * hSv * T :=
@@ -287,9 +286,9 @@ private theorem build_diff3_generic {P : Globals} {S : Scale P} {W : ℝ} {h₁ 
           rw [pow_add]
           field_simp
   calc C * h₃ * h₂ * h₁ + PP * (B * hSv)
-      ≤ sec7_cExp * (PP * (T / S.R ^ 3) * sec7_relErr P S) / S.R ^ m +
+      ≤ sec7_cExp * (PP * (T / S.R ^ 3) * rel) / S.R ^ m +
         sec7_cExp * (PP * hSv * T / S.R ^ 4) / S.R ^ m := by linarith [hkey1, hkey2]
-    _ = sec7_cExp * (PP * (T / S.R ^ 3) * sec7_relErr P S +
+    _ = sec7_cExp * (PP * (T / S.R ^ 3) * rel +
         PP * hSv * T / S.R ^ 4) / S.R ^ m := by ring
 
 /-- **N9′ family D, `B₀₃` instance** (md 1623–27): the triple-differenced `f₂` expansion,
@@ -308,7 +307,8 @@ theorem build_B03_exp (RE : Sec7RaExpData P S W a Ph j)
   intro m hm r hr
   have hgen := build_diff3_generic hh₁ hh₂ hh₃ hW hpad hshift (f := Ph.f2D 0) (e := RE.e₂D)
     (c := RE.c₂) (α := (3:ℝ)/4) (T := S.T₂) (Ap := 8) (Kb := (2 * sec7_cWin) ^ 6)
-    (sec7_T₂_pos S) (by norm_num) RE.e₂D_zero RE.e₂D_deriv RE.e₂D_bound
+    (sec7_T₂_pos S) (by norm_num) (sec7_relErr_pos P S) RE.e₂D_zero RE.e₂D_deriv
+    RE.e₂D_bound
     (by intro k hk; interval_cases k <;> norm_num [sec7_aprod])
     (by
       have h1 := Real.rpow_le_rpow_of_exponent_le
@@ -347,13 +347,14 @@ theorem build_d3f3_exp (RE : Sec7RaExpData P S W a Ph j)
           diff3 (h₁ : ℝ) h₂ h₃ (Ph.f3D j 0) t -
             (-(45/64) * (3 * RE.c₁ * RE.c₂) * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) *
               (t / S.R) ^ (-(13:ℝ)/4))) r| ≤
-        sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S +
+        sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErrF P S +
           sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₃ / S.R ^ 4) / S.R ^ m := by
   intro m hm r hr
   have hgen := build_diff3_generic hh₁ hh₂ hh₃ hW hpad hshift (f := Ph.f3D j 0) (e := RE.e₃D)
     (c := 3 * RE.c₁ * RE.c₂) (α := -(1:ℝ)/4) (T := S.T₃) (Ap := 51)
     (Kb := 10 ^ 21)
-    (sec7_T₃_pos S) (by norm_num) RE.e₃D_zero RE.e₃D_deriv RE.e₃D_bound
+    (sec7_T₃_pos S) (by norm_num) (sec7_relErrF_pos P S) RE.e₃D_zero RE.e₃D_deriv
+    RE.e₃D_bound
     (by intro k hk; interval_cases k <;> norm_num [sec7_aprod])
     (by
       have h1 : ((6:ℝ) - -(1:ℝ)/4) = ((25:ℕ):ℝ) / 4 := by push_cast; norm_num

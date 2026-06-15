@@ -59,7 +59,7 @@ def sec7_cPh : ℝ := 10 ^ 10
 def sec7_cWin : ℝ := 10 ^ 3
 
 /-- Input-side residual-expansion constant for the §3→§7 monomial package. -/
-def sec7_cExpIn : ℝ := 10 ^ 16
+def sec7_cExpIn : ℝ := 10 ^ 25
 
 /-- `j`-band constant: the §7 shifts satisfy `|j| ≤ sec7_cJ·(1 + H/A²)` (md 1307–09).
 G1+U3: `10²⁰ ≥ 2·10¹⁸`, the `ftil_prox` discharge level (ledger U4). -/
@@ -99,6 +99,13 @@ theorem sec7_envC2_pos : (0:ℝ) < sec7_envC2 := by norm_num [sec7_envC2]
    The §7 `+j` shift audit adds the uniform `U^3` budget over the band. -/
 /-- The §7 faithful relative-error scale `(Ω/H)·U^3`. -/
 noncomputable def sec7_relErr (P : Globals) (S : Scale P) : ℝ := (S.Ω / P.H) * P.U ^ 3
+
+/-- Extra loose polynomial budget for the f₁/f₃ residual route. -/
+noncomputable def sec7_cGU (P : Globals) (_S : Scale P) : ℝ := P.G * P.U ^ 2
+
+/-- Loosened f₁/f₃ relative-error scale. -/
+noncomputable def sec7_relErrF (P : Globals) (S : Scale P) : ℝ :=
+  sec7_relErr P S * sec7_cGU P S
 
 /- md 1358–1361 (display, TRAP-1: use AS DISPLAYED, the larger `Δ⁵/(H³Ω²)` form, NOT the
    md-1352 `G²`-identity):
@@ -268,7 +275,8 @@ structure Sec7Phase (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) where
   /-- Graded §3 expansion error for `f₃`, indexed by branch and derivative grade. -/
   ra_e₃D : ℤ → ℕ → ℝ → ℝ
   ra_e₁D_zero : ∀ j, sec7_jBand P S j → ∀ t,
-    ra_e₁D j 0 t = f1D j 0 t - ra_c₁ j * S.T₁ * (t / S.R) ^ (-(1:ℝ))
+    ra_e₁D j 0 t =
+      f1D j 0 t - ra_c₁ j * S.T₁ * (t / S.R) ^ (-(1:ℝ))
   ra_e₂D_zero : ∀ j, sec7_jBand P S j → ∀ t,
     ra_e₂D j 0 t = f2D 0 t - ra_c₂ j * S.T₂ * (t / S.R) ^ ((3:ℝ)/4)
   ra_e₃D_zero : ∀ j, sec7_jBand P S j → ∀ t,
@@ -281,11 +289,11 @@ structure Sec7Phase (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) where
   ra_e₃D_deriv : ∀ j, sec7_jBand P S j → ∀ m < 5, ∀ r ∈ sec7_rWinWide S W,
     HasDerivAt (ra_e₃D j m) (ra_e₃D j (m + 1) r) r
   ra_e₁D_bound : ∀ j, sec7_jBand P S j → ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
-    |ra_e₁D j m r| ≤ sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErr P S
+    |ra_e₁D j m r| ≤ sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErrF P S
   ra_e₂D_bound : ∀ j, sec7_jBand P S j → ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
     |ra_e₂D j m r| ≤ sec7_cExpIn * (S.T₂ / S.R ^ m) * sec7_relErr P S
   ra_e₃D_bound : ∀ j, sec7_jBand P S j → ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
-    |ra_e₃D j m r| ≤ sec7_cExpIn * (S.T₃ / S.R ^ m) * sec7_relErr P S
+    |ra_e₃D j m r| ≤ sec7_cExpIn * (S.T₃ / S.R ^ m) * sec7_relErrF P S
   /-- Global `C²` regularity of the branch phase used by the counting engines. -/
   phiContDiff : ∀ (j h₁ h₂ h₃ : ℤ) (ξ₁ ξ₂ ξ₃ : ℝ)
       (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ),

@@ -38,7 +38,7 @@ include hh₁ hh₂ hh₃ hW hpad hshift
 theorem sec7E_eA_bound : ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
     |sec7E_eA ME k r| ≤
       sec7_cExp * ((sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2 +
-        S.T₁ * sec7_relErr P S) / S.R ^ k := by
+        S.T₁ * sec7_relErrF P S) / S.R ^ k := by
   intro k hk r hr
   have h0 : ∀ x ∈ sec7_rWinMid S W,
       (fun t => Ph.f1D j 0 (t + sec7_hSum h₁ h₂ h₃) -
@@ -61,11 +61,11 @@ theorem sec7E_eQ_bound {h : ℤ} (hh : 1 ≤ h) (hhle : (h:ℝ) ≤ sec7_hSum h�
           diff1 (h : ℝ) (Ph.f1D j 0) (t + sec7_hSum h₁ h₂ h₃ - h) -
             (-(ME.c₁ * h * (S.T₁ / S.R)) * (t / S.R) ^ (-(2:ℝ)))) r| ≤
         sec7_cExp * ((h : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
-          (h : ℝ) * (S.T₁ / S.R) * sec7_relErr P S) / S.R ^ m) :
+          (h : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ m) :
     ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
       |sec7E_eQ ME h k r| ≤
         sec7_cExp * ((h : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
-          (h : ℝ) * (S.T₁ / S.R) * sec7_relErr P S) / S.R ^ k := by
+          (h : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ k := by
   intro k hk r hr
   have h0 : ∀ x ∈ sec7_rWinMid S W,
       (fun t => diff1 (h : ℝ) (Ph.f1D j 0) (t + sec7_hSum h₁ h₂ h₃ - h) -
@@ -125,7 +125,7 @@ theorem sec7E_eB0_bound : ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
 
 theorem sec7E_eP3_bound : ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
     |sec7E_eP3 ME k r| ≤
-      sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S +
+      sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErrF P S +
         sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₃ / S.R ^ 4) / S.R ^ k := by
   intro k hk r hr
   have h0 : ∀ x ∈ sec7_rWinMid S W,

@@ -30,11 +30,11 @@ theorem build_f1_exp (RE : Sec7RaExpData P S W a Ph j)
             (RE.c₁ * S.T₁ * (t / S.R) ^ (-(1:ℝ)) -
               RE.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R) * (t / S.R) ^ (-(2:ℝ)))) r| ≤
         sec7_cExp * ((sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2 +
-          S.T₁ * sec7_relErr P S) / S.R ^ m := by
+          S.T₁ * sec7_relErrF P S) / S.R ^ m := by
   intro m hm r hr
   have hR : 0 < S.R := sec7_R_pos S
   have hT : 0 < S.T₁ := sec7_T₁_pos S
-  have hrel : 0 < sec7_relErr P S := sec7_relErr_pos P S
+  have hrel : 0 < sec7_relErrF P S := sec7_relErrF_pos P S
   set hSv : ℝ := sec7_hSum h₁ h₂ h₃ with hSv_def
   have hSv3 : (3:ℝ) ≤ hSv := sec7_hSum_ge3 hh₁ hh₂ hh₃
   have hSv0 : (0:ℝ) ≤ hSv := by linarith
@@ -92,7 +92,7 @@ theorem build_f1_exp (RE : Sec7RaExpData P S W a Ph j)
   -- bound the two parts
   have hrsw : r + hSv ∈ sec7_rWinWide S W :=
     hmem r hrmid hSv (by rw [abs_of_nonneg hSv0]; linarith)
-  have he : |RE.e₁D m (r + hSv)| ≤ sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErr P S :=
+  have he : |RE.e₁D m (r + hSv)| ≤ sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErrF P S :=
     RE.e₁D_bound m (by omega) _ hrsw
   set B : ℝ := |RE.c₁| * S.T₁ * |sec7_aprod (-1) (m + 2)| * (2 * sec7_cWin) ^ (m + 3) /
     S.R ^ (m + 2) with hB
@@ -123,7 +123,7 @@ theorem build_f1_exp (RE : Sec7RaExpData P S W a Ph j)
             (2 * sec7_cWin) ^ (m + 3) := by rw [hM]; exact hbd
         _ = B := by rw [hB]; ring
   -- assemble and compare with the target bound
-  have hsplit : |G m r| ≤ sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErr P S + B * hSv ^ 2 := by
+  have hsplit : |G m r| ≤ sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErrF P S + B * hSv ^ 2 := by
     have : |G m r| ≤ |RE.e₁D m (r + hSv)| + |M m (r + hSv) - M m r - hSv * M (m + 1) r| := by
       simp only [hG]
       exact abs_add_le _ _
@@ -147,15 +147,15 @@ theorem build_f1_exp (RE : Sec7RaExpData P S W a Ph j)
         (mul_le_mul_of_nonneg_left hpowle (by norm_num))
     refine le_trans h1 ?_
     norm_num [sec7_cWin, sec7_cExp]
-  have hkey1 : sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErr P S ≤
-      sec7_cExp * (S.T₁ * sec7_relErr P S) / S.R ^ m := by
+  have hkey1 : sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErrF P S ≤
+      sec7_cExp * (S.T₁ * sec7_relErrF P S) / S.R ^ m := by
     have hIn : sec7_cExpIn ≤ sec7_cExp := by norm_num [sec7_cExpIn, sec7_cExp]
-    have hmono : (0:ℝ) ≤ S.T₁ * sec7_relErr P S / S.R ^ m := by positivity
-    calc sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErr P S
-        = sec7_cExpIn * (S.T₁ * sec7_relErr P S / S.R ^ m) := by ring
-      _ ≤ sec7_cExp * (S.T₁ * sec7_relErr P S / S.R ^ m) :=
+    have hmono : (0:ℝ) ≤ S.T₁ * sec7_relErrF P S / S.R ^ m := by positivity
+    calc sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErrF P S
+        = sec7_cExpIn * (S.T₁ * sec7_relErrF P S / S.R ^ m) := by ring
+      _ ≤ sec7_cExp * (S.T₁ * sec7_relErrF P S / S.R ^ m) :=
           mul_le_mul_of_nonneg_right hIn hmono
-      _ = sec7_cExp * (S.T₁ * sec7_relErr P S) / S.R ^ m := by ring
+      _ = sec7_cExp * (S.T₁ * sec7_relErrF P S) / S.R ^ m := by ring
   have hkey2 : B * hSv ^ 2 ≤ sec7_cExp * (hSv ^ 2 * S.T₁ / S.R ^ 2) / S.R ^ m := by
     have hmono : (0:ℝ) ≤ hSv ^ 2 * S.T₁ / S.R ^ (m + 2) := by positivity
     calc B * hSv ^ 2
@@ -166,10 +166,10 @@ theorem build_f1_exp (RE : Sec7RaExpData P S W a Ph j)
       _ = sec7_cExp * (hSv ^ 2 * S.T₁ / S.R ^ 2) / S.R ^ m := by
           rw [pow_add]
           field_simp
-  calc sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErr P S + B * hSv ^ 2
-      ≤ sec7_cExp * (S.T₁ * sec7_relErr P S) / S.R ^ m +
+  calc sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErrF P S + B * hSv ^ 2
+      ≤ sec7_cExp * (S.T₁ * sec7_relErrF P S) / S.R ^ m +
         sec7_cExp * (hSv ^ 2 * S.T₁ / S.R ^ 2) / S.R ^ m := by linarith [hkey1, hkey2]
-    _ = sec7_cExp * (hSv ^ 2 * S.T₁ / S.R ^ 2 + S.T₁ * sec7_relErr P S) / S.R ^ m := by
+    _ = sec7_cExp * (hSv ^ 2 * S.T₁ / S.R ^ 2 + S.T₁ * sec7_relErrF P S) / S.R ^ m := by
         ring
 
 /-- **N9′ family B** (md 1613–17): the differenced `f₁` expansion, graded `m ≤ 2`,
@@ -184,11 +184,11 @@ theorem build_d1f1_exp (RE : Sec7RaExpData P S W a Ph j)
           diff1 (h : ℝ) (Ph.f1D j 0) (t + sec7_hSum h₁ h₂ h₃ - h) -
             (-(RE.c₁ * h * (S.T₁ / S.R)) * (t / S.R) ^ (-(2:ℝ)))) r| ≤
         sec7_cExp * ((h : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
-          (h : ℝ) * (S.T₁ / S.R) * sec7_relErr P S) / S.R ^ m := by
+          (h : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ m := by
   intro m hm r hr
   have hR : 0 < S.R := sec7_R_pos S
   have hT : 0 < S.T₁ := sec7_T₁_pos S
-  have hrel : 0 < sec7_relErr P S := sec7_relErr_pos P S
+  have hrel : 0 < sec7_relErrF P S := sec7_relErrF_pos P S
   set hSv : ℝ := sec7_hSum h₁ h₂ h₃ with hSv_def
   have hSv3 : (3:ℝ) ≤ hSv := sec7_hSum_ge3 hh₁ hh₂ hh₃
   have hSv0 : (0:ℝ) ≤ hSv := by linarith
@@ -269,16 +269,16 @@ theorem build_d1f1_exp (RE : Sec7RaExpData P S W a Ph j)
       HasDerivAt (RE.e₁D m) (RE.e₁D (m + 1) x) x :=
     fun x hx => RE.e₁D_deriv m (by omega) x (heIcc x hx)
   have hebound : ∀ x ∈ Icc (r + (hSv - h)) (r + hSv),
-      |RE.e₁D (m + 1) x| ≤ sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErr P S :=
+      |RE.e₁D (m + 1) x| ≤ sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErrF P S :=
     fun x hx => RE.e₁D_bound (m + 1) (by omega) x (heIcc x hx)
   have he : |RE.e₁D m (r + hSv) - RE.e₁D m (r + (hSv - h))| ≤
-      sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErr P S * (h:ℝ) := by
+      sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErrF P S * (h:ℝ) := by
     have := sec7_abs_sub_le_of_deriv (g := RE.e₁D m) (g' := RE.e₁D (m + 1))
       (a := r + (hSv - h)) (b := r + hSv) (by linarith) hederiv hebound
     calc |RE.e₁D m (r + hSv) - RE.e₁D m (r + (hSv - h))|
-        ≤ sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErr P S *
+        ≤ sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErrF P S *
           (r + hSv - (r + (hSv - h))) := this
-      _ = sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErr P S * (h:ℝ) := by ring
+      _ = sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErrF P S * (h:ℝ) := by ring
   -- monomial part: Taylor-2 at r + (hSv − h) plus MVT realignment
   set B : ℝ := |RE.c₁| * S.T₁ * |sec7_aprod (-1) (m + 2)| * (2 * sec7_cWin) ^ (m + 3) /
     S.R ^ (m + 2) with hB
@@ -337,7 +337,7 @@ theorem build_d1f1_exp (RE : Sec7RaExpData P S W a Ph j)
           linarith [htay, this]
       _ = B * (h:ℝ) * hSv := hsq
   -- assemble
-  have hsplit : |G m r| ≤ sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErr P S * (h:ℝ) +
+  have hsplit : |G m r| ≤ sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErrF P S * (h:ℝ) +
       B * (h:ℝ) * hSv := by
     have h1 : |G m r| ≤ |RE.e₁D m (r + hSv) - RE.e₁D m (r + (hSv - h))| +
         |M m (r + hSv) - M m (r + (hSv - h)) - (h:ℝ) * M (m + 1) r| := by
@@ -363,17 +363,17 @@ theorem build_d1f1_exp (RE : Sec7RaExpData P S W a Ph j)
         (mul_le_mul_of_nonneg_left hpowle (by norm_num))
     refine le_trans h1 ?_
     norm_num [sec7_cWin, sec7_cExp]
-  have hkey1 : sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErr P S * (h:ℝ) ≤
-      sec7_cExp * ((h:ℝ) * (S.T₁ / S.R) * sec7_relErr P S) / S.R ^ m := by
+  have hkey1 : sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErrF P S * (h:ℝ) ≤
+      sec7_cExp * ((h:ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ m := by
     have hIn : sec7_cExpIn ≤ sec7_cExp := by norm_num [sec7_cExpIn, sec7_cExp]
-    have hmono : (0:ℝ) ≤ (h:ℝ) * (S.T₁ / S.R) * sec7_relErr P S / S.R ^ m := by positivity
-    calc sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErr P S * (h:ℝ)
-        = sec7_cExpIn * ((h:ℝ) * (S.T₁ / S.R) * sec7_relErr P S / S.R ^ m) := by
+    have hmono : (0:ℝ) ≤ (h:ℝ) * (S.T₁ / S.R) * sec7_relErrF P S / S.R ^ m := by positivity
+    calc sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErrF P S * (h:ℝ)
+        = sec7_cExpIn * ((h:ℝ) * (S.T₁ / S.R) * sec7_relErrF P S / S.R ^ m) := by
           rw [pow_succ]
           field_simp
-      _ ≤ sec7_cExp * ((h:ℝ) * (S.T₁ / S.R) * sec7_relErr P S / S.R ^ m) :=
+      _ ≤ sec7_cExp * ((h:ℝ) * (S.T₁ / S.R) * sec7_relErrF P S / S.R ^ m) :=
           mul_le_mul_of_nonneg_right hIn hmono
-      _ = sec7_cExp * ((h:ℝ) * (S.T₁ / S.R) * sec7_relErr P S) / S.R ^ m := by ring
+      _ = sec7_cExp * ((h:ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ m := by ring
   have hkey2 : B * (h:ℝ) * hSv ≤
       sec7_cExp * ((h:ℝ) * hSv * S.T₁ / S.R ^ 2) / S.R ^ m := by
     have hmono : (0:ℝ) ≤ (h:ℝ) * hSv * S.T₁ / S.R ^ (m + 2) := by positivity
@@ -385,11 +385,11 @@ theorem build_d1f1_exp (RE : Sec7RaExpData P S W a Ph j)
       _ = sec7_cExp * ((h:ℝ) * hSv * S.T₁ / S.R ^ 2) / S.R ^ m := by
           rw [pow_add]
           field_simp
-  calc sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErr P S * (h:ℝ) + B * (h:ℝ) * hSv
-      ≤ sec7_cExp * ((h:ℝ) * (S.T₁ / S.R) * sec7_relErr P S) / S.R ^ m +
+  calc sec7_cExpIn * (S.T₁ / S.R ^ (m + 1)) * sec7_relErrF P S * (h:ℝ) + B * (h:ℝ) * hSv
+      ≤ sec7_cExp * ((h:ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ m +
         sec7_cExp * ((h:ℝ) * hSv * S.T₁ / S.R ^ 2) / S.R ^ m := by linarith [hkey1, hkey2]
     _ = sec7_cExp * ((h:ℝ) * hSv * S.T₁ / S.R ^ 2 +
-        (h:ℝ) * (S.T₁ / S.R) * sec7_relErr P S) / S.R ^ m := by ring
+        (h:ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ m := by ring
 end Sec7RaExpData
 
 end Squarefree

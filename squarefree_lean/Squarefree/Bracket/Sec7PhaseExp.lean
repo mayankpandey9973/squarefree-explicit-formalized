@@ -133,7 +133,7 @@ structure Sec7MonExp (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (Ph : Sec7P
         Ph.f1D j 0 (t + sec7_hSum h₁ h₂ h₃) -
           (c₁ * S.T₁ * (t / S.R) ^ (-(1:ℝ)) -
             c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R) * (t / S.R) ^ (-(2:ℝ)))) r| ≤
-      sec7_cExp * ((sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2 + S.T₁ * sec7_relErr P S) /
+      sec7_cExp * ((sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2 + S.T₁ * sec7_relErrF P S) /
         S.R ^ m
   /-- md 1613–17: `Δ_{h₁}f₁(r+h_Σ−h₁) = −c₁h₁(T₁/R)y⁻² + O(h₁h_ΣT₁/R² + h₁(T₁/R)(Ω/H))`,
   graded `m ≤ 2`. -/
@@ -142,21 +142,21 @@ structure Sec7MonExp (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (Ph : Sec7P
         diff1 (h₁ : ℝ) (Ph.f1D j 0) (t + sec7_hSum h₁ h₂ h₃ - h₁) -
           (-(c₁ * h₁ * (S.T₁ / S.R)) * (t / S.R) ^ (-(2:ℝ)))) r| ≤
       sec7_cExp * ((h₁ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
-        (h₁ : ℝ) * (S.T₁ / S.R) * sec7_relErr P S) / S.R ^ m
+        (h₁ : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ m
   /-- md 1613–17, `i = 2`, graded `m ≤ 2`. -/
   d1f1_exp₂ : ∀ m ≤ 2, ∀ r ∈ sec7_rWin S W,
     |iteratedDeriv m (fun t =>
         diff1 (h₂ : ℝ) (Ph.f1D j 0) (t + sec7_hSum h₁ h₂ h₃ - h₂) -
           (-(c₁ * h₂ * (S.T₁ / S.R)) * (t / S.R) ^ (-(2:ℝ)))) r| ≤
       sec7_cExp * ((h₂ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
-        (h₂ : ℝ) * (S.T₁ / S.R) * sec7_relErr P S) / S.R ^ m
+        (h₂ : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ m
   /-- md 1613–17, `i = 3`, graded `m ≤ 2`. -/
   d1f1_exp₃ : ∀ m ≤ 2, ∀ r ∈ sec7_rWin S W,
     |iteratedDeriv m (fun t =>
         diff1 (h₃ : ℝ) (Ph.f1D j 0) (t + sec7_hSum h₁ h₂ h₃ - h₃) -
           (-(c₁ * h₃ * (S.T₁ / S.R)) * (t / S.R) ^ (-(2:ℝ)))) r| ≤
       sec7_cExp * ((h₃ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
-        (h₃ : ℝ) * (S.T₁ / S.R) * sec7_relErr P S) / S.R ^ m
+        (h₃ : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ m
   /-- md 1618–22 (`i = 1`, `{j,k} = {2,3}`; β = −(3/16)c₂ per md 1648–53):
   `B₁(r) = −(3/16)c₂h₂h₃(T₂/R²)y^{-5/4} + O(h₂h₃(T₂/R²)(Ω/H) + h₂h₃h_Σ(T₂/R³))`,
   graded `m ≤ 2`. -/
@@ -196,7 +196,7 @@ structure Sec7MonExp (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (Ph : Sec7P
         diff3 (h₁ : ℝ) h₂ h₃ (Ph.f3D j 0) t -
           (-(45/64) * c₃ * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) *
             (t / S.R) ^ (-(13:ℝ)/4))) r| ≤
-      sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S +
+      sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErrF P S +
         sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₃ / S.R ^ 4) / S.R ^ m
 
 /- N9 (md 1589–1633): the expansions hold for every fiber `a ∼ A`, every `j` in the §7 band,
@@ -315,9 +315,10 @@ end N10
 remainder `P·h_Σ·T₃/R⁴` is KEPT as an explicit term (the md-1675–80 absorption into
 `P(T₃/R³)·(Ω/H)` needed the undischargeable `habs : h_Σ/R ≤ Ω/H`, now dropped). -/
 noncomputable def sec7_errScale (P : Globals) (S : Scale P) (h₁ h₂ h₃ ρ₀ : ℤ) : ℝ :=
-  (if ρ₀ = 0 then 0 else 1) * S.T₁ * sec7_relErr P S
-    + (sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R) + sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) *
-        sec7_relErr P S
+  (if ρ₀ = 0 then 0 else 1) * S.T₁ * sec7_relErrF P S
+    + sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R) * sec7_relErrF P S
+    + sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErrF P S
+    + sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S
     + (sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2
     + sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * (S.T₃ / S.R ^ 4)
 

@@ -138,13 +138,13 @@ private noncomputable def sec7_raExpData_of_phase (P : Globals) (S : Scale P) (W
   e₃D_deriv := Ph.ra_e₃D_deriv j hj
   e₁D_bound := by
     intro m hm r hr
-    simpa [sec7_cExpIn, sec7_relErr] using Ph.ra_e₁D_bound j hj m hm r hr
+    simpa [sec7_cExpIn, sec7_relErrF] using Ph.ra_e₁D_bound j hj m hm r hr
   e₂D_bound := by
     intro m hm r hr
     simpa [sec7_cExpIn, sec7_relErr] using Ph.ra_e₂D_bound j hj m hm r hr
   e₃D_bound := by
     intro m hm r hr
-    simpa [sec7_cExpIn, sec7_relErr] using Ph.ra_e₃D_bound j hj m hm r hr
+    simpa [sec7_cExpIn, sec7_relErrF] using Ph.ra_e₃D_bound j hj m hm r hr
 
 /-- The `Sec7Phase` regularity field in the exact `sec7_Phi` shape used by N13/N19. -/
 private theorem sec7_phase_phi_contDiff {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
@@ -401,6 +401,88 @@ private theorem sec7_zero_hsub2 {P : Globals} {S : Scale P} (c₀ Cu : ℝ)
     _ ≤ (P.H / (P.G * S.Ω ^ 6)) * (P.G * S.Ω ^ 6) := by
           exact mul_le_mul_of_nonneg_right htarget (by positivity)
     _ = P.H := by field_simp [hG.ne', hΩ.ne']
+
+private theorem sec7_zero_hsub2F {P : Globals} {S : Scale P} (c₀ Cu : ℝ)
+    (hsd : OnStripAux.StripData P S c₀ Cu) (hbud : OnStripAux.Budget P.g P.u Cu)
+    (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
+    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ)) :
+    sec7_cSub * (P.G ^ 2 * S.Ω ^ 6 * P.U ^ 5) ≤ P.H := by
+  have hXgt : 1 < P.X := by
+    by_contra h
+    have h' : P.X ≤ 1 := not_lt.mp h
+    have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
+    linarith
+  have hbud' : 18977 * P.g + 18675 * P.u ≤ 2 := by
+    have hCu0 : 0 ≤ Cu := le_trans zero_le_one hsd.hCu
+    have hextra : 0 ≤ 790 * Cu * P.u := by
+      nlinarith [mul_nonneg hCu0 hu0.le]
+    unfold OnStripAux.Budget at hbud
+    nlinarith [hbud, hextra]
+  have hratio : (1 : ℝ) <
+      P.H ^ ((3/5 : ℝ) - 25 * P.u) * S.x ^ (0 : ℝ) *
+        P.G ^ (-(52/25 : ℝ) - 5 * P.u) *
+        S.Ω ^ (-(6 : ℝ)) :=
+    OnStripAux.one_lt_mono P S c₀ Cu hsd hXgt
+      ((3/5 : ℝ) - 25 * P.u) 0 (-(52/25 : ℝ) - 5 * P.u) (-(6 : ℝ))
+      (by
+        unfold OnStripAux.ratioExp
+        norm_num
+        nlinarith [hbud', hg0, hu0.le])
+  have hcX : sec7_cSub ≤ P.H ^ (2/5 : ℝ) * P.G ^ (2/25 : ℝ) := by
+    simpa [sec7_X_2_25_eq_HG P] using sec7_cSub_le_X_2_25 P hX24
+  have hH := P.H_pos
+  have hG := P.G_pos
+  have hΩ := S.Ω_pos
+  have hUeq : P.U ^ 5 = P.H ^ (25 * P.u) * P.G ^ (5 * P.u) := by
+    unfold Globals.U Globals.H Globals.G
+    rw [← Real.rpow_natCast (P.X ^ P.u) 5, ← Real.rpow_mul P.X_pos.le]
+    rw [← Real.rpow_mul P.X_pos.le, ← Real.rpow_mul P.X_pos.le, ← Real.rpow_add P.X_pos]
+    congr 1
+    ring
+  have htarget :
+      sec7_cSub * P.U ^ 5 ≤ P.H / (P.G ^ 2 * S.Ω ^ 6) := by
+    calc
+      sec7_cSub * P.U ^ 5
+          ≤ (P.H ^ (2/5 : ℝ) * P.G ^ (2/25 : ℝ)) * P.U ^ 5 := by
+          exact mul_le_mul_of_nonneg_right hcX (pow_nonneg P.U_pos.le 5)
+      _ = (P.H ^ (2/5 : ℝ) * P.G ^ (2/25 : ℝ)) *
+            (P.H ^ (25 * P.u) * P.G ^ (5 * P.u)) := by rw [hUeq]
+      _ ≤ (P.H ^ (2/5 : ℝ) * P.G ^ (2/25 : ℝ)) *
+            (P.H ^ (25 * P.u) * P.G ^ (5 * P.u)) *
+            (P.H ^ ((3/5 : ℝ) - 25 * P.u) * S.x ^ (0 : ℝ) *
+              P.G ^ (-(52/25 : ℝ) - 5 * P.u) * S.Ω ^ (-(6 : ℝ))) := by
+          exact le_mul_of_one_le_right (by positivity) hratio.le
+      _ = P.H / (P.G ^ 2 * S.Ω ^ 6) := by
+          rw [Real.rpow_zero]
+          rw [show (P.H ^ (2/5 : ℝ) * P.G ^ (2/25 : ℝ)) *
+                (P.H ^ (25 * P.u) * P.G ^ (5 * P.u)) *
+                (P.H ^ ((3/5 : ℝ) - 25 * P.u) * 1 *
+                  P.G ^ (-(52/25 : ℝ) - 5 * P.u) * S.Ω ^ (-(6 : ℝ))) =
+                (P.H ^ (2/5 : ℝ) * P.H ^ (25 * P.u) *
+                  P.H ^ ((3/5 : ℝ) - 25 * P.u)) *
+                  (P.G ^ (2/25 : ℝ) * P.G ^ (5 * P.u) *
+                    P.G ^ (-(52/25 : ℝ) - 5 * P.u)) *
+                  S.Ω ^ (-(6 : ℝ)) by ring]
+          rw [← Real.rpow_add hH, ← Real.rpow_add hH, ← Real.rpow_add hG,
+            ← Real.rpow_add hG, Real.rpow_neg hΩ.le]
+          rw [show (2 / 5 : ℝ) + 25 * P.u + (3 / 5 - 25 * P.u) = 1 by ring,
+            show (2 / 25 : ℝ) + 5 * P.u + (-(52 / 25) - 5 * P.u) = -2 by ring,
+            Real.rpow_one]
+          rw [show P.G ^ (-(2:ℝ)) = (P.G ^ 2)⁻¹ by
+            rw [Real.rpow_neg hG.le]
+            norm_num [Real.rpow_natCast]]
+          rw [show S.Ω ^ (6 : ℝ) = S.Ω ^ 6 by
+            norm_num [Real.rpow_natCast]]
+          rw [div_eq_mul_inv, mul_inv]
+          ring
+  have hden_pos : 0 < P.G ^ 2 * S.Ω ^ 6 := by positivity
+  calc
+    sec7_cSub * (P.G ^ 2 * S.Ω ^ 6 * P.U ^ 5)
+        = (sec7_cSub * P.U ^ 5) * (P.G ^ 2 * S.Ω ^ 6) := by ring
+    _ ≤ (P.H / (P.G ^ 2 * S.Ω ^ 6)) * (P.G ^ 2 * S.Ω ^ 6) := by
+          exact mul_le_mul_of_nonneg_right htarget (by positivity)
+    _ = P.H := by
+          rw [div_mul_cancel₀ _ (ne_of_gt hden_pos)]
 
 private theorem sec7_dyadic_cover_sum (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t : ℝ)
     (ht : 0 < t) :
@@ -1069,11 +1151,13 @@ private theorem sec7_nonzero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a
     nlinarith
   have hrel143 : sec7_relErr P S * 10 ^ 143 ≤ 1 :=
     sec7_relErr_le Env hW.le hsd hbud hg0 hu0 hX24
+  have hrelF143 : sec7_relErrF P S * 10 ^ 143 ≤ 1 :=
+    sec7_relErrF_le Env hW.le hsd hbud hg0 hu0 hX24
   have hcover : ∀ y : ℝ, S.R / 144 ≤ y → y ≤ 40 * S.R → y ∈ sec7_rWin S W := by
     intro y hylo hyhi
     rw [sec7_rWin, Set.mem_Icc]
     constructor <;> nlinarith [hylo, hyhi, hs_nonneg]
-  have hErr := sec7_err_deriv_bound (ME := ME) Env hj hbox hWpos hpad hshift hrel143 hξ₁ hξ₂ hξ₃
+  have hErr := sec7_err_deriv_bound (ME := ME) Env hj hbox hWpos hpad hshift hrel143 hrelF143 hξ₁ hξ₂ hξ₃
     ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ₀ hρ₁ hρ₂ hρ₃ hu₁ hu₂ hu₃
   have hcd := sec7_phase_phi_contDiff Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃
   set δ : ℝ := sec7_cCal * sec7_delta1 P S h₁ h₂ h₃ with hδdef
@@ -1608,7 +1692,9 @@ private theorem sec7_triple_split (P : Globals) (S : Scale P) (W : ℝ)
               pc.2.1.1 pc.2.1.2.1 pc.2.1.2.2
             hsub1 := sec7_zero_hsub1 Env hW.le
             hsub2 := sec7_zero_hsub2 c₀ Cu hsd hbud hg0 hu0 hX24
+            hsub2F := sec7_zero_hsub2F c₀ Cu hsd hbud hg0 hu0 hX24
             hrel := sec7_zero_hrel Env hbox c₀ Cu hsd hbud hg0 hu0 hX24
+            hrelF := sec7_relErrF_le Env (sec7_W_ge_one hbox) hsd hbud hg0 hu0 hX24
             few_critical := sec7_phase_phi_fewCritical Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃
               pc.1.1 pc.1.2.1 pc.1.2.2.1 pc.1.2.2.2
               pc.2.1.1 pc.2.1.2.1 pc.2.1.2.2 }

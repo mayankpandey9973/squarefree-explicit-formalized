@@ -42,6 +42,14 @@ theorem sec7_T₃_pos {P : Globals} (S : Scale P) : 0 < S.T₃ := by
 theorem sec7_relErr_pos (P : Globals) (S : Scale P) : 0 < sec7_relErr P S := by
   have := P.H_pos; have := S.Ω_pos; have := P.U_pos; unfold sec7_relErr; positivity
 
+theorem sec7_cGU_pos (P : Globals) (S : Scale P) : 0 < sec7_cGU P S := by
+  have := P.G_pos; have := P.U_pos; unfold sec7_cGU; positivity
+
+theorem sec7_relErrF_pos (P : Globals) (S : Scale P) : 0 < sec7_relErrF P S := by
+  have := sec7_relErr_pos P S; have := sec7_cGU_pos P S
+  unfold sec7_relErrF
+  positivity
+
 theorem sec7_hSum_ge3 {h₁ h₂ h₃ : ℤ} (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃) :
     (3:ℝ) ≤ sec7_hSum h₁ h₂ h₃ := by
   have a1 : (1:ℝ) ≤ (h₁:ℝ) := by exact_mod_cast hh₁
@@ -109,16 +117,18 @@ structure Sec7RaExpData (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (Ph : Se
   e₁D : ℕ → ℝ → ℝ
   e₂D : ℕ → ℝ → ℝ
   e₃D : ℕ → ℝ → ℝ
-  e₁D_zero : ∀ t, e₁D 0 t = Ph.f1D j 0 t - c₁ * S.T₁ * (t / S.R) ^ (-(1:ℝ))
+  e₁D_zero : ∀ t, e₁D 0 t =
+    Ph.f1D j 0 t - c₁ * S.T₁ * (t / S.R) ^ (-(1:ℝ))
   e₂D_zero : ∀ t, e₂D 0 t = Ph.f2D 0 t - c₂ * S.T₂ * (t / S.R) ^ ((3:ℝ)/4)
-  e₃D_zero : ∀ t, e₃D 0 t = Ph.f3D j 0 t - 3 * c₁ * c₂ * S.T₃ * (t / S.R) ^ (-(1:ℝ)/4)
+  e₃D_zero : ∀ t, e₃D 0 t =
+    Ph.f3D j 0 t - 3 * c₁ * c₂ * S.T₃ * (t / S.R) ^ (-(1:ℝ)/4)
   e₁D_deriv : ∀ m < 5, ∀ r ∈ sec7_rWinWide S W, HasDerivAt (e₁D m) (e₁D (m + 1) r) r
   e₂D_deriv : ∀ m < 5, ∀ r ∈ sec7_rWinWide S W, HasDerivAt (e₂D m) (e₂D (m + 1) r) r
   e₃D_deriv : ∀ m < 5, ∀ r ∈ sec7_rWinWide S W, HasDerivAt (e₃D m) (e₃D (m + 1) r) r
   e₁D_bound : ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
-    |e₁D m r| ≤ sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErr P S
+    |e₁D m r| ≤ sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErrF P S
   e₂D_bound : ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
     |e₂D m r| ≤ sec7_cExpIn * (S.T₂ / S.R ^ m) * sec7_relErr P S
   e₃D_bound : ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
-    |e₃D m r| ≤ sec7_cExpIn * (S.T₃ / S.R ^ m) * sec7_relErr P S
+    |e₃D m r| ≤ sec7_cExpIn * (S.T₃ / S.R ^ m) * sec7_relErrF P S
 end Squarefree

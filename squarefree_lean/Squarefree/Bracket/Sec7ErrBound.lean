@@ -24,41 +24,43 @@ set_option maxHeartbeats 1600000
 
 /-- **N11 numeric assembly** (abstract scalar form; ledger-banked).  The ten group
 numerators against the four `errScale` slots at `cErr = 10⁴²`. -/
-private theorem sec7E_num_final {T1 T2 T3 R hS Pv rel ind a b c : ℝ}
+private theorem sec7E_num_final {T1 T2 T3 R hS Pv relF rel ind a b c : ℝ}
     (hT1 : 0 < T1) (hT2 : 0 < T2) (hR : 0 < R) (hhS : 3 ≤ hS) (hPv : 1 ≤ Pv)
-    (hrel : 0 ≤ rel) (hind0 : 0 ≤ ind) (hind1 : ind ≤ 1)
+    (hrelF : 0 ≤ relF) (hrel : 0 ≤ rel) (hind0 : 0 ≤ ind) (hind1 : ind ≤ 1)
     (ha1 : 1 ≤ a) (hb1 : 1 ≤ b) (hc1 : 1 ≤ c)
     (ha : a ≤ hS) (hb : b ≤ hS) (hc : c ≤ hS)
     (habc : a * b * c = Pv) (hT3 : T1 * T2 = T3)
     (hSR : hS * 10 ^ 149 ≤ R) :
-    10 ^ 25 * (Pv * (T3 / R ^ 3) * rel + Pv * hS * T3 / R ^ 4)
-      + 4 * ((10 ^ 25 * (hS ^ 2 * T1 / R ^ 2 + T1 * rel)) *
+    10 ^ 25 * (Pv * (T3 / R ^ 3) * relF + Pv * hS * T3 / R ^ 4)
+      + 4 * ((10 ^ 25 * (hS ^ 2 * T1 / R ^ 2 + T1 * relF)) *
           (10 ^ 15 * (Pv * (T2 / R ^ 3)) + ind * 10 ^ 6))
       + 4 * ((10 ^ 11 * T1) *
           (10 ^ 25 * (Pv * (T2 / R ^ 3) * rel + Pv * hS * T2 / R ^ 4)))
-      + 4 * ((10 ^ 25 * (a * hS * T1 / R ^ 2 + a * (T1 / R) * rel)) *
+      + 4 * ((10 ^ 25 * (a * hS * T1 / R ^ 2 + a * (T1 / R) * relF)) *
           (14 * 10 ^ 10 * (b * c * (T2 / R ^ 2)) + 10 ^ 10))
       + 4 * ((4 * 10 ^ 14 * (a * (T1 / R))) *
           (10 ^ 25 * (b * c * (T2 / R ^ 2) * rel + b * c * hS * T2 / R ^ 3)))
-      + 4 * ((10 ^ 25 * (b * hS * T1 / R ^ 2 + b * (T1 / R) * rel)) *
+      + 4 * ((10 ^ 25 * (b * hS * T1 / R ^ 2 + b * (T1 / R) * relF)) *
           (14 * 10 ^ 10 * (a * c * (T2 / R ^ 2)) + 10 ^ 10))
       + 4 * ((4 * 10 ^ 14 * (b * (T1 / R))) *
           (10 ^ 25 * (a * c * (T2 / R ^ 2) * rel + a * c * hS * T2 / R ^ 3)))
-      + 4 * ((10 ^ 25 * (c * hS * T1 / R ^ 2 + c * (T1 / R) * rel)) *
+      + 4 * ((10 ^ 25 * (c * hS * T1 / R ^ 2 + c * (T1 / R) * relF)) *
           (14 * 10 ^ 10 * (a * b * (T2 / R ^ 2)) + 10 ^ 10))
       + 4 * ((4 * 10 ^ 14 * (c * (T1 / R))) *
           (10 ^ 25 * (a * b * (T2 / R ^ 2) * rel + a * b * hS * T2 / R ^ 3)))
       + 4 * 10 ^ 22 * (hS * Pv * (T1 * T2 / R ^ 4))
-    ≤ 10 ^ 42 * (ind * T1 * rel + (hS * (T1 / R) + Pv * (T3 / R ^ 3)) * rel
-        + hS ^ 2 * T1 / R ^ 2 + Pv * hS * (T3 / R ^ 4)) := by
+    ≤ 10 ^ 42 * (ind * T1 * relF + hS * (T1 / R) * relF +
+        Pv * (T3 / R ^ 3) * relF + Pv * (T3 / R ^ 3) * rel +
+        hS ^ 2 * T1 / R ^ 2 + Pv * hS * (T3 / R ^ 4)) := by
   subst hT3
   subst habc
   have hhS0 : (0:ℝ) ≤ hS := by linarith
   have ha0 : (0:ℝ) ≤ a := by linarith
   have hb0 : (0:ℝ) ≤ b := by linarith
   have hc0 : (0:ℝ) ≤ c := by linarith
-  have hs1nn : (0:ℝ) ≤ ind * T1 * rel := by positivity
-  have hs2ann : (0:ℝ) ≤ hS * (T1 / R) * rel := by positivity
+  have hs1nn : (0:ℝ) ≤ ind * T1 * relF := by positivity
+  have hs2ann : (0:ℝ) ≤ hS * (T1 / R) * relF := by positivity
+  have hs2bFnn : (0:ℝ) ≤ a * b * c * (T1 * T2 / R ^ 3) * relF := by positivity
   have hs2bnn : (0:ℝ) ≤ a * b * c * (T1 * T2 / R ^ 3) * rel := by positivity
   have hs3nn : (0:ℝ) ≤ hS ^ 2 * T1 / R ^ 2 := by positivity
   have hs4nn : (0:ℝ) ≤ a * b * c * hS * (T1 * T2 / R ^ 4) := by positivity
@@ -83,22 +85,22 @@ private theorem sec7E_num_final {T1 T2 T3 R hS Pv rel ind a b c : ℝ}
     have hX : (0:ℝ) ≤ hS * T1 * (a * b * c) * T2 := by positivity
     gcongr
   -- group bounds, slot form
-  have HG1 : 10 ^ 25 * (a * b * c * (T1 * T2 / R ^ 3) * rel +
+  have HG1 : 10 ^ 25 * (a * b * c * (T1 * T2 / R ^ 3) * relF +
       a * b * c * hS * (T1 * T2) / R ^ 4) =
-      10 ^ 25 * (a * b * c * (T1 * T2 / R ^ 3) * rel) +
+      10 ^ 25 * (a * b * c * (T1 * T2 / R ^ 3) * relF) +
         10 ^ 25 * (a * b * c * hS * (T1 * T2 / R ^ 4)) := by
     ring
-  have HG2 : 4 * ((10 ^ 25 * (hS ^ 2 * T1 / R ^ 2 + T1 * rel)) *
+  have HG2 : 4 * ((10 ^ 25 * (hS ^ 2 * T1 / R ^ 2 + T1 * relF)) *
       (10 ^ 15 * (a * b * c * (T2 / R ^ 3)) + ind * 10 ^ 6)) ≤
-      4 * 10 ^ 40 * (a * b * c * (T1 * T2 / R ^ 3) * rel) +
+      4 * 10 ^ 40 * (a * b * c * (T1 * T2 / R ^ 3) * relF) +
         a * b * c * hS * (T1 * T2 / R ^ 4) +
-        4 * 10 ^ 31 * (hS ^ 2 * T1 / R ^ 2) + 4 * 10 ^ 31 * (ind * T1 * rel) := by
-    have key : 4 * ((10 ^ 25 * (hS ^ 2 * T1 / R ^ 2 + T1 * rel)) *
+        4 * 10 ^ 31 * (hS ^ 2 * T1 / R ^ 2) + 4 * 10 ^ 31 * (ind * T1 * relF) := by
+    have key : 4 * ((10 ^ 25 * (hS ^ 2 * T1 / R ^ 2 + T1 * relF)) *
         (10 ^ 15 * (a * b * c * (T2 / R ^ 3)) + ind * 10 ^ 6)) =
         4 * 10 ^ 40 * ((hS ^ 2 * T1 / R ^ 2) * (a * b * c * (T2 / R ^ 3))) +
-        4 * 10 ^ 40 * (a * b * c * (T1 * T2 / R ^ 3) * rel) +
+        4 * 10 ^ 40 * (a * b * c * (T1 * T2 / R ^ 3) * relF) +
         4 * 10 ^ 31 * (ind * (hS ^ 2 * T1 / R ^ 2)) +
-        4 * 10 ^ 31 * (ind * T1 * rel) := by
+        4 * 10 ^ 31 * (ind * T1 * relF) := by
       ring
     have hindS3 : ind * (hS ^ 2 * T1 / R ^ 2) ≤ hS ^ 2 * T1 / R ^ 2 := by
       nlinarith [mul_nonneg (sub_nonneg.mpr hind1) hs3nn]
@@ -109,24 +111,24 @@ private theorem sec7E_num_final {T1 T2 T3 R hS Pv rel ind a b c : ℝ}
         4 * 10 ^ 36 * (a * b * c * hS * (T1 * T2 / R ^ 4)) := by
     ring
   have HG4 : ∀ u v w : ℝ, 0 ≤ u → 0 ≤ v → 0 ≤ w → u ≤ hS → u * (v * w) = a * b * c →
-      4 * ((10 ^ 25 * (u * hS * T1 / R ^ 2 + u * (T1 / R) * rel)) *
+      4 * ((10 ^ 25 * (u * hS * T1 / R ^ 2 + u * (T1 / R) * relF)) *
         (14 * 10 ^ 10 * (v * w * (T2 / R ^ 2)) + 10 ^ 10)) ≤
       56 * 10 ^ 35 * (a * b * c * hS * (T1 * T2 / R ^ 4)) +
-        56 * 10 ^ 35 * (a * b * c * (T1 * T2 / R ^ 3) * rel) +
-        4 * 10 ^ 35 * (hS ^ 2 * T1 / R ^ 2) + 4 * 10 ^ 35 * (hS * (T1 / R) * rel) := by
+        56 * 10 ^ 35 * (a * b * c * (T1 * T2 / R ^ 3) * relF) +
+        4 * 10 ^ 35 * (hS ^ 2 * T1 / R ^ 2) + 4 * 10 ^ 35 * (hS * (T1 / R) * relF) := by
     intro u v w hu0 hv0 hw0 hule huvw
-    have key : 4 * ((10 ^ 25 * (u * hS * T1 / R ^ 2 + u * (T1 / R) * rel)) *
+    have key : 4 * ((10 ^ 25 * (u * hS * T1 / R ^ 2 + u * (T1 / R) * relF)) *
         (14 * 10 ^ 10 * (v * w * (T2 / R ^ 2)) + 10 ^ 10)) =
         56 * 10 ^ 35 * ((u * (v * w)) * hS * (T1 * T2 / R ^ 4)) +
-        56 * 10 ^ 35 * ((u * (v * w)) * (T1 * T2 / R ^ 3) * rel) +
-        4 * 10 ^ 35 * (u * hS * T1 / R ^ 2) + 4 * 10 ^ 35 * (u * (T1 / R) * rel) := by
+        56 * 10 ^ 35 * ((u * (v * w)) * (T1 * T2 / R ^ 3) * relF) +
+        4 * 10 ^ 35 * (u * hS * T1 / R ^ 2) + 4 * 10 ^ 35 * (u * (T1 / R) * relF) := by
       ring
     rw [huvw] at key
     have b1 : u * hS * T1 / R ^ 2 ≤ hS ^ 2 * T1 / R ^ 2 := by
       rw [div_le_div_iff_of_pos_right (by positivity)]
       nlinarith [mul_nonneg (mul_nonneg (sub_nonneg.mpr hule) hhS0) hT1.le]
-    have b2 : u * (T1 / R) * rel ≤ hS * (T1 / R) * rel := by
-      nlinarith [mul_nonneg (mul_nonneg (sub_nonneg.mpr hule) hT1R) hrel]
+    have b2 : u * (T1 / R) * relF ≤ hS * (T1 / R) * relF := by
+      nlinarith [mul_nonneg (mul_nonneg (sub_nonneg.mpr hule) hT1R) hrelF]
     linarith [key, b1, b2]
   have HG5 : ∀ u v w : ℝ, u * (v * w) = a * b * c →
       4 * ((4 * 10 ^ 14 * (u * (T1 / R))) *
@@ -151,17 +153,18 @@ private theorem sec7E_num_final {T1 T2 T3 R hS Pv rel ind a b c : ℝ}
   have h52 := HG5 b a c (by ring)
   have h53 := HG5 c a b (by ring)
   -- final assembly: slot coefficients ≤ 10⁴²
-  have hRHS : 10 ^ 42 * (ind * T1 * rel +
-      (hS * (T1 / R) + a * b * c * (T1 * T2 / R ^ 3)) * rel
+  have hRHS : 10 ^ 42 * (ind * T1 * relF + hS * (T1 / R) * relF +
+      a * b * c * (T1 * T2 / R ^ 3) * relF + a * b * c * (T1 * T2 / R ^ 3) * rel
       + hS ^ 2 * T1 / R ^ 2 + a * b * c * hS * (T1 * T2 / R ^ 4)) =
-      10 ^ 42 * (ind * T1 * rel) + 10 ^ 42 * (hS * (T1 / R) * rel) +
+      10 ^ 42 * (ind * T1 * relF) + 10 ^ 42 * (hS * (T1 / R) * relF) +
+        10 ^ 42 * (a * b * c * (T1 * T2 / R ^ 3) * relF) +
         10 ^ 42 * (a * b * c * (T1 * T2 / R ^ 3) * rel) +
         10 ^ 42 * (hS ^ 2 * T1 / R ^ 2) +
         10 ^ 42 * (a * b * c * hS * (T1 * T2 / R ^ 4)) := by
     ring
   linarith [le_of_eq HG1, HG2, le_of_eq HG3, h41, h42, h43,
     le_of_eq h51, le_of_eq h52, le_of_eq h53, le_of_eq HG6, le_of_eq hRHS,
-    hs1nn, hs2ann, hs2bnn, hs3nn, hs4nn]
+    hs1nn, hs2ann, hs2bFnn, hs2bnn, hs3nn, hs4nn]
 
 
 /-- **N11** (md 1666–82): `|Err^{(m)}(r)| ≤ cErr · errScale / Rᵐ` for `m ≤ 2` on the count
@@ -178,6 +181,7 @@ theorem sec7_err_deriv_bound {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
     (hpad : 6 * (W + W ^ 2 + W ^ 4) ≤ S.R / 288)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
     (hrel143 : sec7_relErr P S * 10 ^ 143 ≤ 1)
+    (hrelF143 : sec7_relErrF P S * 10 ^ 143 ≤ 1)
     (hξ₁ : |ξ₁| ≤ sec7_hSum h₁ h₂ h₃) (hξ₂ : |ξ₂| ≤ sec7_hSum h₁ h₂ h₃)
     (hξ₃ : |ξ₃| ≤ sec7_hSum h₁ h₂ h₃)
     (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ)
@@ -200,6 +204,7 @@ theorem sec7_err_deriv_bound {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
   have hT1 : 0 < S.T₁ := sec7_T₁_pos S
   have hT2 : 0 < S.T₂ := sec7_T₂_pos S
   have hrel0 : 0 ≤ sec7_relErr P S := (sec7_relErr_pos P S).le
+  have hrelF0 : 0 ≤ sec7_relErrF P S := (sec7_relErrF_pos P S).le
   have hcrel : sec7_cExp * sec7_relErr P S ≤ 1 :=
     sec7E_cExp_rel hrel143
   have a1 : (1:ℝ) ≤ (h₁:ℝ) := by exact_mod_cast hh₁
@@ -307,11 +312,11 @@ theorem sec7_err_deriv_bound {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
   have nT2R2 : (0:ℝ) ≤ S.T₂ / S.R ^ 2 := div_nonneg hT2.le (pow_nonneg hR.le 2)
   have nT2R3 : (0:ℝ) ≤ S.T₂ / S.R ^ 3 := div_nonneg hT2.le (pow_nonneg hR.le 3)
   have hb1 := sec7E_eP3_bound ME hh₁ hh₂ hh₃ hW hpad hshift m hm r hr
-  have hb2 := sec7_leib_bound (a := sec7_cExp * ((sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2 + S.T₁ * sec7_relErr P S))
+  have hb2 := sec7_leib_bound (a := sec7_cExp * ((sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2 + S.T₁ * sec7_relErrF P S))
     (b := 10 ^ 15 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) + (if ρ₀ = 0 then 0 else 1) * sec7_cCarry) hR
     (mul_nonneg hcExp0 (add_nonneg
       (div_nonneg (mul_nonneg (sq_nonneg _) hT1.le) (pow_nonneg hR.le 2))
-      (mul_nonneg hT1.le hrel0)))
+      (mul_nonneg hT1.le hrelF0)))
     (add_nonneg (mul_nonneg (by norm_num) (mul_nonneg hPv0 nT2R3))
       (mul_nonneg hind0 hcC0))
     (fun k hk => sec7E_eA_bound ME hh₁ hh₂ hh₃ hW hpad hshift k hk r hr)
@@ -324,11 +329,11 @@ theorem sec7_err_deriv_bound {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
       (div_nonneg (mul_nonneg (mul_nonneg hPv0 hS0) hT2.le) (pow_nonneg hR.le 4))))
     (fun k hk => sec7E_M1_bound ME hh₁ hh₂ hh₃ hW hpad hSR k hk r hr)
     (fun k hk => sec7E_eB0_bound ME hh₁ hh₂ hh₃ hW hpad hshift k hk r hr) m hm
-  have hb4 := sec7_leib_bound (a := sec7_cExp * ((h₁ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 + (h₁ : ℝ) * (S.T₁ / S.R) * sec7_relErr P S))
+  have hb4 := sec7_leib_bound (a := sec7_cExp * ((h₁ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 + (h₁ : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S))
     (b := 14 * 10 ^ 10 * ((h₂:ℝ) * (h₃:ℝ) * (S.T₂ / S.R ^ 2)) + sec7_cFib) hR
     (mul_nonneg hcExp0 (add_nonneg
       (div_nonneg (mul_nonneg (mul_nonneg h10 hS0) hT1.le) (pow_nonneg hR.le 2))
-      (mul_nonneg (mul_nonneg h10 nT1R) hrel0)))
+      (mul_nonneg (mul_nonneg h10 nT1R) hrelF0)))
     (add_nonneg (mul_nonneg (by norm_num)
       (mul_nonneg (mul_nonneg h20 h30) nT2R2)) hcF0)
     (fun k hk => sec7E_eQ_bound ME hh₁ hh₂ hh₃ hW hpad hshift hh₁ hle₁ ME.d1f1_exp₁ k hk r hr)
@@ -344,11 +349,11 @@ theorem sec7_err_deriv_bound {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
     (fun k hk => sec7E_N_bound ME hW hpad hh₁ k hk r hr)
     (fun k hk => sec7E_eK_bound ME hh₁ hh₂ hh₃ hW hpad hshift hh₂ hh₃ hle₂ hle₃ hξ₁
       ME.B_exp₁ k hk r hr) m hm
-  have hb6 := sec7_leib_bound (a := sec7_cExp * ((h₂ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 + (h₂ : ℝ) * (S.T₁ / S.R) * sec7_relErr P S))
+  have hb6 := sec7_leib_bound (a := sec7_cExp * ((h₂ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 + (h₂ : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S))
     (b := 14 * 10 ^ 10 * ((h₁:ℝ) * (h₃:ℝ) * (S.T₂ / S.R ^ 2)) + sec7_cFib) hR
     (mul_nonneg hcExp0 (add_nonneg
       (div_nonneg (mul_nonneg (mul_nonneg h20 hS0) hT1.le) (pow_nonneg hR.le 2))
-      (mul_nonneg (mul_nonneg h20 nT1R) hrel0)))
+      (mul_nonneg (mul_nonneg h20 nT1R) hrelF0)))
     (add_nonneg (mul_nonneg (by norm_num)
       (mul_nonneg (mul_nonneg h10 h30) nT2R2)) hcF0)
     (fun k hk => sec7E_eQ_bound ME hh₁ hh₂ hh₃ hW hpad hshift hh₂ hle₂ ME.d1f1_exp₂ k hk r hr)
@@ -364,11 +369,11 @@ theorem sec7_err_deriv_bound {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
     (fun k hk => sec7E_N_bound ME hW hpad hh₂ k hk r hr)
     (fun k hk => sec7E_eK_bound ME hh₁ hh₂ hh₃ hW hpad hshift hh₁ hh₃ hle₁ hle₃ hξ₂
       ME.B_exp₂ k hk r hr) m hm
-  have hb8 := sec7_leib_bound (a := sec7_cExp * ((h₃ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 + (h₃ : ℝ) * (S.T₁ / S.R) * sec7_relErr P S))
+  have hb8 := sec7_leib_bound (a := sec7_cExp * ((h₃ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 + (h₃ : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S))
     (b := 14 * 10 ^ 10 * ((h₁:ℝ) * (h₂:ℝ) * (S.T₂ / S.R ^ 2)) + sec7_cFib) hR
     (mul_nonneg hcExp0 (add_nonneg
       (div_nonneg (mul_nonneg (mul_nonneg h30 hS0) hT1.le) (pow_nonneg hR.le 2))
-      (mul_nonneg (mul_nonneg h30 nT1R) hrel0)))
+      (mul_nonneg (mul_nonneg h30 nT1R) hrelF0)))
     (add_nonneg (mul_nonneg (by norm_num)
       (mul_nonneg (mul_nonneg h10 h20) nT2R2)) hcF0)
     (fun k hk => sec7E_eQ_bound ME hh₁ hh₂ hh₃ hW hpad hshift hh₃ hle₃ ME.d1f1_exp₃ k hk r hr)
@@ -459,34 +464,35 @@ theorem sec7_err_deriv_bound {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
     have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith
     nlinarith [h12, a3]
   have hnum := sec7E_num_final (T1 := S.T₁) (T2 := S.T₂) (T3 := S.T₃) (R := S.R)
-    (hS := sec7_hSum h₁ h₂ h₃) (Pv := sec7_Pprod h₁ h₂ h₃) (rel := sec7_relErr P S)
+    (hS := sec7_hSum h₁ h₂ h₃) (Pv := sec7_Pprod h₁ h₂ h₃)
+    (relF := sec7_relErrF P S) (rel := sec7_relErr P S)
     (ind := if ρ₀ = 0 then (0:ℝ) else 1) (a := (h₁:ℝ)) (b := (h₂:ℝ)) (c := (h₃:ℝ))
-    hT1 hT2 hR hSv3 hPv1 hrel0 hind0 hind1 a1 a2 a3 hle₁ hle₂ hle₃
+    hT1 hT2 hR hSv3 hPv1 hrelF0 hrel0 hind0 hind1 a1 a2 a3 hle₁ hle₂ hle₃
     (by unfold sec7_Pprod; ring) (sec7_T₁_mul_T₂ S) hSR
   calc |F m r|
-      ≤ (sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S +
+      ≤ (sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErrF P S +
             sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₃ / S.R ^ 4)
         + 4 * ((sec7_cExp * ((sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2 +
-              S.T₁ * sec7_relErr P S)) *
+              S.T₁ * sec7_relErrF P S)) *
             (10 ^ 15 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) +
               (if ρ₀ = 0 then 0 else 1) * sec7_cCarry))
         + 4 * ((10 ^ 11 * S.T₁) *
             (sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) * sec7_relErr P S +
               sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 4)))
         + 4 * ((sec7_cExp * ((h₁ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
-              (h₁ : ℝ) * (S.T₁ / S.R) * sec7_relErr P S)) *
+              (h₁ : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S)) *
             (14 * 10 ^ 10 * ((h₂:ℝ) * (h₃:ℝ) * (S.T₂ / S.R ^ 2)) + sec7_cFib))
         + 4 * ((4 * 10 ^ 14 * ((h₁:ℝ) * (S.T₁ / S.R))) *
             (sec7_cExp * ((h₂ : ℝ) * h₃ * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
               (h₂ : ℝ) * h₃ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3)))
         + 4 * ((sec7_cExp * ((h₂ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
-              (h₂ : ℝ) * (S.T₁ / S.R) * sec7_relErr P S)) *
+              (h₂ : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S)) *
             (14 * 10 ^ 10 * ((h₁:ℝ) * (h₃:ℝ) * (S.T₂ / S.R ^ 2)) + sec7_cFib))
         + 4 * ((4 * 10 ^ 14 * ((h₂:ℝ) * (S.T₁ / S.R))) *
             (sec7_cExp * ((h₁ : ℝ) * h₃ * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
               (h₁ : ℝ) * h₃ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3)))
         + 4 * ((sec7_cExp * ((h₃ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
-              (h₃ : ℝ) * (S.T₁ / S.R) * sec7_relErr P S)) *
+              (h₃ : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S)) *
             (14 * 10 ^ 10 * ((h₁:ℝ) * (h₂:ℝ) * (S.T₂ / S.R ^ 2)) + sec7_cFib))
         + 4 * ((4 * 10 ^ 14 * ((h₃:ℝ) * (S.T₁ / S.R))) *
             (sec7_cExp * ((h₁ : ℝ) * h₂ * (S.T₂ / S.R ^ 2) * sec7_relErr P S +

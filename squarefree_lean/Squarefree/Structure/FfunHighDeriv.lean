@@ -131,6 +131,39 @@ theorem Ffun_hasDerivAt5_d (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
   rw [hfun]
   exact h
 
+/-- **Sixth `d`-derivative of `F_a`** (as the derivative of the fifth-derivative
+function).
+`(d/dt)(-720X/t⁷ + 720X/(t+a)⁷)|_{t=d} = 5040X/d⁸ - 5040X/(d+a)⁸`. -/
+theorem Ffun_hasDerivAt6_d (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
+    HasDerivAt (fun t => -720 * X / t ^ 7 + 720 * X / (t + a) ^ 7)
+      (5040 * X / d ^ 8 - 5040 * X / (d + a) ^ 8) d := by
+  have hleft : HasDerivAt (fun t => -720 * X / t ^ 7) (5040 * X / d ^ 8) d := by
+    have hpow : HasDerivAt (fun t : ℝ => t ^ 7) (7 * d ^ 6) d := by
+      simpa using (hasDerivAt_pow 7 d)
+    have h := (hasDerivAt_const d (-720 * X)).div hpow (pow_ne_zero 7 hd)
+    convert h using 1
+    field_simp
+    ring
+  have hright : HasDerivAt (fun t => 720 * X / (t + a) ^ 7)
+      (-5040 * X / (d + a) ^ 8) d := by
+    have hshift : HasDerivAt (fun t : ℝ => t + a) (1 : ℝ) d := by
+      simpa using (hasDerivAt_id d).add_const a
+    have hpow : HasDerivAt (fun t : ℝ => (t + a) ^ 7)
+        (7 * (d + a) ^ 6 * 1) d := by
+      simpa using (hasDerivAt_pow 7 (d + a)).comp d hshift
+    have h := (hasDerivAt_const d (720 * X)).div hpow (pow_ne_zero 7 hda)
+    convert h using 1
+    field_simp
+    ring
+  have h := hleft.add hright
+  have hfun : (fun t => -720 * X / t ^ 7 + 720 * X / (t + a) ^ 7)
+      = (fun t => -720 * X / t ^ 7) + (fun t => 720 * X / (t + a) ^ 7) := by
+    funext t
+    simp only [Pi.add_apply]
+  rw [hfun]
+  convert h using 1
+  ring
+
 /-! ## Iterated-derivative identities -/
 
 /-- The second derivative function `iteratedDeriv 2 (fun t => Ffun X a t)` agrees locally
@@ -195,6 +228,23 @@ theorem Ffun_iteratedDeriv5_d (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
   rw [show (5 : ℕ) = 4 + 1 by rfl, iteratedDeriv_succ]
   rw [(iteratedDeriv4_Ffun_eventuallyEq X a d hd hda).deriv_eq]
   exact (Ffun_hasDerivAt5_d X a d hd hda).deriv
+
+/-- **`iteratedDeriv 6` value of `F_a`** on the pole-free set:
+`iteratedDeriv 6 (fun t => Ffun X a t) d = 5040X/d⁸ - 5040X/(d+a)⁸`. -/
+theorem Ffun_iteratedDeriv6_d (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
+    iteratedDeriv 6 (fun t => Ffun X a t) d =
+      5040 * X / d ^ 8 - 5040 * X / (d + a) ^ 8 := by
+  have hev : iteratedDeriv 5 (fun t => Ffun X a t)
+      =ᶠ[nhds d] (fun t => -720 * X / t ^ 7 + 720 * X / (t + a) ^ 7) := by
+    have hopen : IsOpen {t : ℝ | t ≠ 0 ∧ t + a ≠ 0} :=
+      (isOpen_ne.preimage continuous_id).inter (isOpen_ne.preimage (continuous_id.add continuous_const))
+    have hmem : d ∈ {t : ℝ | t ≠ 0 ∧ t + a ≠ 0} := ⟨hd, hda⟩
+    refine Filter.eventuallyEq_of_mem (hopen.mem_nhds hmem) ?_
+    intro t ht
+    exact Ffun_iteratedDeriv5_d X a t ht.1 ht.2
+  rw [show (6 : ℕ) = 5 + 1 by rfl, iteratedDeriv_succ]
+  rw [hev.deriv_eq]
+  exact (Ffun_hasDerivAt6_d X a d hd hda).deriv
 
 /-! ## Smoothness away from poles -/
 
@@ -275,6 +325,17 @@ theorem Ffun_deriv5_factor (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
   field_simp
   ring
 
+/-- Factored sixth `d`-derivative:
+`F_a⁽⁶⁾(d) = 5040X a(a⁷+8a⁶d+28a⁵d²+56a⁴d³+70a³d⁴+56a²d⁵+28ad⁶+8d⁷)/(d⁸(d+a)⁸)`. -/
+theorem Ffun_deriv6_factor (X a d : ℝ) (hd : d ≠ 0) (hda : d + a ≠ 0) :
+    5040 * X / d ^ 8 - 5040 * X / (d + a) ^ 8 =
+      5040 * X * a *
+        (a ^ 7 + 8 * a ^ 6 * d + 28 * a ^ 5 * d ^ 2 + 56 * a ^ 4 * d ^ 3
+          + 70 * a ^ 3 * d ^ 4 + 56 * a ^ 2 * d ^ 5 + 28 * a * d ^ 6
+          + 8 * d ^ 7) / (d ^ 8 * (d + a) ^ 8) := by
+  field_simp
+  ring
+
 /-- Exact magnitude of `F_a'(d)` at positive inputs. -/
 theorem Ffun_deriv1_abs_eq {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) :
     |deriv (fun t => Ffun X a t) d| =
@@ -345,6 +406,19 @@ theorem Ffun_deriv5_abs_eq {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) 
           + 35 * a ^ 2 * d ^ 4 + 21 * a * d ^ 5 + 7 * d ^ 6) /
           (d ^ 7 * (d + a) ^ 7)) by ring]
   rw [abs_neg, abs_of_nonneg]
+  positivity
+
+/-- Exact magnitude of `F_a⁽⁶⁾(d)` at positive inputs. -/
+theorem Ffun_deriv6_abs_eq {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) :
+    |iteratedDeriv 6 (fun t => Ffun X a t) d| =
+      5040 * X * a *
+        (a ^ 7 + 8 * a ^ 6 * d + 28 * a ^ 5 * d ^ 2 + 56 * a ^ 4 * d ^ 3
+          + 70 * a ^ 3 * d ^ 4 + 56 * a ^ 2 * d ^ 5 + 28 * a * d ^ 6
+          + 8 * d ^ 7) / (d ^ 8 * (d + a) ^ 8) := by
+  have hda : d + a ≠ 0 := by positivity
+  rw [Ffun_iteratedDeriv6_d X a d (ne_of_gt hd) hda,
+    Ffun_deriv6_factor X a d (ne_of_gt hd) hda]
+  rw [abs_of_nonneg]
   positivity
 
 /-! ## Local magnitude bounds in the natural `X*a/d^(k+3)` scale -/
@@ -645,6 +719,81 @@ theorem Ffun_deriv5_abs_bounds {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 <
       nlinarith [hmul]
     linarith
 
+/-- Local two-sided sixth-derivative bound for `0 < a ≤ 11d`:
+`|F_a⁽⁶⁾(d)| ≍ X a/d⁹`. -/
+theorem Ffun_deriv6_abs_bounds {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (hd : 0 < d)
+    (had : a ≤ 11 * d) :
+    X * a / (20000 * d ^ 9) ≤ |iteratedDeriv 6 (fun t => Ffun X a t) d| ∧
+      |iteratedDeriv 6 (fun t => Ffun X a t) d| ≤ 197009794800 * X * a / d ^ 9 := by
+  rw [Ffun_deriv6_abs_eq hX ha hd]
+  have hda_pos : 0 < d + a := by positivity
+  have hden_pos : 0 < d ^ 8 * (d + a) ^ 8 := by positivity
+  set Q : ℝ := a ^ 7 + 8 * a ^ 6 * d + 28 * a ^ 5 * d ^ 2
+    + 56 * a ^ 4 * d ^ 3 + 70 * a ^ 3 * d ^ 4 + 56 * a ^ 2 * d ^ 5
+    + 28 * a * d ^ 6 + 8 * d ^ 7 with hQ_def
+  have hQlo : 8 * d ^ 7 ≤ Q := by
+    have h1 : 0 ≤ a ^ 7 := by positivity
+    have h2 : 0 ≤ 8 * a ^ 6 * d := by positivity
+    have h3 : 0 ≤ 28 * a ^ 5 * d ^ 2 := by positivity
+    have h4 : 0 ≤ 56 * a ^ 4 * d ^ 3 := by positivity
+    have h5 : 0 ≤ 70 * a ^ 3 * d ^ 4 := by positivity
+    have h6 : 0 ≤ 56 * a ^ 2 * d ^ 5 := by positivity
+    have h7 : 0 ≤ 28 * a * d ^ 6 := by positivity
+    rw [hQ_def]
+    nlinarith
+  have hQhi : Q ≤ 39089245 * d ^ 7 := by
+    have ha7 : a ^ 7 ≤ (11 * d) ^ 7 := pow_le_pow_left₀ ha.le had 7
+    have ha6 : a ^ 6 ≤ (11 * d) ^ 6 := pow_le_pow_left₀ ha.le had 6
+    have ha6d : a ^ 6 * d ≤ (11 * d) ^ 6 * d :=
+      mul_le_mul_of_nonneg_right ha6 hd.le
+    have ha5 : a ^ 5 ≤ (11 * d) ^ 5 := pow_le_pow_left₀ ha.le had 5
+    have ha5d2 : a ^ 5 * d ^ 2 ≤ (11 * d) ^ 5 * d ^ 2 :=
+      mul_le_mul_of_nonneg_right ha5 (by positivity)
+    have ha4 : a ^ 4 ≤ (11 * d) ^ 4 := pow_le_pow_left₀ ha.le had 4
+    have ha4d3 : a ^ 4 * d ^ 3 ≤ (11 * d) ^ 4 * d ^ 3 :=
+      mul_le_mul_of_nonneg_right ha4 (by positivity)
+    have ha3 : a ^ 3 ≤ (11 * d) ^ 3 := pow_le_pow_left₀ ha.le had 3
+    have ha3d4 : a ^ 3 * d ^ 4 ≤ (11 * d) ^ 3 * d ^ 4 :=
+      mul_le_mul_of_nonneg_right ha3 (by positivity)
+    have ha2 : a ^ 2 ≤ (11 * d) ^ 2 := pow_le_pow_left₀ ha.le had 2
+    have ha2d5 : a ^ 2 * d ^ 5 ≤ (11 * d) ^ 2 * d ^ 5 :=
+      mul_le_mul_of_nonneg_right ha2 (by positivity)
+    have had6 : a * d ^ 6 ≤ (11 * d) * d ^ 6 :=
+      mul_le_mul_of_nonneg_right had (by positivity)
+    rw [hQ_def]
+    nlinarith [ha7, ha6d, ha5d2, ha4d3, ha3d4, ha2d5, had6]
+  have hden_lo : d ^ 16 ≤ d ^ 8 * (d + a) ^ 8 := by
+    have hpow : d ^ 8 ≤ (d + a) ^ 8 := pow_le_pow_left₀ hd.le (by linarith) 8
+    nlinarith [hpow, pow_pos hd 8]
+  have hden_hi : d ^ 8 * (d + a) ^ 8 ≤ 429981696 * d ^ 16 := by
+    have hda_le : d + a ≤ 12 * d := by linarith
+    have hpow : (d + a) ^ 8 ≤ (12 * d) ^ 8 := pow_le_pow_left₀ hda_pos.le hda_le 8
+    nlinarith [hpow, pow_pos hd 8]
+  constructor
+  · rw [div_le_div_iff₀ (by positivity : 0 < 20000 * d ^ 9) hden_pos]
+    have h1 : X * a * (d ^ 8 * (d + a) ^ 8) ≤ X * a * (429981696 * d ^ 16) :=
+      mul_le_mul_of_nonneg_left hden_hi (by positivity)
+    have h2 : X * a * (429981696 * d ^ 16) ≤ 5040 * X * a * Q * (20000 * d ^ 9) := by
+      have hmul : (5040 * X * a * (20000 * d ^ 9)) * (8 * d ^ 7) ≤
+          (5040 * X * a * (20000 * d ^ 9)) * Q :=
+        mul_le_mul_of_nonneg_left hQlo (by positivity)
+      nlinarith [hmul]
+    linarith
+  · rw [div_le_div_iff₀ hden_pos (by positivity : 0 < d ^ 9)]
+    have h1 : 5040 * X * a * Q * d ^ 9 ≤
+        5040 * X * a * (39089245 * d ^ 7) * d ^ 9 := by
+      have hmul : (5040 * X * a * d ^ 9) * Q ≤
+          (5040 * X * a * d ^ 9) * (39089245 * d ^ 7) :=
+        mul_le_mul_of_nonneg_left hQhi (by positivity)
+      nlinarith [hmul]
+    have h2 : 5040 * X * a * (39089245 * d ^ 7) * d ^ 9 ≤
+        197009794800 * X * a * (d ^ 8 * (d + a) ^ 8) := by
+      have hmul : (197009794800 * X * a) * d ^ 16 ≤
+          (197009794800 * X * a) * (d ^ 8 * (d + a) ^ 8) :=
+        mul_le_mul_of_nonneg_left hden_lo (by positivity)
+      nlinarith [hmul]
+    linarith
+
 /-! ## Wide-window scale bounds in the dyadic `F/D^k` scale -/
 
 private theorem XA_div_D4_eq_F_div_D {P : Globals} (S : Scale P) :
@@ -885,6 +1034,52 @@ theorem Ffun_deriv5_scale_wide {P : Globals} {S : Scale P} {a d : ℝ}
     have hD8 : S.D ^ 8 ≤ 10 ^ 8 * d ^ 8 := by nlinarith [hd8, hDpos]
     have hprod : a * S.D ^ 8 ≤ (11 * S.A) * (10 ^ 8 * d ^ 8) :=
       mul_le_mul ha_hi hD8 (by positivity) (by positivity)
+    nlinarith [hprod, hX, hApos, hDpos]
+
+/-- Wide inverse-window sixth-derivative scale:
+if `10A ≤ D`, `a ∈ [A/5,11A]`, and `d ∈ [D/10,18D]`, then
+`|F_a⁽⁶⁾(d)| ≍ F/D⁶` with explicit constants. -/
+theorem Ffun_deriv6_scale_wide {P : Globals} {S : Scale P} {a d : ℝ}
+    (hAD : 10 * S.A ≤ S.D) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (hd_lo : S.D / 10 ≤ d) (hd_hi : d ≤ 18 * S.D) :
+    (1 / (20000 * 5 * 18 ^ 9) : ℝ) * (S.F / S.D ^ 6) ≤
+        |iteratedDeriv 6 (fun t => Ffun P.X a t) d| ∧
+      |iteratedDeriv 6 (fun t => Ffun P.X a t) d| ≤
+        (197009794800 * 11 * 10 ^ 9 : ℝ) * (S.F / S.D ^ 6) := by
+  have hX := P.X_pos
+  have hApos : 0 < S.A := by
+    rw [show S.A = S.Δ * S.Ω from rfl]
+    exact mul_pos S.Δ_pos S.Ω_pos
+  have hDpos : 0 < S.D := S.D_pos
+  have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
+  have hd0 : 0 < d := lt_of_lt_of_le (by positivity : 0 < S.D / 10) hd_lo
+  have had : a ≤ 11 * d := by nlinarith [ha_hi, hAD, hd_lo]
+  have hXA : P.X * S.A / S.D ^ 9 = S.F / S.D ^ 6 := by
+    have hH := P.H_pos; have hG := P.G_pos; have hΔ := S.Δ_pos; have hΩ := S.Ω_pos
+    rw [Scale.A, Scale.D, Scale.F, P.X_eq_G_mul_H_pow_five]
+    field_simp
+  obtain ⟨hloc, hloc_hi⟩ := Ffun_deriv6_abs_bounds hX ha0 hd0 had
+  constructor
+  · refine le_trans ?_ hloc
+    rw [← hXA]
+    rw [show (1 / (20000 * 5 * 18 ^ 9) : ℝ) * (P.X * S.A / S.D ^ 9)
+        = P.X * S.A / ((20000 * 5 * 18 ^ 9) * S.D ^ 9) by field_simp]
+    rw [div_le_div_iff₀ (by positivity : 0 < (20000 * 5 * 18 ^ 9 : ℝ) * S.D ^ 9)
+      (by positivity : 0 < 20000 * d ^ 9)]
+    have hd9 : d ^ 9 ≤ (18 * S.D) ^ 9 := pow_le_pow_left₀ hd0.le hd_hi 9
+    have ha5 : S.A ≤ 5 * a := by linarith
+    have hprod : S.A * d ^ 9 ≤ (5 * a) * (18 * S.D) ^ 9 :=
+      mul_le_mul ha5 hd9 (by positivity) (by positivity)
+    nlinarith [hprod, hX, hApos, hDpos]
+  · refine le_trans hloc_hi ?_
+    rw [← hXA]
+    rw [show (197009794800 * 11 * 10 ^ 9 : ℝ) * (P.X * S.A / S.D ^ 9)
+        = (197009794800 * 11 * 10 ^ 9) * P.X * S.A / S.D ^ 9 by ring]
+    rw [div_le_div_iff₀ (by positivity : 0 < d ^ 9) (by positivity : 0 < S.D ^ 9)]
+    have hd9 : (S.D / 10) ^ 9 ≤ d ^ 9 := pow_le_pow_left₀ (by positivity) hd_lo 9
+    have hD9 : S.D ^ 9 ≤ 10 ^ 9 * d ^ 9 := by nlinarith [hd9, hDpos]
+    have hprod : a * S.D ^ 9 ≤ (11 * S.A) * (10 ^ 9 * d ^ 9) :=
+      mul_le_mul ha_hi hD9 (by positivity) (by positivity)
     nlinarith [hprod, hX, hApos, hDpos]
 
 end Squarefree
