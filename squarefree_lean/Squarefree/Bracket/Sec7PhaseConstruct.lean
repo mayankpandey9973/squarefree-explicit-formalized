@@ -4,7 +4,7 @@ import Squarefree.Bracket.Sec7MonExpData
 import Squarefree.Lower.Sec7DBreveScale
 import Squarefree.Lower.DefectDeriv5
 import Squarefree.Lower.Sec7DtildeWide
-import Squarefree.Lower.Sec7RaResidual
+import Squarefree.Lower.Sec7RaB1Tower
 import Squarefree.Lower.Sec7RaCompose
 import Squarefree.Opt.OnStripAux
 import Squarefree.Opt.StripRegimePack
