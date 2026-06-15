@@ -1209,6 +1209,123 @@ private theorem sec7_phase_rpow_neg_quarter_upper {x b : ℝ} {q : ℕ}
   rw [Real.rpow_neg hx.le]
   simpa [one_div] using (one_div_le_one_div hxq hb).2 h
 
+private theorem sec7_phase_rpow_neg_nat_lower {x b : ℝ} {q : ℕ}
+    (hx : 0 < x) (hb : 0 < b) (h : x ^ q ≤ b) :
+    1 / b ≤ x ^ (-(q : ℝ)) := by
+  have hxq : 0 < x ^ (q : ℝ) := Real.rpow_pos_of_pos hx _
+  have h' : x ^ (q : ℝ) ≤ b := by
+    simpa [Real.rpow_natCast] using h
+  rw [Real.rpow_neg hx.le]
+  simpa [one_div] using (one_div_le_one_div hb hxq).2 h'
+
+private theorem sec7_phase_rpow_neg_nat_upper {x b : ℝ} {q : ℕ}
+    (hx : 0 < x) (hb : 0 < b) (h : b ≤ x ^ q) :
+    x ^ (-(q : ℝ)) ≤ 1 / b := by
+  have hxq : 0 < x ^ (q : ℝ) := Real.rpow_pos_of_pos hx _
+  have h' : b ≤ x ^ (q : ℝ) := by
+    simpa [Real.rpow_natCast] using h
+  rw [Real.rpow_neg hx.le]
+  simpa [one_div] using (one_div_le_one_div hxq hb).2 h'
+
+private theorem sec7_phase_f1D_rpow_factor_bounds {P : Globals} {S : Scale P}
+    {W r : ℝ} {m : ℕ}
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hm : m ≤ 3) (hr : r ∈ sec7_rWin S W) :
+    1 / (10 : ℝ) ^ 7 ≤ (r / S.R) ^ (-(1 : ℝ) - m) ∧
+      (r / S.R) ^ (-(1 : ℝ) - m) ≤ (10 : ℝ) ^ 9 := by
+  have hR : 0 < S.R := sec7_R_pos S
+  have hcore := sec7_phase_rWin_core Env hW c₀ Cu hsd hr
+  set y : ℝ := r / S.R with hydef
+  have hypos : 0 < y := by
+    rw [hydef]
+    exact div_pos (sec7_phase_rWin_pos Env hW c₀ Cu hsd r hr) hR
+  have hy0 : 0 ≤ y := hypos.le
+  have hylo : (107 / 18000 : ℝ) ≤ y := by
+    rw [hydef, le_div_iff₀ hR]
+    simpa [mul_assoc] using hcore.1
+  have hyhi : y ≤ (40001 / 1000 : ℝ) := by
+    rw [hydef, div_le_iff₀ hR]
+    simpa [mul_assoc] using hcore.2
+  interval_cases m
+  · have hpowhi : y ^ 1 ≤ (10 : ℝ) ^ 7 := by
+      have : y ≤ (40001 / 1000 : ℝ) := hyhi
+      norm_num at this ⊢
+      exact le_trans this (by norm_num)
+    have hlo := sec7_phase_rpow_neg_nat_lower (x := y) (b := (10 : ℝ) ^ 7)
+      (q := 1) hypos (by positivity) hpowhi
+    have hpowlo : (1 / (10 : ℝ) ^ 9) ≤ y ^ 1 := by
+      have : (1 / (10 : ℝ) ^ 9) ≤ (107 / 18000 : ℝ) := by norm_num
+      exact le_trans this (by simpa using hylo)
+    have hhi₀ := sec7_phase_rpow_neg_nat_upper (x := y)
+      (b := 1 / (10 : ℝ) ^ 9) (q := 1) hypos (by positivity) hpowlo
+    have hhi : y ^ (-(1 : ℝ)) ≤ (10 : ℝ) ^ 9 := by
+      norm_num at hhi₀ ⊢
+      exact hhi₀
+    constructor
+    · simpa [show (-(1 : ℝ) - (0 : ℕ)) = -(1 : ℝ) by norm_num] using hlo
+    · simpa [show (-(1 : ℝ) - (0 : ℕ)) = -(1 : ℝ) by norm_num] using hhi
+  · have hpowhi : y ^ 2 ≤ (10 : ℝ) ^ 7 := by
+      have hbase : y ^ 2 ≤ (40001 / 1000 : ℝ) ^ 2 :=
+        pow_le_pow_left₀ hy0 hyhi 2
+      exact le_trans hbase (by norm_num)
+    have hlo := sec7_phase_rpow_neg_nat_lower (x := y) (b := (10 : ℝ) ^ 7)
+      (q := 2) hypos (by positivity) hpowhi
+    have hpowlo : (1 / (10 : ℝ) ^ 9) ≤ y ^ 2 := by
+      have hbase : (107 / 18000 : ℝ) ^ 2 ≤ y ^ 2 :=
+        pow_le_pow_left₀ (by norm_num) hylo 2
+      exact le_trans (by norm_num) hbase
+    have hhi₀ := sec7_phase_rpow_neg_nat_upper (x := y)
+      (b := 1 / (10 : ℝ) ^ 9) (q := 2) hypos (by positivity) hpowlo
+    have hhi : y ^ (-(2 : ℝ)) ≤ (10 : ℝ) ^ 9 := by
+      norm_num at hhi₀ ⊢
+      exact hhi₀
+    constructor
+    · rw [show (-(1 : ℝ) - ((1 : ℕ) : ℝ)) = -(2 : ℝ) by norm_num]
+      exact hlo
+    · rw [show (-(1 : ℝ) - ((1 : ℕ) : ℝ)) = -(2 : ℝ) by norm_num]
+      exact hhi
+  · have hpowhi : y ^ 3 ≤ (10 : ℝ) ^ 7 := by
+      have hbase : y ^ 3 ≤ (40001 / 1000 : ℝ) ^ 3 :=
+        pow_le_pow_left₀ hy0 hyhi 3
+      exact le_trans hbase (by norm_num)
+    have hlo := sec7_phase_rpow_neg_nat_lower (x := y) (b := (10 : ℝ) ^ 7)
+      (q := 3) hypos (by positivity) hpowhi
+    have hpowlo : (1 / (10 : ℝ) ^ 9) ≤ y ^ 3 := by
+      have hbase : (107 / 18000 : ℝ) ^ 3 ≤ y ^ 3 :=
+        pow_le_pow_left₀ (by norm_num) hylo 3
+      exact le_trans (by norm_num) hbase
+    have hhi₀ := sec7_phase_rpow_neg_nat_upper (x := y)
+      (b := 1 / (10 : ℝ) ^ 9) (q := 3) hypos (by positivity) hpowlo
+    have hhi : y ^ (-(3 : ℝ)) ≤ (10 : ℝ) ^ 9 := by
+      norm_num at hhi₀ ⊢
+      exact hhi₀
+    constructor
+    · rw [show (-(1 : ℝ) - ((2 : ℕ) : ℝ)) = -(3 : ℝ) by norm_num]
+      exact hlo
+    · rw [show (-(1 : ℝ) - ((2 : ℕ) : ℝ)) = -(3 : ℝ) by norm_num]
+      exact hhi
+  · have hpowhi : y ^ 4 ≤ (10 : ℝ) ^ 7 := by
+      have hbase : y ^ 4 ≤ (40001 / 1000 : ℝ) ^ 4 :=
+        pow_le_pow_left₀ hy0 hyhi 4
+      exact le_trans hbase (by norm_num)
+    have hlo := sec7_phase_rpow_neg_nat_lower (x := y) (b := (10 : ℝ) ^ 7)
+      (q := 4) hypos (by positivity) hpowhi
+    have hpowlo : (1 / (10 : ℝ) ^ 9) ≤ y ^ 4 := by
+      have hbase : (107 / 18000 : ℝ) ^ 4 ≤ y ^ 4 :=
+        pow_le_pow_left₀ (by norm_num) hylo 4
+      exact le_trans (by norm_num) hbase
+    have hhi₀ := sec7_phase_rpow_neg_nat_upper (x := y)
+      (b := 1 / (10 : ℝ) ^ 9) (q := 4) hypos (by positivity) hpowlo
+    have hhi : y ^ (-(4 : ℝ)) ≤ (10 : ℝ) ^ 9 := by
+      norm_num at hhi₀ ⊢
+      exact hhi₀
+    constructor
+    · rw [show (-(1 : ℝ) - ((3 : ℕ) : ℝ)) = -(4 : ℝ) by norm_num]
+      exact hlo
+    · rw [show (-(1 : ℝ) - ((3 : ℕ) : ℝ)) = -(4 : ℝ) by norm_num]
+      exact hhi
+
 private theorem sec7_phase_f2D_rpow_factor_bounds {P : Globals} {S : Scale P}
     {W r : ℝ} {m : ℕ}
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
@@ -1396,6 +1513,365 @@ private theorem sec7_phase_f2D_monomial_scale {P : Globals} {S : Scale P}
             rw [habs]
       _ ≤ (4 * (S.T₂ / S.R ^ m)) * (10 : ℝ) ^ 6 := hstep
       _ ≤ (10 : ℝ) ^ 8 * (S.T₂ / S.R ^ m) := by
+            nlinarith [hB0]
+
+private theorem sec7_phase_f1D_monomial_scale {P : Globals} {S : Scale P}
+    {W : ℝ} {a j : ℤ} {m : ℕ} {r : ℝ}
+    (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hm : m ≤ 3) (hr : r ∈ sec7_rWin S W) :
+    (1 / (10 : ℝ) ^ 9) * (S.T₁ / S.R ^ m) ≤
+        |sec7_powMonD S.R (sec7_phase_ra_c₁ P S a j * S.T₁)
+          (-(1 : ℝ)) m r| ∧
+      |sec7_powMonD S.R (sec7_phase_ra_c₁ P S a j * S.T₁)
+          (-(1 : ℝ)) m r| ≤
+        (6 * (10 : ℝ) ^ 9) * (S.T₁ / S.R ^ m) := by
+  have hR : 0 < S.R := sec7_R_pos S
+  have hT : 0 < S.T₁ := sec7_T₁_pos S
+  have hApos : 0 < S.A := by
+    have hΔ : 0 < S.Δ := S.Δ_pos
+    have hΩ : 0 < S.Ω := S.Ω_pos
+    unfold Scale.A
+    positivity
+  have hr0 : 0 < r := sec7_phase_rWin_pos Env hW c₀ Cu hsd r hr
+  have hypos : 0 < r / S.R := div_pos hr0 hR
+  have hfacpos :
+      0 < (r / S.R) ^ (-(1 : ℝ) - m) := Real.rpow_pos_of_pos hypos _
+  have hB0 : 0 ≤ S.T₁ / S.R ^ m := by positivity
+  have hc_lo : 1 / 16 ≤ |sec7_phase_ra_c₁ P S a j| :=
+    sec7_phase_ra_c₁_window_lo (P := P) (S := S) (a := a) (j := j) ha_lo
+  have hc_hi : |sec7_phase_ra_c₁ P S a j| ≤ 1 := by
+    have hs_lo : (1 : ℝ) ≤ (a : ℝ) / S.A := by
+      rw [le_div_iff₀ hApos]
+      simpa using ha_lo
+    have hs_nonneg : 0 ≤ (a : ℝ) / S.A := le_trans zero_le_one hs_lo
+    have hs_hi : (a : ℝ) / S.A ≤ 2 := by
+      rw [div_le_iff₀ hApos]
+      simpa using ha_hi
+    have hsq_le : ((a : ℝ) / S.A) ^ 2 ≤ (2 : ℝ) ^ 2 :=
+      pow_le_pow_left₀ hs_nonneg hs_hi 2
+    rw [sec7_phase_ra_c₁, abs_of_nonneg (by positivity :
+      0 ≤ (1 / 6 : ℝ) * ((a : ℝ) / S.A) ^ 2)]
+    nlinarith
+  have haprod_lo : 1 ≤ |sec7_aprod (-(1 : ℝ)) m| := by
+    interval_cases m <;> norm_num [sec7_aprod]
+  have haprod_hi : |sec7_aprod (-(1 : ℝ)) m| ≤ 6 := by
+    interval_cases m <;> norm_num [sec7_aprod]
+  have hfac := sec7_phase_f1D_rpow_factor_bounds (P := P) (S := S)
+    (W := W) (r := r) (m := m) Env hW c₀ Cu hsd hm hr
+  have habs :
+      |sec7_powMonD S.R (sec7_phase_ra_c₁ P S a j * S.T₁)
+          (-(1 : ℝ)) m r| =
+        |sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m| *
+          (S.T₁ / S.R ^ m) * (r / S.R) ^ (-(1 : ℝ) - m) := by
+    unfold sec7_powMonD sec7_powMon
+    rw [abs_mul, abs_div, abs_mul, abs_mul, abs_of_pos hT,
+      abs_of_pos (pow_pos hR m), abs_of_pos hfacpos]
+    ring
+  have hcoef_lo :
+      1 / 16 ≤ |sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m| := by
+    nlinarith [hc_lo, haprod_lo, abs_nonneg (sec7_phase_ra_c₁ P S a j),
+      abs_nonneg (sec7_aprod (-(1 : ℝ)) m)]
+  have hcoef_hi :
+      |sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m| ≤ 6 := by
+    nlinarith [hc_hi, haprod_hi, abs_nonneg (sec7_phase_ra_c₁ P S a j),
+      abs_nonneg (sec7_aprod (-(1 : ℝ)) m)]
+  constructor
+  · have hcoefB :
+        (1 / 16) * (S.T₁ / S.R ^ m) ≤
+          (|sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m|) *
+            (S.T₁ / S.R ^ m) :=
+      mul_le_mul_of_nonneg_right hcoef_lo hB0
+    have hstep :
+        ((|sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m|) *
+            (S.T₁ / S.R ^ m)) * (1 / (10 : ℝ) ^ 7) ≤
+          ((|sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m|) *
+            (S.T₁ / S.R ^ m)) * (r / S.R) ^ (-(1 : ℝ) - m) := by
+      exact mul_le_mul_of_nonneg_left hfac.1 (by positivity)
+    calc
+      (1 / (10 : ℝ) ^ 9) * (S.T₁ / S.R ^ m)
+          ≤ ((1 / 16) * (1 / (10 : ℝ) ^ 7)) * (S.T₁ / S.R ^ m) := by
+            exact mul_le_mul_of_nonneg_right (by norm_num) hB0
+      _ = ((1 / 16) * (S.T₁ / S.R ^ m)) *
+              (1 / (10 : ℝ) ^ 7) := by ring
+      _ ≤ ((|sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m|) *
+              (S.T₁ / S.R ^ m)) * (1 / (10 : ℝ) ^ 7) :=
+            mul_le_mul_of_nonneg_right hcoefB (by positivity)
+      _ ≤ ((|sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m|) *
+              (S.T₁ / S.R ^ m)) * (r / S.R) ^ (-(1 : ℝ) - m) := hstep
+      _ = |sec7_powMonD S.R (sec7_phase_ra_c₁ P S a j * S.T₁)
+            (-(1 : ℝ)) m r| := by
+            rw [habs]
+  · have hcoefB :
+        (|sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m|) *
+            (S.T₁ / S.R ^ m) ≤
+          6 * (S.T₁ / S.R ^ m) :=
+      mul_le_mul_of_nonneg_right hcoef_hi hB0
+    have hstep :
+        ((|sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m|) *
+            (S.T₁ / S.R ^ m)) *
+            (r / S.R) ^ (-(1 : ℝ) - m) ≤
+          (6 * (S.T₁ / S.R ^ m)) * (10 : ℝ) ^ 9 := by
+      exact mul_le_mul hcoefB hfac.2 (by positivity) (by positivity)
+    calc
+      |sec7_powMonD S.R (sec7_phase_ra_c₁ P S a j * S.T₁)
+          (-(1 : ℝ)) m r|
+          = ((|sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m|) *
+              (S.T₁ / S.R ^ m)) * (r / S.R) ^ (-(1 : ℝ) - m) := by
+            rw [habs]
+      _ ≤ (6 * (S.T₁ / S.R ^ m)) * (10 : ℝ) ^ 9 := hstep
+      _ = (6 * (10 : ℝ) ^ 9) * (S.T₁ / S.R ^ m) := by ring
+
+private theorem sec7_phase_f3D_rpow_factor_bounds {P : Globals} {S : Scale P}
+    {W r : ℝ} {m : ℕ}
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hm : m ≤ 3) (hr : r ∈ sec7_rWin S W) :
+    1 / (10 : ℝ) ^ 6 ≤ (r / S.R) ^ (-(1 : ℝ) / 4 - m) ∧
+      (r / S.R) ^ (-(1 : ℝ) / 4 - m) ≤ (10 : ℝ) ^ 8 := by
+  have hR : 0 < S.R := sec7_R_pos S
+  have hcore := sec7_phase_rWin_core Env hW c₀ Cu hsd hr
+  set y : ℝ := r / S.R with hydef
+  have hypos : 0 < y := by
+    rw [hydef]
+    exact div_pos (sec7_phase_rWin_pos Env hW c₀ Cu hsd r hr) hR
+  have hy0 : 0 ≤ y := hypos.le
+  have hylo : (1 / 200 : ℝ) ≤ y := by
+    rw [hydef, le_div_iff₀ hR]
+    nlinarith [hcore.1]
+  have hyhi : y ≤ (41 : ℝ) := by
+    rw [hydef, div_le_iff₀ hR]
+    nlinarith [hcore.2]
+  interval_cases m
+  · have hpowhi : y ^ 1 ≤ ((10 : ℝ) ^ 6) ^ 4 := by
+      have : y ≤ (41 : ℝ) := hyhi
+      norm_num at this ⊢
+      exact le_trans this (by norm_num)
+    have hqhi := sec7_phase_rpow_quarter_le (x := y) (b := (10 : ℝ) ^ 6)
+      (q := 1) hy0 (by positivity) hpowhi
+    have hlo := sec7_phase_rpow_neg_quarter_lower (x := y) (b := (10 : ℝ) ^ 6)
+      (q := 1) hypos (by positivity) hqhi
+    have hpowlo : (1 / (10 : ℝ) ^ 8) ^ 4 ≤ y ^ 1 := by
+      have : (1 / (10 : ℝ) ^ 8) ^ 4 ≤ (1 / 200 : ℝ) := by norm_num
+      exact le_trans this (by simpa using hylo)
+    have hqlo := sec7_phase_le_rpow_quarter (x := y) (b := 1 / (10 : ℝ) ^ 8)
+      (q := 1) hy0 (by positivity) hpowlo
+    have hhi₀ := sec7_phase_rpow_neg_quarter_upper (x := y)
+      (b := 1 / (10 : ℝ) ^ 8) (q := 1) hypos (by positivity) hqlo
+    have hhi : y ^ (-((1 : ℝ) / 4)) ≤ (10 : ℝ) ^ 8 := by
+      simpa using hhi₀
+    constructor
+    · convert hlo using 2 <;> ring
+    · convert hhi using 2 <;> ring
+  · have hpowhi : y ^ 5 ≤ ((10 : ℝ) ^ 6) ^ 4 := by
+      have hbase : y ^ 5 ≤ (41 : ℝ) ^ 5 := pow_le_pow_left₀ hy0 hyhi 5
+      exact le_trans hbase (by norm_num)
+    have hqhi := sec7_phase_rpow_quarter_le (x := y) (b := (10 : ℝ) ^ 6)
+      (q := 5) hy0 (by positivity) hpowhi
+    have hlo := sec7_phase_rpow_neg_quarter_lower (x := y) (b := (10 : ℝ) ^ 6)
+      (q := 5) hypos (by positivity) hqhi
+    have hpowlo : (1 / (10 : ℝ) ^ 8) ^ 4 ≤ y ^ 5 := by
+      have hbase : (1 / 200 : ℝ) ^ 5 ≤ y ^ 5 :=
+        pow_le_pow_left₀ (by norm_num) hylo 5
+      exact le_trans (by norm_num) hbase
+    have hqlo := sec7_phase_le_rpow_quarter (x := y) (b := 1 / (10 : ℝ) ^ 8)
+      (q := 5) hy0 (by positivity) hpowlo
+    have hhi₀ := sec7_phase_rpow_neg_quarter_upper (x := y)
+      (b := 1 / (10 : ℝ) ^ 8) (q := 5) hypos (by positivity) hqlo
+    have hhi : y ^ (-((5 : ℝ) / 4)) ≤ (10 : ℝ) ^ 8 := by
+      simpa using hhi₀
+    constructor
+    · convert hlo using 2 <;> ring
+    · convert hhi using 2 <;> ring
+  · have hpowhi : y ^ 9 ≤ ((10 : ℝ) ^ 6) ^ 4 := by
+      have hbase : y ^ 9 ≤ (41 : ℝ) ^ 9 := pow_le_pow_left₀ hy0 hyhi 9
+      exact le_trans hbase (by norm_num)
+    have hqhi := sec7_phase_rpow_quarter_le (x := y) (b := (10 : ℝ) ^ 6)
+      (q := 9) hy0 (by positivity) hpowhi
+    have hlo := sec7_phase_rpow_neg_quarter_lower (x := y) (b := (10 : ℝ) ^ 6)
+      (q := 9) hypos (by positivity) hqhi
+    have hpowlo : (1 / (10 : ℝ) ^ 8) ^ 4 ≤ y ^ 9 := by
+      have hbase : (1 / 200 : ℝ) ^ 9 ≤ y ^ 9 :=
+        pow_le_pow_left₀ (by norm_num) hylo 9
+      exact le_trans (by norm_num) hbase
+    have hqlo := sec7_phase_le_rpow_quarter (x := y) (b := 1 / (10 : ℝ) ^ 8)
+      (q := 9) hy0 (by positivity) hpowlo
+    have hhi₀ := sec7_phase_rpow_neg_quarter_upper (x := y)
+      (b := 1 / (10 : ℝ) ^ 8) (q := 9) hypos (by positivity) hqlo
+    have hhi : y ^ (-((9 : ℝ) / 4)) ≤ (10 : ℝ) ^ 8 := by
+      simpa using hhi₀
+    constructor
+    · convert hlo using 2 <;> ring
+    · convert hhi using 2 <;> ring
+  · have hpowhi : y ^ 13 ≤ ((10 : ℝ) ^ 6) ^ 4 := by
+      have hbase : y ^ 13 ≤ (41 : ℝ) ^ 13 := pow_le_pow_left₀ hy0 hyhi 13
+      exact le_trans hbase (by norm_num)
+    have hqhi := sec7_phase_rpow_quarter_le (x := y) (b := (10 : ℝ) ^ 6)
+      (q := 13) hy0 (by positivity) hpowhi
+    have hlo := sec7_phase_rpow_neg_quarter_lower (x := y) (b := (10 : ℝ) ^ 6)
+      (q := 13) hypos (by positivity) hqhi
+    have hpowlo : (1 / (10 : ℝ) ^ 8) ^ 4 ≤ y ^ 13 := by
+      have hbase : (1 / 200 : ℝ) ^ 13 ≤ y ^ 13 :=
+        pow_le_pow_left₀ (by norm_num) hylo 13
+      exact le_trans (by norm_num) hbase
+    have hqlo := sec7_phase_le_rpow_quarter (x := y) (b := 1 / (10 : ℝ) ^ 8)
+      (q := 13) hy0 (by positivity) hpowlo
+    have hhi₀ := sec7_phase_rpow_neg_quarter_upper (x := y)
+      (b := 1 / (10 : ℝ) ^ 8) (q := 13) hypos (by positivity) hqlo
+    have hhi : y ^ (-((13 : ℝ) / 4)) ≤ (10 : ℝ) ^ 8 := by
+      simpa using hhi₀
+    constructor
+    · convert hlo using 2 <;> ring
+    · convert hhi using 2 <;> ring
+
+private theorem sec7_phase_f3D_monomial_scale {P : Globals} {S : Scale P}
+    {W : ℝ} {a j : ℤ} {m : ℕ} {r : ℝ}
+    (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hm : m ≤ 3) (hr : r ∈ sec7_rWin S W) :
+    (1 / (10 : ℝ) ^ 9) * (S.T₃ / S.R ^ m) ≤
+        |sec7_powMonD S.R
+          (3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+          (-(1 : ℝ) / 4) m r| ∧
+      |sec7_powMonD S.R
+          (3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+          (-(1 : ℝ) / 4) m r| ≤
+        (5 * (10 : ℝ) ^ 9) * (S.T₃ / S.R ^ m) := by
+  have hR : 0 < S.R := sec7_R_pos S
+  have hT : 0 < S.T₃ := sec7_T₃_pos S
+  have hr0 : 0 < r := sec7_phase_rWin_pos Env hW c₀ Cu hsd r hr
+  have hypos : 0 < r / S.R := div_pos hr0 hR
+  have hfacpos :
+      0 < (r / S.R) ^ (-(1 : ℝ) / 4 - m) := Real.rpow_pos_of_pos hypos _
+  have hB0 : 0 ≤ S.T₃ / S.R ^ m := by positivity
+  have hc₁_lo : 1 / 16 ≤ |sec7_phase_ra_c₁ P S a j| :=
+    sec7_phase_ra_c₁_window_lo (P := P) (S := S) (a := a) (j := j) ha_lo
+  have hc₁_hi : |sec7_phase_ra_c₁ P S a j| ≤ 4 :=
+    sec7_phase_ra_c₁_window_hi (P := P) (S := S) (a := a) (j := j) ha_lo ha_hi
+  have hc₂_lo : 1 / 16 ≤ |sec7_phase_ra_c₂ P S a j| :=
+    sec7_phase_ra_c₂_window_lo (P := P) (S := S) (a := a) (j := j) ha_lo ha_hi
+  have hc₂_hi : |sec7_phase_ra_c₂ P S a j| ≤ 4 :=
+    sec7_phase_ra_c₂_window_hi (P := P) (S := S) (a := a) (j := j) ha_lo
+  have haprod_lo : 1 / 4 ≤ |sec7_aprod (-(1 : ℝ) / 4) m| := by
+    interval_cases m <;> norm_num [sec7_aprod]
+  have haprod_hi : |sec7_aprod (-(1 : ℝ) / 4) m| ≤ 1 := by
+    interval_cases m <;> norm_num [sec7_aprod]
+  have hfac := sec7_phase_f3D_rpow_factor_bounds (P := P) (S := S)
+    (W := W) (r := r) (m := m) Env hW c₀ Cu hsd hm hr
+  have habs :
+      |sec7_powMonD S.R
+          (3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+          (-(1 : ℝ) / 4) m r| =
+        |(3 : ℝ)| * |sec7_phase_ra_c₁ P S a j| * |sec7_phase_ra_c₂ P S a j| *
+          |sec7_aprod (-(1 : ℝ) / 4) m| *
+          (S.T₃ / S.R ^ m) * (r / S.R) ^ (-(1 : ℝ) / 4 - m) := by
+    unfold sec7_powMonD sec7_powMon
+    rw [abs_mul, abs_div, abs_mul, abs_mul, abs_mul, abs_mul,
+      abs_of_pos (by norm_num : (0 : ℝ) < 3), abs_of_pos hT,
+      abs_of_pos (pow_pos hR m), abs_of_pos hfacpos]
+    ring
+  have hcoef_lo :
+      1 / 1000 ≤
+        |(3 : ℝ)| * |sec7_phase_ra_c₁ P S a j| *
+          |sec7_phase_ra_c₂ P S a j| * |sec7_aprod (-(1 : ℝ) / 4) m| := by
+    have h3 : |(3 : ℝ)| = 3 := by norm_num
+    have hc12_lo :
+        1 / 256 ≤ |sec7_phase_ra_c₁ P S a j| * |sec7_phase_ra_c₂ P S a j| := by
+      nlinarith [hc₁_lo, hc₂_lo, abs_nonneg (sec7_phase_ra_c₁ P S a j),
+        abs_nonneg (sec7_phase_ra_c₂ P S a j)]
+    have hcap_lo :
+        1 / 1024 ≤
+          (|sec7_phase_ra_c₁ P S a j| * |sec7_phase_ra_c₂ P S a j|) *
+            |sec7_aprod (-(1 : ℝ) / 4) m| := by
+      nlinarith [hc12_lo, haprod_lo,
+        mul_nonneg (abs_nonneg (sec7_phase_ra_c₁ P S a j))
+          (abs_nonneg (sec7_phase_ra_c₂ P S a j)),
+        abs_nonneg (sec7_aprod (-(1 : ℝ) / 4) m)]
+    rw [h3]
+    calc
+      1 / 1000 ≤ 3 * (1 / 1024 : ℝ) := by norm_num
+      _ ≤ 3 * ((|sec7_phase_ra_c₁ P S a j| * |sec7_phase_ra_c₂ P S a j|) *
+            |sec7_aprod (-(1 : ℝ) / 4) m|) :=
+          mul_le_mul_of_nonneg_left hcap_lo (by norm_num)
+      _ = 3 * |sec7_phase_ra_c₁ P S a j| *
+            |sec7_phase_ra_c₂ P S a j| * |sec7_aprod (-(1 : ℝ) / 4) m| := by ring
+  have hcoef_hi :
+      |(3 : ℝ)| * |sec7_phase_ra_c₁ P S a j| *
+          |sec7_phase_ra_c₂ P S a j| * |sec7_aprod (-(1 : ℝ) / 4) m| ≤ 48 := by
+    have h3 : |(3 : ℝ)| = 3 := by norm_num
+    have hc12_hi :
+        |sec7_phase_ra_c₁ P S a j| * |sec7_phase_ra_c₂ P S a j| ≤ 16 := by
+      nlinarith [hc₁_hi, hc₂_hi, abs_nonneg (sec7_phase_ra_c₁ P S a j),
+        abs_nonneg (sec7_phase_ra_c₂ P S a j)]
+    have hcap_hi :
+        (|sec7_phase_ra_c₁ P S a j| * |sec7_phase_ra_c₂ P S a j|) *
+            |sec7_aprod (-(1 : ℝ) / 4) m| ≤ 16 := by
+      have h :=
+        mul_le_mul hc12_hi haprod_hi (abs_nonneg (sec7_aprod (-(1 : ℝ) / 4) m))
+          (by norm_num : (0 : ℝ) ≤ 16)
+      simpa using h
+    rw [h3]
+    calc
+      3 * |sec7_phase_ra_c₁ P S a j| *
+          |sec7_phase_ra_c₂ P S a j| * |sec7_aprod (-(1 : ℝ) / 4) m|
+          = 3 * ((|sec7_phase_ra_c₁ P S a j| * |sec7_phase_ra_c₂ P S a j|) *
+              |sec7_aprod (-(1 : ℝ) / 4) m|) := by ring
+      _ ≤ 3 * 16 := mul_le_mul_of_nonneg_left hcap_hi (by norm_num)
+      _ = 48 := by norm_num
+  constructor
+  · have hcoefB :
+        (1 / 1000) * (S.T₃ / S.R ^ m) ≤
+          (|(3 : ℝ)| * |sec7_phase_ra_c₁ P S a j| *
+            |sec7_phase_ra_c₂ P S a j| * |sec7_aprod (-(1 : ℝ) / 4) m|) *
+            (S.T₃ / S.R ^ m) :=
+      mul_le_mul_of_nonneg_right hcoef_lo hB0
+    have hstep :
+        ((|(3 : ℝ)| * |sec7_phase_ra_c₁ P S a j| *
+            |sec7_phase_ra_c₂ P S a j| * |sec7_aprod (-(1 : ℝ) / 4) m|) *
+            (S.T₃ / S.R ^ m)) * (1 / (10 : ℝ) ^ 6) ≤
+          ((|(3 : ℝ)| * |sec7_phase_ra_c₁ P S a j| *
+            |sec7_phase_ra_c₂ P S a j| * |sec7_aprod (-(1 : ℝ) / 4) m|) *
+            (S.T₃ / S.R ^ m)) * (r / S.R) ^ (-(1 : ℝ) / 4 - m) := by
+      exact mul_le_mul_of_nonneg_left hfac.1 (by positivity)
+    calc
+      (1 / (10 : ℝ) ^ 9) * (S.T₃ / S.R ^ m)
+          = ((1 / 1000) * (S.T₃ / S.R ^ m)) * (1 / (10 : ℝ) ^ 6) := by ring
+      _ ≤ ((|(3 : ℝ)| * |sec7_phase_ra_c₁ P S a j| *
+              |sec7_phase_ra_c₂ P S a j| * |sec7_aprod (-(1 : ℝ) / 4) m|) *
+              (S.T₃ / S.R ^ m)) * (1 / (10 : ℝ) ^ 6) :=
+            mul_le_mul_of_nonneg_right hcoefB (by positivity)
+      _ ≤ ((|(3 : ℝ)| * |sec7_phase_ra_c₁ P S a j| *
+              |sec7_phase_ra_c₂ P S a j| * |sec7_aprod (-(1 : ℝ) / 4) m|) *
+              (S.T₃ / S.R ^ m)) * (r / S.R) ^ (-(1 : ℝ) / 4 - m) := hstep
+      _ = |sec7_powMonD S.R
+            (3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+            (-(1 : ℝ) / 4) m r| := by
+            rw [habs]
+  · have hcoefB :
+        (|(3 : ℝ)| * |sec7_phase_ra_c₁ P S a j| *
+            |sec7_phase_ra_c₂ P S a j| * |sec7_aprod (-(1 : ℝ) / 4) m|) *
+            (S.T₃ / S.R ^ m) ≤
+          48 * (S.T₃ / S.R ^ m) :=
+      mul_le_mul_of_nonneg_right hcoef_hi hB0
+    have hstep :
+        ((|(3 : ℝ)| * |sec7_phase_ra_c₁ P S a j| *
+            |sec7_phase_ra_c₂ P S a j| * |sec7_aprod (-(1 : ℝ) / 4) m|) *
+            (S.T₃ / S.R ^ m)) *
+            (r / S.R) ^ (-(1 : ℝ) / 4 - m) ≤
+          (48 * (S.T₃ / S.R ^ m)) * (10 : ℝ) ^ 8 := by
+      exact mul_le_mul hcoefB hfac.2 (by positivity) (by positivity)
+    calc
+      |sec7_powMonD S.R
+          (3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+          (-(1 : ℝ) / 4) m r|
+          = ((|(3 : ℝ)| * |sec7_phase_ra_c₁ P S a j| *
+              |sec7_phase_ra_c₂ P S a j| * |sec7_aprod (-(1 : ℝ) / 4) m|) *
+              (S.T₃ / S.R ^ m)) * (r / S.R) ^ (-(1 : ℝ) / 4 - m) := by
+            rw [habs]
+      _ ≤ (48 * (S.T₃ / S.R ^ m)) * (10 : ℝ) ^ 8 := hstep
+      _ ≤ (5 * (10 : ℝ) ^ 9) * (S.T₃ / S.R ^ m) := by
             nlinarith [hB0]
 
 private theorem sec7_phase_ra_e₁_base_contDiffAt5 {P : Globals} {S : Scale P} {W : ℝ}
@@ -2539,6 +3015,66 @@ private theorem sec7_phase_f2D_eq_powMonD_add_ra_e₂D {P : Globals} {S : Scale 
             simp [sec7_phase_f2D]
   linarith
 
+private theorem sec7_phase_f1D_eq_powMonD_add_ra_e₁D {P : Globals} {S : Scale P}
+    {W : ℝ} {a j : ℤ} {m : ℕ} {r : ℝ} (ha : 0 < a)
+    (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
+    (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hj : sec7_jBand P S j) (hm : m ≤ 5) (hr : r ∈ sec7_rWinWide S W) :
+    sec7_phase_f1D P S a j m r =
+      sec7_powMonD S.R (sec7_phase_ra_c₁ P S a j * S.T₁) (-(1 : ℝ)) m r +
+        sec7_phase_ra_e₁D P S a j m r := by
+  have hbase5 : ContDiffAt ℝ 5 (fun t => sec7_phase_f1D P S a j 0 t) r := by
+    have hbase : ContDiffAt ℝ 5
+        (fun x => -sec7_phase_dBreve' P a (sec7_phase_ftil P S a x + (j : ℝ))) r :=
+      sec7_phase_f1_base_contDiffAt5 (P := P) (S := S) (W := W) (a := a) (j := j)
+        (r := r) ha hAD hG1 (sec7_phase_a_lo_wide ha_lo)
+        (sec7_phase_a_hi_wide ha_hi) Env hW c₀ Cu hsd hj hr
+    simpa [sec7_phase_f1D] using hbase
+  have hr0 : 0 < r := sec7_phase_rWinWide_pos Env hW c₀ Cu hsd r hr
+  have hpow5 : ContDiffAt ℝ 5
+      (fun t : ℝ => (t / S.R) ^ (-(1 : ℝ))) r :=
+    sec7_phase_rpow_div_contDiffAt5 (P := P) (S := S) (r := r)
+      (α := (-(1 : ℝ))) hr0
+  have hmon5 : ContDiffAt ℝ 5
+      (fun t : ℝ => sec7_phase_ra_c₁ P S a j * S.T₁ *
+        (t / S.R) ^ (-(1 : ℝ))) r := by
+    simpa [mul_assoc] using
+      ((contDiffAt_const :
+        ContDiffAt ℝ 5 (fun _ : ℝ => sec7_phase_ra_c₁ P S a j * S.T₁) r).mul hpow5)
+  have hsub := iteratedDeriv_fun_sub (n := m)
+    (f := fun t : ℝ => sec7_phase_f1D P S a j 0 t)
+    (g := fun t : ℝ => sec7_phase_ra_c₁ P S a j * S.T₁ *
+      (t / S.R) ^ (-(1 : ℝ)))
+    (x := r) (hbase5.of_le (by exact_mod_cast hm)) (hmon5.of_le (by exact_mod_cast hm))
+  have hmonDeriv :
+      iteratedDeriv m
+        (fun t : ℝ => sec7_phase_ra_c₁ P S a j * S.T₁ *
+          (t / S.R) ^ (-(1 : ℝ))) r =
+        sec7_powMonD S.R (sec7_phase_ra_c₁ P S a j * S.T₁) (-(1 : ℝ)) m r :=
+    sec7_phase_powMon_iteratedDeriv_eq (P := P) (S := S)
+      (c := sec7_phase_ra_c₁ P S a j * S.T₁) (α := (-(1 : ℝ))) m hr0
+  have hres :
+      sec7_phase_ra_e₁D P S a j m r =
+        sec7_phase_f1D P S a j m r -
+          sec7_powMonD S.R (sec7_phase_ra_c₁ P S a j * S.T₁) (-(1 : ℝ)) m r := by
+    calc
+      sec7_phase_ra_e₁D P S a j m r =
+          iteratedDeriv m
+            (fun t : ℝ => sec7_phase_f1D P S a j 0 t -
+              sec7_phase_ra_c₁ P S a j * S.T₁ * (t / S.R) ^ (-(1 : ℝ))) r := by
+            rfl
+      _ = iteratedDeriv m (fun t : ℝ => sec7_phase_f1D P S a j 0 t) r -
+          iteratedDeriv m
+            (fun t : ℝ => sec7_phase_ra_c₁ P S a j * S.T₁ *
+              (t / S.R) ^ (-(1 : ℝ))) r := hsub
+      _ = sec7_phase_f1D P S a j m r -
+          sec7_powMonD S.R (sec7_phase_ra_c₁ P S a j * S.T₁) (-(1 : ℝ)) m r := by
+            rw [hmonDeriv]
+            simp [sec7_phase_f1D]
+  linarith
+
 /-- Graded expansion error for `f₃`, defined as derivatives of the genuine grade-0 residual. -/
 noncomputable def sec7_phase_ra_e₃D (P : Globals) (S : Scale P) (a : ℤ) :
     ℤ → ℕ → ℝ → ℝ := fun j m =>
@@ -2547,6 +3083,78 @@ noncomputable def sec7_phase_ra_e₃D (P : Globals) (S : Scale P) (a : ℤ) :
         - 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
             * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4)
     )
+
+private theorem sec7_phase_f3D_eq_powMonD_add_ra_e₃D {P : Globals} {S : Scale P}
+    {W : ℝ} {a j : ℤ} {m : ℕ} {r : ℝ} (ha : 0 < a)
+    (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
+    (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hj : sec7_jBand P S j) (hm : m ≤ 5) (hr : r ∈ sec7_rWinWide S W) :
+    sec7_phase_f3D P S a j m r =
+      sec7_powMonD S.R
+        (3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+        (-(1 : ℝ) / 4) m r +
+        sec7_phase_ra_e₃D P S a j m r := by
+  have hbase5 : ContDiffAt ℝ 5 (fun t => sec7_phase_f3D P S a j 0 t) r := by
+    have hbase : ContDiffAt ℝ 5
+        (fun x => sec7_phase_dBreve P a (sec7_phase_ftil P S a x + (j : ℝ))) r :=
+      sec7_phase_f3_base_contDiffAt5 (P := P) (S := S) (W := W) (a := a) (j := j)
+        (r := r) ha hAD hG1 (sec7_phase_a_lo_wide ha_lo)
+        (sec7_phase_a_hi_wide ha_hi) Env hW c₀ Cu hsd hj hr
+    simpa [sec7_phase_f3D] using hbase
+  have hr0 : 0 < r := sec7_phase_rWinWide_pos Env hW c₀ Cu hsd r hr
+  have hpow5 : ContDiffAt ℝ 5
+      (fun t : ℝ => (t / S.R) ^ (-(1 : ℝ) / 4)) r :=
+    sec7_phase_rpow_div_contDiffAt5 (P := P) (S := S) (r := r)
+      (α := (-(1 : ℝ) / 4)) hr0
+  have hmon5 : ContDiffAt ℝ 5
+      (fun t : ℝ => 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
+        * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4)) r := by
+    simpa [mul_assoc] using
+      ((contDiffAt_const :
+        ContDiffAt ℝ 5
+          (fun _ : ℝ =>
+            3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃) r).mul hpow5)
+  have hsub := iteratedDeriv_fun_sub (n := m)
+    (f := fun t : ℝ => sec7_phase_f3D P S a j 0 t)
+    (g := fun t : ℝ => 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
+      * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4))
+    (x := r) (hbase5.of_le (by exact_mod_cast hm)) (hmon5.of_le (by exact_mod_cast hm))
+  have hmonDeriv :
+      iteratedDeriv m
+        (fun t : ℝ => 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
+          * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4)) r =
+        sec7_powMonD S.R
+          (3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+          (-(1 : ℝ) / 4) m r :=
+    sec7_phase_powMon_iteratedDeriv_eq (P := P) (S := S)
+      (c := 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+      (α := (-(1 : ℝ) / 4)) m hr0
+  have hres :
+      sec7_phase_ra_e₃D P S a j m r =
+        sec7_phase_f3D P S a j m r -
+          sec7_powMonD S.R
+            (3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+            (-(1 : ℝ) / 4) m r := by
+    calc
+      sec7_phase_ra_e₃D P S a j m r =
+          iteratedDeriv m
+            (fun t : ℝ => sec7_phase_f3D P S a j 0 t -
+              3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
+                * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4)) r := by
+            rfl
+      _ = iteratedDeriv m (fun t : ℝ => sec7_phase_f3D P S a j 0 t) r -
+          iteratedDeriv m
+            (fun t : ℝ => 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
+              * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4)) r := hsub
+      _ = sec7_phase_f3D P S a j m r -
+          sec7_powMonD S.R
+            (3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+            (-(1 : ℝ) / 4) m r := by
+            rw [hmonDeriv]
+            simp [sec7_phase_f3D]
+  linarith
 
 /-- The one-variable residual after subtracting the §7 `f₂` principal term. -/
 private noncomputable def sec7_ra_rhoFun (X a : ℝ) : ℝ → ℝ :=
@@ -5012,6 +5620,76 @@ theorem sec7_ra_e₁D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
     simpa [sec7_phase_ra_e₁D, hres_deriv] using hcomp_deriv
   exact le_trans hnative (sec7_ra_e₁D_comp_scale_absorb (P := P) (S := S) (m := m) hm)
 
+private theorem sec7_phase_ra_e₁D_tiny {P : Globals} {S : Scale P} {W : ℝ}
+    {a j : ℤ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
+    (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
+    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1 / 100 : ℝ))
+    (hG10x : P.G * P.U ^ 10 ≤ S.x) (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
+    (hj : sec7_jBand P S j) {m : ℕ} {r : ℝ}
+    (hm : m ≤ 5) (hr : r ∈ sec7_rWinWide S W) :
+    |sec7_phase_ra_e₁D P S a j m r| ≤
+      (1 / (10 : ℝ) ^ 100) * (S.T₁ / S.R ^ m) := by
+  have hcore := sec7_ra_e₁D_core P S W a ha hAD hG1 ha_lo ha_hi
+    Env hW c₀ Cu hsd hbud hg0 hu0 hX24 hG10x hUbig j hj m hm r hr
+  have hrel143 : sec7_relErrF P S * 10 ^ 143 ≤ 1 :=
+    sec7_relErrF_le Env hW hsd hbud hg0 hu0 hX24
+  have hrel_le : sec7_relErrF P S ≤ 1 / (10 : ℝ) ^ 143 := by
+    rw [le_div_iff₀ (by positivity : (0 : ℝ) < (10 : ℝ) ^ 143)]
+    simpa [mul_comm] using hrel143
+  have hsmall : sec7_cExpIn * sec7_relErrF P S ≤ 1 / (10 : ℝ) ^ 100 := by
+    calc
+      sec7_cExpIn * sec7_relErrF P S
+          ≤ (10 ^ 25 : ℝ) * (1 / (10 : ℝ) ^ 143) := by
+            rw [sec7_cExpIn]
+            exact mul_le_mul_of_nonneg_left hrel_le (by positivity)
+      _ ≤ 1 / (10 : ℝ) ^ 100 := by norm_num
+  have hB0 : 0 ≤ S.T₁ / S.R ^ m :=
+    div_nonneg (sec7_T₁_pos S).le (pow_nonneg (sec7_R_pos S).le m)
+  calc
+    |sec7_phase_ra_e₁D P S a j m r|
+        ≤ sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErrF P S := hcore
+    _ = (sec7_cExpIn * sec7_relErrF P S) * (S.T₁ / S.R ^ m) := by ring
+    _ ≤ (1 / (10 : ℝ) ^ 100) * (S.T₁ / S.R ^ m) :=
+        mul_le_mul_of_nonneg_right hsmall hB0
+
+private theorem sec7_phase_ra_e₃D_tiny {P : Globals} {S : Scale P} {W : ℝ}
+    {a j : ℤ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
+    (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
+    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1 / 100 : ℝ))
+    (hG10x : P.G * P.U ^ 10 ≤ S.x) (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
+    (hj : sec7_jBand P S j) {m : ℕ} {r : ℝ}
+    (hm : m ≤ 5) (hr : r ∈ sec7_rWinWide S W) :
+    |sec7_phase_ra_e₃D P S a j m r| ≤
+      (1 / (10 : ℝ) ^ 100) * (S.T₃ / S.R ^ m) := by
+  have hcore := sec7_ra_e₃D_core P S W a ha hAD hG1 ha_lo ha_hi
+    Env hW c₀ Cu hsd hu0 hG10x hUbig j hj m hm r hr
+  have hrel143 : sec7_relErrF P S * 10 ^ 143 ≤ 1 :=
+    sec7_relErrF_le Env hW hsd hbud hg0 hu0 hX24
+  have hrel_le : sec7_relErrF P S ≤ 1 / (10 : ℝ) ^ 143 := by
+    rw [le_div_iff₀ (by positivity : (0 : ℝ) < (10 : ℝ) ^ 143)]
+    simpa [mul_comm] using hrel143
+  have hsmall : sec7_cExpIn * sec7_relErrF P S ≤ 1 / (10 : ℝ) ^ 100 := by
+    calc
+      sec7_cExpIn * sec7_relErrF P S
+          ≤ (10 ^ 25 : ℝ) * (1 / (10 : ℝ) ^ 143) := by
+            rw [sec7_cExpIn]
+            exact mul_le_mul_of_nonneg_left hrel_le (by positivity)
+      _ ≤ 1 / (10 : ℝ) ^ 100 := by norm_num
+  have hB0 : 0 ≤ S.T₃ / S.R ^ m :=
+    div_nonneg (sec7_T₃_pos S).le (pow_nonneg (sec7_R_pos S).le m)
+  calc
+    |sec7_phase_ra_e₃D P S a j m r|
+        ≤ sec7_cExpIn * (S.T₃ / S.R ^ m) * sec7_relErrF P S := hcore
+    _ = (sec7_cExpIn * sec7_relErrF P S) * (S.T₃ / S.R ^ m) := by ring
+    _ ≤ (1 / (10 : ℝ) ^ 100) * (S.T₃ / S.R ^ m) :=
+        mul_le_mul_of_nonneg_right hsmall hB0
+
 private theorem sec7_phase_ra_e₂D_tiny {P : Globals} {S : Scale P} {W : ℝ}
     {a : ℤ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
@@ -5159,11 +5837,93 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
         (g := fun x => sec7_phase_dBreve P a (sec7_phase_ftil P S a x + (j : ℝ)))
         (r := r) (m := m) hcd hm
   f1D_lo := by
-    -- TODO(N24-PHASE/f1-scale): prove `f₁^{(m)} ≍ T₁/R^m`.
-    sorry
+    intro j hj m hm r hr
+    have hmid : r ∈ sec7_rWinMid S W :=
+      sec7_rWin_subset_mid S (lt_of_lt_of_le zero_lt_one hW) hr
+    have hrwide : r ∈ sec7_rWinWide S W := by
+      have hshift : |(0 : ℝ)| ≤ 3 * (W + W ^ 2 + W ^ 4) := by
+        simp
+        positivity
+      simpa using sec7_mid_add_mem_wide (S := S) (W := W) (r := r) (s := 0) hmid hshift
+    let M : ℝ :=
+      sec7_powMonD S.R (sec7_phase_ra_c₁ P S a j * S.T₁) (-(1 : ℝ)) m r
+    let E : ℝ := sec7_phase_ra_e₁D P S a j m r
+    have hsplit : sec7_phase_f1D P S a j m r = M + E := by
+      simpa [M, E] using
+        sec7_phase_f1D_eq_powMonD_add_ra_e₁D (P := P) (S := S)
+          (W := W) (a := a) (j := j) (m := m) (r := r) ha hAD _hG1 ha_lo ha_hi
+          Env hW c₀ Cu hsd hj (le_trans hm (by norm_num)) hrwide
+    have hmono := (sec7_phase_f1D_monomial_scale (P := P) (S := S) (W := W)
+      (a := a) (j := j) (m := m) (r := r) ha_lo ha_hi Env hW c₀ Cu hsd hm hr).1
+    have hres := sec7_phase_ra_e₁D_tiny (P := P) (S := S) (W := W) (a := a)
+      (j := j) ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd hbud hg0 hu0 hX24
+      hG10x hUbig hj (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
+    have hB0 : 0 ≤ S.T₁ / S.R ^ m :=
+      div_nonneg (sec7_T₁_pos S).le (pow_nonneg (sec7_R_pos S).le m)
+    have htri : |M| ≤ |sec7_phase_f1D P S a j m r| + |E| := by
+      have hM : M = sec7_phase_f1D P S a j m r + (-E) := by
+        linarith [hsplit]
+      calc
+        |M| = |sec7_phase_f1D P S a j m r + (-E)| := by rw [hM]
+        _ ≤ |sec7_phase_f1D P S a j m r| + |-E| := abs_add_le _ _
+        _ = |sec7_phase_f1D P S a j m r| + |E| := by rw [abs_neg]
+    have hpre :
+        (1 / (10 : ℝ) ^ 10) * (S.T₁ / S.R ^ m) +
+          (1 / (10 : ℝ) ^ 100) * (S.T₁ / S.R ^ m) ≤
+        (1 / (10 : ℝ) ^ 9) * (S.T₁ / S.R ^ m) := by
+      calc
+        (1 / (10 : ℝ) ^ 10) * (S.T₁ / S.R ^ m) +
+            (1 / (10 : ℝ) ^ 100) * (S.T₁ / S.R ^ m)
+            = (1 / (10 : ℝ) ^ 10 + 1 / (10 : ℝ) ^ 100) *
+                (S.T₁ / S.R ^ m) := by ring
+        _ ≤ (1 / (10 : ℝ) ^ 9) * (S.T₁ / S.R ^ m) :=
+              mul_le_mul_of_nonneg_right (by norm_num) hB0
+    have hf_lower :
+        (1 / (10 : ℝ) ^ 10) * (S.T₁ / S.R ^ m) ≤
+          |sec7_phase_f1D P S a j m r| := by
+      have hmono' : (1 / (10 : ℝ) ^ 9) * (S.T₁ / S.R ^ m) ≤ |M| := by
+        simpa [M] using hmono
+      have hres' : |E| ≤ (1 / (10 : ℝ) ^ 100) * (S.T₁ / S.R ^ m) := by
+        simpa [E] using hres
+      nlinarith [hmono', hres', htri, hpre]
+    calc
+      S.T₁ / S.R ^ m =
+          (10 : ℝ) ^ 10 * ((1 / (10 : ℝ) ^ 10) * (S.T₁ / S.R ^ m)) := by ring
+      _ ≤ (10 : ℝ) ^ 10 * |sec7_phase_f1D P S a j m r| :=
+            mul_le_mul_of_nonneg_left hf_lower (by positivity)
+      _ ≤ sec7_cPh * |sec7_phase_f1D P S a j m r| :=
+            mul_le_mul_of_nonneg_right (by norm_num [sec7_cPh]) (abs_nonneg _)
   f1D_hi := by
-    -- TODO(N24-PHASE/f1-scale): prove `f₁^{(m)} ≍ T₁/R^m`.
-    sorry
+    intro j hj m hm r hr
+    have hmid : r ∈ sec7_rWinMid S W :=
+      sec7_rWin_subset_mid S (lt_of_lt_of_le zero_lt_one hW) hr
+    have hrwide : r ∈ sec7_rWinWide S W := by
+      have hshift : |(0 : ℝ)| ≤ 3 * (W + W ^ 2 + W ^ 4) := by
+        simp
+        positivity
+      simpa using sec7_mid_add_mem_wide (S := S) (W := W) (r := r) (s := 0) hmid hshift
+    have hsplit := sec7_phase_f1D_eq_powMonD_add_ra_e₁D (P := P) (S := S)
+      (W := W) (a := a) (j := j) (m := m) (r := r) ha hAD _hG1 ha_lo ha_hi
+      Env hW c₀ Cu hsd hj (le_trans hm (by norm_num)) hrwide
+    have hmono := (sec7_phase_f1D_monomial_scale (P := P) (S := S) (W := W)
+      (a := a) (j := j) (m := m) (r := r) ha_lo ha_hi Env hW c₀ Cu hsd hm hr).2
+    have hres := sec7_phase_ra_e₁D_tiny (P := P) (S := S) (W := W) (a := a)
+      (j := j) ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd hbud hg0 hu0 hX24
+      hG10x hUbig hj (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
+    have hB0 : 0 ≤ S.T₁ / S.R ^ m :=
+      div_nonneg (sec7_T₁_pos S).le (pow_nonneg (sec7_R_pos S).le m)
+    calc
+      |sec7_phase_f1D P S a j m r|
+          = |sec7_powMonD S.R (sec7_phase_ra_c₁ P S a j * S.T₁)
+              (-(1 : ℝ)) m r + sec7_phase_ra_e₁D P S a j m r| := by
+            rw [hsplit]
+      _ ≤ |sec7_powMonD S.R (sec7_phase_ra_c₁ P S a j * S.T₁)
+              (-(1 : ℝ)) m r| + |sec7_phase_ra_e₁D P S a j m r| := abs_add_le _ _
+      _ ≤ (6 * (10 : ℝ) ^ 9) * (S.T₁ / S.R ^ m) +
+            (1 / (10 : ℝ) ^ 100) * (S.T₁ / S.R ^ m) := add_le_add hmono hres
+      _ = (6 * (10 : ℝ) ^ 9 + 1 / (10 : ℝ) ^ 100) * (S.T₁ / S.R ^ m) := by ring
+      _ ≤ sec7_cPh * (S.T₁ / S.R ^ m) :=
+            mul_le_mul_of_nonneg_right (by norm_num [sec7_cPh]) hB0
   f2D_lo := by
     intro m hm r hr
     have hmid : r ∈ sec7_rWinMid S W :=
@@ -5253,11 +6013,97 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
       _ ≤ sec7_cPh * (S.T₂ / S.R ^ m) :=
             mul_le_mul_of_nonneg_right (by norm_num [sec7_cPh]) hB0
   f3D_lo := by
-    -- TODO(N24-PHASE/f3-scale): prove `f₃^{(m)} ≍ T₃/R^m`.
-    sorry
+    intro j hj m hm r hr
+    have hmid : r ∈ sec7_rWinMid S W :=
+      sec7_rWin_subset_mid S (lt_of_lt_of_le zero_lt_one hW) hr
+    have hrwide : r ∈ sec7_rWinWide S W := by
+      have hshift : |(0 : ℝ)| ≤ 3 * (W + W ^ 2 + W ^ 4) := by
+        simp
+        positivity
+      simpa using sec7_mid_add_mem_wide (S := S) (W := W) (r := r) (s := 0) hmid hshift
+    let M : ℝ :=
+      sec7_powMonD S.R
+        (3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+        (-(1 : ℝ) / 4) m r
+    let E : ℝ := sec7_phase_ra_e₃D P S a j m r
+    have hsplit : sec7_phase_f3D P S a j m r = M + E := by
+      simpa [M, E] using
+        sec7_phase_f3D_eq_powMonD_add_ra_e₃D (P := P) (S := S)
+          (W := W) (a := a) (j := j) (m := m) (r := r) ha hAD _hG1 ha_lo ha_hi
+          Env hW c₀ Cu hsd hj (le_trans hm (by norm_num)) hrwide
+    have hmono := (sec7_phase_f3D_monomial_scale (P := P) (S := S) (W := W)
+      (a := a) (j := j) (m := m) (r := r) ha_lo ha_hi Env hW c₀ Cu hsd hm hr).1
+    have hres := sec7_phase_ra_e₃D_tiny (P := P) (S := S) (W := W) (a := a)
+      (j := j) ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd hbud hg0 hu0 hX24
+      hG10x hUbig hj (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
+    have hB0 : 0 ≤ S.T₃ / S.R ^ m :=
+      div_nonneg (sec7_T₃_pos S).le (pow_nonneg (sec7_R_pos S).le m)
+    have htri : |M| ≤ |sec7_phase_f3D P S a j m r| + |E| := by
+      have hM : M = sec7_phase_f3D P S a j m r + (-E) := by
+        linarith [hsplit]
+      calc
+        |M| = |sec7_phase_f3D P S a j m r + (-E)| := by rw [hM]
+        _ ≤ |sec7_phase_f3D P S a j m r| + |-E| := abs_add_le _ _
+        _ = |sec7_phase_f3D P S a j m r| + |E| := by rw [abs_neg]
+    have hpre :
+        (1 / (10 : ℝ) ^ 10) * (S.T₃ / S.R ^ m) +
+          (1 / (10 : ℝ) ^ 100) * (S.T₃ / S.R ^ m) ≤
+        (1 / (10 : ℝ) ^ 9) * (S.T₃ / S.R ^ m) := by
+      calc
+        (1 / (10 : ℝ) ^ 10) * (S.T₃ / S.R ^ m) +
+            (1 / (10 : ℝ) ^ 100) * (S.T₃ / S.R ^ m)
+            = (1 / (10 : ℝ) ^ 10 + 1 / (10 : ℝ) ^ 100) *
+                (S.T₃ / S.R ^ m) := by ring
+        _ ≤ (1 / (10 : ℝ) ^ 9) * (S.T₃ / S.R ^ m) :=
+              mul_le_mul_of_nonneg_right (by norm_num) hB0
+    have hf_lower :
+        (1 / (10 : ℝ) ^ 10) * (S.T₃ / S.R ^ m) ≤
+          |sec7_phase_f3D P S a j m r| := by
+      have hmono' : (1 / (10 : ℝ) ^ 9) * (S.T₃ / S.R ^ m) ≤ |M| := by
+        simpa [M] using hmono
+      have hres' : |E| ≤ (1 / (10 : ℝ) ^ 100) * (S.T₃ / S.R ^ m) := by
+        simpa [E] using hres
+      nlinarith [hmono', hres', htri, hpre]
+    calc
+      S.T₃ / S.R ^ m =
+          (10 : ℝ) ^ 10 * ((1 / (10 : ℝ) ^ 10) * (S.T₃ / S.R ^ m)) := by ring
+      _ ≤ (10 : ℝ) ^ 10 * |sec7_phase_f3D P S a j m r| :=
+            mul_le_mul_of_nonneg_left hf_lower (by positivity)
+      _ ≤ sec7_cPh * |sec7_phase_f3D P S a j m r| :=
+            mul_le_mul_of_nonneg_right (by norm_num [sec7_cPh]) (abs_nonneg _)
   f3D_hi := by
-    -- TODO(N24-PHASE/f3-scale): prove `f₃^{(m)} ≍ T₃/R^m`.
-    sorry
+    intro j hj m hm r hr
+    have hmid : r ∈ sec7_rWinMid S W :=
+      sec7_rWin_subset_mid S (lt_of_lt_of_le zero_lt_one hW) hr
+    have hrwide : r ∈ sec7_rWinWide S W := by
+      have hshift : |(0 : ℝ)| ≤ 3 * (W + W ^ 2 + W ^ 4) := by
+        simp
+        positivity
+      simpa using sec7_mid_add_mem_wide (S := S) (W := W) (r := r) (s := 0) hmid hshift
+    have hsplit := sec7_phase_f3D_eq_powMonD_add_ra_e₃D (P := P) (S := S)
+      (W := W) (a := a) (j := j) (m := m) (r := r) ha hAD _hG1 ha_lo ha_hi
+      Env hW c₀ Cu hsd hj (le_trans hm (by norm_num)) hrwide
+    have hmono := (sec7_phase_f3D_monomial_scale (P := P) (S := S) (W := W)
+      (a := a) (j := j) (m := m) (r := r) ha_lo ha_hi Env hW c₀ Cu hsd hm hr).2
+    have hres := sec7_phase_ra_e₃D_tiny (P := P) (S := S) (W := W) (a := a)
+      (j := j) ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd hbud hg0 hu0 hX24
+      hG10x hUbig hj (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
+    have hB0 : 0 ≤ S.T₃ / S.R ^ m :=
+      div_nonneg (sec7_T₃_pos S).le (pow_nonneg (sec7_R_pos S).le m)
+    calc
+      |sec7_phase_f3D P S a j m r|
+          = |sec7_powMonD S.R
+              (3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+              (-(1 : ℝ) / 4) m r + sec7_phase_ra_e₃D P S a j m r| := by
+            rw [hsplit]
+      _ ≤ |sec7_powMonD S.R
+              (3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j * S.T₃)
+              (-(1 : ℝ) / 4) m r| + |sec7_phase_ra_e₃D P S a j m r| := abs_add_le _ _
+      _ ≤ (5 * (10 : ℝ) ^ 9) * (S.T₃ / S.R ^ m) +
+            (1 / (10 : ℝ) ^ 100) * (S.T₃ / S.R ^ m) := add_le_add hmono hres
+      _ = (5 * (10 : ℝ) ^ 9 + 1 / (10 : ℝ) ^ 100) * (S.T₃ / S.R ^ m) := by ring
+      _ ≤ sec7_cPh * (S.T₃ / S.R ^ m) :=
+            mul_le_mul_of_nonneg_right (by norm_num [sec7_cPh]) hB0
   shift_mem := by
     exact sec7_phase_shift_mem P S W a ha hAD _hG1 (sec7_phase_a_lo_wide ha_lo)
       (sec7_phase_a_hi_wide ha_hi) Env hW c₀ Cu hsd
