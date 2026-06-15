@@ -51,14 +51,6 @@ noncomputable def sec7_phase_dBreve' (P : Globals) (a : ℤ) : ℝ → ℝ :=
 noncomputable def sec7_phase_dBreve'' (P : Globals) (a : ℤ) : ℝ → ℝ :=
   dBreve'' P.X (a : ℝ)
 
-/-- Third inverse-derivative handle, used in the chain-rule bookkeeping. -/
-noncomputable def sec7_phase_dBreve''' (P : Globals) (a : ℤ) : ℝ → ℝ :=
-  dBreve''' P.X (a : ℝ)
-
-/-- Fourth inverse-derivative handle, used in the chain-rule bookkeeping. -/
-noncomputable def sec7_phase_dBreve'''' (P : Globals) (a : ℤ) : ℝ → ℝ :=
-  dBreve'''' P.X (a : ℝ)
-
 /-- `f₂^{(m)}`: the `m`-th `r`-derivative family of `ftil`. -/
 noncomputable def sec7_phase_f2D (P : Globals) (S : Scale P) (a : ℤ) :
     ℕ → ℝ → ℝ :=
