@@ -1,4 +1,5 @@
 import Squarefree.Bracket.Sec7Defs
+import Squarefree.Bracket.Sec7PhiSmooth
 import Squarefree.Bracket.Sec7PhaseExp
 import Squarefree.Bracket.Sec7PhiDeriv
 import Squarefree.Opt.OnStripAux
@@ -2043,7 +2044,8 @@ theorem sec7_nonzero_count_78 :
       (∀ m ≤ 2, ∀ r ∈ sec7_rWin S W,
         |iteratedDeriv m (ME.Err ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r| ≤
           sec7_cErr * sec7_errScale P S h₁ h₂ h₃ ρ₀ / S.R ^ m) →
-      ContDiff ℝ 2 (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) →
+      ContDiffOn ℝ 2 (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃)
+        (Set.Ioo (S.R / 144 - 1) (40 * S.R + 1)) →
       -- AM-2: dyadic sub-window of the wide count range
       ∀ p q : ℕ, Finset.Icc (p : ℤ) (q : ℤ) ⊆ Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋ →
         q ≤ 2 * p →
@@ -2162,8 +2164,18 @@ theorem sec7_nonzero_count_78 :
             256 * T
         simpa [T, Real.rpow_natCast, mul_comm, mul_left_comm, mul_assoc] using hcurv.2
       simpa [mul_div_assoc, mul_comm, mul_left_comm, mul_assoc] using hscaled
-    have hcore := Geometry.prop43_local_explicit (p : ℝ) lam δ₁ f
-      hp_pos hlampos hδpos hδlt hcd hfloor hlower hupper
+    -- `p ≥ R/72 ≥ 72 ≥ 2` (from the count-pad `hpad` and `1 < W`).
+    have hp2 : (2 : ℝ) ≤ (p : ℝ) := by
+      have hW1 : (1 : ℝ) ≤ W := le_of_lt _hW
+      have hW2 : (1 : ℝ) ≤ W ^ 2 := by nlinarith [hW1, sq_nonneg (W - 1)]
+      have hW4 : (1 : ℝ) ≤ W ^ 4 := by nlinarith [hW2, sq_nonneg (W ^ 2 - 1)]
+      have hRge : (5184 : ℝ) ≤ S.R := by linarith [hpad, hW1, hW2, hW4]
+      linarith [hpRlo, hRge]
+    -- restrict the window `ContDiffOn` to the rescaled count window `[p/2-1, 5p/2+1]`.
+    have hcdO : ContDiffOn ℝ 2 f (Set.Ioo ((p : ℝ) / 2 - 1) (5 * (p : ℝ) / 2 + 1)) :=
+      hcd.mono (Set.Ioo_subset_Ioo (by linarith [hpRlo]) (by linarith [hpRhi]))
+    have hcore := sec7_prop43_local_contDiffOn (p : ℝ) lam δ₁ f
+      hp_pos hlampos hδpos hδlt hp2 hcdO hfloor hlower hupper
     have hsub :
         (((Finset.Icc (p : ℤ) (q : ℤ)).filter
             (fun r : ℤ => distInt (f (r : ℝ)) ≤ δ₁)).image

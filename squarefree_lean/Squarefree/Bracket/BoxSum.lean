@@ -149,32 +149,14 @@ private noncomputable def sec7_raExpData_of_phase (P : Globals) (S : Scale P) (W
 /-- The `Sec7Phase` regularity field in the exact `sec7_Phi` shape used by N13/N19. -/
 private theorem sec7_phase_phi_contDiff {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
     (Ph : Sec7Phase P S W a) (j h₁ h₂ h₃ : ℤ) (ξ₁ ξ₂ ξ₃ : ℝ)
-    (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ) :
-    ContDiff ℝ 2 (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) := by
+    (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ) (hj : sec7_jBand P S j)
+    (hbox : sec7_shiftBox W h₁ h₂ h₃) (hξ₁ : |ξ₁| ≤ sec7_hSum h₁ h₂ h₃)
+    (hξ₂ : |ξ₂| ≤ sec7_hSum h₁ h₂ h₃) (hξ₃ : |ξ₃| ≤ sec7_hSum h₁ h₂ h₃) :
+    ContDiffOn ℝ 2 (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃)
+      (Set.Ioo (S.R / 144 - 1) (40 * S.R + 1)) := by
   simpa [sec7_Phi, sec7_hSum] using
     Ph.phiContDiff j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃
-
-/-- The `Sec7Phase` critical-zero field in the exact `Sec7ZeroHyp` shape. -/
-private theorem sec7_phase_phi_fewCritical {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
-    (Ph : Sec7Phase P S W a) (j h₁ h₂ h₃ : ℤ) (ξ₁ ξ₂ ξ₃ : ℝ)
-    (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ) :
-    ∀ p q : ℕ,
-      Finset.Icc (p : ℤ) (q : ℤ) ⊆ Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋ → q ≤ 2 * p →
-      ((Set.Icc (p : ℝ) (q : ℝ) ∩
-          {r | deriv (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r = 0}).Finite ∧
-        (Set.Icc (p : ℝ) (q : ℝ) ∩
-          {r | deriv (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r = 0}).ncard ≤
-          sec7_KZero) ∧
-      ((Set.Icc (p : ℝ) (q : ℝ) ∩
-          {r | iteratedDeriv 2
-            (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r = 0}).Finite ∧
-        (Set.Icc (p : ℝ) (q : ℝ) ∩
-          {r | iteratedDeriv 2
-            (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r = 0}).ncard ≤
-          sec7_KZero) := by
-  intro p q hwin hdyad
-  simpa [sec7_Phi, sec7_hSum, sec7_KZero] using
-    Ph.phiFewCritical j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ p q hwin hdyad
+      hj ⟨hbox, hξ₁, hξ₂, hξ₃⟩
 
 private theorem sec7_shiftBox_of_box {W : ℝ} {p : ℕ × ℕ × ℕ} (hW : 1 ≤ W)
     (hp : p ∈ box W) : sec7_shiftBox W (p.1 : ℤ) (p.2.1 : ℤ) (p.2.2 : ℤ) := by
@@ -1160,6 +1142,7 @@ private theorem sec7_nonzero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a
   have hErr := sec7_err_deriv_bound (ME := ME) Env hj hbox hWpos hpad hshift hrel143 hrelF143 hξ₁ hξ₂ hξ₃
     ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ₀ hρ₁ hρ₂ hρ₃ hu₁ hu₂ hu₃
   have hcd := sec7_phase_phi_contDiff Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃
+    hj hbox hξ₁ hξ₂ hξ₃
   set δ : ℝ := sec7_cCal * sec7_delta1 P S h₁ h₂ h₃ with hδdef
   set B : ℝ := sec7_cN19 * (1 + Real.log P.X) *
         ((S.R * S.T₁) ^ ((1:ℝ)/3) + S.R * δ +
@@ -1690,14 +1673,12 @@ private theorem sec7_triple_split (P : Globals) (S : Scale P) (W : ℝ)
             hcd := sec7_phase_phi_contDiff Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃
               pc.1.1 pc.1.2.1 pc.1.2.2.1 pc.1.2.2.2
               pc.2.1.1 pc.2.1.2.1 pc.2.1.2.2
+              hj hbox hξ₁ hξ₂ hξ₃
             hsub1 := sec7_zero_hsub1 Env hW.le
             hsub2 := sec7_zero_hsub2 c₀ Cu hsd hbud hg0 hu0 hX24
             hsub2F := sec7_zero_hsub2F c₀ Cu hsd hbud hg0 hu0 hX24
             hrel := sec7_zero_hrel Env hbox c₀ Cu hsd hbud hg0 hu0 hX24
-            hrelF := sec7_relErrF_le Env (sec7_W_ge_one hbox) hsd hbud hg0 hu0 hX24
-            few_critical := sec7_phase_phi_fewCritical Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃
-              pc.1.1 pc.1.2.1 pc.1.2.2.1 pc.1.2.2.2
-              pc.2.1.1 pc.2.1.2.1 pc.2.1.2.2 }
+            hrelF := sec7_relErrF_le Env (sec7_W_ge_one hbox) hsd hbud hg0 hu0 hX24 }
         have hcnt := sec7_zero_wide_count (ME := ME) Hyp hxsmall hδNpos le_rfl
         simpa [Tpiece, Bz, wide] using hcnt
     let Bn : ℝ := 11 * sec7_cN19 * (1 + Real.log P.X) *

@@ -1,23 +1,33 @@
-SQUAREFREE FORMALIZATION — PROGRESS SUMMARY (2026-06-11)
+SQUAREFREE FORMALIZATION — PROGRESS SUMMARY (2026-06-16)
 =========================================================
 
-BUILD: GREEN, full tree (8513 jobs). Tracked stubs: exactly 6, all §7:
-  - Squarefree/Bracket/BoxSum.lean:40,49   prop_7_1, prop_7_3
-  - Squarefree/Bracket/BoxPowerSums.lean   box_sum_* (4 power-sum helpers)
+BUILD: GREEN, BoxSum target (8519 jobs). Tracked stubs: exactly 2, both §7:
+  - Squarefree/Bracket/Sec7ZeroScale.lean:~1984  sec7_zero_few_critical Φ″ branch (order-3 blocker)
+  - Squarefree/Bracket/BoxSum.lean:1965          sec7_phase_build (N24-PHASE assembly)
 
-✅ prop_5_1 PROVED 2026-06-11 (Prop51.lean:37) — axiom-clean [propext, Classical.choice, Quot.sound].
-   Chain: prop51_perpair (Prop51Assembly.lean:30 — fiber_le_sum_ranges partition at V₁/10⁶⁰·V₂ +
-   the four range counts + producer packs Prop51Step4Pack/Step4WindowFacts/RaWitness)
-   → Ra_card_le_popular + markov_discharge (Wnat = ⌈128W⌉) → prop51_combine (C₀=10⁴⁰⁹ Bcombine,
-   8→3 collapse) → prop_5_1 with C = 10⁴¹⁵.
-   Regime: the faithful band G^{-1/4}U^{-3/4} ≤ Ω ≤ U (NO Ω≥1, NO G≤U anywhere); pack discharged
-   end-to-end at Opt/Strip→Global→DyadicAssembly→Main X₀.
+§7 ENDGAME PROGRESS (2026-06-16) — 4 original sorries → 2 (and one of those is half-closed):
+  ✅ phiContDiff PROVEN. Major architectural fix: the §7 zero-count engines required GLOBAL
+     `ContDiff ℝ 2 Φ`, but Φ is `Function.invFun`-built ⟹ only `ContDiffOn`. Reworked to mirror
+     §5's `step2_subset_count`: field/wrapper/Sec7ZeroHyp.hcd → `ContDiffOn … (Ioo(R/144-1)(40R+1))`;
+     two new adapters bump-extend internally — `sec7_prop43_local_contDiffOn` (N19/prop43, Sec7PhiSmooth)
+     and `sec7_bands_count_slack_split_contDiffOn` (N13/bands, Sec7ZeroScale). The field ALSO needed two
+     dropped hyps (it was unprovable as a bare sorry): `sec7_jBand P S j` + `sec7_phiBound` (box+|ξ|≤hSum,
+     new Prop in Sec7Defs). phiContDiff proven pointwise (f2D=ftil smooth ∀r>0; f1D/f3D need r∈rWin).
+  ✅ sec7_phase_round_inverse_margin PROVEN. Also under-hypothesized: needed near-integrality
+     `distInt(Ffun a d) ≤ 2H/d²` (Prop 3.2, threaded into sec7_phase_construct's output conjunct) AND
+     `hpert : 2H/D² ≤ F/1000` (discharged in-construct via sec7_ra_HA2_large + hAD). Ffun-IVT/MVT,
+     constant 147456 ≤ cdMar=10⁷.
+  ◐ phiFewCritical — RELOCATED + HALF-CLOSED. Was false/under-hyp'd as a Sec7Phase field (needs
+     jBand+phiBound+hρ₀:ρ₀=0+carry/fiber/strip facts, and the strip facts aren't Sec7Phase fields).
+     RESTRUCTURED: removed from Sec7Phase AND Sec7ZeroHyp; now a derived theorem
+     `sec7_zero_few_critical (ME)(Hyp)` in Sec7ZeroScale, filled into the N13 count. Construct is now
+     sorry-FREE. ✅ generic Rolle `sec7_zeros_subsingleton_of_deriv_ne` + ✅ Φ′ branch `sec7_zero_deriv_few`
+     (weight r³ collapses ρ₀=0 principal to one (65/16)C·R·y⁻⁹ᐟ⁴ monomial dominating the ≤2-order remainder,
+     Rolle ⟹ ≤1). ⛔ Φ″ branch OPEN (1 sorry, ~1984): `(r⁴Φ″)′` needs ORDER-3 (`iteratedDeriv 3 Φ`), but
+     `sec7_leib_deriv` (Sec7ErrAux:82, m<2) + `sec7_err_deriv_bound` (Sec7ErrBound:175, m≤2) cap the chain.
+     Inputs exist (ra_e*D_deriv m<5); FIX = extend leib_deriv→m<3 + err_deriv_bound→m≤3 (cross-file:
+     Sec7ErrAux/ErrBound + the PhiJet/A/Q chains), then mirror Φ′ with weight r⁴.
+  ⛔ sec7_phase_build — N24 assembly: construct the Sec7Phase + thread hnear (inDa_distInt_Ffun) into
+     sec7_phase_construct's now-hnear-carrying margin conjunct. Independent of the Φ″ blocker.
 
-DONE: §1 (Möbius), §4 (counting engines), §5 (Prop 5.1 COMPLETE), §6 (prop_6_1), §8/§9 spine.
-NEXT: §7 (prop_7_1, prop_7_3 + the 4 BoxPowerSums stubs) — the LAST remaining section.
-
-HOUSEKEEPING ✅ 2026-06-11: 14 dead legacy files pruned (crude Step-4 route, Diam2 Vmax-form,
-Confinement, PervCount, …; kept-as-live verified: SmoothConf/SsumAdd/Confine/Diam/Prop51Step4Prime/
-UpsilonMag chain). Oversize files split: FitEA 855→273(+Core,+Cap), FitEB 544→234(+Cap),
-Capstone 565→390(+Aux), Step4Pack 423→264(+Facts), Step3FsumTight 446→336(+Mon);
-UpsilonErrSharp 434 left (single-theorem, unsplittable). Full build green.
+DONE earlier: §1, §4, §5 (prop_5_1 axiom-clean C=10⁴¹⁵), §6 (prop_6_1), §8/§9 spine.

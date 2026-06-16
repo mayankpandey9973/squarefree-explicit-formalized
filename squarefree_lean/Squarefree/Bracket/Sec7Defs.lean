@@ -224,6 +224,15 @@ def sec7_jBand (P : Globals) (S : Scale P) (j : ℤ) : Prop :=
 /- md 1327–31: "the inverse-function scale  F·d̆ₐ'(t) ≍ HΔ,  F²·d̆ₐ''(t) ≍ HΔ  (t ≍ F)".
    md 1505–07: "f₃(r) := d̆ₐ(f̃ₐ(r)+j),  f₁(r) := −d̆ₐ'(f̃ₐ(r)+j),  f₂(r) := f̃ₐ(r)".
    md 1509–14: "f₁^{(m)}(r) ≍ T₁/Rᵐ,  f₂^{(m)}(r) ≍ T₂/Rᵐ,  f₃^{(m)}(r) ≍ T₃/Rᵐ". -/
+/-- Shift bounds under which the §7 branch phase is `C²` on the count window: the box bounds
+`1 ≤ h₁ ≤ W`, `1 ≤ h₂ ≤ W²`, `1 ≤ h₃ ≤ W⁴` (md 1463–66, = `sec7_shiftBox` unfolded) and
+`|ξᵢ| ≤ h₁+h₂+h₃` (= `sec7_hSum`).  These keep every `f`-piece argument inside `sec7_rWin`
+(the `f₁,f₃` pieces shift up by at most `h_Σ`; the globally-smooth `f₂ = f̃` absorbs the `ξ`).
+Stated here (upstream of `sec7_shiftBox`) by inlining the conjuncts. -/
+def sec7_phiBound (W : ℝ) (h₁ h₂ h₃ : ℤ) (ξ₁ ξ₂ ξ₃ : ℝ) : Prop :=
+  ((1 ≤ h₁ ∧ (h₁ : ℝ) ≤ W) ∧ (1 ≤ h₂ ∧ (h₂ : ℝ) ≤ W ^ 2) ∧ (1 ≤ h₃ ∧ (h₃ : ℝ) ≤ W ^ 4)) ∧
+    |ξ₁| ≤ (h₁ : ℝ) + h₂ + h₃ ∧ |ξ₂| ≤ (h₁ : ℝ) + h₂ + h₃ ∧ |ξ₃| ≤ (h₁ : ℝ) + h₂ + h₃
+
 /-- §7 phase data for the fiber `a ∼ A` (md 1299–1331, 1505–14): the functions
 `f̃ₐ, d̆ₐ, d̆ₐ', d̆ₐ''` with the inverse-function scales `F·d̆' ≍ HΔ`, `F²·d̆'' ≍ HΔ` on
 `t ≍ F`, and the `m`-th derivative families (`m ≤ 3`) of `f₁ = −d̆'(f̃+j)`, `f₂ = f̃`,
@@ -302,7 +311,8 @@ structure Sec7Phase (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) where
   /-- Global `C²` regularity of the branch phase used by the counting engines. -/
   phiContDiff : ∀ (j h₁ h₂ h₃ : ℤ) (ξ₁ ξ₂ ξ₃ : ℝ)
       (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ),
-    ContDiff ℝ 2 (fun r =>
+    sec7_jBand P S j → sec7_phiBound W h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ →
+    ContDiffOn ℝ 2 (fun r =>
       diff3 (h₁ : ℝ) h₂ h₃ (f3D j 0) r
         + f1D j 0 (r + ((h₁ : ℝ) + h₂ + h₃)) *
             (diff3 (h₁ : ℝ) h₂ h₃ (f2D 0) r + ρ₀)
@@ -312,56 +322,7 @@ structure Sec7Phase (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) where
             (diff1 (h₁ : ℝ) (diff1 (h₃ : ℝ) (f2D 0)) (r + ξ₂) - u₂ + ρ₂)
         + diff1 (h₃ : ℝ) (f1D j 0) (r + ((h₁ : ℝ) + h₂ + h₃) - h₃) *
             (diff1 (h₁ : ℝ) (diff1 (h₂ : ℝ) (f2D 0)) (r + ξ₃) - u₃ + ρ₃))
-  /-- Uniform critical-zero bound for the branch phase, used by the zero-carry engine. -/
-  phiFewCritical : ∀ (j h₁ h₂ h₃ : ℤ) (ξ₁ ξ₂ ξ₃ : ℝ)
-      (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ) (p q : ℕ),
-    Finset.Icc (p : ℤ) (q : ℤ) ⊆ Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋ → q ≤ 2 * p →
-    ((Set.Icc (p : ℝ) (q : ℝ) ∩
-        {r | deriv (fun x =>
-          diff3 (h₁ : ℝ) h₂ h₃ (f3D j 0) x
-            + f1D j 0 (x + ((h₁ : ℝ) + h₂ + h₃)) *
-                (diff3 (h₁ : ℝ) h₂ h₃ (f2D 0) x + ρ₀)
-            + diff1 (h₁ : ℝ) (f1D j 0) (x + ((h₁ : ℝ) + h₂ + h₃) - h₁) *
-                (diff1 (h₂ : ℝ) (diff1 (h₃ : ℝ) (f2D 0)) (x + ξ₁) - u₁ + ρ₁)
-            + diff1 (h₂ : ℝ) (f1D j 0) (x + ((h₁ : ℝ) + h₂ + h₃) - h₂) *
-                (diff1 (h₁ : ℝ) (diff1 (h₃ : ℝ) (f2D 0)) (x + ξ₂) - u₂ + ρ₂)
-            + diff1 (h₃ : ℝ) (f1D j 0) (x + ((h₁ : ℝ) + h₂ + h₃) - h₃) *
-                (diff1 (h₁ : ℝ) (diff1 (h₂ : ℝ) (f2D 0)) (x + ξ₃) - u₃ + ρ₃)) r = 0}).Finite ∧
-      (Set.Icc (p : ℝ) (q : ℝ) ∩
-        {r | deriv (fun x =>
-          diff3 (h₁ : ℝ) h₂ h₃ (f3D j 0) x
-            + f1D j 0 (x + ((h₁ : ℝ) + h₂ + h₃)) *
-                (diff3 (h₁ : ℝ) h₂ h₃ (f2D 0) x + ρ₀)
-            + diff1 (h₁ : ℝ) (f1D j 0) (x + ((h₁ : ℝ) + h₂ + h₃) - h₁) *
-                (diff1 (h₂ : ℝ) (diff1 (h₃ : ℝ) (f2D 0)) (x + ξ₁) - u₁ + ρ₁)
-            + diff1 (h₂ : ℝ) (f1D j 0) (x + ((h₁ : ℝ) + h₂ + h₃) - h₂) *
-                (diff1 (h₁ : ℝ) (diff1 (h₃ : ℝ) (f2D 0)) (x + ξ₂) - u₂ + ρ₂)
-            + diff1 (h₃ : ℝ) (f1D j 0) (x + ((h₁ : ℝ) + h₂ + h₃) - h₃) *
-                (diff1 (h₁ : ℝ) (diff1 (h₂ : ℝ) (f2D 0)) (x + ξ₃) - u₃ + ρ₃)) r = 0}).ncard ≤
-        100) ∧
-    ((Set.Icc (p : ℝ) (q : ℝ) ∩
-        {r | iteratedDeriv 2 (fun x =>
-          diff3 (h₁ : ℝ) h₂ h₃ (f3D j 0) x
-            + f1D j 0 (x + ((h₁ : ℝ) + h₂ + h₃)) *
-                (diff3 (h₁ : ℝ) h₂ h₃ (f2D 0) x + ρ₀)
-            + diff1 (h₁ : ℝ) (f1D j 0) (x + ((h₁ : ℝ) + h₂ + h₃) - h₁) *
-                (diff1 (h₂ : ℝ) (diff1 (h₃ : ℝ) (f2D 0)) (x + ξ₁) - u₁ + ρ₁)
-            + diff1 (h₂ : ℝ) (f1D j 0) (x + ((h₁ : ℝ) + h₂ + h₃) - h₂) *
-                (diff1 (h₁ : ℝ) (diff1 (h₃ : ℝ) (f2D 0)) (x + ξ₂) - u₂ + ρ₂)
-            + diff1 (h₃ : ℝ) (f1D j 0) (x + ((h₁ : ℝ) + h₂ + h₃) - h₃) *
-                (diff1 (h₁ : ℝ) (diff1 (h₂ : ℝ) (f2D 0)) (x + ξ₃) - u₃ + ρ₃)) r = 0}).Finite ∧
-      (Set.Icc (p : ℝ) (q : ℝ) ∩
-        {r | iteratedDeriv 2 (fun x =>
-          diff3 (h₁ : ℝ) h₂ h₃ (f3D j 0) x
-            + f1D j 0 (x + ((h₁ : ℝ) + h₂ + h₃)) *
-                (diff3 (h₁ : ℝ) h₂ h₃ (f2D 0) x + ρ₀)
-            + diff1 (h₁ : ℝ) (f1D j 0) (x + ((h₁ : ℝ) + h₂ + h₃) - h₁) *
-                (diff1 (h₂ : ℝ) (diff1 (h₃ : ℝ) (f2D 0)) (x + ξ₁) - u₁ + ρ₁)
-            + diff1 (h₂ : ℝ) (f1D j 0) (x + ((h₁ : ℝ) + h₂ + h₃) - h₂) *
-                (diff1 (h₁ : ℝ) (diff1 (h₃ : ℝ) (f2D 0)) (x + ξ₂) - u₂ + ρ₂)
-            + diff1 (h₃ : ℝ) (f1D j 0) (x + ((h₁ : ℝ) + h₂ + h₃) - h₃) *
-                (diff1 (h₁ : ℝ) (diff1 (h₂ : ℝ) (f2D 0)) (x + ξ₃) - u₃ + ρ₃)) r = 0}).ncard ≤
-        100)
+      (Set.Ioo (S.R / 144 - 1) (40 * S.R + 1))
 
 /- N2 (md 1327–31): "F·d̆ₐ'(t) ≍ HΔ, F²·d̆ₐ''(t) ≍ HΔ (t ≍ F)" — accessor (carried fields,
    no stub). -/

@@ -11,6 +11,31 @@ chain = prop51_perpair (Prop51Assembly.lean:30; partition + 4 range counts + pro
 → Ra_card_le_popular + markov_discharge (Wnat=⌈128W⌉) → prop51_combine → prop_5_1, C=10⁴¹⁵.
 [Historical GAP-3/Step-4 repair ledger below — superseded, kept for reference.]
 
+### §7 FRONTIER (2026-06-15) — 4 sorries left; the phiContDiff/phiFewCritical endgame
+Residual + f-scale layers DONE (ra_e₁/₂/₃D bounds, f-scale lo/hi all green). Remaining:
+`Sec7PhaseConstruct.lean` `phiContDiff` (6190), `phiFewCritical` (6193), `round_inverse_margin`
+(6208); `BoxSum.lean` `sec7_phase_build` (1959, the N24-PHASE assembly consuming the above).
+
+**ROUTE for `phiContDiff` (FORCED, faithful):** the field is currently `ContDiff ℝ 2 Φ` (GLOBAL),
+but Φ is built from `dBreve = Function.invFun` ⟹ only `ContDiffOn` the inversion window, NEVER
+globally C². So global ContDiff is UNDISCHARGEABLE. Fix = mirror §5's proven `step2_subset_count`
+(`Lower/Step2Bands.lean:104`): field → `ContDiffOn`, and the zero-count engines bump-extend to a
+global ψ internally, feed `prop43_local_explicit` (which needs global C², `NearCurveResidual:395`),
+transfer counts via `ψ = Φ` on integers in the window. Tools already in `Sec7PhiSmooth.lean`:
+`sec7_phi_expanded_contDiffOn` (Φ is `ContDiffOn` on a window) + `sec7_exists_global_extension`.
+EXECUTION (bottom-up, green each step):
+  (A) adapter `sec7_prop43_local_contDiffOn` in Sec7PhiSmooth: takes `ContDiffOn ℝ 2 f (Ioo(N/2-1)(5N/2+1))`
+      + curvature on `Icc(N/2)(5N/2)` + `2≤N`, does extension internally, returns the prop43 count bound on f.
+  (B/C) N19 (`Sec7Nonzero:2027`) + N13 (`Sec7Branch`, ρ₀=0): `hcd : ContDiff` → `hcdO : ContDiffOn`,
+        swap the `prop43_local_explicit` call (N19 line 2165) for the adapter.
+  (D) `Sec7Defs` field `phiContDiff` → ContDiffOn on a window ⊇ [R/144-1, 40R+1]; `BoxSum` wrapper
+      `sec7_phase_phi_contDiff` returns ContDiffOn; call sites 1162/1690.
+  (E) construct: discharge field via an ASYMMETRIC `sec7_phi_expanded_contDiffOn` — the symmetric one
+      over-shrinks by M≈4(W+W²+W⁴) and misses the count edges; but h₁,h₂,h₃≥1>0 (box) ⟹ diff terms
+      shrink only the UPPER window, ξ's (|ξ|≤hSum) shrink lower by ≤hSum ⟹ covers [R/144-(W+W²+W⁴),40R+…].
+  (F) `phiFewCritical` — separate Rolle argument (see [[sec7-wall-phifewcritical]]); ρ₀=0 ⟹ ≤1 zero.
+  (G) `round_inverse_margin` + `sec7_phase_build` assembly → prop_7_3.
+
 > ⛔ **STRUCTURAL FINDING (2026-06-13) — Sec7Phase wide-window scale fields UNSATISFIABLE; SCOPED, FIX = Option A.**
 > The `Sec7Phase` structure (Sec7Defs.lean, ~30 fields) states uniform `≍` scale bounds on the WIDE
 > windows `sec7_tWin=[F/10³,10³F]`, `sec7_rWin`, `sec7_rWinWide` (all factor-10⁶ apertures). `F2d''_lo/hi`

@@ -5731,6 +5731,62 @@ private theorem sec7_phase_ra_e₂D_tiny {P : Globals} {S : Scale P} {W : ℝ}
     _ ≤ (1 / (10 : ℝ) ^ 100) * (S.T₂ / S.R ^ m) :=
         mul_le_mul_of_nonneg_right hsmall hB0
 
+/-- `ContDiffAt` for a single forward difference `diff1 h g` at `x`, from smoothness of `g`
+at the two evaluation points `x` and `x + h`. -/
+private theorem sec7_contDiffAt_diff1 {n : WithTop ℕ∞} {g : ℝ → ℝ} {h x : ℝ}
+    (hg : ContDiffAt ℝ n g x) (hgh : ContDiffAt ℝ n g (x + h)) :
+    ContDiffAt ℝ n (Squarefree.FiniteDiff.diff1 h g) x := by
+  have hshift : ContDiffAt ℝ n (fun y : ℝ => y + h) x :=
+    contDiffAt_id.add contDiffAt_const
+  have hcomp : ContDiffAt ℝ n (fun y => g (y + h)) x := hgh.comp x hshift
+  simpa only [Squarefree.FiniteDiff.diff1] using hcomp.sub hg
+
+/-- `ContDiffAt` for a double forward difference `diff1 h₂ (diff1 h₃ g)` at `x`, from
+smoothness of `g` on the closed interval `[x, x + (h₂ + h₃)]`. -/
+private theorem sec7_contDiffAt_diff2_Icc {n : WithTop ℕ∞} {g : ℝ → ℝ} {h₂ h₃ x : ℝ}
+    (hh₂ : 0 ≤ h₂) (hh₃ : 0 ≤ h₃)
+    (H : ∀ y ∈ Set.Icc x (x + (h₂ + h₃)), ContDiffAt ℝ n g y) :
+    ContDiffAt ℝ n
+      (Squarefree.FiniteDiff.diff1 h₂ (Squarefree.FiniteDiff.diff1 h₃ g)) x := by
+  have e00 := H x ⟨le_refl x, by linarith⟩
+  have e01 := H (x + h₃) ⟨by linarith, by linarith⟩
+  have e10 := H (x + h₂) ⟨by linarith, by linarith⟩
+  have e11 := H (x + h₂ + h₃) ⟨by linarith, by linarith⟩
+  exact sec7_contDiffAt_diff1 (sec7_contDiffAt_diff1 e00 e01)
+    (sec7_contDiffAt_diff1 e10 e11)
+
+/-- `ContDiffAt` for a mixed third difference `diff3 h₁ h₂ h₃ g` at `x`, from smoothness of
+`g` on the closed interval `[x, x + (h₁ + h₂ + h₃)]`. -/
+private theorem sec7_contDiffAt_diff3_Icc {n : WithTop ℕ∞} {g : ℝ → ℝ} {h₁ h₂ h₃ x : ℝ}
+    (hh₁ : 0 ≤ h₁) (hh₂ : 0 ≤ h₂) (hh₃ : 0 ≤ h₃)
+    (H : ∀ y ∈ Set.Icc x (x + (h₁ + h₂ + h₃)), ContDiffAt ℝ n g y) :
+    ContDiffAt ℝ n (Squarefree.FiniteDiff.diff3 h₁ h₂ h₃ g) x := by
+  have e000 := H x ⟨le_refl x, by linarith⟩
+  have e001 := H (x + h₃) ⟨by linarith, by linarith⟩
+  have e010 := H (x + h₂) ⟨by linarith, by linarith⟩
+  have e011 := H (x + h₂ + h₃) ⟨by linarith, by linarith⟩
+  have e100 := H (x + h₁) ⟨by linarith, by linarith⟩
+  have e101 := H (x + h₁ + h₃) ⟨by linarith, by linarith⟩
+  have e110 := H (x + h₁ + h₂) ⟨by linarith, by linarith⟩
+  have e111 := H (x + h₁ + h₂ + h₃) ⟨by linarith, by linarith⟩
+  have d3x := sec7_contDiffAt_diff1 e000 e001
+  have d3xh2 := sec7_contDiffAt_diff1 e010 e011
+  have d3xh1 := sec7_contDiffAt_diff1 e100 e101
+  have d3xh1h2 := sec7_contDiffAt_diff1 e110 e111
+  have m2x := sec7_contDiffAt_diff1 d3x d3xh2
+  have m2xh1 := sec7_contDiffAt_diff1 d3xh1 d3xh1h2
+  simpa only [Squarefree.FiniteDiff.diff3] using sec7_contDiffAt_diff1 m2x m2xh1
+
+/-- `ContDiffAt` of an affine shift `r ↦ r + c`. -/
+private theorem sec7_contDiffAt_addConst {n : WithTop ℕ∞} (c x : ℝ) :
+    ContDiffAt ℝ n (fun r : ℝ => r + c) x :=
+  contDiffAt_id.add contDiffAt_const
+
+/-- `ContDiffAt` of an affine shift `r ↦ r + c - d`. -/
+private theorem sec7_contDiffAt_addSubConst {n : WithTop ℕ∞} (c d x : ℝ) :
+    ContDiffAt ℝ n (fun r : ℝ => r + c - d) x :=
+  (contDiffAt_id.add contDiffAt_const).sub contDiffAt_const
+
 /-- Concrete phase bundle assembled from the definitions above.
 
 The analytic fields that require substantial scale or §3 expansion bookkeeping are left as
@@ -6186,11 +6242,144 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
     exact sec7_ra_e₃D_core P S W a ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd
       hu0 hG10x hUbig j hj m hm r hr
   phiContDiff := by
-    -- TODO(N24-PHASE/critical): global `C²` regularity of the §7 branch phase.
-    sorry
-  phiFewCritical := by
-    -- TODO(N24-PHASE/critical): finite critical-zero bound for the §7 branch phase.
-    sorry
+    intro j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hj hbound
+    intro x hx
+    obtain ⟨hx1, hx2⟩ := Set.mem_Ioo.mp hx
+    obtain ⟨⟨⟨hh1lo, hh1hi⟩, ⟨hh2lo, hh2hi⟩, ⟨hh3lo, hh3hi⟩⟩, hξ1, hξ2, hξ3⟩ := hbound
+    have hW2 : (1 : ℝ) ≤ W ^ 2 := by nlinarith [hW, sq_nonneg (W - 1)]
+    have hW4 : (1 : ℝ) ≤ W ^ 4 := by nlinarith [hW2, sq_nonneg (W ^ 2 - 1)]
+    have hWsum3 : (3 : ℝ) ≤ W + W ^ 2 + W ^ 4 := by linarith
+    have hmar : W + W ^ 2 + W ^ 4 ≤ S.R / 2000 :=
+      sec7_phase_shift_margin Env hW c₀ Cu hsd
+    have hn1 : (0 : ℝ) ≤ (h₁ : ℝ) := by exact_mod_cast (show (0 : ℤ) ≤ h₁ by linarith)
+    have hn2 : (0 : ℝ) ≤ (h₂ : ℝ) := by exact_mod_cast (show (0 : ℤ) ≤ h₂ by linarith)
+    have hn3 : (0 : ℝ) ≤ (h₃ : ℝ) := by exact_mod_cast (show (0 : ℤ) ≤ h₃ by linarith)
+    have hHle : (h₁ : ℝ) + h₂ + h₃ ≤ W + W ^ 2 + W ^ 4 := by linarith
+    obtain ⟨hξ1lo, _⟩ := abs_le.mp hξ1
+    obtain ⟨hξ2lo, _⟩ := abs_le.mp hξ2
+    obtain ⟨hξ3lo, _⟩ := abs_le.mp hξ3
+    have memR : ∀ y : ℝ, x ≤ y → y ≤ x + ((h₁ : ℝ) + h₂ + h₃) →
+        y ∈ sec7_rWin S W := by
+      intro y hy1 hy2
+      simp only [sec7_rWin, Set.mem_Icc]
+      exact ⟨by linarith, by linarith⟩
+    have posR : ∀ y : ℝ, x - ((h₁ : ℝ) + h₂ + h₃) ≤ y → 0 < y := by
+      intro y hy
+      have hR6000 : (6000 : ℝ) ≤ S.R := by linarith
+      linarith
+    have hF1 : ∀ y, y ∈ sec7_rWin S W →
+        ContDiffAt ℝ 2 (sec7_phase_f1D P S a j 0) y := by
+      intro y hy
+      have h4 := sec7_phase_f1_base_contDiffAt4 (P := P) (S := S) (W := W) (a := a) (j := j)
+        (r := y) ha hAD _hG1 (sec7_phase_a_lo_wide ha_lo) (sec7_phase_a_hi_wide ha_hi)
+        Env hW c₀ Cu hsd hj hy
+      have h2 := h4.of_le (show (2 : WithTop ℕ∞) ≤ 4 by norm_num)
+      simpa only [sec7_phase_f1D, iteratedDeriv_zero] using h2
+    have hF3 : ∀ y, y ∈ sec7_rWin S W →
+        ContDiffAt ℝ 2 (sec7_phase_f3D P S a j 0) y := by
+      intro y hy
+      have h4 := sec7_phase_f3_base_contDiffAt4 (P := P) (S := S) (W := W) (a := a) (j := j)
+        (r := y) ha hAD _hG1 (sec7_phase_a_lo_wide ha_lo) (sec7_phase_a_hi_wide ha_hi)
+        Env hW c₀ Cu hsd hj hy
+      have h2 := h4.of_le (show (2 : WithTop ℕ∞) ≤ 4 by norm_num)
+      simpa only [sec7_phase_f3D, iteratedDeriv_zero] using h2
+    have hF2 : ∀ y, 0 < y → ContDiffAt ℝ 2 (sec7_phase_f2D P S a 0) y := by
+      intro y hy
+      have h2 := sec7_phase_ftil_contDiffAt (n := 2) (P := P) (S := S) (a := a) ha hy
+      simpa only [sec7_phase_f2D, iteratedDeriv_zero] using h2
+    apply ContDiffAt.contDiffWithinAt
+    refine ContDiffAt.add (ContDiffAt.add (ContDiffAt.add (ContDiffAt.add ?_ ?_) ?_) ?_) ?_
+    · exact sec7_contDiffAt_diff3_Icc hn1 hn2 hn3
+        (fun y hy => hF3 y (memR y hy.1 hy.2))
+    · refine ContDiffAt.mul ?_ ?_
+      · exact (hF1 (x + ((h₁ : ℝ) + h₂ + h₃)) (memR _ (by linarith) (by linarith))).comp x
+          (sec7_contDiffAt_addConst ((h₁ : ℝ) + h₂ + h₃) x)
+      · refine ContDiffAt.add ?_ contDiffAt_const
+        exact sec7_contDiffAt_diff3_Icc hn1 hn2 hn3
+          (fun y hy => hF2 y (posR y (by linarith [hy.1])))
+    · refine ContDiffAt.mul ?_ ?_
+      · have hg := sec7_contDiffAt_diff1
+          (hF1 (x + ((h₁ : ℝ) + h₂ + h₃) - ↑h₁) (memR _ (by linarith) (by linarith)))
+          (hF1 (x + ((h₁ : ℝ) + h₂ + h₃) - ↑h₁ + ↑h₁) (memR _ (by linarith) (by linarith)))
+        exact hg.comp x (sec7_contDiffAt_addSubConst ((h₁ : ℝ) + h₂ + h₃) (↑h₁) x)
+      · have hD := sec7_contDiffAt_diff2_Icc (x := x + ξ₁) hn2 hn3
+          (fun y hy => hF2 y (posR y (by linarith [hy.1, hξ1lo])))
+        exact ((hD.comp x (sec7_contDiffAt_addConst ξ₁ x)).sub contDiffAt_const).add
+          contDiffAt_const
+    · refine ContDiffAt.mul ?_ ?_
+      · have hg := sec7_contDiffAt_diff1
+          (hF1 (x + ((h₁ : ℝ) + h₂ + h₃) - ↑h₂) (memR _ (by linarith) (by linarith)))
+          (hF1 (x + ((h₁ : ℝ) + h₂ + h₃) - ↑h₂ + ↑h₂) (memR _ (by linarith) (by linarith)))
+        exact hg.comp x (sec7_contDiffAt_addSubConst ((h₁ : ℝ) + h₂ + h₃) (↑h₂) x)
+      · have hD := sec7_contDiffAt_diff2_Icc (x := x + ξ₂) hn1 hn3
+          (fun y hy => hF2 y (posR y (by linarith [hy.1, hξ2lo])))
+        exact ((hD.comp x (sec7_contDiffAt_addConst ξ₂ x)).sub contDiffAt_const).add
+          contDiffAt_const
+    · refine ContDiffAt.mul ?_ ?_
+      · have hg := sec7_contDiffAt_diff1
+          (hF1 (x + ((h₁ : ℝ) + h₂ + h₃) - ↑h₃) (memR _ (by linarith) (by linarith)))
+          (hF1 (x + ((h₁ : ℝ) + h₂ + h₃) - ↑h₃ + ↑h₃) (memR _ (by linarith) (by linarith)))
+        exact hg.comp x (sec7_contDiffAt_addSubConst ((h₁ : ℝ) + h₂ + h₃) (↑h₃) x)
+      · have hD := sec7_contDiffAt_diff2_Icc (x := x + ξ₃) hn1 hn2
+          (fun y hy => hF2 y (posR y (by linarith [hy.1, hξ3lo])))
+        exact ((hD.comp x (sec7_contDiffAt_addConst ξ₃ x)).sub contDiffAt_const).add
+          contDiffAt_const
+
+/-- Clean two-sided `X a/d³` envelope for `F_a(d)` when `0 < a ≤ d`. -/
+private theorem sec7_Ffun_clean {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (had : a ≤ d) :
+    X * a / (2 * d ^ 3) ≤ Ffun X a d ∧ Ffun X a d ≤ 3 * X * a / d ^ 3 := by
+  have hd : 0 < d := lt_of_lt_of_le ha had
+  have hda : d + a ≠ 0 := by positivity
+  rw [Ffun_factor' X a d (ne_of_gt hd) hda]
+  refine ⟨?_, ?_⟩
+  · rw [div_le_div_iff₀ (by positivity) (by positivity)]
+    nlinarith [mul_nonneg (mul_nonneg (mul_nonneg hX.le ha.le) (sq_nonneg d))
+      (by nlinarith [had, hd] : (0 : ℝ) ≤ 3 * d ^ 2 - a ^ 2)]
+  · rw [div_le_div_iff₀ (by positivity) (by positivity)]
+    nlinarith [mul_nonneg (mul_nonneg (mul_nonneg hX.le ha.le) (sq_nonneg d))
+      (by positivity : (0 : ℝ) ≤ d ^ 2 + 5 * a * d + 3 * a ^ 2)]
+
+/-- Lower bound on `m · |u − v|` by the `F_a`-gap, via the mean value theorem with a uniform
+lower bound `m` on `|F_a'|` over `[lo, hi]`. -/
+private theorem sec7_Ffun_dist_lt {X a u v lo hi m : ℝ} (hX : 0 < X) (ha : 0 < a)
+    (hlo : 0 < lo) (huv : u < v) (hu : lo ≤ u) (hv : v ≤ hi)
+    (hbd : ∀ c, lo ≤ c → c ≤ hi → m ≤ |deriv (fun x => Ffun X a x) c|) :
+    m * (v - u) ≤ |Ffun X a u - Ffun X a v| := by
+  have hcont : ContinuousOn (fun x => Ffun X a x) (Set.Icc u v) := by
+    intro x hx
+    have hx0 : 0 < x := lt_of_lt_of_le (lt_of_lt_of_le hlo hu) hx.1
+    exact (Ffun_contDiffAt4 (ne_of_gt hx0)
+      (by positivity)).continuousAt.continuousWithinAt
+  have hdiff : DifferentiableOn ℝ (fun x => Ffun X a x) (Set.Ioo u v) := by
+    intro x hx
+    have hx0 : 0 < x := lt_of_lt_of_le (lt_of_lt_of_le hlo hu) (le_of_lt hx.1)
+    exact ((Ffun_contDiffAt4 (ne_of_gt hx0) (by positivity)).differentiableAt
+      (by norm_num)).differentiableWithinAt
+  obtain ⟨c, hcmem, hcderiv⟩ := exists_deriv_eq_slope (fun x => Ffun X a x) huv hcont hdiff
+  have hcl : lo ≤ c := le_trans hu (le_of_lt hcmem.1)
+  have hch : c ≤ hi := le_trans (le_of_lt hcmem.2) hv
+  have hmc := hbd c hcl hch
+  have hvu : (0 : ℝ) < v - u := sub_pos.mpr huv
+  have heq : Ffun X a v - Ffun X a u = deriv (fun x => Ffun X a x) c * (v - u) := by
+    rw [hcderiv, div_mul_cancel₀ _ (ne_of_gt hvu)]
+  have habs : |Ffun X a u - Ffun X a v|
+      = |deriv (fun x => Ffun X a x) c| * (v - u) := by
+    rw [show Ffun X a u - Ffun X a v = -(Ffun X a v - Ffun X a u) by ring, abs_neg, heq,
+      abs_mul, abs_of_pos hvu]
+  rw [habs]
+  exact mul_le_mul_of_nonneg_right hmc hvu.le
+
+/-- Symmetric form of the inverse-MVT magnitude bound. -/
+private theorem sec7_Ffun_dist_le {X a u v lo hi m : ℝ} (hX : 0 < X) (ha : 0 < a)
+    (hlo : 0 < lo) (hu : u ∈ Set.Icc lo hi) (hv : v ∈ Set.Icc lo hi)
+    (hbd : ∀ c, lo ≤ c → c ≤ hi → m ≤ |deriv (fun x => Ffun X a x) c|) :
+    m * |u - v| ≤ |Ffun X a u - Ffun X a v| := by
+  rcases lt_trichotomy u v with h | h | h
+  · rw [abs_of_neg (by linarith : u - v < 0), neg_sub]
+    exact sec7_Ffun_dist_lt hX ha hlo h hu.1 hv.2 hbd
+  · subst h; simp
+  · rw [abs_of_pos (by linarith : 0 < u - v), abs_sub_comm (Ffun X a u) (Ffun X a v)]
+    exact sec7_Ffun_dist_lt hX ha hlo h hv.1 hu.2 hbd
 
 /-- Rounded inverse margin for the concrete `dBreve`.
 
@@ -6198,14 +6387,144 @@ This is the exact auxiliary fact needed by the public constructor.  The intended
 `|round x - x| ≤ 1/2`, the inverse MVT using `|dBreve'| ≍ D/F`, and the scale identity
 `D/F = Δ²/(H² G A)` (up to the ledger slack `sec7_cdMar`). -/
 private theorem sec7_phase_round_inverse_margin (P : Globals) (S : Scale P) (a : ℤ)
-    (_ha : 0 < a) (_hAD : 10 * S.A ≤ S.D) (_hG1 : 1 ≤ P.G)
-    (_ha_lo : S.A ≤ (a : ℝ)) (_ha_hi : (a : ℝ) ≤ 2 * S.A)
-    {d f : ℤ} (_hdD : S.D ≤ (d : ℝ)) (_hd2D : (d : ℝ) ≤ 2 * S.D)
-    (hf : f = round (Ffun P.X (a : ℝ) (d : ℝ))) :
+    (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (_hG1 : 1 ≤ P.G)
+    (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    {d f : ℤ} (hdD : S.D ≤ (d : ℝ)) (hd2D : (d : ℝ) ≤ 2 * S.D)
+    (hf : f = round (Ffun P.X (a : ℝ) (d : ℝ)))
+    (hnear : Counting.distInt (Ffun P.X (a : ℝ) (d : ℝ)) ≤ 2 * P.H / (d : ℝ) ^ 2)
+    (hpert : 2 * P.H / S.D ^ 2 ≤ S.F / 1000) :
     |(d : ℝ) - sec7_phase_dBreve P a (f : ℝ)| ≤
       sec7_cdMar * (S.Δ ^ 2 / (P.H ^ 2 * P.G * S.A)) := by
-  -- TODO(N24-PHASE/margin): round step + inverse MVT on the image interval.
-  sorry
+  classical
+  have hX : 0 < P.X := P.X_pos
+  have haR : (0 : ℝ) < (a : ℝ) := by exact_mod_cast ha
+  have hH := P.H_pos
+  have hG := P.G_pos
+  have hΔ := S.Δ_pos
+  have hΩ := S.Ω_pos
+  have hD : 0 < S.D := S.D_pos
+  have hDne : S.D ≠ 0 := hD.ne'
+  have hApos : 0 < S.A := mul_pos hΔ hΩ
+  have hdpos : 0 < (d : ℝ) := lt_of_lt_of_le hD hdD
+  have hFpos : 0 < S.F := sec7_ra_F_pos S
+  have hAle' : S.Δ * S.Ω ≤ (a : ℝ) := ha_lo
+  -- `a` is small relative to every reference point `D/2, D, 2D, 4D`.
+  have haD5 : (a : ℝ) ≤ S.D / 5 := by nlinarith [ha_hi, hAD]
+  have hadR : (a : ℝ) ≤ (d : ℝ) := by nlinarith [haD5, hdD, hD]
+  have haD2 : (a : ℝ) ≤ S.D / 2 := by nlinarith [haD5, hD]
+  have ha2D : (a : ℝ) ≤ 2 * S.D := by nlinarith [haD5, hD]
+  have ha4D : (a : ℝ) ≤ 4 * S.D := by nlinarith [haD5, hD]
+  -- The closeness `|F_a(d) − f| ≤ 2H/D²` and the perturbation budget `≤ F/1000`.
+  have hdist : Counting.distInt (Ffun P.X (a : ℝ) (d : ℝ))
+      = |Ffun P.X (a : ℝ) (d : ℝ) - (f : ℝ)| := by
+    unfold Counting.distInt
+    rw [← hf]
+  rw [hdist] at hnear
+  have he2 : |Ffun P.X (a : ℝ) (d : ℝ) - (f : ℝ)| ≤ 2 * P.H / S.D ^ 2 := by
+    refine le_trans hnear ?_
+    exact div_le_div_of_nonneg_left (by positivity) (by positivity)
+      (by nlinarith [hdD, hD])
+  have he : |Ffun P.X (a : ℝ) (d : ℝ) - (f : ℝ)| ≤ S.F / 1000 := le_trans he2 hpert
+  -- Clean two-sided `X a/d³` envelope at the four reference points.
+  have hcl_dR := sec7_Ffun_clean hX haR hadR
+  have hcl_half := sec7_Ffun_clean hX haR haD2
+  have hcl_4D := sec7_Ffun_clean hX haR ha4D
+  -- Single scale atom `t = X a / D³`; `F ≤ t`.
+  set t : ℝ := P.X * (a : ℝ) / S.D ^ 3 with ht_def
+  have ht0 : 0 < t := by rw [ht_def]; positivity
+  have hXaF : S.F ≤ t := by
+    rw [ht_def, Scale.F, Scale.D, P.X_eq_G_mul_H_pow_five,
+      div_le_div_iff₀ (by positivity) (by positivity)]
+    nlinarith [mul_le_mul_of_nonneg_left hAle'
+      (show (0 : ℝ) ≤ P.G * P.H ^ 5 * S.Δ ^ 2 by positivity)]
+  -- Reference-point envelope facts, all in the atom `t`.
+  have hUpdR : Ffun P.X (a : ℝ) (d : ℝ) ≤ 3 * t := by
+    rw [ht_def, show (3 : ℝ) * (P.X * (a : ℝ) / S.D ^ 3)
+        = 3 * P.X * (a : ℝ) / S.D ^ 3 by ring]
+    refine le_trans hcl_dR.2 ?_
+    exact div_le_div_of_nonneg_left (by positivity) (by positivity)
+      (pow_le_pow_left₀ hD.le hdD 3)
+  have hLoHalf : 4 * t ≤ Ffun P.X (a : ℝ) (S.D / 2) := by
+    have heq : 4 * t = P.X * (a : ℝ) / (2 * (S.D / 2) ^ 3) := by
+      rw [ht_def]; field_simp; ring
+    rw [heq]; exact hcl_half.1
+  have hLodR : (1 / 16 : ℝ) * t ≤ Ffun P.X (a : ℝ) (d : ℝ) := by
+    refine le_trans ?_ hcl_dR.1
+    rw [ht_def, show (1 / 16 : ℝ) * (P.X * (a : ℝ) / S.D ^ 3)
+        = P.X * (a : ℝ) / (16 * S.D ^ 3) by ring]
+    apply div_le_div_of_nonneg_left (by positivity) (by positivity)
+    nlinarith [pow_le_pow_left₀ hdpos.le hd2D 3, hD.le]
+  have hUp4D : Ffun P.X (a : ℝ) (4 * S.D) ≤ (3 / 64 : ℝ) * t := by
+    have heq : (3 / 64 : ℝ) * t = 3 * P.X * (a : ℝ) / (4 * S.D) ^ 3 := by
+      rw [ht_def]; field_simp; ring
+    rw [heq]; exact hcl_4D.2
+  -- IVT bracket: `f` lies between `F_a(4D)` and `F_a(D/2)`.
+  have hf_hi : (f : ℝ) ≤ Ffun P.X (a : ℝ) (S.D / 2) := by
+    have hup : (f : ℝ) ≤ Ffun P.X (a : ℝ) (d : ℝ) + 2 * P.H / S.D ^ 2 := by
+      have := (abs_le.mp he2).1; linarith
+    have hgap : Ffun P.X (a : ℝ) (d : ℝ) + 2 * P.H / S.D ^ 2
+        ≤ Ffun P.X (a : ℝ) (S.D / 2) := by
+      linarith [hUpdR, hLoHalf, hXaF, ht0.le, hpert, hFpos]
+    linarith
+  have hf_lo : Ffun P.X (a : ℝ) (4 * S.D) ≤ (f : ℝ) := by
+    have hlo : Ffun P.X (a : ℝ) (d : ℝ) - 2 * P.H / S.D ^ 2 ≤ (f : ℝ) := by
+      have := (abs_le.mp he2).2; linarith
+    have hgap : Ffun P.X (a : ℝ) (4 * S.D)
+        ≤ Ffun P.X (a : ℝ) (d : ℝ) - 2 * P.H / S.D ^ 2 := by
+      linarith [hLodR, hUp4D, hXaF, ht0.le, hpert, hFpos]
+    linarith
+  -- Continuity of `F_a` on `[D/2, 4D]`, then IVT to produce `d'` with `F_a(d') = f`.
+  have hcontIVT : ContinuousOn (fun x => Ffun P.X (a : ℝ) x)
+      (Set.Icc (S.D / 2) (4 * S.D)) := by
+    intro x hx
+    have hx0 : 0 < x := lt_of_lt_of_le (by positivity) hx.1
+    exact (Ffun_contDiffAt4 (ne_of_gt hx0)
+      (by positivity)).continuousAt.continuousWithinAt
+  have hmemIVT : (f : ℝ) ∈ Set.Icc (Ffun P.X (a : ℝ) (4 * S.D))
+      (Ffun P.X (a : ℝ) (S.D / 2)) := ⟨hf_lo, hf_hi⟩
+  obtain ⟨d', hd'mem, hd'eq0⟩ :=
+    intermediate_value_Icc' (by linarith [hD] : S.D / 2 ≤ 4 * S.D) hcontIVT hmemIVT
+  have hd'eq : Ffun P.X (a : ℝ) d' = (f : ℝ) := hd'eq0
+  have hd'pos : 0 < d' := lt_of_lt_of_le (by positivity) hd'mem.1
+  have hdBeq : dBreve P.X (a : ℝ) (f : ℝ) = d' := by
+    rw [← hd'eq]; exact dBreve_spec hX haR hd'pos
+  -- Reduce the goal to `|d − d'| ≤ …`.
+  simp only [sec7_phase_dBreve, hdBeq]
+  -- Inverse-MVT magnitude bound.
+  set m : ℝ := P.X * (a : ℝ) / (288 * (4 * S.D) ^ 4) with hm_def
+  have hmpos : 0 < m := by rw [hm_def]; positivity
+  have hdmemIcc : (d : ℝ) ∈ Set.Icc (S.D / 2) (4 * S.D) :=
+    ⟨by linarith [hdD, hD], by linarith [hd2D, hD]⟩
+  have hbd : ∀ c, S.D / 2 ≤ c → c ≤ 4 * S.D →
+      m ≤ |deriv (fun x => Ffun P.X (a : ℝ) x) c| := by
+    intro c hcl hch
+    have hcpos : 0 < c := lt_of_lt_of_le (by positivity) hcl
+    have hac : (a : ℝ) ≤ 11 * c := by nlinarith [haD5, hcl, hD.le]
+    refine le_trans ?_ (Ffun_deriv1_abs_bounds hX haR hcpos hac).1
+    rw [hm_def]
+    apply div_le_div_of_nonneg_left (by positivity) (by positivity)
+    nlinarith [pow_le_pow_left₀ hcpos.le hch 4]
+  have hmd : m * |(d : ℝ) - d'|
+      ≤ |Ffun P.X (a : ℝ) (d : ℝ) - Ffun P.X (a : ℝ) d'| :=
+    sec7_Ffun_dist_le hX haR (by positivity) hdmemIcc hd'mem hbd
+  have hmd2 : m * |(d : ℝ) - d'| ≤ 2 * P.H / S.D ^ 2 := by
+    rw [hd'eq] at hmd
+    exact le_trans hmd he2
+  -- Scale inequality `2H/D² ≤ m · (cdMar · Δ²/(H²GA))`.
+  have hmT : 2 * P.H / S.D ^ 2
+      ≤ m * (sec7_cdMar * (S.Δ ^ 2 / (P.H ^ 2 * P.G * S.A))) := by
+    have hRHS : m * (sec7_cdMar * (S.Δ ^ 2 / (P.H ^ 2 * P.G * S.A)))
+        = (P.X * (a : ℝ) * sec7_cdMar * S.Δ ^ 2)
+            / ((288 * (4 * S.D) ^ 4) * (P.H ^ 2 * P.G * S.A)) := by
+      rw [hm_def]; ring
+    rw [hRHS, div_le_div_iff₀ (by positivity) (by positivity), sec7_cdMar,
+      Scale.D, Scale.A, P.X_eq_G_mul_H_pow_five]
+    nlinarith [mul_le_mul_of_nonneg_left hAle'
+      (show (0 : ℝ) ≤ 10 ^ 7 * P.G * P.H ^ 7 * S.Δ ^ 4 by positivity),
+      mul_pos (mul_pos (mul_pos hG (pow_pos hH 7)) (pow_pos hΔ 5)) hΩ]
+  have hfinal : m * |(d : ℝ) - d'|
+      ≤ m * (sec7_cdMar * (S.Δ ^ 2 / (P.H ^ 2 * P.G * S.A))) := le_trans hmd2 hmT
+  exact le_of_mul_le_mul_left hfinal hmpos
 
 /-- Public constructor matching the private `BoxSum.sec7_phase_build` input/output shape. -/
 theorem sec7_phase_construct (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (ha : 0 < a)
@@ -6221,13 +6540,27 @@ theorem sec7_phase_construct (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (ha
         Ph.ftil r = Ffun P.X (a : ℝ) (dtilde P.X r (a : ℝ))) ∧
       (∀ {d f : ℤ}, S.D ≤ (d : ℝ) → (d : ℝ) ≤ 2 * S.D →
         f = round (Ffun P.X (a : ℝ) (d : ℝ)) →
+        Counting.distInt (Ffun P.X (a : ℝ) (d : ℝ)) ≤ 2 * P.H / (d : ℝ) ^ 2 →
         |(d : ℝ) - Ph.dBreve (f : ℝ)| ≤
           sec7_cdMar * (S.Δ ^ 2 / (P.H ^ 2 * P.G * S.A))) := by
   refine ⟨sec7_phase_concrete P S W a ha hAD hG1 ha_lo ha_hi Env hW c₀ Cu hsd
     hbud hg0 hu0 hX24 hG10x hUbig, ?_, ?_⟩
   · intro r hrlo hrhi
     rfl
-  · intro d f hdD hd2D hf
-    exact sec7_phase_round_inverse_margin P S a ha hAD hG1 ha_lo ha_hi hdD hd2D hf
+  · intro d f hdD hd2D hf hnear
+    have hpert : 2 * P.H / S.D ^ 2 ≤ S.F / 1000 := by
+      have hHA := sec7_ra_HA2_large (P := P) (S := S) (W := W) Env hW c₀ Cu hsd
+      have hH := P.H_pos
+      have hA : 0 < S.A := mul_pos S.Δ_pos S.Ω_pos
+      have hD : 0 < S.D := S.D_pos
+      have hHA2 : (10 : ℝ) ^ 120 * P.H ≤ S.F * S.A ^ 2 := by
+        rw [← mul_div_assoc] at hHA
+        have h2 := (div_le_iff₀ (pow_pos hA 2)).mp hHA
+        calc (10 : ℝ) ^ 120 * P.H = 10 ^ 100 * sec7_cJ * P.H := by norm_num [sec7_cJ]
+          _ ≤ S.F * S.A ^ 2 := h2
+      rw [div_le_div_iff₀ (pow_pos hD 2) (by norm_num)]
+      nlinarith [hHA2, hH.le, mul_le_mul_of_nonneg_left
+        (show (100 : ℝ) * S.A ^ 2 ≤ S.D ^ 2 by nlinarith [hAD, hA.le]) (sec7_ra_F_pos S).le]
+    exact sec7_phase_round_inverse_margin P S a ha hAD hG1 ha_lo ha_hi hdD hd2D hf hnear hpert
 
 end Squarefree
