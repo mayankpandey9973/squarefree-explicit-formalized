@@ -77,12 +77,18 @@ private theorem sec7_leib_two (F G : ℕ → ℝ → ℝ) (t : ℝ) :
   simp [sec7_leib, Finset.sum_range_succ]
   ring
 
+private theorem sec7_leib_three (F G : ℕ → ℝ → ℝ) (t : ℝ) :
+    sec7_leib F G 3 t =
+      F 0 t * G 3 t + 3 * (F 1 t * G 2 t) + 3 * (F 2 t * G 1 t) + F 3 t * G 0 t := by
+  simp [sec7_leib, Finset.sum_range_succ]
+  ring
+
 /-- The Leibniz family is a derivative chain (order 2) on any set where both factor
 families are chains. -/
 theorem sec7_leib_deriv {F G : ℕ → ℝ → ℝ} {s : Set ℝ}
-    (hF : ∀ m < 2, ∀ r ∈ s, HasDerivAt (F m) (F (m + 1) r) r)
-    (hG : ∀ m < 2, ∀ r ∈ s, HasDerivAt (G m) (G (m + 1) r) r) :
-    ∀ m < 2, ∀ r ∈ s, HasDerivAt (sec7_leib F G m) (sec7_leib F G (m + 1) r) r := by
+    (hF : ∀ m < 3, ∀ r ∈ s, HasDerivAt (F m) (F (m + 1) r) r)
+    (hG : ∀ m < 3, ∀ r ∈ s, HasDerivAt (G m) (G (m + 1) r) r) :
+    ∀ m < 3, ∀ r ∈ s, HasDerivAt (sec7_leib F G m) (sec7_leib F G (m + 1) r) r := by
   intro m hm r hr
   interval_cases m
   · -- grade 0 → 1
@@ -102,6 +108,19 @@ theorem sec7_leib_deriv {F G : ℕ → ℝ → ℝ} {s : Set ℝ}
     have hval : F 1 r * G 1 r + F 0 r * G 2 r + (F 2 r * G 0 r + F 1 r * G 1 r) =
         sec7_leib F G 2 r := by
       rw [sec7_leib_two]; ring
+    rw [← hfun, ← hval]
+    exact h
+  · -- grade 2 → 3
+    have h1 := (hF 0 (by norm_num) r hr).mul (hG 2 (by norm_num) r hr)
+    have h2 := (hF 1 (by norm_num) r hr).mul (hG 1 (by norm_num) r hr)
+    have h3 := (hF 2 (by norm_num) r hr).mul (hG 0 (by norm_num) r hr)
+    have h := (h1.add (h2.const_mul 2)).add h3
+    have hfun : (fun t => F 0 t * G 2 t + 2 * (F 1 t * G 1 t) + F 2 t * G 0 t) =
+        sec7_leib F G 2 := by
+      funext t; rw [sec7_leib_two]
+    have hval : F 1 r * G 2 r + F 0 r * G 3 r + 2 * (F 2 r * G 1 r + F 1 r * G 2 r) +
+        (F 3 r * G 0 r + F 2 r * G 1 r) = sec7_leib F G 3 r := by
+      rw [sec7_leib_three]; ring
     rw [← hfun, ← hval]
     exact h
 

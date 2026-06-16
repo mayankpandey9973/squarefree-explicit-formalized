@@ -242,24 +242,25 @@ theorem sec7_err_deriv_bound {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
   -- its chain on the mid window
   have hchain : ∀ k < 2, ∀ x ∈ sec7_rWinMid S W, HasDerivAt (F k) (F (k + 1) x) x := by
     intro k hk x hx
-    have c1 := sec7E_eP3_chain ME hh₁ hh₂ hh₃ hpad hshift k hk x hx
+    have hk3 : k < 3 := by omega
+    have c1 := sec7E_eP3_chain ME hh₁ hh₂ hh₃ hpad hshift k hk3 x hx
     have c2 := sec7_leib_deriv (sec7E_eA_chain ME hh₁ hh₂ hh₃ hpad hshift)
-      (sec7E_gB_chain ME hh₁ hh₂ hh₃ hshift ρ₀) k hk x hx
+      (sec7E_gB_chain ME hh₁ hh₂ hh₃ hshift ρ₀) k hk3 x hx
     have c3 := sec7_leib_deriv (sec7E_M1_chain ME hpad)
-      (sec7E_eB0_chain ME hh₁ hh₂ hh₃ hpad hshift) k hk x hx
+      (sec7E_eB0_chain ME hh₁ hh₂ hh₃ hpad hshift) k hk3 x hx
     have c4 := sec7_leib_deriv (sec7E_eQ_chain ME hh₁ hh₂ hh₃ hpad hshift hh₁ hle₁)
-      (sec7E_gK_chain ME hh₁ hh₂ hh₃ hshift hh₂ hh₃ hle₂ hle₃ hξ₁ ((ρ₁:ℝ) - u₁)) k hk x hx
+      (sec7E_gK_chain ME hh₁ hh₂ hh₃ hshift hh₂ hh₃ hle₂ hle₃ hξ₁ ((ρ₁:ℝ) - u₁)) k hk3 x hx
     have c5 := sec7_leib_deriv (sec7E_N_chain ME hpad h₁)
-      (sec7E_eK_chain ME hh₁ hh₂ hh₃ hpad hshift hh₂ hh₃ hle₂ hle₃ hξ₁) k hk x hx
+      (sec7E_eK_chain ME hh₁ hh₂ hh₃ hpad hshift hh₂ hh₃ hle₂ hle₃ hξ₁) k hk3 x hx
     have c6 := sec7_leib_deriv (sec7E_eQ_chain ME hh₁ hh₂ hh₃ hpad hshift hh₂ hle₂)
-      (sec7E_gK_chain ME hh₁ hh₂ hh₃ hshift hh₁ hh₃ hle₁ hle₃ hξ₂ ((ρ₂:ℝ) - u₂)) k hk x hx
+      (sec7E_gK_chain ME hh₁ hh₂ hh₃ hshift hh₁ hh₃ hle₁ hle₃ hξ₂ ((ρ₂:ℝ) - u₂)) k hk3 x hx
     have c7 := sec7_leib_deriv (sec7E_N_chain ME hpad h₂)
-      (sec7E_eK_chain ME hh₁ hh₂ hh₃ hpad hshift hh₁ hh₃ hle₁ hle₃ hξ₂) k hk x hx
+      (sec7E_eK_chain ME hh₁ hh₂ hh₃ hpad hshift hh₁ hh₃ hle₁ hle₃ hξ₂) k hk3 x hx
     have c8 := sec7_leib_deriv (sec7E_eQ_chain ME hh₁ hh₂ hh₃ hpad hshift hh₃ hle₃)
-      (sec7E_gK_chain ME hh₁ hh₂ hh₃ hshift hh₁ hh₂ hle₁ hle₂ hξ₃ ((ρ₃:ℝ) - u₃)) k hk x hx
+      (sec7E_gK_chain ME hh₁ hh₂ hh₃ hshift hh₁ hh₂ hle₁ hle₂ hξ₃ ((ρ₃:ℝ) - u₃)) k hk3 x hx
     have c9 := sec7_leib_deriv (sec7E_N_chain ME hpad h₃)
-      (sec7E_eK_chain ME hh₁ hh₂ hh₃ hpad hshift hh₁ hh₂ hle₁ hle₂ hξ₃) k hk x hx
-    have c10 := sec7E_T6_chain ME hpad k hk x hx
+      (sec7E_eK_chain ME hh₁ hh₂ hh₃ hpad hshift hh₁ hh₂ hle₁ hle₂ hξ₃) k hk3 x hx
+    have c10 := sec7E_T6_chain ME hpad k hk3 x hx
     simp only [hFdef]
     exact ((((((((c1.add c2).add c3).add c4).add c5).add c6).add c7).add c8).add
       c9).add c10

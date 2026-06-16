@@ -59,7 +59,7 @@ private theorem sec7Phi_A_chain
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4)) :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7Phi_A ME k) (sec7Phi_A ME (k + 1) x) x := by
   intro k hk x hx
   have hSv3 : (3 : ℝ) ≤ sec7_hSum h₁ h₂ h₃ := sec7_hSum_ge3 hh₁ hh₂ hh₃
@@ -71,7 +71,7 @@ private theorem sec7Phi_Q_chain
     (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
     {h : ℤ} (hh : 1 ≤ h) (hhle : (h : ℝ) ≤ sec7_hSum h₁ h₂ h₃) :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7Phi_Q ME h k) (sec7Phi_Q ME h (k + 1) x) x := by
   intro k hk x hx
   have hSv3 : (3 : ℝ) ≤ sec7_hSum h₁ h₂ h₃ := sec7_hSum_ge3 hh₁ hh₂ hh₃
@@ -132,7 +132,7 @@ theorem sec7_ErrJet_zero
   rw [sec7_PhiJet_zero ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ r,
     sec7_principalJet_zero ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ r]
 
-/-- The phase jet is a derivative chain through order two on the open mid-window. -/
+/-- The phase jet is a derivative chain through order three on the open mid-window. -/
 theorem sec7_PhiJet_chain
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃)
@@ -140,7 +140,7 @@ theorem sec7_PhiJet_chain
     (hξ₃ : |ξ₃| ≤ sec7_hSum h₁ h₂ h₃)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
     (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ) :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ k)
         (sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ (k + 1) x) x := by
   have a1 : (1 : ℝ) ≤ (h₁ : ℝ) := by exact_mod_cast hh₁
@@ -170,12 +170,12 @@ theorem sec7_PhiJet_chain
       k hk x hx
   simpa only [sec7_PhiJet] using ((((c1.add c2).add c3).add c4).add c5)
 
-/-- The principal-part jet is a derivative chain through order two on the open mid-window. -/
+/-- The principal-part jet is a derivative chain through order three on the open mid-window. -/
 theorem sec7_principalJet_chain
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (hpad : 6 * (W + W ^ 2 + W ^ 4) ≤ S.R / 288)
     (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ) :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7_principalJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ k)
         (sec7_principalJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ (k + 1) x) x := by
   intro k hk x hx
@@ -186,7 +186,7 @@ theorem sec7_principalJet_chain
     (sec7_powMonD_hasDerivAt hR _ _ k hx0)).add
     (sec7_powMonD_hasDerivAt hR _ _ k hx0)
 
-/-- The error jet is a derivative chain through order two on the open mid-window. -/
+/-- The error jet is a derivative chain through order three on the open mid-window. -/
 theorem sec7_ErrJet_chain
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃)
@@ -195,7 +195,7 @@ theorem sec7_ErrJet_chain
     (hpad : 6 * (W + W ^ 2 + W ^ 4) ≤ S.R / 288)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
     (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ) :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ k)
         (sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ (k + 1) x) x := by
   intro k hk x hx
@@ -204,7 +204,7 @@ theorem sec7_ErrJet_chain
       ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ k hk x hx).sub
       (sec7_principalJet_chain ME hpad ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ k hk x hx)
 
-/-- On the count window, `iteratedDeriv m Φ` is the phase jet for `m ≤ 2`. -/
+/-- On the count window, `iteratedDeriv m Φ` is the phase jet for `m ≤ 3`. -/
 theorem sec7_Phi_iteratedDeriv_eq
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃)
@@ -213,7 +213,7 @@ theorem sec7_Phi_iteratedDeriv_eq
     (hW : 0 < W)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
     (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ) :
-    ∀ m ≤ 2, ∀ r ∈ sec7_rWin S W,
+    ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
       iteratedDeriv m
           (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r =
         sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ m r := by
@@ -223,13 +223,13 @@ theorem sec7_Phi_iteratedDeriv_eq
     (sec7_PhiJet_chain ME hh₁ hh₂ hh₃ hξ₁ hξ₂ hξ₃ hshift ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃)
     m hm r (sec7_rWin_subset_mid S hW hr)
 
-/-- On the count window, `iteratedDeriv m principal` is the principal jet for `m ≤ 2`. -/
+/-- On the count window, `iteratedDeriv m principal` is the principal jet for `m ≤ 3`. -/
 theorem sec7_principal_iteratedDeriv_eq
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (hW : 0 < W)
     (hpad : 6 * (W + W ^ 2 + W ^ 4) ≤ S.R / 288)
     (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ) :
-    ∀ m ≤ 2, ∀ r ∈ sec7_rWin S W,
+    ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
       iteratedDeriv m (ME.principal ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r =
         sec7_principalJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ m r := by
   intro m hm r hr
@@ -238,7 +238,7 @@ theorem sec7_principal_iteratedDeriv_eq
     (sec7_principalJet_chain ME hpad ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃)
     m hm r (sec7_rWin_subset_mid S hW hr)
 
-/-- On the count window, `iteratedDeriv m Err` is the error jet for `m ≤ 2`. -/
+/-- On the count window, `iteratedDeriv m Err` is the error jet for `m ≤ 3`. -/
 theorem sec7_Err_iteratedDeriv_eq
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃)
@@ -248,7 +248,7 @@ theorem sec7_Err_iteratedDeriv_eq
     (hpad : 6 * (W + W ^ 2 + W ^ 4) ≤ S.R / 288)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
     (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ) :
-    ∀ m ≤ 2, ∀ r ∈ sec7_rWin S W,
+    ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
       iteratedDeriv m (ME.Err ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r =
         sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ m r := by
   intro m hm r hr
@@ -257,7 +257,7 @@ theorem sec7_Err_iteratedDeriv_eq
     (sec7_ErrJet_chain ME hh₁ hh₂ hh₃ hξ₁ hξ₂ hξ₃ hpad hshift ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃)
     m hm r (sec7_rWin_subset_mid S hW hr)
 
-/-- The reusable split `Φ^(m) = principal^(m) + Err^(m)` on the count window, for `m ≤ 2`. -/
+/-- The reusable split `Φ^(m) = principal^(m) + Err^(m)` on the count window, for `m ≤ 3`. -/
 theorem sec7_Phi_iteratedDeriv_eq_principal_add_Err
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃)
@@ -267,7 +267,7 @@ theorem sec7_Phi_iteratedDeriv_eq_principal_add_Err
     (hpad : 6 * (W + W ^ 2 + W ^ 4) ≤ S.R / 288)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
     (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ) :
-    ∀ m ≤ 2, ∀ r ∈ sec7_rWin S W,
+    ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
       iteratedDeriv m
           (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r =
         iteratedDeriv m (ME.principal ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r

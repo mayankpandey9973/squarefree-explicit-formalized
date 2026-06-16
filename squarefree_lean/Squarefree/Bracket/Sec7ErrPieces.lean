@@ -28,7 +28,7 @@ from the mid window by at most `3h_Σ` (under `hshift`). -/
 theorem sec7E_basePt {F : ℕ → ℝ → ℝ}
     (hF : ∀ m < 4, ∀ r ∈ sec7_rWinWide S W, HasDerivAt (F m) (F (m + 1) r) r)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
-    {k : ℕ} (hk : k < 2) {x : ℝ} (hx : x ∈ sec7_rWinMid S W)
+    {k : ℕ} (hk : k < 3) {x : ℝ} (hx : x ∈ sec7_rWinMid S W)
     {d : ℝ} (hd : |d| ≤ 3 * sec7_hSum h₁ h₂ h₃) :
     HasDerivAt (F k) (F (k + 1) (x + d)) (x + d) :=
   hF k (by omega) (x + d) (sec7_mem_wide_of_near hx (le_trans hd hshift))
@@ -37,7 +37,7 @@ theorem sec7E_basePt {F : ℕ → ℝ → ℝ}
 theorem sec7E_shift_chain {F : ℕ → ℝ → ℝ}
     (hF : ∀ m < 4, ∀ r ∈ sec7_rWinWide S W, HasDerivAt (F m) (F (m + 1) r) r)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
-    {k : ℕ} (hk : k < 2) {x : ℝ} (hx : x ∈ sec7_rWinMid S W)
+    {k : ℕ} (hk : k < 3) {x : ℝ} (hx : x ∈ sec7_rWinMid S W)
     {d : ℝ} (hd : |d| ≤ 3 * sec7_hSum h₁ h₂ h₃) :
     HasDerivAt (fun t => F k (t + d)) (F (k + 1) (x + d)) x := by
   have := (sec7E_basePt hF hshift hk hx hd).comp x ((hasDerivAt_id x).add_const d)
@@ -48,7 +48,7 @@ theorem sec7E_shift_chain {F : ℕ → ℝ → ℝ}
 theorem sec7E_d1shift_chain {F : ℕ → ℝ → ℝ}
     (hF : ∀ m < 4, ∀ r ∈ sec7_rWinWide S W, HasDerivAt (F m) (F (m + 1) r) r)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
-    {k : ℕ} (hk : k < 2) {x : ℝ} (hx : x ∈ sec7_rWinMid S W)
+    {k : ℕ} (hk : k < 3) {x : ℝ} (hx : x ∈ sec7_rWinMid S W)
     {d h : ℝ} (hd : |d| ≤ 3 * sec7_hSum h₁ h₂ h₃)
     (hdh : |d + h| ≤ 3 * sec7_hSum h₁ h₂ h₃) :
     HasDerivAt (fun t => diff1 h (F k) (t + d)) (diff1 h (F (k + 1)) (x + d)) x := by
@@ -71,7 +71,7 @@ theorem sec7E_d1shift_chain {F : ℕ → ℝ → ℝ}
 theorem sec7E_d2shift_chain {F : ℕ → ℝ → ℝ}
     (hF : ∀ m < 4, ∀ r ∈ sec7_rWinWide S W, HasDerivAt (F m) (F (m + 1) r) r)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
-    {k : ℕ} (hk : k < 2) {x : ℝ} (hx : x ∈ sec7_rWinMid S W)
+    {k : ℕ} (hk : k < 3) {x : ℝ} (hx : x ∈ sec7_rWinMid S W)
     {d g h : ℝ} (hd : |d| ≤ 3 * sec7_hSum h₁ h₂ h₃)
     (hdh : |d + h| ≤ 3 * sec7_hSum h₁ h₂ h₃)
     (hdg : |d + g| ≤ 3 * sec7_hSum h₁ h₂ h₃)
@@ -102,7 +102,7 @@ theorem sec7E_diff3_chain {F : ℕ → ℝ → ℝ}
     (hF : ∀ m < 4, ∀ r ∈ sec7_rWinWide S W, HasDerivAt (F m) (F (m + 1) r) r)
     (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
-    {k : ℕ} (hk : k < 2) {x : ℝ} (hx : x ∈ sec7_rWinMid S W) :
+    {k : ℕ} (hk : k < 3) {x : ℝ} (hx : x ∈ sec7_rWinMid S W) :
     HasDerivAt (fun t => diff3 (h₁ : ℝ) h₂ h₃ (F k) t)
       (diff3 (h₁ : ℝ) h₂ h₃ (F (k + 1)) x) x := by
   have a1 : (1:ℝ) ≤ (h₁:ℝ) := by exact_mod_cast hh₁
@@ -312,7 +312,7 @@ variable (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃)
 include hh₁ hh₂ hh₃ hpad hshift
 
 theorem sec7E_eA_chain :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W, HasDerivAt (sec7E_eA ME k) (sec7E_eA ME (k + 1) x) x := by
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W, HasDerivAt (sec7E_eA ME k) (sec7E_eA ME (k + 1) x) x := by
   intro k hk x hx
   have hR : 0 < S.R := sec7_R_pos S
   have hx0 : 0 < x := sec7E_mid_pos hpad hx
@@ -328,7 +328,7 @@ theorem sec7E_eA_chain :
   simpa only [sec7E_eA] using h1.sub h2
 
 theorem sec7E_eQ_chain {h : ℤ} (hh : 1 ≤ h) (hhle : (h:ℝ) ≤ sec7_hSum h₁ h₂ h₃) :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7E_eQ ME h k) (sec7E_eQ ME h (k + 1) x) x := by
   intro k hk x hx
   have hR : 0 < S.R := sec7_R_pos S
@@ -364,7 +364,7 @@ theorem sec7E_eQ_chain {h : ℤ} (hh : 1 ≤ h) (hhle : (h:ℝ) ≤ sec7_hSum h�
 theorem sec7E_eK_chain {g h : ℤ} (hg : 1 ≤ g) (hh : 1 ≤ h)
     (hgle : (g:ℝ) ≤ sec7_hSum h₁ h₂ h₃) (hhle : (h:ℝ) ≤ sec7_hSum h₁ h₂ h₃)
     {ξ : ℝ} (hξ : |ξ| ≤ sec7_hSum h₁ h₂ h₃) :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7E_eK ME g h ξ k) (sec7E_eK ME g h ξ (k + 1) x) x := by
   intro k hk x hx
   have hR : 0 < S.R := sec7_R_pos S
@@ -387,7 +387,7 @@ theorem sec7E_eK_chain {g h : ℤ} (hg : 1 ≤ g) (hh : 1 ≤ h)
   simpa only [sec7E_eK] using h1.sub h2
 
 theorem sec7E_eB0_chain :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7E_eB0 ME k) (sec7E_eB0 ME (k + 1) x) x := by
   intro k hk x hx
   have hR : 0 < S.R := sec7_R_pos S
@@ -399,7 +399,7 @@ theorem sec7E_eB0_chain :
   simpa only [sec7E_eB0] using h1.sub h2
 
 theorem sec7E_eP3_chain :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7E_eP3 ME k) (sec7E_eP3 ME (k + 1) x) x := by
   intro k hk x hx
   have hR : 0 < S.R := sec7_R_pos S
@@ -412,7 +412,7 @@ theorem sec7E_eP3_chain :
 
 omit hpad in
 theorem sec7E_gB_chain (ρ₀ : ℤ) :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7E_gB ME ρ₀ k) (sec7E_gB ME ρ₀ (k + 1) x) x := by
   intro k hk x hx
   have h1 := sec7E_diff3_chain ME.f2C_deriv hh₁ hh₂ hh₃ hshift hk hx
@@ -422,7 +422,7 @@ omit hpad in
 theorem sec7E_gK_chain {g h : ℤ} (hg : 1 ≤ g) (hh : 1 ≤ h)
     (hgle : (g:ℝ) ≤ sec7_hSum h₁ h₂ h₃) (hhle : (h:ℝ) ≤ sec7_hSum h₁ h₂ h₃)
     {ξ : ℝ} (hξ : |ξ| ≤ sec7_hSum h₁ h₂ h₃) (c : ℝ) :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7E_gK ME g h ξ c k) (sec7E_gK ME g h ξ c (k + 1) x) x := by
   intro k hk x hx
   have hSv3 : (3:ℝ) ≤ sec7_hSum h₁ h₂ h₃ := sec7_hSum_ge3 hh₁ hh₂ hh₃
@@ -441,7 +441,7 @@ theorem sec7E_gK_chain {g h : ℤ} (hg : 1 ≤ g) (hh : 1 ≤ h)
 
 omit hh₁ hh₂ hh₃ hshift in
 theorem sec7E_T6_chain :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7E_T6 ME k) (sec7E_T6 ME (k + 1) x) x := by
   intro k hk x hx
   have hR : 0 < S.R := sec7_R_pos S
@@ -450,7 +450,7 @@ theorem sec7E_T6_chain :
 
 omit hh₁ hh₂ hh₃ hshift in
 theorem sec7E_M1_chain :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7E_M1 ME k) (sec7E_M1 ME (k + 1) x) x := by
   intro k hk x hx
   have hR : 0 < S.R := sec7_R_pos S
@@ -460,7 +460,7 @@ theorem sec7E_M1_chain :
 
 omit hh₁ hh₂ hh₃ hshift in
 theorem sec7E_N_chain (h : ℤ) :
-    ∀ k < 2, ∀ x ∈ sec7_rWinMid S W,
+    ∀ k < 3, ∀ x ∈ sec7_rWinMid S W,
       HasDerivAt (sec7E_N ME h k) (sec7E_N ME h (k + 1) x) x := by
   intro k hk x hx
   have hR : 0 < S.R := sec7_R_pos S

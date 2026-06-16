@@ -51,7 +51,7 @@ theorem sec7E_eA_bound : ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
       ME.f1C 0 (x + sec7_hSum h₁ h₂ h₃) from (ME.f1C_zero _).symm]
     ring
   have hid := sec7_iteratedDeriv_eq_of_chain_eqOn (sec7_rWinMid_isOpen S W) h0
-    (sec7E_eA_chain ME hh₁ hh₂ hh₃ hpad hshift) k hk r (sec7_rWin_subset_mid S hW hr)
+    (sec7E_eA_chain ME hh₁ hh₂ hh₃ hpad hshift) k (by omega) r (sec7_rWin_subset_mid S hW hr)
   rw [← hid]
   exact ME.f1_exp k hk r hr
 
@@ -75,7 +75,7 @@ theorem sec7E_eQ_bound {h : ℤ} (hh : 1 ≤ h) (hhle : (h:ℝ) ≤ sec7_hSum h�
     simp only [sec7E_eQ, sec7E_N, sec7_powMonD_zero, sec7_powMon]
     rw [show Ph.f1D j 0 = ME.f1C 0 from (funext ME.f1C_zero).symm]
   have hid := sec7_iteratedDeriv_eq_of_chain_eqOn (sec7_rWinMid_isOpen S W) h0
-    (sec7E_eQ_chain ME hh₁ hh₂ hh₃ hpad hshift hh hhle) k hk r (sec7_rWin_subset_mid S hW hr)
+    (sec7E_eQ_chain ME hh₁ hh₂ hh₃ hpad hshift hh hhle) k (by omega) r (sec7_rWin_subset_mid S hW hr)
   rw [← hid]
   exact hfield k hk r hr
 
@@ -101,7 +101,7 @@ theorem sec7E_eK_bound {g h : ℤ} (hg : 1 ≤ g) (hh : 1 ≤ h)
     simp only [sec7E_eK, sec7E_L, sec7_powMonD_zero, sec7_powMon]
     rw [show Ph.f2D 0 = ME.f2C 0 from (funext ME.f2C_zero).symm]
   have hid := sec7_iteratedDeriv_eq_of_chain_eqOn (sec7_rWinMid_isOpen S W) h0
-    (sec7E_eK_chain ME hh₁ hh₂ hh₃ hpad hshift hg hh hgle hhle hξ) k hk r
+    (sec7E_eK_chain ME hh₁ hh₂ hh₃ hpad hshift hg hh hgle hhle hξ) k (by omega) r
     (sec7_rWin_subset_mid S hW hr)
   rw [← hid]
   exact hfield k hk r hr
@@ -119,7 +119,7 @@ theorem sec7E_eB0_bound : ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
     simp only [sec7E_eB0, sec7E_M0, sec7_powMonD_zero, sec7_powMon]
     rw [show Ph.f2D 0 = ME.f2C 0 from (funext ME.f2C_zero).symm]
   have hid := sec7_iteratedDeriv_eq_of_chain_eqOn (sec7_rWinMid_isOpen S W) h0
-    (sec7E_eB0_chain ME hh₁ hh₂ hh₃ hpad hshift) k hk r (sec7_rWin_subset_mid S hW hr)
+    (sec7E_eB0_chain ME hh₁ hh₂ hh₃ hpad hshift) k (by omega) r (sec7_rWin_subset_mid S hW hr)
   rw [← hid]
   exact ME.B03_exp k hk r hr
 
@@ -136,7 +136,7 @@ theorem sec7E_eP3_bound : ∀ k ≤ 2, ∀ r ∈ sec7_rWin S W,
     simp only [sec7E_eP3, sec7E_M3, sec7_powMonD_zero, sec7_powMon]
     rw [show Ph.f3D j 0 = ME.f3C 0 from (funext ME.f3C_zero).symm]
   have hid := sec7_iteratedDeriv_eq_of_chain_eqOn (sec7_rWinMid_isOpen S W) h0
-    (sec7E_eP3_chain ME hh₁ hh₂ hh₃ hpad hshift) k hk r (sec7_rWin_subset_mid S hW hr)
+    (sec7E_eP3_chain ME hh₁ hh₂ hh₃ hpad hshift) k (by omega) r (sec7_rWin_subset_mid S hW hr)
   rw [← hid]
   exact ME.d3f3_exp k hk r hr
 
