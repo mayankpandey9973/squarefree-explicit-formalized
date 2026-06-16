@@ -6,6 +6,7 @@ import Squarefree.Bracket.Sec7Cube
 import Squarefree.Bracket.Sec7Harvest
 import Squarefree.Bracket.Sec7MonExpBuild
 import Squarefree.Bracket.Sec7Nonzero
+import Squarefree.Bracket.Sec7PhaseConstruct
 import Squarefree.Bracket.Sec7Prox
 import Squarefree.Counting.Preimage
 import Squarefree.Structure.DaSpacing
@@ -384,87 +385,64 @@ private theorem sec7_zero_hsub2 {P : Globals} {S : Scale P} (c₀ Cu : ℝ)
           exact mul_le_mul_of_nonneg_right htarget (by positivity)
     _ = P.H := by field_simp [hG.ne', hΩ.ne']
 
-private theorem sec7_zero_hsub2F {P : Globals} {S : Scale P} (c₀ Cu : ℝ)
+/-- **Power-saving f₁/f₃ residual floor** (replaces the old `relErr·G·U²` subordination
+form after the `hG10x`-deletion re-pin): `G·Ω⁵·relErrF ≤ 1/cSub` with `relErrF = X^{-19/100}`.
+Proof: `G·Ω⁵ ≤ G·U⁵ = X^{g+5u} ≤ X^{1/100}` (band `Ω ≤ U`, admissibility `g+5u ≤ 1/100`),
+so `G·Ω⁵·relErrF ≤ X^{-18/100} ≤ 1/cSub` since `X^{18/100} ≥ (2^24)^18 ≥ 10^55 = cSub`. -/
+private theorem sec7_zero_hGΩ5F {P : Globals} {S : Scale P} (c₀ Cu : ℝ)
     (hsd : OnStripAux.StripData P S c₀ Cu) (hbud : OnStripAux.Budget P.g P.u Cu)
     (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ)) :
-    sec7_cSub * (P.G ^ 2 * S.Ω ^ 6 * P.U ^ 5) ≤ P.H := by
-  have hXgt : 1 < P.X := by
-    by_contra h
-    have h' : P.X ≤ 1 := not_lt.mp h
-    have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
-    linarith
+    P.G * S.Ω ^ 5 * sec7_relErrF P S ≤ 1 / sec7_cSub := by
+  have hc : (0 : ℝ) < sec7_cSub := sec7_cSub_pos
+  have hX1 : (1 : ℝ) ≤ P.X := by
+    rcases le_or_gt 1 P.X with h | h
+    · exact h
+    · exfalso
+      have h1 : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h.le (by norm_num)
+      have : (16777216 : ℝ) ≤ 1 := le_trans hX24 h1
+      norm_num at this
   have hbud' : 18977 * P.g + 18675 * P.u ≤ 2 := by
     have hCu0 : 0 ≤ Cu := le_trans zero_le_one hsd.hCu
     have hextra : 0 ≤ 790 * Cu * P.u := by
       nlinarith [mul_nonneg hCu0 hu0.le]
     unfold OnStripAux.Budget at hbud
     nlinarith [hbud, hextra]
-  have hratio : (1 : ℝ) <
-      P.H ^ ((3/5 : ℝ) - 25 * P.u) * S.x ^ (0 : ℝ) *
-        P.G ^ (-(52/25 : ℝ) - 5 * P.u) *
-        S.Ω ^ (-(6 : ℝ)) :=
-    OnStripAux.one_lt_mono P S c₀ Cu hsd hXgt
-      ((3/5 : ℝ) - 25 * P.u) 0 (-(52/25 : ℝ) - 5 * P.u) (-(6 : ℝ))
-      (by
-        unfold OnStripAux.ratioExp
-        norm_num
-        nlinarith [hbud', hg0, hu0.le])
-  have hcX : sec7_cSub ≤ P.H ^ (2/5 : ℝ) * P.G ^ (2/25 : ℝ) := by
-    simpa [sec7_X_2_25_eq_HG P] using sec7_cSub_le_X_2_25 P hX24
-  have hH := P.H_pos
-  have hG := P.G_pos
-  have hΩ := S.Ω_pos
-  have hUeq : P.U ^ 5 = P.H ^ (25 * P.u) * P.G ^ (5 * P.u) := by
-    unfold Globals.U Globals.H Globals.G
-    rw [← Real.rpow_natCast (P.X ^ P.u) 5, ← Real.rpow_mul P.X_pos.le]
-    rw [← Real.rpow_mul P.X_pos.le, ← Real.rpow_mul P.X_pos.le, ← Real.rpow_add P.X_pos]
-    congr 1
-    ring
-  have htarget :
-      sec7_cSub * P.U ^ 5 ≤ P.H / (P.G ^ 2 * S.Ω ^ 6) := by
-    calc
-      sec7_cSub * P.U ^ 5
-          ≤ (P.H ^ (2/5 : ℝ) * P.G ^ (2/25 : ℝ)) * P.U ^ 5 := by
-          exact mul_le_mul_of_nonneg_right hcX (pow_nonneg P.U_pos.le 5)
-      _ = (P.H ^ (2/5 : ℝ) * P.G ^ (2/25 : ℝ)) *
-            (P.H ^ (25 * P.u) * P.G ^ (5 * P.u)) := by rw [hUeq]
-      _ ≤ (P.H ^ (2/5 : ℝ) * P.G ^ (2/25 : ℝ)) *
-            (P.H ^ (25 * P.u) * P.G ^ (5 * P.u)) *
-            (P.H ^ ((3/5 : ℝ) - 25 * P.u) * S.x ^ (0 : ℝ) *
-              P.G ^ (-(52/25 : ℝ) - 5 * P.u) * S.Ω ^ (-(6 : ℝ))) := by
-          exact le_mul_of_one_le_right (by positivity) hratio.le
-      _ = P.H / (P.G ^ 2 * S.Ω ^ 6) := by
-          rw [Real.rpow_zero]
-          rw [show (P.H ^ (2/5 : ℝ) * P.G ^ (2/25 : ℝ)) *
-                (P.H ^ (25 * P.u) * P.G ^ (5 * P.u)) *
-                (P.H ^ ((3/5 : ℝ) - 25 * P.u) * 1 *
-                  P.G ^ (-(52/25 : ℝ) - 5 * P.u) * S.Ω ^ (-(6 : ℝ))) =
-                (P.H ^ (2/5 : ℝ) * P.H ^ (25 * P.u) *
-                  P.H ^ ((3/5 : ℝ) - 25 * P.u)) *
-                  (P.G ^ (2/25 : ℝ) * P.G ^ (5 * P.u) *
-                    P.G ^ (-(52/25 : ℝ) - 5 * P.u)) *
-                  S.Ω ^ (-(6 : ℝ)) by ring]
-          rw [← Real.rpow_add hH, ← Real.rpow_add hH, ← Real.rpow_add hG,
-            ← Real.rpow_add hG, Real.rpow_neg hΩ.le]
-          rw [show (2 / 5 : ℝ) + 25 * P.u + (3 / 5 - 25 * P.u) = 1 by ring,
-            show (2 / 25 : ℝ) + 5 * P.u + (-(52 / 25) - 5 * P.u) = -2 by ring,
-            Real.rpow_one]
-          rw [show P.G ^ (-(2:ℝ)) = (P.G ^ 2)⁻¹ by
-            rw [Real.rpow_neg hG.le]
-            norm_num [Real.rpow_natCast]]
-          rw [show S.Ω ^ (6 : ℝ) = S.Ω ^ 6 by
-            norm_num [Real.rpow_natCast]]
-          rw [div_eq_mul_inv, mul_inv]
-          ring
-  have hden_pos : 0 < P.G ^ 2 * S.Ω ^ 6 := by positivity
-  calc
-    sec7_cSub * (P.G ^ 2 * S.Ω ^ 6 * P.U ^ 5)
-        = (sec7_cSub * P.U ^ 5) * (P.G ^ 2 * S.Ω ^ 6) := by ring
-    _ ≤ (P.H / (P.G ^ 2 * S.Ω ^ 6)) * (P.G ^ 2 * S.Ω ^ 6) := by
-          exact mul_le_mul_of_nonneg_right htarget (by positivity)
-    _ = P.H := by
-          rw [div_mul_cancel₀ _ (ne_of_gt hden_pos)]
+  have hexp : P.g + 5 * P.u ≤ (1 / 100 : ℝ) := by nlinarith [hbud', hg0, hu0.le]
+  have hGU5eq : P.G * P.U ^ 5 = P.X ^ (P.g + 5 * P.u) := by
+    unfold Globals.G Globals.U
+    rw [← Real.rpow_natCast (P.X ^ P.u) 5, ← Real.rpow_mul P.X_pos.le, ← Real.rpow_add P.X_pos]
+    congr 1; ring
+  have hGΩ5 : P.G * S.Ω ^ 5 ≤ P.X ^ (1 / 100 : ℝ) := by
+    have hΩU : S.Ω ≤ P.U := hsd.hΩhi
+    calc P.G * S.Ω ^ 5
+          ≤ P.G * P.U ^ 5 :=
+            mul_le_mul_of_nonneg_left (pow_le_pow_left₀ S.Ω_pos.le hΩU 5) P.G_pos.le
+      _ = P.X ^ (P.g + 5 * P.u) := hGU5eq
+      _ ≤ P.X ^ (1 / 100 : ℝ) := Real.rpow_le_rpow_of_exponent_le hX1 hexp
+  have hXpow18 : P.X ^ (18 / 100 : ℝ) = (P.X ^ (1 / 100 : ℝ)) ^ (18 : ℕ) := by
+    rw [← Real.rpow_natCast (P.X ^ (1 / 100 : ℝ)) 18, ← Real.rpow_mul P.X_pos.le]
+    congr 1; norm_num
+  have hXge : sec7_cSub ≤ P.X ^ (18 / 100 : ℝ) := by
+    rw [hXpow18, show sec7_cSub = (10 : ℝ) ^ 55 from rfl]
+    calc (10 : ℝ) ^ 55
+          ≤ (16777216 : ℝ) ^ (18 : ℕ) := by norm_num
+      _ ≤ (P.X ^ (1 / 100 : ℝ)) ^ (18 : ℕ) := pow_le_pow_left₀ (by norm_num) hX24 18
+  have hrelF0 : (0 : ℝ) ≤ sec7_relErrF P S := (sec7_relErrF_pos P S).le
+  rw [le_div_iff₀ hc]
+  calc P.G * S.Ω ^ 5 * sec7_relErrF P S * sec7_cSub
+        ≤ P.X ^ (1 / 100 : ℝ) * sec7_relErrF P S * sec7_cSub :=
+          mul_le_mul_of_nonneg_right
+            (mul_le_mul_of_nonneg_right hGΩ5 hrelF0) hc.le
+    _ = P.X ^ (1 / 100 : ℝ) * P.X ^ (-(19 : ℝ) / 100) * sec7_cSub := by
+          rw [show sec7_relErrF P S = P.X ^ (-(19 : ℝ) / 100) from rfl]
+    _ = P.X ^ (-(18 : ℝ) / 100) * sec7_cSub := by
+          rw [← Real.rpow_add P.X_pos]; congr 2; norm_num
+    _ ≤ P.X ^ (-(18 : ℝ) / 100) * P.X ^ (18 / 100 : ℝ) :=
+          mul_le_mul_of_nonneg_left hXge (Real.rpow_nonneg P.X_pos.le _)
+    _ = 1 := by
+          rw [← Real.rpow_add P.X_pos,
+            show (-(18 : ℝ) / 100) + (18 / 100 : ℝ) = 0 by norm_num, Real.rpow_zero]
 
 private theorem sec7_dyadic_cover_sum (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t : ℝ)
     (ht : 0 < t) :
@@ -1096,6 +1074,7 @@ private theorem sec7_nonzero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a
     (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ))
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (hj : sec7_jBand P S j) (hbox : sec7_shiftBox W h₁ h₂ h₃)
     (hξ₁ : |ξ₁| ≤ sec7_hSum h₁ h₂ h₃) (hξ₂ : |ξ₂| ≤ sec7_hSum h₁ h₂ h₃)
@@ -1134,7 +1113,7 @@ private theorem sec7_nonzero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a
   have hrel143 : sec7_relErr P S * 10 ^ 143 ≤ 1 :=
     sec7_relErr_le Env hW.le hsd hbud hg0 hu0 hX24
   have hrelF143 : sec7_relErrF P S * 10 ^ 143 ≤ 1 :=
-    sec7_relErrF_le Env hW.le hsd hbud hg0 hu0 hX24
+    sec7_relErrF_le Env hW.le hsd hbud hg0 hu0 hX24 hUbig
   have hcover : ∀ y : ℝ, S.R / 144 ≤ y → y ≤ 40 * S.R → y ∈ sec7_rWin S W := by
     intro y hylo hyhi
     rw [sec7_rWin, Set.mem_Icc]
@@ -1195,7 +1174,7 @@ private theorem sec7_nonzero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a
       ring_nf
       exact le_rfl
     have hwin := sec7_dyadic_block_subset_wide (S := S) hxl0 hxu0 hlo hhi
-    have hcnt := sec7_nonzero_count_78 P S W Env hW c₀ Cu hsd hbud hg0 hu0 hX24
+    have hcnt := sec7_nonzero_count_78 P S W Env hW c₀ Cu hsd hbud hg0 hu0 hX24 hUbig
       a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ME hj hbox hpad hshift hξ₁ hξ₂ hξ₃
       ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ₀ne hρ₀ hρ₁ hρ₂ hρ₃ hu₁ hu₂ hu₃ hErr hcd
       ⌈xl⌉₊ ⌊xu⌋₊ hwin hdy hcover δ (by rw [hδdef]; exact hδpos) (by rw [hδdef]; exact hδlt)
@@ -1223,7 +1202,7 @@ private theorem sec7_nonzero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a
       norm_num
       nlinarith [hR]
     have hwin := sec7_dyadic_block_subset_wide (S := S) hxl0 hxu0 hlo hhi
-    have hcnt := sec7_nonzero_count_78 P S W Env hW c₀ Cu hsd hbud hg0 hu0 hX24
+    have hcnt := sec7_nonzero_count_78 P S W Env hW c₀ Cu hsd hbud hg0 hu0 hX24 hUbig
       a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ME hj hbox hpad hshift hξ₁ hξ₂ hξ₃
       ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ₀ne hρ₀ hρ₁ hρ₂ hρ₃ hu₁ hu₂ hu₃ hErr hcd
       ⌈xl⌉₊ ⌊xu⌋₊ hwin hdy hcover δ (by rw [hδdef]; exact hδpos) (by rw [hδdef]; exact hδlt)
@@ -1450,7 +1429,8 @@ private theorem sec7_triple_split (P : Globals) (S : Scale P) (W : ℝ)
     (j : ℤ) (hj : sec7_jBand P S j)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
-    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ)) :
+    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ))
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     ∃ cz cn : ℕ × ℕ × ℕ → ℝ,
       (∀ p ∈ box W,
         ((sec7_cubeSet ((Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋).filter
@@ -1676,9 +1656,9 @@ private theorem sec7_triple_split (P : Globals) (S : Scale P) (W : ℝ)
               hj hbox hξ₁ hξ₂ hξ₃
             hsub1 := sec7_zero_hsub1 Env hW.le
             hsub2 := sec7_zero_hsub2 c₀ Cu hsd hbud hg0 hu0 hX24
-            hsub2F := sec7_zero_hsub2F c₀ Cu hsd hbud hg0 hu0 hX24
+            hGΩ5F := sec7_zero_hGΩ5F c₀ Cu hsd hbud hg0 hu0 hX24
             hrel := sec7_zero_hrel Env hbox c₀ Cu hsd hbud hg0 hu0 hX24
-            hrelF := sec7_relErrF_le Env (sec7_W_ge_one hbox) hsd hbud hg0 hu0 hX24 }
+            hrelF := sec7_relErrF_le Env (sec7_W_ge_one hbox) hsd hbud hg0 hu0 hX24 hUbig }
         have hcnt := sec7_zero_wide_count (ME := ME) Hyp hxsmall hδNpos le_rfl
         simpa [Tpiece, Bz, wide] using hcnt
     let Bn : ℝ := 11 * sec7_cN19 * (1 + Real.log P.X) *
@@ -1709,7 +1689,7 @@ private theorem sec7_triple_split (P : Globals) (S : Scale P) (W : ℝ)
         have hpcΛ : pc ∈ Λ := (Finset.mem_filter.mp hpc).1
         have hpcne : pc.1.1 ≠ 0 := (Finset.mem_filter.mp hpc).2
         have hpcData := hΛpiece pc hpcΛ
-        have hcnt := sec7_nonzero_wide_count Env hW c₀ Cu hsd hbud hg0 hu0 hX24
+        have hcnt := sec7_nonzero_wide_count Env hW c₀ Cu hsd hbud hg0 hu0 hX24 hUbig
           ME hj hbox hξ₁ hξ₂ hξ₃ hpcne hpcData.1.1 hpcData.1.2.1
           hpcData.1.2.2.1 hpcData.1.2.2.2 hpcData.2.1.1 hpcData.2.1.2.1 hpcData.2.1.2.2
         simpa [Tpiece, Bn, wide] using hcnt
@@ -1929,15 +1909,20 @@ private theorem sec7_phase_build (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
     (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
-    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu) :
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
+    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1 / 100 : ℝ))
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     ∃ Ph : Sec7Phase P S W a,
       (∀ {r : ℝ}, (1/72) * S.R ≤ r → r ≤ 16 * S.R →
         Ph.ftil r = Ffun P.X (a : ℝ) (dtilde P.X r (a : ℝ))) ∧
       (∀ {d f : ℤ}, S.D ≤ (d : ℝ) → (d : ℝ) ≤ 2 * S.D →
         f = round (Ffun P.X (a : ℝ) (d : ℝ)) →
+        Counting.distInt (Ffun P.X (a : ℝ) (d : ℝ)) ≤ 2 * P.H / (d : ℝ) ^ 2 →
         |(d : ℝ) - Ph.dBreve (f : ℝ)| ≤
-          sec7_cdMar * (S.Δ ^ 2 / (P.H ^ 2 * P.G * S.A))) := by
-  sorry -- STUB: N24-PHASE (inverse-F_a Sec7Phase construction + rounded inverse margin)
+          sec7_cdMar * (S.Δ ^ 2 / (P.H ^ 2 * P.G * S.A))) :=
+  sec7_phase_construct P S W a ha hAD hG1 ha_lo ha_hi Env hW c₀ Cu hsd
+    hbud hg0 hu0 hX24 hUbig
 
 /-- G1-AUDIT: dischargeability — the r-side phase/branch data pack for prop_7_3 (N24):
 the `Sec7Phase` bundle for the fiber `a` (a §3 construction, not yet in-tree), the N4
@@ -1951,6 +1936,9 @@ private theorem sec7_ra_data_pack (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ
     (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
+    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1 / 100 : ℝ))
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W) (Ra : Finset ℕ)
     (hRa : ∀ r ∈ Ra, RaWitness P S a r) :
     ∃ (Ph : Sec7Phase P S W a) (FdStar : ℤ → ℝ) (dStar fStar : ℤ → ℤ),
@@ -1968,6 +1956,7 @@ private theorem sec7_ra_data_pack (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ
         |FdStar r - Ph.ftil (r : ℝ)| ≤ 10 ^ 18 * (P.H / S.A ^ 2) := by
   obtain ⟨Ph, hftil, hdBreve⟩ :=
     sec7_phase_build P S W a ha hAD hG1 ha_lo ha_hi Env hW c₀ Cu hsd
+      hbud hg0 hu0 hX24 hUbig
   let Wint : ℤ → Prop := fun r => ∃ n ∈ Ra, (n : ℤ) = r ∧ RaWitness P S a n
   let dStar : ℤ → ℤ := fun r =>
     if h : Wint r then Classical.choose (Classical.choose_spec h).2.2 else 0
@@ -2020,6 +2009,9 @@ private theorem sec7_ra_data_pack (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ
       unfold Scale.R
       positivity
     have hdpos : 0 < (d : ℝ) := lt_of_lt_of_le S.D_pos hdD
+    -- N3 near-integrality (Prop 3.2): the `hnear` precondition of the rounded-inverse margin
+    have hdist : Counting.distInt (Ffun P.X (a : ℝ) (d : ℝ)) ≤ 2 * P.H / (d : ℝ) ^ 2 :=
+      inDa_distInt_Ffun (X := P.X) (H := P.H) (a := a) (d := d) P.X_pos hdpos ha hinDa
     refine ⟨?_, ?_, ?_, ?_, ?_⟩
     · rw [Finset.mem_Icc]
       exact ⟨Int.ceil_le.mpr (by simpa [show S.R / 72 = (1/72) * S.R by ring] using hrlo),
@@ -2031,10 +2023,8 @@ private theorem sec7_ra_data_pack (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ
       constructor
       · nlinarith [hrlo, hRpos, hs_nonneg]
       · nlinarith [hrhi, hRpos, hs_nonneg]
-    · simpa [d, hdStar, hfStar] using hdBreve hdD hd2D hfStar
-    · have hdist := inDa_distInt_Ffun (X := P.X) (H := P.H) (a := a) (d := d)
-        P.X_pos hdpos ha hinDa
-      have hnear_d : |(round (Ffun P.X (a : ℝ) (d : ℝ)) : ℝ) -
+    · simpa [d, hdStar, hfStar] using hdBreve hdD hd2D hfStar hdist
+    · have hnear_d : |(round (Ffun P.X (a : ℝ) (d : ℝ)) : ℝ) -
             Ffun P.X (a : ℝ) (d : ℝ)| ≤ 2 * P.H / (d : ℝ) ^ 2 := by
         simpa [Counting.distInt, abs_sub_comm] using hdist
       have hDsq : S.D ^ 2 ≤ (d : ℝ) ^ 2 := pow_le_pow_left₀ S.D_pos.le hdD 2
@@ -2113,6 +2103,7 @@ theorem prop_7_1 : ∃ C : ℝ, 0 < C ∧
     ∀ (P : Globals) (S : Scale P) (W : ℝ), Sec7Envelope P S W →
       ∀ c₀ Cu : ℝ, OnStripAux.StripData P S c₀ Cu → OnStripAux.Budget P.g P.u Cu →
       0 ≤ P.g → 0 < P.u → (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+      (10 : ℝ) ^ 33 ≤ P.U →
       Real.log P.X ≤ P.X ^ P.u →
       ∀ (a : ℤ) (Ph : Sec7Phase P S W a) (gfun : ℤ → ℝ → ℝ),
         (∀ (j : ℤ) (r : ℝ),
@@ -2130,7 +2121,7 @@ theorem prop_7_1 : ∃ C : ℝ, 0 < C ∧
   -- sec7_harvM` (200 < 1000, slack 5): N5 forces `(R/W)/cCube ≤ Σ cubes`, the two harvests
   -- cap `Σ cubes ≤ 2·(R/W)/harvM` — impossible for `R/W > 0`.
   refine ⟨sec7_cCubeIn, sec7_cCubeIn_pos, ?_⟩
-  intro P S W Env c₀ Cu hsd hbud hg0 hu0 hX24 _hlog a Ph gfun hg δ₀ hδ0 hδle j hjB
+  intro P S W Env c₀ Cu hsd hbud hg0 hu0 hX24 hUbig _hlog a Ph gfun hg δ₀ hδ0 hδle j hjB
   have hR1 : (1 : ℝ) < S.R := Env.R_gt_one
   have hW0 : (0 : ℝ) < W := Env.W_pos
   rcases le_or_gt W 1 with hW1 | hW1
@@ -2168,7 +2159,7 @@ theorem prop_7_1 : ∃ C : ℝ, 0 < C ∧
         (fun r : ℤ => distInt (gfun j (r : ℝ)) ≤ δ₀))
       (Finset.filter_subset _ _) hcon.le
     obtain ⟨cz, cn, hsplit, hzb, hnb⟩ := sec7_triple_split P S W Env hW1 a Ph gfun hg
-      δ₀ hδ0 hδle j hjB c₀ Cu hsd hbud hg0 hu0 hX24
+      δ₀ hδ0 hδle j hjB c₀ Cu hsd hbud hg0 hu0 hX24 hUbig
     have hZ := sec7_harvest_zero P S W Env hW1.le c₀ Cu hsd hbud hg0 hu0 hX24 cz hzb
     have hN := sec7_harvest_nonzero P S W Env hW1.le c₀ Cu hsd hbud hg0 hu0 hX24 cn hnb
     have hsum : (∑ p ∈ box W,
@@ -2192,6 +2183,7 @@ theorem prop_7_3 : ∃ C : ℝ, 0 < C ∧
       ∀ (W : ℝ), Sec7Envelope P S W →
       ∀ c₀ Cu : ℝ, OnStripAux.StripData P S c₀ Cu → OnStripAux.Budget P.g P.u Cu →
       0 ≤ P.g → 0 < P.u → (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+      (10 : ℝ) ^ 33 ≤ P.U →
       Real.log P.X ≤ P.X ^ P.u →
       ∀ (Ra : Finset ℕ), (∀ r ∈ Ra, RaWitness P S a r) →
         (Ra.card : ℝ) ≤ C * ((1 + P.H / S.A ^ 2) * (S.R / W)) := by
@@ -2200,12 +2192,13 @@ theorem prop_7_3 : ∃ C : ℝ, 0 < C ∧
   -- `z := sec7_cJ·(1+H/A²) ≥ sec7_cJ ≥ 1`, so `C := 3·sec7_cJ·C₇₁` (ledger U4: cJ = 10²⁰).
   obtain ⟨C₁, hC₁, h71⟩ := prop_7_1
   refine ⟨3 * sec7_cJ * C₁ + 1000, by have := sec7_cJ_pos; positivity, ?_⟩
-  intro P S a ha hAD hG1 ha_lo ha_hi W Env c₀ Cu hsd hbud hg0 hu0 hX24 hlog Ra hRa
+  intro P S a ha hAD hG1 ha_lo ha_hi W Env c₀ Cu hsd hbud hg0 hu0 hX24 hUbig hlog Ra hRa
   have hR1 : (1 : ℝ) < S.R := Env.R_gt_one
   have hW0 : (0 : ℝ) < W := Env.W_pos
   rcases le_or_gt 1 W with hW | hWlt
   · obtain ⟨Ph, FdStar, dStar, fStar, hAD, hTay, hdata⟩ :=
-      sec7_ra_data_pack P S W a ha hAD hG1 ha_lo ha_hi c₀ Cu hsd Env hW Ra hRa
+      sec7_ra_data_pack P S W a ha hAD hG1 ha_lo ha_hi c₀ Cu hsd
+        hbud hg0 hu0 hX24 hUbig Env hW Ra hRa
     -- the `g_j` phase (md 1313), with its defining equation by `rfl`
     set gfun : ℤ → ℝ → ℝ := fun j t =>
       Ph.dBreve (Ph.ftil t + j) - Ph.dBreve' (Ph.ftil t + j) * Int.fract (Ph.ftil t) with hgdef
@@ -2241,7 +2234,7 @@ theorem prop_7_3 : ∃ C : ℝ, 0 < C ∧
         have habs : |jj| ≤ ⌊z⌋ := abs_le.mpr ⟨by linarith [hjj.1], hjj.2⟩
         have hcast : |(jj : ℝ)| ≤ ((⌊z⌋ : ℤ) : ℝ) := by exact_mod_cast habs
         exact le_trans hcast (Int.floor_le z)
-      exact h71 P S W Env c₀ Cu hsd hbud hg0 hu0 hX24 hlog a Ph gfun (fun _ _ => rfl)
+      exact h71 P S W Env c₀ Cu hsd hbud hg0 hu0 hX24 hUbig hlog a Ph gfun (fun _ _ => rfl)
         (sec7_cTay * sec7_delta0 P S) hδpos le_rfl jj hband
     -- sum the band: `2⌊z⌋+1 ≤ 3z` values
     have hsum := Finset.sum_le_card_nsmul _ _ _ hperj

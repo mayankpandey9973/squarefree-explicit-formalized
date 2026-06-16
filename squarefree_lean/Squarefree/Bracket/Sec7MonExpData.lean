@@ -46,9 +46,8 @@ theorem sec7_cGU_pos (P : Globals) (S : Scale P) : 0 < sec7_cGU P S := by
   have := P.G_pos; have := P.U_pos; unfold sec7_cGU; positivity
 
 theorem sec7_relErrF_pos (P : Globals) (S : Scale P) : 0 < sec7_relErrF P S := by
-  have := sec7_relErr_pos P S; have := sec7_cGU_pos P S
   unfold sec7_relErrF
-  positivity
+  exact Real.rpow_pos_of_pos P.X_pos _
 
 theorem sec7_hSum_ge3 {h₁ h₂ h₃ : ℤ} (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃) :
     (3:ℝ) ≤ sec7_hSum h₁ h₂ h₃ := by

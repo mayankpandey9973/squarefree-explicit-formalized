@@ -1,9 +1,18 @@
 SQUAREFREE FORMALIZATION — PROGRESS SUMMARY (2026-06-16)
 =========================================================
 
-BUILD: GREEN, BoxSum target (8519 jobs). Tracked stubs: exactly 2, both §7:
-  - Squarefree/Bracket/Sec7ZeroScale.lean:~1984  sec7_zero_few_critical Φ″ branch (order-3 blocker)
-  - Squarefree/Bracket/BoxSum.lean:1965          sec7_phase_build (N24-PHASE assembly)
+BUILD: GREEN, full project (`lake build`). Tracked stubs: exactly 1, §7:
+  - Squarefree/Bracket/Sec7ZeroScale.lean:1969   sec7_zero_few_critical Φ″ branch (order-3 blocker)
+  theorem_10_1 axioms = [propext, sorryAx, Classical.choice, Quot.sound] — sorryAx = this ONE stub.
+
+  ✅ sec7_phase_build CLOSED (2026-06-16): = sec7_phase_construct (hG10x-free) + hnear reorder.
+     hG10x (G·U^10 ≤ x, regime-FALSE on-strip) DELETED tree-wide; sec7_relErrF re-pinned to the
+     power-saving X^{-19/100}. Cascade: Sec7ZeroHyp field hsub2F→hGΩ5F (discharged by new
+     BoxSum.sec7_zero_hGΩ5F: G·Ω⁵·X^{-19/100} ≤ 1/cSub from band Ω≤U + admissibility g+5u≤1/100
+     + X^{18/100}≥(2^24)^18≥10^55); hUbig (10^33≤U, needed for the 10^143 relErrF discharge)
+     threaded merger→dblock_on_strip→prop_7_3→{prop_7_1→triple_split→nonzero_wide_count→
+     {nonzero_pieces,nonzero_count_78,nonzero_relErrF_small}, ra_data_pack→phase_build→phase_construct}.
+     BoxSum now imports Sec7PhaseConstruct.
 
 §7 ENDGAME PROGRESS (2026-06-16) — 4 original sorries → 2 (and one of those is half-closed):
   ✅ phiContDiff PROVEN. Major architectural fix: the §7 zero-count engines required GLOBAL

@@ -343,23 +343,6 @@ private theorem sec7_GΩ5_relErr_le_inv_cSub {P : Globals} {S : Scale P}
   rw [le_div_iff₀ hc]
   simpa [mul_comm, mul_left_comm, mul_assoc] using hmain
 
-private theorem sec7_GΩ5_relErrF_le_inv_cSub {P : Globals} {S : Scale P}
-    (hsub2F : sec7_cSub * (P.G ^ 2 * S.Ω ^ 6 * P.U ^ 5) ≤ P.H) :
-    P.G * S.Ω ^ 5 * sec7_relErrF P S ≤ 1 / sec7_cSub := by
-  have hH := P.H_pos
-  have hc : 0 < sec7_cSub := sec7_cSub_pos
-  have hmain : sec7_cSub * (P.G * S.Ω ^ 5 * sec7_relErrF P S) ≤ 1 := by
-    have hdiv := div_le_div_of_nonneg_right hsub2F hH.le
-    calc
-      sec7_cSub * (P.G * S.Ω ^ 5 * sec7_relErrF P S)
-          = sec7_cSub * (P.G ^ 2 * S.Ω ^ 6 * P.U ^ 5) / P.H := by
-            unfold sec7_relErrF sec7_relErr sec7_cGU
-            field_simp
-      _ ≤ P.H / P.H := hdiv
-      _ = 1 := by field_simp
-  rw [le_div_iff₀ hc]
-  simpa [mul_comm, mul_left_comm, mul_assoc] using hmain
-
 private theorem sec7_W4_GΩ5_div_R_le_inv_cSub {P : Globals} {S : Scale P} {W : ℝ}
     (hsub1 : sec7_cSub * (W ^ 4 * S.Ω ^ 2) ≤ Real.sqrt (P.H * S.x)) :
     W ^ 4 * (P.G * S.Ω ^ 5) / S.R ≤ 1 / sec7_cSub := by
@@ -449,8 +432,10 @@ structure Sec7ZeroHyp (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (Ph : Sec7
   hsub1 : sec7_cSub * (W ^ 4 * S.Ω ^ 2) ≤ Real.sqrt (P.H * S.x)
   /-- md 1718–29 in TRAP-3 form for `relErr = (Ω/H)·U³`: `GΩ⁵·relErr ≪ X^{-c}`. -/
   hsub2 : sec7_cSub * (P.G * S.Ω ^ 6 * P.U ^ 3) ≤ P.H
-  /-- The same TRAP-3 form for the loosened f₁/f₃ residual scale. -/
-  hsub2F : sec7_cSub * (P.G ^ 2 * S.Ω ^ 6 * P.U ^ 5) ≤ P.H
+  /-- The loosened f₁/f₃ residual scale is power-saving below the subordination floor:
+  `G·Ω⁵·relErrF ≤ 1/cSub` (relErrF = X^{-19/100}, band+admissibility; discharged at the
+  construction site by `sec7_zero_hGΩ5F`). Replaces the old `relErr·G·U²` subordination form. -/
+  hGΩ5F : P.G * S.Ω ^ 5 * sec7_relErrF P S ≤ 1 / sec7_cSub
   /-- Strip smallness for the faithful `relErr = (Ω/H)·U³` scale. -/
   hrel : sec7_relErr P S * 10 ^ 143 ≤ 1
   /-- Strip smallness for the loosened f₁/f₃ residual scale. -/
@@ -517,7 +502,7 @@ private theorem sec7_zero_errScale_subordinate {P : Globals} {S : Scale P} {a : 
   have hT1id := sec7_T₁_div_R_eq_GΩ5_T₃ S
   have hSlePP := sec7_hSum_le_three_Pprod_of_box Hyp.hbox
   have hGrel := sec7_GΩ5_relErr_le_inv_cSub (P := P) (S := S) Hyp.hsub2
-  have hGrelF := sec7_GΩ5_relErrF_le_inv_cSub (P := P) (S := S) Hyp.hsub2F
+  have hGrelF := Hyp.hGΩ5F
   have hGrel0 : 0 ≤ P.G * S.Ω ^ 5 * sec7_relErr P S :=
     mul_nonneg (mul_nonneg P.G_pos.le (pow_nonneg S.Ω_pos.le 5)) hrel0
   have hGrelF0 : 0 ≤ P.G * S.Ω ^ 5 * sec7_relErrF P S :=
@@ -1062,7 +1047,7 @@ private theorem sec7_zero_errScale_subordinate_tiny {P : Globals} {S : Scale P} 
   have hT1id := sec7_T₁_div_R_eq_GΩ5_T₃ S
   have hSlePP := sec7_hSum_le_three_Pprod_of_box Hyp.hbox
   have hGrel := sec7_GΩ5_relErr_le_inv_cSub (P := P) (S := S) Hyp.hsub2
-  have hGrelF := sec7_GΩ5_relErrF_le_inv_cSub (P := P) (S := S) Hyp.hsub2F
+  have hGrelF := Hyp.hGΩ5F
   have hGrel0 : 0 ≤ P.G * S.Ω ^ 5 * sec7_relErr P S :=
     mul_nonneg (mul_nonneg P.G_pos.le (pow_nonneg S.Ω_pos.le 5)) hrel0
   have hGrelF0 : 0 ≤ P.G * S.Ω ^ 5 * sec7_relErrF P S :=
@@ -1591,7 +1576,7 @@ private theorem sec7_zero_errScale_le_Cbase {P : Globals} {S : Scale P} {a : ℤ
   have hT1id := sec7_T₁_div_R_eq_GΩ5_T₃ S
   have hSlePP := sec7_hSum_le_three_Pprod_of_box Hyp.hbox
   have hGrel := sec7_GΩ5_relErr_le_inv_cSub (P := P) (S := S) Hyp.hsub2
-  have hGrelF := sec7_GΩ5_relErrF_le_inv_cSub (P := P) (S := S) Hyp.hsub2F
+  have hGrelF := Hyp.hGΩ5F
   have hGrel0 : 0 ≤ P.G * S.Ω ^ 5 * sec7_relErr P S :=
     mul_nonneg (mul_nonneg P.G_pos.le (pow_nonneg S.Ω_pos.le 5)) hrel0
   have hGrelF0 : 0 ≤ P.G * S.Ω ^ 5 * sec7_relErrF P S :=

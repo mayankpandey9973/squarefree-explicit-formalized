@@ -39,6 +39,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
         Real.log P.X ≤ P.X ^ P.u →
+        (10:ℝ) ^ 33 ≤ P.U →
         (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
         2 * S.A ≤ S.D →
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω →
@@ -52,7 +53,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   refine ⟨C₂' * (C₇ * 10 ^ 25 * (4 * (1 + c₀ ^ (-8/3 : ℝ)))), ?_, ?_⟩
   · have := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-8/3 : ℝ)
     positivity
-  intro P hg hu hX S hΔlong hX0big hlog hNR hAD hbandlo hΩU hxlo hxhi D hDpos hDeq
+  intro P hg hu hX S hΔlong hX0big hlog hUbig hNR hAD hbandlo hΩU hxlo hxhi D hDpos hDeq
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hG := P.G_pos; have hH := P.H_pos; have hU := P.U_pos
   have hΔ := S.Δ_pos; have hΩ := S.Ω_pos
@@ -128,7 +129,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       hfiber' P S a ha0 hΔlong hX0big hloq hAa ha2A hAD D hDpos hDeq
     have h73raw := hp73 P S a ha0 hAD10 hG1 hAa ha2A
       ((10:ℝ) ^ (-25 : ℤ) * P.X ^ (-(2:ℝ) * P.u) * OnStripAux.Wnz P S) hEnv
-      c₀ Cu SD hbudP hg0' hPu hX0big hlog Ra hwit
+      c₀ Cu SD hbudP hg0' hPu hX0big hUbig hlog Ra hwit
     have h73 : (Ra.card : ℝ)
         ≤ C₇ * 10 ^ 25 * ((1 + P.H / S.A ^ 2)
             * (P.X ^ (2 * P.u) * (S.R / OnStripAux.Wnz P S))) := by
@@ -284,7 +285,7 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
             rw [mul_div_assoc, mul_div_assoc]
             exact mul_le_mul_of_nonneg_right (le_max_left _ _) hHU
     · push_neg at h1 h2
-      have := hon P hPg hPu hX S hΔ hX0big hlog hNR hAD hband hΩU h1.le h2.le D hDpos hDeq
+      have := hon P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU h1.le h2.le D hDpos hDeq
       calc DBlock P S D ≤ Con * P.H / P.U := this
         _ ≤ max Coff Con * P.H / P.U := by
             rw [mul_div_assoc, mul_div_assoc]

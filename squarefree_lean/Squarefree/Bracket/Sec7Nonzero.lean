@@ -548,11 +548,12 @@ private theorem sec7_nonzero_relErrF_small {P : Globals} {S : Scale P} {W : ℝ}
     {h₁ h₂ h₃ : ℤ} (Env : Sec7Envelope P S W) (hbox : sec7_shiftBox W h₁ h₂ h₃)
     (c₀ Cu : ℝ) (D : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg : 0 ≤ P.g) (hu : 0 < P.u)
-    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ)) :
+    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ))
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     sec7_relErrF P S ≤ 1 / (10 : ℝ) ^ 143 := by
   have hpow : 0 < (10 : ℝ) ^ 143 := by positivity
   rw [le_div_iff₀ hpow]
-  exact sec7_relErrF_le Env (sec7_W_ge_one hbox) D hbud hg hu hX24
+  exact sec7_relErrF_le Env (sec7_W_ge_one hbox) D hbud hg hu hX24 hUbig
 
 private theorem Sec7MonExp.nonzero_Cstar_upper_tight {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ}
     {Ph : Sec7Phase P S W a} {j h₁ h₂ h₃ : ℤ} {ξ₁ ξ₂ ξ₃ : ℝ}
@@ -1368,6 +1369,7 @@ theorem sec7_nonzero_pieces :
     ∀ (P : Globals) (S : Scale P) (W : ℝ), Sec7Envelope P S W → 1 ≤ W →
     ∀ c₀ Cu : ℝ, OnStripAux.StripData P S c₀ Cu → OnStripAux.Budget P.g P.u Cu →
     0 ≤ P.g → 0 < P.u → (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+    (10 : ℝ) ^ 33 ≤ P.U →
     ∀ (a : ℤ) (Ph : Sec7Phase P S W a) (j h₁ h₂ h₃ : ℤ) (ξ₁ ξ₂ ξ₃ : ℝ)
       (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃),
       sec7_jBand P S j → sec7_shiftBox W h₁ h₂ h₃ →
@@ -1396,7 +1398,7 @@ theorem sec7_nonzero_pieces :
               S.R ^ 2 *
                 |iteratedDeriv 2
                   (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r| ≤ 2 * Tq i := by
-  intro P S W Env _hW c₀ Cu D hbud hg hu hX24
+  intro P S W Env _hW c₀ Cu D hbud hg hu hX24 hUbig
   intro a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ME _hj hbox hpad hshift hξ₁ hξ₂ hξ₃
   intro ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ₀ne hρ₀abs _hρ₁ _hρ₂ _hρ₃ hu₁ hu₂ hu₃ hErr
   intro p q hwin hdyad hpq
@@ -1407,7 +1409,7 @@ theorem sec7_nonzero_pieces :
     linarith
   have hX1 : 1 ≤ P.X := hXgt.le
   have hrel := sec7_nonzero_relErr_small Env hbox c₀ Cu D hbud hg hu hX24
-  have hrelF := sec7_nonzero_relErrF_small Env hbox c₀ Cu D hbud hg hu hX24
+  have hrelF := sec7_nonzero_relErrF_small Env hbox c₀ Cu D hbud hg hu hX24 hUbig
   let K : ℕ := 100
   let pt : ℕ → ℝ := fun i => (p : ℝ) + (i : ℝ) * (((q : ℝ) - (p : ℝ)) / 100)
   let Tq : ℕ → ℝ := fun i =>
@@ -2029,6 +2031,7 @@ theorem sec7_nonzero_count_78 :
     ∀ (P : Globals) (S : Scale P) (W : ℝ), Sec7Envelope P S W → 1 < W →
     ∀ c₀ Cu : ℝ, OnStripAux.StripData P S c₀ Cu → OnStripAux.Budget P.g P.u Cu →
     0 ≤ P.g → 0 < P.u → (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+    (10 : ℝ) ^ 33 ≤ P.U →
     ∀ (a : ℤ) (Ph : Sec7Phase P S W a) (j h₁ h₂ h₃ : ℤ) (ξ₁ ξ₂ ξ₃ : ℝ)
       (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃),
       sec7_jBand P S j → sec7_shiftBox W h₁ h₂ h₃ →
@@ -2057,12 +2060,12 @@ theorem sec7_nonzero_count_78 :
           ≤ sec7_cN19 * (1 + Real.log P.X)
             * ((S.R * S.T₁) ^ ((1:ℝ)/3) + S.R * δ₁
                 + S.R * Real.sqrt (δ₁ / S.T₁) + 1) := by
-  intro P S W Env _hW c₀ Cu D hbud hg hu hX24
+  intro P S W Env _hW c₀ Cu D hbud hg hu hX24 hUbig
   intro a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ME _hj hbox hpad hshift hξ₁ hξ₂ hξ₃
   intro ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ₀ne hρ₀abs _hρ₁ _hρ₂ _hρ₃ hu₁ hu₂ hu₃ hErr hcd
   intro p q hwin hdyad hcover δ₁ hδpos hδlt
   have hrel := sec7_nonzero_relErr_small Env hbox c₀ Cu D hbud hg hu hX24
-  have hrelF := sec7_nonzero_relErrF_small Env hbox c₀ Cu D hbud hg hu hX24
+  have hrelF := sec7_nonzero_relErrF_small Env hbox c₀ Cu D hbud hg hu hX24 hUbig
   let f : ℝ → ℝ :=
     sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃
   by_cases hpq : p ≤ q

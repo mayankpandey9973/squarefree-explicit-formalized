@@ -3444,11 +3444,58 @@ private theorem sec7_ra_residual_scale_base {P : Globals} (S : Scale P) :
   rw [P.X_eq_G_mul_H_pow_five]
   field_simp
 
-private theorem sec7_ra_T₃_relErrF_eq_A_G_U5 {P : Globals} (S : Scale P) :
-    S.T₃ * sec7_relErrF P S = S.A * P.G * P.U ^ 5 := by
-  have hH := P.H_pos
-  unfold sec7_relErrF sec7_relErr sec7_cGU Scale.T₃ Scale.A
-  field_simp [hH.ne']
+/-- On-strip bridge: the f₂ tight scale `relErr = (Ω/H)U³` is below the f₁/f₃ power-saving
+budget `relErrF = X^{-19/100}` (since `Ω ≤ U` and admissibility gives `4u ≤ 1/100`). -/
+private theorem sec7_relErr_le_relErrF {P : Globals} {S : Scale P}
+    {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u) :
+    sec7_relErr P S ≤ sec7_relErrF P S := by
+  have hHpos := P.H_pos
+  have hUpos := P.U_pos
+  have hb : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hCu1 : (1 : ℝ) ≤ Cu := hsd.hCu
+  have hCuu_nn : (0 : ℝ) ≤ Cu * P.u := mul_nonneg (le_trans zero_le_one hCu1) hu0.le
+  have hu_le : P.u ≤ 2 / 18675 := by nlinarith [hb, hg0, hCuu_nn]
+  have hg_le : P.g ≤ 2 / 18977 := by nlinarith [hb, hu0.le, hCuu_nn]
+  have key : sec7_relErr P S ≤ P.U / P.H * P.U ^ 3 := by
+    unfold sec7_relErr
+    gcongr
+    exact hsd.hΩhi
+  have heq : P.U / P.H * P.U ^ 3 = P.X ^ (4 * P.u - (1 - P.g) / 5 : ℝ) := by
+    rw [Globals.U, Globals.H, ← Real.rpow_natCast (P.X ^ P.u) 3, ← Real.rpow_mul P.X_pos.le,
+      div_eq_mul_inv, ← Real.rpow_neg P.X_pos.le, ← Real.rpow_add P.X_pos, ← Real.rpow_add P.X_pos]
+    congr 1; push_cast; ring
+  have hgoal : sec7_relErrF P S = P.X ^ (-(19 : ℝ) / 100) := rfl
+  rw [hgoal]
+  refine le_trans key (le_trans (le_of_eq heq) ?_)
+  exact Real.rpow_le_rpow_of_exponent_le hsd.hX (by nlinarith [hu_le, hg_le])
+
+/-- On-strip bridge: `A = ΔΩ ≤ HΔ·X^{-19/100} = T₃·relErrF` (since `Ω ≤ U` and `u ≤ 1/100`). -/
+private theorem sec7_A_le_T₃_relErrF {P : Globals} {S : Scale P}
+    {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u) :
+    S.A ≤ S.T₃ * sec7_relErrF P S := by
+  have hHpos := P.H_pos
+  have hΔpos := S.Δ_pos
+  have hb : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hCu1 : (1 : ℝ) ≤ Cu := hsd.hCu
+  have hCuu_nn : (0 : ℝ) ≤ Cu * P.u := mul_nonneg (le_trans zero_le_one hCu1) hu0.le
+  have hu_le : P.u ≤ 2 / 18675 := by nlinarith [hb, hg0, hCuu_nn]
+  have hg_le : P.g ≤ 2 / 18977 := by nlinarith [hb, hu0.le, hCuu_nn]
+  have hHrelF : P.H * sec7_relErrF P S = P.X ^ ((1 - P.g) / 5 - 19 / 100 : ℝ) := by
+    rw [Globals.H, show sec7_relErrF P S = P.X ^ (-(19 : ℝ) / 100) from rfl,
+      ← Real.rpow_add P.X_pos]
+    congr 1; ring
+  have hΩH : S.Ω ≤ P.H * sec7_relErrF P S := by
+    rw [hHrelF]
+    calc S.Ω ≤ P.U := hsd.hΩhi
+      _ = P.X ^ P.u := by rw [Globals.U]
+      _ ≤ P.X ^ ((1 - P.g) / 5 - 19 / 100 : ℝ) :=
+          Real.rpow_le_rpow_of_exponent_le hsd.hX (by nlinarith [hu_le, hg_le])
+  calc S.A ≤ S.Δ * (P.H * sec7_relErrF P S) := by
+        rw [show S.A = S.Δ * S.Ω from rfl]
+        exact mul_le_mul_of_nonneg_left hΩH hΔpos.le
+    _ = S.T₃ * sec7_relErrF P S := by rw [show S.T₃ = P.H * S.Δ from rfl]; ring
 
 private theorem sec7_ra_A_Dsq_div_X_eq_T₁_ΩH_sq {P : Globals} (S : Scale P) :
     S.A * S.D ^ 2 / P.X = S.T₁ * (S.Ω / P.H) ^ 2 := by
@@ -3537,375 +3584,183 @@ private noncomputable def sec7_ra_B1ComposeScale : ℕ → ℝ
   | 5 => 191061040000
   | _ => 0
 
+/-- Power-saving `|j|/F ≤ X^{-19/100}` from the **strip lower bound** `hsd.hxlo` (no `hG10x`).
+`F = H·x·G·Ω` and `H/A² = x/Ω²`, so `|j|/F ≤ cJ·(1/F + 1/(HGΩ³))`.  Both reciprocals are
+`≤ X^{-39/200}` by the band + `hxlo` (LP), and the `cJ = 10^20` constant is absorbed by the
+`X^{1/200}` floor coming from `hUbig` + admissibility. -/
+private theorem sec7_ra_jF_powersaving {P : Globals} {S : Scale P} {c₀ Cu : ℝ} {j : ℤ}
+    (hsd : OnStripAux.StripData P S c₀ Cu) (hbud : OnStripAux.Budget P.g P.u Cu)
+    (hj : sec7_jBand P S j) (hG1 : 1 ≤ P.G) (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
+    |(j : ℝ)| / S.F ≤ (1 / (10 : ℝ) ^ 9) * P.X ^ (-(19 : ℝ) / 100) := by
+  -- positivity facts
+  have hXpos := P.X_pos
+  have hHpos := P.H_pos
+  have hGpos := P.G_pos
+  have hUpos := P.U_pos
+  have hΩpos := S.Ω_pos
+  have hΔpos := S.Δ_pos
+  have hxpos : 0 < S.x := by unfold Scale.x; positivity
+  have hFpos : 0 < S.F := by unfold Scale.F; positivity
+  -- X > 1 and the regime sign facts
+  have hX_gt1 : 1 < P.X := by
+    rcases eq_or_lt_of_le hsd.hX with h | h
+    · exfalso
+      have hU1 : P.U = 1 := by rw [Globals.U, ← h, Real.one_rpow]
+      rw [hU1] at hUbig; norm_num at hUbig
+    · exact h
+  have hg0 : 0 ≤ P.g := by
+    have hG1' : (P.X : ℝ) ^ (0 : ℝ) ≤ P.X ^ P.g := by rw [Real.rpow_zero]; exact hG1
+    exact (Real.rpow_le_rpow_left_iff hX_gt1).mp hG1'
+  have hu_pos : 0 < P.u := by
+    have h0 : (P.X : ℝ) ^ (0 : ℝ) < P.X ^ P.u := by
+      rw [Real.rpow_zero]
+      exact lt_of_lt_of_le (by norm_num) hUbig
+    exact (Real.rpow_lt_rpow_left_iff hX_gt1).mp h0
+  -- admissibility consequences of the budget
+  have hb : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hCu1 : (1 : ℝ) ≤ Cu := hsd.hCu
+  have hCuu_nn : (0 : ℝ) ≤ Cu * P.u := mul_nonneg (le_trans zero_le_one hCu1) hu_pos.le
+  have hu_le : P.u ≤ 2 / 18675 := by nlinarith [hb, hg0, hCuu_nn]
+  have hg_le : P.g ≤ 2 / 18977 := by nlinarith [hb, hu_pos.le, hCuu_nn]
+  have hCuu_le : Cu * P.u ≤ 2 / 790 := by nlinarith [hb, hg0, hu_pos.le]
+  -- the strip lower bound on Ω and x as clean X-powers
+  have hΩpow : P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) = P.X ^ (-P.g/4 - 3*P.u/4 : ℝ) := by
+    rw [Globals.G, Globals.U, ← Real.rpow_mul P.X_pos.le, ← Real.rpow_mul P.X_pos.le,
+      ← Real.rpow_add P.X_pos]
+    congr 1; ring
+  have hΩlo' : P.X ^ (-P.g/4 - 3*P.u/4 : ℝ) ≤ S.Ω := by
+    rw [← hΩpow]
+    exact le_trans (le_mul_of_one_le_left (by positivity) hsd.hc₀) hsd.hΩlo
+  have hxpow : P.G ^ (-2 : ℝ) * P.U ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u))
+      = P.X ^ (-2*P.g - 11*P.u/2 - Cu*P.u : ℝ) := by
+    rw [Globals.G, Globals.U, ← Real.rpow_mul P.X_pos.le, ← Real.rpow_mul P.X_pos.le,
+      ← Real.rpow_add P.X_pos, ← Real.rpow_add P.X_pos]
+    congr 1; ring
+  have hxlo' : P.X ^ (-2*P.g - 11*P.u/2 - Cu*P.u : ℝ) ≤ S.x := by
+    rw [← hxpow]
+    have hΩU : P.U ^ (-11/2 : ℝ) ≤ S.Ω ^ (-11/2 : ℝ) :=
+      Real.rpow_le_rpow_of_nonpos hΩpos hsd.hΩhi (by norm_num)
+    calc P.G ^ (-2 : ℝ) * P.U ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u))
+        ≤ P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u)) :=
+          mul_le_mul_of_nonneg_right
+            (mul_le_mul_of_nonneg_left hΩU (Real.rpow_pos_of_pos hGpos _).le)
+            (Real.rpow_pos_of_pos hXpos _).le
+      _ ≤ S.x := hsd.hxlo
+  -- lower bound on F = H·x·G·Ω
+  have hpoweqF : P.H * P.X ^ (-2*P.g - 11*P.u/2 - Cu*P.u : ℝ) * P.G
+        * P.X ^ (-P.g/4 - 3*P.u/4 : ℝ)
+      = P.X ^ (1/5 - 29*P.g/20 - 25*P.u/4 - Cu*P.u : ℝ) := by
+    rw [Globals.H, Globals.G, ← Real.rpow_add P.X_pos, ← Real.rpow_add P.X_pos,
+      ← Real.rpow_add P.X_pos]
+    congr 1; ring
+  have hbound : P.H * P.X ^ (-2*P.g - 11*P.u/2 - Cu*P.u : ℝ) * P.G
+        * P.X ^ (-P.g/4 - 3*P.u/4 : ℝ) ≤ S.F := by
+    rw [S.F_eq_H_x_G_Ω]; gcongr
+  have hexpF : (39/200 : ℝ) ≤ 1/5 - 29*P.g/20 - 25*P.u/4 - Cu*P.u := by
+    nlinarith [hg_le, hu_le, hCuu_le, hg0, hu_pos.le]
+  have hFlo : P.X ^ (39/200 : ℝ) ≤ S.F := by
+    calc P.X ^ (39/200 : ℝ)
+        ≤ P.X ^ (1/5 - 29*P.g/20 - 25*P.u/4 - Cu*P.u : ℝ) :=
+          Real.rpow_le_rpow_of_exponent_le hsd.hX hexpF
+      _ = P.H * P.X ^ (-2*P.g - 11*P.u/2 - Cu*P.u : ℝ) * P.G
+            * P.X ^ (-P.g/4 - 3*P.u/4 : ℝ) := hpoweqF.symm
+      _ ≤ S.F := hbound
+  -- lower bound on H·G·Ω³
+  have hbound2 : P.H * P.G * (P.X ^ (-P.g/4 - 3*P.u/4 : ℝ)) ^ 3 ≤ P.H * P.G * S.Ω ^ 3 := by
+    gcongr
+  have hexpH2 : (39/200 : ℝ) ≤ 1/5 + P.g/20 - 9*P.u/4 := by
+    nlinarith [hg0, hu_le]
+  have hH2lo : P.X ^ (39/200 : ℝ) ≤ P.H * P.G * S.Ω ^ 3 := by
+    calc P.X ^ (39/200 : ℝ)
+        ≤ P.X ^ (1/5 + P.g/20 - 9*P.u/4 : ℝ) :=
+          Real.rpow_le_rpow_of_exponent_le hsd.hX hexpH2
+      _ = P.H * P.G * (P.X ^ (-P.g/4 - 3*P.u/4 : ℝ)) ^ 3 := by
+          rw [Globals.H, Globals.G, ← Real.rpow_natCast (P.X ^ (-P.g/4 - 3*P.u/4 : ℝ)) 3,
+            ← Real.rpow_mul P.X_pos.le, ← Real.rpow_add P.X_pos, ← Real.rpow_add P.X_pos]
+          congr 1; push_cast; ring
+      _ ≤ P.H * P.G * S.Ω ^ 3 := hbound2
+  -- the two reciprocal terms
+  have hterm1 : 1 / S.F ≤ P.X ^ (-(39/200) : ℝ) := by
+    rw [Real.rpow_neg P.X_pos.le, ← one_div]
+    exact one_div_le_one_div_of_le (by positivity) hFlo
+  have hHA2 : P.H / S.A ^ 2 = S.x / S.Ω ^ 2 := by
+    unfold Scale.A Scale.x
+    field_simp
+  have hT2eq : (P.H / S.A ^ 2) / S.F = 1 / (P.H * P.G * S.Ω ^ 3) := by
+    rw [hHA2, S.F_eq_H_x_G_Ω]
+    field_simp
+  have hterm2 : (P.H / S.A ^ 2) / S.F ≤ P.X ^ (-(39/200) : ℝ) := by
+    rw [hT2eq, Real.rpow_neg P.X_pos.le, ← one_div]
+    exact one_div_le_one_div_of_le (by positivity) hH2lo
+  -- the X^{1/200} floor that absorbs cJ together with the spare `10^9` factor
+  have hX1 : 2 * sec7_cJ * (10 : ℝ) ^ 9 ≤ P.X ^ (1/200 : ℝ) := by
+    have hU1 : (1 : ℝ) ≤ P.U := le_trans (by norm_num) hUbig
+    have hExp : (6000/33 : ℝ) ≤ 1 / P.u := by
+      rw [le_div_iff₀ hu_pos]; nlinarith [hu_le, hu_pos]
+    have hXeq : (P.U) ^ (1 / P.u) = P.X := by
+      rw [Globals.U, ← Real.rpow_mul P.X_pos.le, mul_one_div, div_self hu_pos.ne', Real.rpow_one]
+    have hXbig : (10 : ℝ) ^ (6000 : ℕ) ≤ P.X := by
+      calc (10 : ℝ) ^ (6000 : ℕ)
+          = ((10 : ℝ) ^ 33) ^ (6000/33 : ℝ) := by
+            rw [← Real.rpow_natCast (10 : ℝ) 6000, ← Real.rpow_natCast (10 : ℝ) 33,
+              ← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 10)]
+            congr 1; push_cast; norm_num
+        _ ≤ (P.U) ^ (6000/33 : ℝ) := Real.rpow_le_rpow (by positivity) hUbig (by norm_num)
+        _ ≤ (P.U) ^ (1 / P.u) := Real.rpow_le_rpow_of_exponent_le hU1 hExp
+        _ = P.X := hXeq
+    calc 2 * sec7_cJ * (10 : ℝ) ^ 9 ≤ (10 : ℝ) ^ 30 := by norm_num [sec7_cJ]
+      _ = ((10 : ℝ) ^ (6000 : ℕ)) ^ (1/200 : ℝ) := by
+          rw [← Real.rpow_natCast (10 : ℝ) 6000, ← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 10),
+            ← Real.rpow_natCast (10 : ℝ) 30]
+          congr 1; push_cast; norm_num
+      _ ≤ P.X ^ (1/200 : ℝ) := Real.rpow_le_rpow (by positivity) hXbig (by norm_num)
+  -- assemble
+  have hj_abs : |(j : ℝ)| ≤ sec7_cJ * (1 + P.H / S.A ^ 2) := by
+    rw [← Int.cast_abs]; simpa [sec7_jBand] using hj
+  have hcJ_nn : (0 : ℝ) ≤ sec7_cJ := by norm_num [sec7_cJ]
+  calc |(j : ℝ)| / S.F
+      ≤ sec7_cJ * (1 + P.H / S.A ^ 2) / S.F := div_le_div_of_nonneg_right hj_abs hFpos.le
+    _ = sec7_cJ * ((1 + P.H / S.A ^ 2) / S.F) := by rw [mul_div_assoc]
+    _ ≤ sec7_cJ * (2 * P.X ^ (-(39/200) : ℝ)) := by
+        refine mul_le_mul_of_nonneg_left ?_ hcJ_nn
+        rw [add_div]
+        calc 1 / S.F + P.H / S.A ^ 2 / S.F
+            ≤ P.X ^ (-(39/200) : ℝ) + P.X ^ (-(39/200) : ℝ) := add_le_add hterm1 hterm2
+          _ = 2 * P.X ^ (-(39/200) : ℝ) := by ring
+    _ = (2 * sec7_cJ) * P.X ^ (-(39/200) : ℝ) := by ring
+    _ ≤ (1 / (10 : ℝ) ^ 9 * P.X ^ (1/200 : ℝ)) * P.X ^ (-(39/200) : ℝ) := by
+        have h2 : 2 * sec7_cJ ≤ 1 / (10 : ℝ) ^ 9 * P.X ^ (1/200 : ℝ) := by
+          have hmul := mul_le_mul_of_nonneg_right hX1 (by norm_num : (0:ℝ) ≤ 1 / (10:ℝ) ^ 9)
+          calc 2 * sec7_cJ = (2 * sec7_cJ * (10 : ℝ) ^ 9) * (1 / (10:ℝ) ^ 9) := by ring
+            _ ≤ P.X ^ (1/200 : ℝ) * (1 / (10:ℝ) ^ 9) := hmul
+            _ = 1 / (10:ℝ) ^ 9 * P.X ^ (1/200 : ℝ) := by ring
+        exact mul_le_mul_of_nonneg_right h2 (Real.rpow_pos_of_pos hXpos _).le
+    _ = 1 / (10 : ℝ) ^ 9 * (P.X ^ (1/200 : ℝ) * P.X ^ (-(39/200) : ℝ)) := by ring
+    _ = (1 / (10 : ℝ) ^ 9) * P.X ^ (-(19 : ℝ) / 100) := by
+        rw [← Real.rpow_add hXpos]; congr 2; norm_num
+
 private theorem sec7_ra_j_over_F_le_relErrF_small {P : Globals} {S : Scale P}
     {c₀ Cu : ℝ} {j : ℤ}
-    (hsd : OnStripAux.StripData P S c₀ Cu) (hj : sec7_jBand P S j)
-    (hG1 : 1 ≤ P.G) (hG10x : P.G * P.U ^ 10 ≤ S.x)
-    (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
+    (hsd : OnStripAux.StripData P S c₀ Cu) (hbud : OnStripAux.Budget P.g P.u Cu)
+    (hj : sec7_jBand P S j) (hG1 : 1 ≤ P.G) (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     |(j : ℝ)| / S.F ≤ (1 / (10 : ℝ) ^ 5) * sec7_relErrF P S := by
-  have hFpos : 0 < S.F := by
-    have := P.H_pos
-    have := P.G_pos
-    have := S.Ω_pos
-    have := S.Δ_pos
-    unfold Scale.F
-    positivity
-  have hΩpos : 0 < S.Ω := S.Ω_pos
-  have hxpos : 0 < S.x := by
-    have := P.H_pos
-    have := S.Δ_pos
-    unfold Scale.x
-    positivity
-  have hU1 : (1 : ℝ) ≤ P.U := le_trans (by norm_num) hUbig
-  have hband6 : P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) ≤ S.Ω := by
-    have hbase_pos : 0 ≤ P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) := by positivity
-    calc
-      P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)
-          = 1 * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) := by ring
-      _ ≤ c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) :=
-            mul_le_mul_of_nonneg_right hsd.hc₀ hbase_pos
-      _ ≤ S.Ω := hsd.hΩlo
-  have hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4 :=
-    StripAux.regime_band_one P S hband6
-  have hΩ2leU2 : S.Ω ^ 2 ≤ P.U ^ 2 :=
-    pow_le_pow_left₀ hΩpos.le hsd.hΩhi 2
-  have hband_to : P.G * P.U ^ 3 * S.Ω ^ 4 ≤ P.G * S.Ω ^ 2 * P.U ^ 5 := by
-    calc
-      P.G * P.U ^ 3 * S.Ω ^ 4
-          = P.G * P.U ^ 3 * (S.Ω ^ 2 * S.Ω ^ 2) := by ring
-      _ ≤ P.G * P.U ^ 3 * (S.Ω ^ 2 * P.U ^ 2) := by gcongr
-      _ = P.G * S.Ω ^ 2 * P.U ^ 5 := by ring
-  have hbaseΩ : 1 ≤ P.G * S.Ω ^ 2 * P.U ^ 5 := le_trans hband hband_to
-  have hG2U8 : 1 ≤ P.G ^ 2 * P.U ^ 8 := by
-    have hG2 : 1 ≤ P.G ^ 2 := one_le_pow₀ hG1
-    have hU8 : 1 ≤ P.U ^ 8 := one_le_pow₀ hU1
-    calc
-      (1 : ℝ) = 1 * 1 := by ring
-      _ ≤ P.G ^ 2 * P.U ^ 8 := mul_le_mul hG2 hU8 zero_le_one (by positivity)
-  have hΩfactor : 1 ≤ P.G ^ 3 * S.Ω ^ 2 * P.U ^ 13 := by
-    calc
-      (1 : ℝ) = 1 * 1 := by ring
-      _ ≤ (P.G * S.Ω ^ 2 * P.U ^ 5) * (P.G ^ 2 * P.U ^ 8) :=
-            mul_le_mul hbaseΩ hG2U8 zero_le_one (by positivity)
-      _ = P.G ^ 3 * S.Ω ^ 2 * P.U ^ 13 := by ring
-  set Den : ℝ := P.G ^ 2 * S.Ω ^ 4 * S.x * P.U ^ 5 with hDen
-  have hDen_nonneg : 0 ≤ Den := by
-    rw [hDen]
-    positivity
-  have hG_le_G2 : P.G ≤ P.G ^ 2 := by
-    calc
-      P.G = P.G * 1 := by ring
-      _ ≤ P.G * P.G := mul_le_mul_of_nonneg_left hG1 P.G_pos.le
-      _ = P.G ^ 2 := by ring
-  have hG_le_G2 : P.G ≤ P.G ^ 2 := by
-    calc
-      P.G = P.G * 1 := by ring
-      _ ≤ P.G * P.G := mul_le_mul_of_nonneg_left hG1 P.G_pos.le
-      _ = P.G ^ 2 := by ring
-  have hDenx : S.x * P.U ^ 2 ≤ Den := by
-    have hfac : 1 ≤ P.G ^ 2 * S.Ω ^ 4 * P.U ^ 3 := by
-      calc
-        (1 : ℝ) ≤ P.G * P.U ^ 3 * S.Ω ^ 4 := hband
-        _ ≤ P.G ^ 2 * P.U ^ 3 * S.Ω ^ 4 := by gcongr
-        _ = P.G ^ 2 * S.Ω ^ 4 * P.U ^ 3 := by ring
-    calc
-      S.x * P.U ^ 2 = 1 * (S.x * P.U ^ 2) := by ring
-      _ ≤ (P.G ^ 2 * S.Ω ^ 4 * P.U ^ 3) * (S.x * P.U ^ 2) :=
-            mul_le_mul_of_nonneg_right hfac (by positivity)
-      _ = Den := by rw [hDen]; ring
-  have hDenΩ : S.Ω ^ 2 * P.U ^ 2 ≤ Den := by
-    have hmid : S.Ω ^ 2 * P.U ^ 2 ≤ P.G ^ 3 * S.Ω ^ 4 * P.U ^ 15 := by
-      calc
-        S.Ω ^ 2 * P.U ^ 2 = 1 * (S.Ω ^ 2 * P.U ^ 2) := by ring
-        _ ≤ (P.G ^ 3 * S.Ω ^ 2 * P.U ^ 13) * (S.Ω ^ 2 * P.U ^ 2) :=
-              mul_le_mul_of_nonneg_right hΩfactor (by positivity)
-        _ = P.G ^ 3 * S.Ω ^ 4 * P.U ^ 15 := by ring
-    have hden_ge : P.G ^ 3 * S.Ω ^ 4 * P.U ^ 15 ≤ Den := by
-      calc
-        P.G ^ 3 * S.Ω ^ 4 * P.U ^ 15
-            = (P.G ^ 2 * S.Ω ^ 4 * P.U ^ 5) * (P.G * P.U ^ 10) := by ring
-        _ ≤ (P.G ^ 2 * S.Ω ^ 4 * P.U ^ 5) * S.x :=
-              mul_le_mul_of_nonneg_left hG10x (by positivity)
-        _ = Den := by rw [hDen]; ring
-    exact le_trans hmid hden_ge
-  have hU2big : (10 : ℝ) ^ 66 ≤ P.U ^ 2 := by
-    have h := pow_le_pow_left₀ (by positivity : 0 ≤ (10 : ℝ) ^ 33) hUbig 2
-    norm_num at h ⊢
-    exact h
-  have hcJsmall : sec7_cJ ≤ (1 / (10 : ℝ) ^ 6) * P.U ^ 2 := by
-    have hmul : sec7_cJ * (10 : ℝ) ^ 6 ≤ P.U ^ 2 :=
-      le_trans (by norm_num [sec7_cJ]) hU2big
-    calc
-      sec7_cJ = (sec7_cJ * (10 : ℝ) ^ 6) / (10 : ℝ) ^ 6 := by field_simp
-      _ ≤ P.U ^ 2 / (10 : ℝ) ^ 6 := div_le_div_of_nonneg_right hmul (by positivity)
-      _ = (1 / (10 : ℝ) ^ 6) * P.U ^ 2 := by ring
-  have hΩterm : sec7_cJ * S.Ω ^ 2 ≤ (1 / (10 : ℝ) ^ 6) * Den := by
-    calc
-      sec7_cJ * S.Ω ^ 2 ≤ ((1 / (10 : ℝ) ^ 6) * P.U ^ 2) * S.Ω ^ 2 := by gcongr
-      _ = (1 / (10 : ℝ) ^ 6) * (S.Ω ^ 2 * P.U ^ 2) := by ring
-      _ ≤ (1 / (10 : ℝ) ^ 6) * Den := by gcongr
-  have hxterm : sec7_cJ * S.x ≤ (1 / (10 : ℝ) ^ 6) * Den := by
-    calc
-      sec7_cJ * S.x ≤ ((1 / (10 : ℝ) ^ 6) * P.U ^ 2) * S.x := by gcongr
-      _ = (1 / (10 : ℝ) ^ 6) * (S.x * P.U ^ 2) := by ring
-      _ ≤ (1 / (10 : ℝ) ^ 6) * Den := by gcongr
-  have hkey : sec7_cJ * (S.Ω ^ 2 + S.x) ≤
-      (1 / (10 : ℝ) ^ 5) * (P.G ^ 2 * S.Ω ^ 4 * S.x * P.U ^ 5) := by
-    calc
-      sec7_cJ * (S.Ω ^ 2 + S.x) = sec7_cJ * S.Ω ^ 2 + sec7_cJ * S.x := by ring
-      _ ≤ (1 / (10 : ℝ) ^ 6) * Den + (1 / (10 : ℝ) ^ 6) * Den :=
-            add_le_add hΩterm hxterm
-      _ = (2 / (10 : ℝ) ^ 6) * Den := by ring
-      _ ≤ (1 / (10 : ℝ) ^ 5) * Den :=
-            mul_le_mul_of_nonneg_right (by norm_num) hDen_nonneg
-      _ = (1 / (10 : ℝ) ^ 5) * (P.G ^ 2 * S.Ω ^ 4 * S.x * P.U ^ 5) := by
-            rw [hDen]
-  have hraw : sec7_cJ * (1 + P.H / S.A ^ 2) / S.F ≤
-      (1 / (10 : ℝ) ^ 5) * sec7_relErrF P S := by
-    have hH := P.H_pos
-    have hG := P.G_pos
-    have hΩ := S.Ω_pos
-    have hΔ := S.Δ_pos
-    unfold Scale.x at hkey
-    unfold sec7_relErrF sec7_relErr sec7_cGU Scale.F Scale.A
-    field_simp [hH.ne', hG.ne', hΩ.ne', hΔ.ne'] at hkey ⊢
-    simpa [mul_comm, mul_left_comm, mul_assoc] using hkey
-  have hj_abs : |(j : ℝ)| ≤ sec7_cJ * (1 + P.H / S.A ^ 2) := by
-    rw [← Int.cast_abs]
-    simpa [sec7_jBand] using hj
-  calc
-    |(j : ℝ)| / S.F ≤ sec7_cJ * (1 + P.H / S.A ^ 2) / S.F :=
-      div_le_div_of_nonneg_right hj_abs hFpos.le
-    _ ≤ (1 / (10 : ℝ) ^ 5) * sec7_relErrF P S := hraw
+  have hps := sec7_ra_jF_powersaving (P := P) (S := S) (c₀ := c₀) (Cu := Cu)
+    (j := j) hsd hbud hj hG1 hUbig
+  have hXnn : (0 : ℝ) ≤ P.X ^ (-(19 : ℝ) / 100) := (Real.rpow_pos_of_pos P.X_pos _).le
+  unfold sec7_relErrF
+  calc |(j : ℝ)| / S.F ≤ (1 / (10 : ℝ) ^ 9) * P.X ^ (-(19 : ℝ) / 100) := hps
+    _ ≤ (1 / (10 : ℝ) ^ 5) * P.X ^ (-(19 : ℝ) / 100) :=
+        mul_le_mul_of_nonneg_right (by norm_num) hXnn
 
 private theorem sec7_ra_j_over_F_le_relErrF_tiny {P : Globals} {S : Scale P}
     {c₀ Cu : ℝ} {j : ℤ}
-    (hsd : OnStripAux.StripData P S c₀ Cu) (hj : sec7_jBand P S j)
-    (hG1 : 1 ≤ P.G) (hG10x : P.G * P.U ^ 10 ≤ S.x)
-    (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
+    (hsd : OnStripAux.StripData P S c₀ Cu) (hbud : OnStripAux.Budget P.g P.u Cu)
+    (hj : sec7_jBand P S j) (hG1 : 1 ≤ P.G) (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     |(j : ℝ)| / S.F ≤ (1 / (10 : ℝ) ^ 9) * sec7_relErrF P S := by
-  have hFpos : 0 < S.F := by
-    have := P.H_pos
-    have := P.G_pos
-    have := S.Ω_pos
-    have := S.Δ_pos
-    unfold Scale.F
-    positivity
-  have hΩpos : 0 < S.Ω := S.Ω_pos
-  have hxpos : 0 < S.x := by
-    have := P.H_pos
-    have := S.Δ_pos
-    unfold Scale.x
-    positivity
-  have hU1 : (1 : ℝ) ≤ P.U := le_trans (by norm_num) hUbig
-  have hband6 : P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) ≤ S.Ω := by
-    have hbase_pos : 0 ≤ P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) := by positivity
-    calc
-      P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)
-          = 1 * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) := by ring
-      _ ≤ c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) :=
-            mul_le_mul_of_nonneg_right hsd.hc₀ hbase_pos
-      _ ≤ S.Ω := hsd.hΩlo
-  have hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4 :=
-    StripAux.regime_band_one P S hband6
-  have hΩ2leU2 : S.Ω ^ 2 ≤ P.U ^ 2 :=
-    pow_le_pow_left₀ hΩpos.le hsd.hΩhi 2
-  have hband_to : P.G * P.U ^ 3 * S.Ω ^ 4 ≤ P.G * S.Ω ^ 2 * P.U ^ 5 := by
-    calc
-      P.G * P.U ^ 3 * S.Ω ^ 4
-          = P.G * P.U ^ 3 * (S.Ω ^ 2 * S.Ω ^ 2) := by ring
-      _ ≤ P.G * P.U ^ 3 * (S.Ω ^ 2 * P.U ^ 2) := by gcongr
-      _ = P.G * S.Ω ^ 2 * P.U ^ 5 := by ring
-  have hbaseΩ : 1 ≤ P.G * S.Ω ^ 2 * P.U ^ 5 := le_trans hband hband_to
-  have hG2U8 : 1 ≤ P.G ^ 2 * P.U ^ 8 := by
-    have hG2 : 1 ≤ P.G ^ 2 := one_le_pow₀ hG1
-    have hU8 : 1 ≤ P.U ^ 8 := one_le_pow₀ hU1
-    calc
-      (1 : ℝ) = 1 * 1 := by ring
-      _ ≤ P.G ^ 2 * P.U ^ 8 := mul_le_mul hG2 hU8 zero_le_one (by positivity)
-  have hΩfactor : 1 ≤ P.G ^ 3 * S.Ω ^ 2 * P.U ^ 13 := by
-    calc
-      (1 : ℝ) = 1 * 1 := by ring
-      _ ≤ (P.G * S.Ω ^ 2 * P.U ^ 5) * (P.G ^ 2 * P.U ^ 8) :=
-            mul_le_mul hbaseΩ hG2U8 zero_le_one (by positivity)
-      _ = P.G ^ 3 * S.Ω ^ 2 * P.U ^ 13 := by ring
-  set Den : ℝ := P.G ^ 2 * S.Ω ^ 4 * S.x * P.U ^ 5 with hDen
-  have hDen_nonneg : 0 ≤ Den := by
-    rw [hDen]
-    positivity
-  have hG_le_G2_tiny : P.G ≤ P.G ^ 2 := by
-    calc
-      P.G = P.G * 1 := by ring
-      _ ≤ P.G * P.G := mul_le_mul_of_nonneg_left hG1 P.G_pos.le
-      _ = P.G ^ 2 := by ring
-  have hDenx : S.x * P.U ^ 2 ≤ Den := by
-    have hfac : 1 ≤ P.G ^ 2 * S.Ω ^ 4 * P.U ^ 3 := by
-      calc
-        (1 : ℝ) ≤ P.G * P.U ^ 3 * S.Ω ^ 4 := hband
-        _ ≤ P.G ^ 2 * P.U ^ 3 * S.Ω ^ 4 := by gcongr
-        _ = P.G ^ 2 * S.Ω ^ 4 * P.U ^ 3 := by ring
-    calc
-      S.x * P.U ^ 2 = 1 * (S.x * P.U ^ 2) := by ring
-      _ ≤ (P.G ^ 2 * S.Ω ^ 4 * P.U ^ 3) * (S.x * P.U ^ 2) :=
-            mul_le_mul_of_nonneg_right hfac (by positivity)
-      _ = Den := by rw [hDen]; ring
-  have hDenΩ : S.Ω ^ 2 * P.U ^ 2 ≤ Den := by
-    have hmid : S.Ω ^ 2 * P.U ^ 2 ≤ P.G ^ 3 * S.Ω ^ 4 * P.U ^ 15 := by
-      calc
-        S.Ω ^ 2 * P.U ^ 2 = 1 * (S.Ω ^ 2 * P.U ^ 2) := by ring
-        _ ≤ (P.G ^ 3 * S.Ω ^ 2 * P.U ^ 13) * (S.Ω ^ 2 * P.U ^ 2) :=
-              mul_le_mul_of_nonneg_right hΩfactor (by positivity)
-        _ = P.G ^ 3 * S.Ω ^ 4 * P.U ^ 15 := by ring
-    have hden_ge : P.G ^ 3 * S.Ω ^ 4 * P.U ^ 15 ≤ Den := by
-      calc
-        P.G ^ 3 * S.Ω ^ 4 * P.U ^ 15
-            = (P.G ^ 2 * S.Ω ^ 4 * P.U ^ 5) * (P.G * P.U ^ 10) := by ring
-        _ ≤ (P.G ^ 2 * S.Ω ^ 4 * P.U ^ 5) * S.x :=
-              mul_le_mul_of_nonneg_left hG10x (by positivity)
-        _ = Den := by rw [hDen]; ring
-    exact le_trans hmid hden_ge
-  have hU2big : (10 : ℝ) ^ 66 ≤ P.U ^ 2 := by
-    have h := pow_le_pow_left₀ (by positivity : 0 ≤ (10 : ℝ) ^ 33) hUbig 2
-    norm_num at h ⊢
-    exact h
-  have hcJsmall : sec7_cJ ≤ (1 / (10 : ℝ) ^ 10) * P.U ^ 2 := by
-    have hmul : sec7_cJ * (10 : ℝ) ^ 10 ≤ P.U ^ 2 :=
-      le_trans (by norm_num [sec7_cJ]) hU2big
-    calc
-      sec7_cJ = (sec7_cJ * (10 : ℝ) ^ 10) / (10 : ℝ) ^ 10 := by field_simp
-      _ ≤ P.U ^ 2 / (10 : ℝ) ^ 10 := div_le_div_of_nonneg_right hmul (by positivity)
-      _ = (1 / (10 : ℝ) ^ 10) * P.U ^ 2 := by ring
-  have hΩterm : sec7_cJ * S.Ω ^ 2 ≤ (1 / (10 : ℝ) ^ 10) * Den := by
-    calc
-      sec7_cJ * S.Ω ^ 2 ≤ ((1 / (10 : ℝ) ^ 10) * P.U ^ 2) * S.Ω ^ 2 := by gcongr
-      _ = (1 / (10 : ℝ) ^ 10) * (S.Ω ^ 2 * P.U ^ 2) := by ring
-      _ ≤ (1 / (10 : ℝ) ^ 10) * Den := by gcongr
-  have hxterm : sec7_cJ * S.x ≤ (1 / (10 : ℝ) ^ 10) * Den := by
-    calc
-      sec7_cJ * S.x ≤ ((1 / (10 : ℝ) ^ 10) * P.U ^ 2) * S.x := by gcongr
-      _ = (1 / (10 : ℝ) ^ 10) * (S.x * P.U ^ 2) := by ring
-      _ ≤ (1 / (10 : ℝ) ^ 10) * Den := by gcongr
-  have hkey : sec7_cJ * (S.Ω ^ 2 + S.x) ≤
-      (1 / (10 : ℝ) ^ 9) * (P.G ^ 2 * S.Ω ^ 4 * S.x * P.U ^ 5) := by
-    calc
-      sec7_cJ * (S.Ω ^ 2 + S.x) = sec7_cJ * S.Ω ^ 2 + sec7_cJ * S.x := by ring
-      _ ≤ (1 / (10 : ℝ) ^ 10) * Den + (1 / (10 : ℝ) ^ 10) * Den :=
-            add_le_add hΩterm hxterm
-      _ = (2 / (10 : ℝ) ^ 10) * Den := by ring
-      _ ≤ (1 / (10 : ℝ) ^ 9) * Den :=
-            mul_le_mul_of_nonneg_right (by norm_num) hDen_nonneg
-      _ = (1 / (10 : ℝ) ^ 9) * (P.G ^ 2 * S.Ω ^ 4 * S.x * P.U ^ 5) := by
-            rw [hDen]
-  have hraw : sec7_cJ * (1 + P.H / S.A ^ 2) / S.F ≤
-      (1 / (10 : ℝ) ^ 9) * sec7_relErrF P S := by
-    have hH := P.H_pos
-    have hG := P.G_pos
-    have hΩ := S.Ω_pos
-    have hΔ := S.Δ_pos
-    unfold Scale.x at hkey
-    unfold sec7_relErrF sec7_relErr sec7_cGU Scale.F Scale.A
-    field_simp [hH.ne', hG.ne', hΩ.ne', hΔ.ne'] at hkey ⊢
-    simpa [mul_comm, mul_left_comm, mul_assoc] using hkey
-  have hj_abs : |(j : ℝ)| ≤ sec7_cJ * (1 + P.H / S.A ^ 2) := by
-    rw [← Int.cast_abs]
-    simpa [sec7_jBand] using hj
-  calc
-    |(j : ℝ)| / S.F ≤ sec7_cJ * (1 + P.H / S.A ^ 2) / S.F :=
-      div_le_div_of_nonneg_right hj_abs hFpos.le
-    _ ≤ (1 / (10 : ℝ) ^ 9) * sec7_relErrF P S := hraw
-
-private theorem sec7_ra_rho3_A_rescaled_bound {P : Globals} {S : Scale P} {W : ℝ}
-    {a : ℤ} {r : ℝ} {i : ℕ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
-    (hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
-    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
-    {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu) (hu0 : 0 < P.u)
-    (hr : r ∈ sec7_rWinWide S W) (hi : i ≤ 5) :
-    S.D ^ i *
-        |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ))))
-          (dtilde P.X r (a : ℝ))|
-      ≤ (10 ^ 8 : ℝ) * (S.T₃ * sec7_relErrF P S) := by
-  have haR : 0 < (a : ℝ) := by exact_mod_cast ha
-  have hApos : 0 < S.A := by
-    unfold Scale.A
-    exact mul_pos S.Δ_pos S.Ω_pos
-  have hDpos : 0 < S.D := S.D_pos
-  have hrcore := sec7_phase_rWinWide_core Env hW c₀ Cu hsd hr
-  obtain ⟨hft_lo, hft_hi⟩ :=
-    sec7_phase_ftil_scale (P := P) (S := S) (r := r) (a := a)
-      ha hAD (sec7_phase_a_lo_wide ha_lo) (sec7_phase_a_hi_wide ha_hi)
-      hrcore.1 hrcore.2
-  have htWin : sec7_phase_ftil P S a r ∈ sec7_tWin S := by
-    have hFpos : 0 < S.F := sec7_phase_F_pos S
-    simp only [sec7_tWin, Set.mem_Icc]
-    constructor
-    · rw [sec7_cWin]
-      nlinarith
-    · rw [sec7_cWin]
-      nlinarith
-  set d : ℝ := dtilde P.X r (a : ℝ) with hd_def
-  have hr0 : 0 < r := sec7_phase_rWinWide_pos Env hW c₀ Cu hsd r hr
-  have hdpos : 0 < d := by
-    simpa [d, hd_def] using dtilde_pos P.X_pos haR hr0
-  have hdb_eq : dBreve P.X (a : ℝ) (sec7_phase_ftil P S a r) = d := by
-    simpa [d, hd_def, sec7_phase_ftil] using dBreve_spec P.X_pos haR hdpos
-  obtain ⟨_himg, hdlo16_raw, _hdhi30_raw⟩ :=
-    dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ))
-      (t := sec7_phase_ftil P S a r) hAD (sec7_phase_a_lo_wide ha_lo)
-      (sec7_phase_a_hi_wide ha_hi) htWin
-  have hdlo16 : S.D / 16 ≤ d := by
-    simpa [hdb_eq] using hdlo16_raw
-  have hA3 :=
-    sec7_ra_A3_bound_public (a := (a : ℝ)) (d := d) (d_lo := S.D / 16)
-      (k := i) hi haR (by positivity) hdlo16
-  have hcancel := sec7_ra_rpow_neg_cancel_unit (D := S.D) (d := d) (i := i)
-    hDpos hdlo16
-  have hmain :
-      S.D ^ i *
-          |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ)))) d|
-        ≤ (10 ^ 8 : ℝ) * S.A := by
-    calc
-      S.D ^ i *
-          |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ)))) d|
-          ≤ S.D ^ i * ((30 : ℝ) * (a : ℝ) * d ^ (-(i : ℝ))) := by
-            exact mul_le_mul_of_nonneg_left hA3 (by positivity)
-      _ = (30 : ℝ) * (a : ℝ) * (S.D ^ i * d ^ (-(i : ℝ))) := by ring
-      _ ≤ (30 : ℝ) * (a : ℝ) * 16 ^ i := by
-            exact mul_le_mul_of_nonneg_left hcancel (by positivity)
-      _ ≤ (30 : ℝ) * (2 * S.A) * 16 ^ i := by
-            gcongr
-      _ ≤ (10 ^ 8 : ℝ) * S.A := by
-            have hconst : (30 : ℝ) * (2 : ℝ) * 16 ^ i ≤ 10 ^ 8 := by
-              interval_cases i <;> norm_num
-            calc
-              (30 : ℝ) * (2 * S.A) * 16 ^ i =
-                  ((30 : ℝ) * (2 : ℝ) * 16 ^ i) * S.A := by ring
-              _ ≤ (10 ^ 8 : ℝ) * S.A :=
-                  mul_le_mul_of_nonneg_right hconst hApos.le
-  have hU1 : (1 : ℝ) ≤ P.U := by
-    unfold Globals.U
-    exact Real.one_le_rpow hsd.hX hu0.le
-  have hGU : (1 : ℝ) ≤ P.G * P.U ^ 5 := by
-    have hU5 : (1 : ℝ) ≤ P.U ^ 5 := one_le_pow₀ hU1
-    calc
-      (1 : ℝ) = 1 * 1 := by ring
-      _ ≤ P.G * P.U ^ 5 := mul_le_mul hG1 hU5 zero_le_one P.G_pos.le
-  have hA_le : S.A ≤ S.A * P.G * P.U ^ 5 := by
-    calc
-      S.A = S.A * 1 := by ring
-      _ ≤ S.A * (P.G * P.U ^ 5) := mul_le_mul_of_nonneg_left hGU hApos.le
-      _ = S.A * P.G * P.U ^ 5 := by ring
-  calc
-    S.D ^ i *
-        |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ))))
-          (dtilde P.X r (a : ℝ))|
-        = S.D ^ i *
-          |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ)))) d| := by
-            rw [hd_def]
-    _ ≤ (10 ^ 8 : ℝ) * S.A := hmain
-    _ ≤ (10 ^ 8 : ℝ) * (S.A * P.G * P.U ^ 5) :=
-          mul_le_mul_of_nonneg_left hA_le (by positivity)
-    _ = (10 ^ 8 : ℝ) * (S.T₃ * sec7_relErrF P S) := by
-          rw [sec7_ra_T₃_relErrF_eq_A_G_U5]
+  have hps := sec7_ra_jF_powersaving (P := P) (S := S) (c₀ := c₀) (Cu := Cu)
+    (j := j) hsd hbud hj hG1 hUbig
+  unfold sec7_relErrF
+  exact hps
 
 private theorem sec7_ra_rho1_A_rescaled_bound {P : Globals} {S : Scale P} {W : ℝ}
     {a : ℤ} {r : ℝ} {i : ℕ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
@@ -3999,17 +3854,8 @@ private theorem sec7_ra_rho1_A_rescaled_bound {P : Globals} {S : Scale P} {W : �
     simpa [mul_comm] using hrel143
   have hΩH_small : S.Ω / P.H ≤ 1 / (10 : ℝ) ^ 143 :=
     le_trans hΩH_le_rel hrel_small
-  have hrel_le_relF : sec7_relErr P S ≤ sec7_relErrF P S := by
-    have hGU : (1 : ℝ) ≤ sec7_cGU P S := by
-      unfold sec7_cGU
-      have hU2 : (1 : ℝ) ≤ P.U ^ 2 := one_le_pow₀ hU1
-      calc
-        (1 : ℝ) = 1 * 1 := by ring
-        _ ≤ P.G * P.U ^ 2 := mul_le_mul hG1 hU2 zero_le_one P.G_pos.le
-    unfold sec7_relErrF
-    calc
-      sec7_relErr P S = sec7_relErr P S * 1 := by ring
-      _ ≤ sec7_relErr P S * sec7_cGU P S := mul_le_mul_of_nonneg_left hGU hrel0
+  have hrel_le_relF : sec7_relErr P S ≤ sec7_relErrF P S :=
+    sec7_relErr_le_relErrF hsd hbud hg0 hu0
   have hsq :
       (S.Ω / P.H) ^ 2 ≤ (1 / (10 : ℝ) ^ 143) * sec7_relErrF P S := by
     calc
@@ -4048,7 +3894,8 @@ private theorem sec7_ra_rho3_A_rescaled_bound_sharp {P : Globals} {S : Scale P} 
     {a : ℤ} {r : ℝ} {i : ℕ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
     (hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
-    {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu) (hu0 : 0 < P.u)
+    {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
     (hr : r ∈ sec7_rWinWide S W) (hi : i ≤ 5) :
     S.D ^ i *
         |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ))))
@@ -4111,19 +3958,8 @@ private theorem sec7_ra_rho3_A_rescaled_bound_sharp {P : Globals} {S : Scale P} 
                   ((30 : ℝ) * (2 : ℝ) * 16 ^ i) * S.A := by ring
               _ ≤ (7 * 10 ^ 7 : ℝ) * S.A :=
                   mul_le_mul_of_nonneg_right hconst hApos.le
-  have hU1 : (1 : ℝ) ≤ P.U := by
-    unfold Globals.U
-    exact Real.one_le_rpow hsd.hX hu0.le
-  have hGU : (1 : ℝ) ≤ P.G * P.U ^ 5 := by
-    have hU5 : (1 : ℝ) ≤ P.U ^ 5 := one_le_pow₀ hU1
-    calc
-      (1 : ℝ) = 1 * 1 := by ring
-      _ ≤ P.G * P.U ^ 5 := mul_le_mul hG1 hU5 zero_le_one P.G_pos.le
-  have hA_le : S.A ≤ S.A * P.G * P.U ^ 5 := by
-    calc
-      S.A = S.A * 1 := by ring
-      _ ≤ S.A * (P.G * P.U ^ 5) := mul_le_mul_of_nonneg_left hGU hApos.le
-      _ = S.A * P.G * P.U ^ 5 := by ring
+  have hAbridge : S.A ≤ S.T₃ * sec7_relErrF P S :=
+    sec7_A_le_T₃_relErrF hsd hbud hg0 hu0
   calc
     S.D ^ i *
         |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ))))
@@ -4132,10 +3968,8 @@ private theorem sec7_ra_rho3_A_rescaled_bound_sharp {P : Globals} {S : Scale P} 
           |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ)))) d| := by
             rw [hd_def]
     _ ≤ (7 * 10 ^ 7 : ℝ) * S.A := hmain
-    _ ≤ (7 * 10 ^ 7 : ℝ) * (S.A * P.G * P.U ^ 5) :=
-          mul_le_mul_of_nonneg_left hA_le (by positivity)
-    _ = (7 * 10 ^ 7 : ℝ) * (S.T₃ * sec7_relErrF P S) := by
-          rw [sec7_ra_T₃_relErrF_eq_A_G_U5]
+    _ ≤ (7 * 10 ^ 7 : ℝ) * (S.T₃ * sec7_relErrF P S) :=
+          mul_le_mul_of_nonneg_left hAbridge (by positivity)
 
 private theorem sec7_ra_B3_close_scale {P : Globals} {S : Scale P} {W : ℝ}
     {a d : ℝ} {j : ℤ} (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
@@ -4727,6 +4561,7 @@ private theorem sec7_ra_rho3_rescaled_FDeriv_prebound {P : Globals} {S : Scale P
     (hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g)
     (hj : sec7_jBand P S j) (hu0 : 0 < P.u)
     (hr : r ∈ sec7_rWinWide S W) (hi : i ≤ 5) :
     ‖iteratedFDerivWithin ℝ i
@@ -4852,7 +4687,7 @@ private theorem sec7_ra_rho3_rescaled_FDeriv_prebound {P : Globals} {S : Scale P
     exact iteratedDeriv_fun_add (x := d) hBcd hAcd
   have hA_bound :=
     sec7_ra_rho3_A_rescaled_bound_sharp (P := P) (S := S) (W := W)
-      (a := a) (r := r) (i := i) ha hAD hG1 ha_lo ha_hi Env hW hsd hu0 hr hi
+      (a := a) (r := r) (i := i) ha hAD hG1 ha_lo ha_hi Env hW hsd hbud hg0 hu0 hr hi
   have hB_bound :=
     sec7_ra_rho3_B_rescaled_prebound (P := P) (S := S) (W := W)
       (a := a) (j := j) (r := r) (i := i) ha hAD ha_lo ha_hi Env hW hsd hj hr hi
@@ -5065,14 +4900,14 @@ private theorem sec7_ra_rho1_rescaled_FDeriv_prebound {P : Globals} {S : Scale P
 
 private theorem sec7_ra_rho1_B_budget_absorb {P : Globals} {S : Scale P}
     {c₀ Cu : ℝ} {j : ℤ}
-    (hsd : OnStripAux.StripData P S c₀ Cu) (hj : sec7_jBand P S j)
-    (hG1 : 1 ≤ P.G) (hG10x : P.G * P.U ^ 10 ≤ S.x)
+    (hsd : OnStripAux.StripData P S c₀ Cu) (hbud : OnStripAux.Budget P.g P.u Cu)
+    (hj : sec7_jBand P S j) (hG1 : 1 ≤ P.G)
     (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     (8 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₁
       ≤ (10 ^ 7 : ℝ) * (S.T₁ * sec7_relErrF P S) := by
   have hJ :=
     sec7_ra_j_over_F_le_relErrF_tiny (P := P) (S := S) (c₀ := c₀) (Cu := Cu)
-      (j := j) hsd hj hG1 hG10x hUbig
+      (j := j) hsd hbud hj hG1 hUbig
   have hT0 : 0 ≤ S.T₁ := (sec7_T₁_pos S).le
   have hcoef0 : 0 ≤ (8 * 10 ^ 15 : ℝ) := by norm_num
   have hbase0 : 0 ≤ S.T₁ * sec7_relErrF P S :=
@@ -5096,7 +4931,7 @@ private theorem sec7_ra_rho1_rescaled_FDeriv_bound {P : Globals} {S : Scale P} {
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1 / 100 : ℝ))
     (hj : sec7_jBand P S j)
-    (hG10x : P.G * P.U ^ 10 ≤ S.x) (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
     (hr : r ∈ sec7_rWinWide S W) (hi : i ≤ 5) :
     ‖iteratedFDerivWithin ℝ i
         (fun u : ℝ => sec7_ra_rho1Fun P.X (a : ℝ) (j : ℝ) (S.D * u))
@@ -5109,7 +4944,7 @@ private theorem sec7_ra_rho1_rescaled_FDeriv_bound {P : Globals} {S : Scale P} {
       Env hW c₀ Cu hsd hbud hg0 hu0 hX24 hj hr hi
   have hB :=
     sec7_ra_rho1_B_budget_absorb (P := P) (S := S) (c₀ := c₀) (Cu := Cu)
-      (j := j) hsd hj hG1 hG10x hUbig
+      (j := j) hsd hbud hj hG1 hUbig
   have hbase0 : 0 ≤ S.T₁ * sec7_relErrF P S :=
     mul_nonneg (sec7_T₁_pos S).le (sec7_relErrF_pos P S).le
   calc
@@ -5128,14 +4963,14 @@ private theorem sec7_ra_rho1_rescaled_FDeriv_bound {P : Globals} {S : Scale P} {
 
 private theorem sec7_ra_rho3_B_budget_absorb {P : Globals} {S : Scale P}
     {c₀ Cu : ℝ} {j : ℤ}
-    (hsd : OnStripAux.StripData P S c₀ Cu) (hj : sec7_jBand P S j)
-    (hG1 : 1 ≤ P.G) (hG10x : P.G * P.U ^ 10 ≤ S.x)
+    (hsd : OnStripAux.StripData P S c₀ Cu) (hbud : OnStripAux.Budget P.g P.u Cu)
+    (hj : sec7_jBand P S j) (hG1 : 1 ≤ P.G)
     (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     (7 * 10 ^ 11 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃
       ≤ (10 ^ 7 : ℝ) * (S.T₃ * sec7_relErrF P S) := by
   have hJ :=
     sec7_ra_j_over_F_le_relErrF_small (P := P) (S := S) (c₀ := c₀) (Cu := Cu)
-      (j := j) hsd hj hG1 hG10x hUbig
+      (j := j) hsd hbud hj hG1 hUbig
   have hT0 : 0 ≤ S.T₃ := (sec7_T₃_pos S).le
   have hcoef0 : 0 ≤ (7 * 10 ^ 11 : ℝ) := by norm_num
   have hbase0 : 0 ≤ S.T₃ * sec7_relErrF P S :=
@@ -5156,8 +4991,9 @@ private theorem sec7_ra_rho3_rescaled_FDeriv_bound {P : Globals} {S : Scale P} {
     (hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g)
     (hj : sec7_jBand P S j) (hu0 : 0 < P.u)
-    (hG10x : P.G * P.U ^ 10 ≤ S.x) (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
     (hr : r ∈ sec7_rWinWide S W) (hi : i ≤ 5) :
     ‖iteratedFDerivWithin ℝ i
         (fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u))
@@ -5167,10 +5003,10 @@ private theorem sec7_ra_rho3_rescaled_FDeriv_bound {P : Globals} {S : Scale P} {
   have hpre :=
     sec7_ra_rho3_rescaled_FDeriv_prebound (P := P) (S := S) (W := W)
       (a := a) (j := j) (r := r) (i := i) ha hAD hG1 ha_lo ha_hi
-      Env hW c₀ Cu hsd hj hu0 hr hi
+      Env hW c₀ Cu hsd hbud hg0 hj hu0 hr hi
   have hB :=
     sec7_ra_rho3_B_budget_absorb (P := P) (S := S) (c₀ := c₀) (Cu := Cu)
-      (j := j) hsd hj hG1 hG10x hUbig
+      (j := j) hsd hbud hj hG1 hUbig
   calc
     ‖iteratedFDerivWithin ℝ i
         (fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u))
@@ -5412,7 +5248,8 @@ theorem sec7_ra_e₃D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
-    (hu0 : 0 < P.u) (hG10x : P.G * P.U ^ 10 ≤ S.x)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g)
+    (hu0 : 0 < P.u)
     (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     ∀ j, sec7_jBand P S j → ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
       |sec7_phase_ra_e₃D P S a j m r| ≤
@@ -5445,7 +5282,7 @@ theorem sec7_ra_e₃D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
     intro i hi
     exact sec7_ra_rho3_rescaled_FDeriv_bound (P := P) (S := S) (W := W)
       (a := a) (j := j) (r := r) (i := i) ha hAD hG1 ha_lo ha_hi
-      Env hW c₀ Cu hsd hj hu0 hG10x hUbig hr (le_trans hi hm)
+      Env hW c₀ Cu hsd hbud hg0 hj hu0 hUbig hr (le_trans hi hm)
   have hD : ∀ i : ℕ, 1 ≤ i → i ≤ m →
       ‖iteratedFDerivWithin ℝ i (fun s => dtilde P.X s (a : ℝ) / S.D)
           (sec7_rWinWide S W) r‖ ≤ (((10 ^ 3 : ℝ) / S.R) ^ i) := by
@@ -5521,7 +5358,7 @@ theorem sec7_ra_e₁D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1 / 100 : ℝ))
-    (hG10x : P.G * P.U ^ 10 ≤ S.x) (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     ∀ j, sec7_jBand P S j → ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
       |sec7_phase_ra_e₁D P S a j m r| ≤
         sec7_cExpIn * (S.T₁ / S.R ^ m) * sec7_relErrF P S := by
@@ -5553,7 +5390,7 @@ theorem sec7_ra_e₁D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
     intro i hi
     exact sec7_ra_rho1_rescaled_FDeriv_bound (P := P) (S := S) (W := W)
       (a := a) (j := j) (r := r) (i := i) ha hAD hG1 ha_lo ha_hi
-      Env hW c₀ Cu hsd hbud hg0 hu0 hX24 hj hG10x hUbig hr (le_trans hi hm)
+      Env hW c₀ Cu hsd hbud hg0 hu0 hX24 hj hUbig hr (le_trans hi hm)
   have hD : ∀ i : ℕ, 1 ≤ i → i ≤ m →
       ‖iteratedFDerivWithin ℝ i (fun s => dtilde P.X s (a : ℝ) / S.D)
           (sec7_rWinWide S W) r‖ ≤ (((10 ^ 3 : ℝ) / S.R) ^ i) := by
@@ -5627,15 +5464,15 @@ private theorem sec7_phase_ra_e₁D_tiny {P : Globals} {S : Scale P} {W : ℝ}
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1 / 100 : ℝ))
-    (hG10x : P.G * P.U ^ 10 ≤ S.x) (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
     (hj : sec7_jBand P S j) {m : ℕ} {r : ℝ}
     (hm : m ≤ 5) (hr : r ∈ sec7_rWinWide S W) :
     |sec7_phase_ra_e₁D P S a j m r| ≤
       (1 / (10 : ℝ) ^ 100) * (S.T₁ / S.R ^ m) := by
   have hcore := sec7_ra_e₁D_core P S W a ha hAD hG1 ha_lo ha_hi
-    Env hW c₀ Cu hsd hbud hg0 hu0 hX24 hG10x hUbig j hj m hm r hr
+    Env hW c₀ Cu hsd hbud hg0 hu0 hX24 hUbig j hj m hm r hr
   have hrel143 : sec7_relErrF P S * 10 ^ 143 ≤ 1 :=
-    sec7_relErrF_le Env hW hsd hbud hg0 hu0 hX24
+    sec7_relErrF_le Env hW hsd hbud hg0 hu0 hX24 hUbig
   have hrel_le : sec7_relErrF P S ≤ 1 / (10 : ℝ) ^ 143 := by
     rw [le_div_iff₀ (by positivity : (0 : ℝ) < (10 : ℝ) ^ 143)]
     simpa [mul_comm] using hrel143
@@ -5662,15 +5499,15 @@ private theorem sec7_phase_ra_e₃D_tiny {P : Globals} {S : Scale P} {W : ℝ}
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1 / 100 : ℝ))
-    (hG10x : P.G * P.U ^ 10 ≤ S.x) (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
     (hj : sec7_jBand P S j) {m : ℕ} {r : ℝ}
     (hm : m ≤ 5) (hr : r ∈ sec7_rWinWide S W) :
     |sec7_phase_ra_e₃D P S a j m r| ≤
       (1 / (10 : ℝ) ^ 100) * (S.T₃ / S.R ^ m) := by
   have hcore := sec7_ra_e₃D_core P S W a ha hAD hG1 ha_lo ha_hi
-    Env hW c₀ Cu hsd hu0 hG10x hUbig j hj m hm r hr
+    Env hW c₀ Cu hsd hbud hg0 hu0 hUbig j hj m hm r hr
   have hrel143 : sec7_relErrF P S * 10 ^ 143 ≤ 1 :=
-    sec7_relErrF_le Env hW hsd hbud hg0 hu0 hX24
+    sec7_relErrF_le Env hW hsd hbud hg0 hu0 hX24 hUbig
   have hrel_le : sec7_relErrF P S ≤ 1 / (10 : ℝ) ^ 143 := by
     rw [le_div_iff₀ (by positivity : (0 : ℝ) < (10 : ℝ) ^ 143)]
     simpa [mul_comm] using hrel143
@@ -5798,7 +5635,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1 / 100 : ℝ))
-    (hG10x : P.G * P.U ^ 10 ≤ S.x) (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     Sec7Phase P S W a where
   ftil := sec7_phase_ftil P S a
   dBreve := sec7_phase_dBreve P a
@@ -5913,7 +5750,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
       (a := a) (j := j) (m := m) (r := r) ha_lo ha_hi Env hW c₀ Cu hsd hm hr).1
     have hres := sec7_phase_ra_e₁D_tiny (P := P) (S := S) (W := W) (a := a)
       (j := j) ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd hbud hg0 hu0 hX24
-      hG10x hUbig hj (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
+      hUbig hj (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
     have hB0 : 0 ≤ S.T₁ / S.R ^ m :=
       div_nonneg (sec7_T₁_pos S).le (pow_nonneg (sec7_R_pos S).le m)
     have htri : |M| ≤ |sec7_phase_f1D P S a j m r| + |E| := by
@@ -5965,7 +5802,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
       (a := a) (j := j) (m := m) (r := r) ha_lo ha_hi Env hW c₀ Cu hsd hm hr).2
     have hres := sec7_phase_ra_e₁D_tiny (P := P) (S := S) (W := W) (a := a)
       (j := j) ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd hbud hg0 hu0 hX24
-      hG10x hUbig hj (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
+      hUbig hj (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
     have hB0 : 0 ≤ S.T₁ / S.R ^ m :=
       div_nonneg (sec7_T₁_pos S).le (pow_nonneg (sec7_R_pos S).le m)
     calc
@@ -6091,7 +5928,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
       (a := a) (j := j) (m := m) (r := r) ha_lo ha_hi Env hW c₀ Cu hsd hm hr).1
     have hres := sec7_phase_ra_e₃D_tiny (P := P) (S := S) (W := W) (a := a)
       (j := j) ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd hbud hg0 hu0 hX24
-      hG10x hUbig hj (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
+      hUbig hj (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
     have hB0 : 0 ≤ S.T₃ / S.R ^ m :=
       div_nonneg (sec7_T₃_pos S).le (pow_nonneg (sec7_R_pos S).le m)
     have htri : |M| ≤ |sec7_phase_f3D P S a j m r| + |E| := by
@@ -6143,7 +5980,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
       (a := a) (j := j) (m := m) (r := r) ha_lo ha_hi Env hW c₀ Cu hsd hm hr).2
     have hres := sec7_phase_ra_e₃D_tiny (P := P) (S := S) (W := W) (a := a)
       (j := j) ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd hbud hg0 hu0 hX24
-      hG10x hUbig hj (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
+      hUbig hj (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
     have hB0 : 0 ≤ S.T₃ / S.R ^ m :=
       div_nonneg (sec7_T₃_pos S).le (pow_nonneg (sec7_R_pos S).le m)
     calc
@@ -6232,7 +6069,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
   ra_e₁D_bound := by
     intro j hj m hm r hr
     exact sec7_ra_e₁D_core P S W a ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd
-      hbud hg0 hu0 hX24 hG10x hUbig j hj m hm r hr
+      hbud hg0 hu0 hX24 hUbig j hj m hm r hr
   ra_e₂D_bound := by
     intro j hj m hm r hr
     exact sec7_ra_e₂D_core P S W a ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd
@@ -6240,7 +6077,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
   ra_e₃D_bound := by
     intro j hj m hm r hr
     exact sec7_ra_e₃D_core P S W a ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd
-      hu0 hG10x hUbig j hj m hm r hr
+      hbud hg0 hu0 hUbig j hj m hm r hr
   phiContDiff := by
     intro j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hj hbound
     intro x hx
@@ -6534,7 +6371,7 @@ theorem sec7_phase_construct (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (ha
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1 / 100 : ℝ))
-    (hG10x : P.G * P.U ^ 10 ≤ S.x) (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     ∃ Ph : Sec7Phase P S W a,
       (∀ {r : ℝ}, (1/72) * S.R ≤ r → r ≤ 16 * S.R →
         Ph.ftil r = Ffun P.X (a : ℝ) (dtilde P.X r (a : ℝ))) ∧
@@ -6544,7 +6381,7 @@ theorem sec7_phase_construct (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (ha
         |(d : ℝ) - Ph.dBreve (f : ℝ)| ≤
           sec7_cdMar * (S.Δ ^ 2 / (P.H ^ 2 * P.G * S.A))) := by
   refine ⟨sec7_phase_concrete P S W a ha hAD hG1 ha_lo ha_hi Env hW c₀ Cu hsd
-    hbud hg0 hu0 hX24 hG10x hUbig, ?_, ?_⟩
+    hbud hg0 hu0 hX24 hUbig, ?_, ?_⟩
   · intro r hrlo hrhi
     rfl
   · intro d f hdD hd2D hf hnear

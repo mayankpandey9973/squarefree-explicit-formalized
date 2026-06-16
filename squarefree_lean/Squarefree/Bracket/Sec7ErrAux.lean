@@ -383,104 +383,46 @@ theorem sec7_relErrF_le {P : Globals} {S : Scale P} {W : ℝ}
     (_Env : Sec7Envelope P S W) (_hW : 1 ≤ W)
     {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
-    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ)) :
+    (_hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ))
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     sec7_relErrF P S * 10 ^ 143 ≤ 1 := by
-  have hH := P.H_pos
-  have hG := P.G_pos
-  have hΩ := S.Ω_pos
-  have hXgt : 1 < P.X := by
-    by_contra h
-    have h' : P.X ≤ 1 := not_lt.mp h
-    have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
-    linarith
-  have hbud' : 18977 * P.g + 18675 * P.u ≤ 2 := by
-    have hCu0 : 0 ≤ Cu := le_trans zero_le_one hsd.hCu
-    have hextra : 0 ≤ 790 * Cu * P.u := by
-      nlinarith [mul_nonneg hCu0 hu0.le]
-    unfold OnStripAux.Budget at hbud
-    nlinarith [hbud, hextra]
-  have hbig0 : (10:ℝ) ^ 143 ≤ (2 ^ 24 : ℝ) ^ ((198:ℝ) / 10) := by
-    have hpow : ((10:ℝ) ^ 143) ^ (10:ℝ) ≤ (2 ^ 24 : ℝ) ^ (198:ℝ) := by norm_num
-    rw [show ((198:ℝ) / 10) = (198:ℝ) * (10:ℝ)⁻¹ by norm_num]
-    rw [Real.rpow_mul (by norm_num : (0:ℝ) ≤ 2 ^ 24)]
-    exact (Real.le_rpow_inv_iff_of_pos (by positivity) (by positivity)
-      (by norm_num : (0:ℝ) < 10)).mpr hpow
-  have hbig : (10:ℝ) ^ 143 ≤ P.X ^ (198/1000 : ℝ) := by
-    have hX24' : (2 ^ 24 : ℝ) ≤ P.X ^ (1/100 : ℝ) := by
-      norm_num
-      exact hX24
-    have hpow : (2 ^ 24 : ℝ) ^ ((198:ℝ) / 10) ≤
-        (P.X ^ (1/100 : ℝ)) ^ ((198:ℝ) / 10) :=
-      Real.rpow_le_rpow (by norm_num) hX24' (by norm_num)
-    calc
-      (10:ℝ) ^ 143 ≤ (2 ^ 24 : ℝ) ^ ((198:ℝ) / 10) := hbig0
-      _ ≤ (P.X ^ (1/100 : ℝ)) ^ ((198:ℝ) / 10) := hpow
-      _ = P.X ^ (198/1000 : ℝ) := by
-          rw [← Real.rpow_mul P.X_pos.le]
-          congr 1
-          norm_num
-  have hkey : (1:ℝ) <
-      P.H ^ (1 - 5 * (198/1000 : ℝ) - 25 * P.u) * S.x ^ (0:ℝ) *
-        P.G ^ (-(198/1000 : ℝ) - 1 - 5 * P.u) * S.Ω ^ (-1:ℝ) :=
-    OnStripAux.one_lt_mono P S c₀ Cu hsd hXgt
-      (1 - 5 * (198/1000 : ℝ) - 25 * P.u) 0
-      (-(198/1000 : ℝ) - 1 - 5 * P.u) (-1)
-      (by
-        unfold OnStripAux.ratioExp
-        norm_num
-        nlinarith [hbud', hg0, hu0.le])
-  have hXGU :
-      P.X ^ (198/1000 : ℝ) * (P.G * P.U ^ 5) =
-        P.H ^ (5 * (198/1000 : ℝ) + 25 * P.u) *
-          P.G ^ ((198/1000 : ℝ) + 1 + 5 * P.u) := by
-    unfold Globals.U Globals.H Globals.G
-    rw [← Real.rpow_natCast (P.X ^ P.u) 5, ← Real.rpow_mul P.X_pos.le]
-    rw [← Real.rpow_add P.X_pos, ← Real.rpow_add P.X_pos]
-    rw [← Real.rpow_mul P.X_pos.le, ← Real.rpow_mul P.X_pos.le, ← Real.rpow_add P.X_pos]
-    congr 1
-    ring
-  have hsplit :
-      (P.H ^ (5 * (198/1000 : ℝ) + 25 * P.u) *
-          P.G ^ ((198/1000 : ℝ) + 1 + 5 * P.u)) *
-        (P.H ^ (1 - 5 * (198/1000 : ℝ) - 25 * P.u) * S.x ^ (0:ℝ) *
-          P.G ^ (-(198/1000 : ℝ) - 1 - 5 * P.u) * S.Ω ^ (-1:ℝ)) = P.H / S.Ω := by
-    rw [Real.rpow_zero]
-    rw [show (P.H ^ (5 * (198/1000 : ℝ) + 25 * P.u) *
-          P.G ^ ((198/1000 : ℝ) + 1 + 5 * P.u)) *
-        (P.H ^ (1 - 5 * (198/1000 : ℝ) - 25 * P.u) * 1 *
-          P.G ^ (-(198/1000 : ℝ) - 1 - 5 * P.u) * S.Ω ^ (-1:ℝ)) =
-        (P.H ^ (5 * (198/1000 : ℝ) + 25 * P.u) *
-          P.H ^ (1 - 5 * (198/1000 : ℝ) - 25 * P.u)) *
-        (P.G ^ ((198/1000 : ℝ) + 1 + 5 * P.u) *
-          P.G ^ (-(198/1000 : ℝ) - 1 - 5 * P.u)) * S.Ω ^ (-1:ℝ) by ring]
-    rw [← Real.rpow_add hH, ← Real.rpow_add hG, Real.rpow_neg hΩ.le]
-    rw [show 5 * (198/1000 : ℝ) + 25 * P.u +
-          (1 - 5 * (198/1000 : ℝ) - 25 * P.u) = 1 by ring,
-      show ((198/1000 : ℝ) + 1 + 5 * P.u) +
-          (-(198/1000 : ℝ) - 1 - 5 * P.u) = 0 by ring,
-      Real.rpow_one, Real.rpow_zero, Real.rpow_one]
-    field_simp [hΩ.ne']
-  have htarget : (10:ℝ) ^ 143 * (P.G * P.U ^ 5) ≤ P.H / S.Ω := by
-    calc
-      (10:ℝ) ^ 143 * (P.G * P.U ^ 5) ≤
-          P.X ^ (198/1000 : ℝ) * (P.G * P.U ^ 5) := by
-        exact mul_le_mul_of_nonneg_right hbig (mul_nonneg hG.le (pow_nonneg P.U_pos.le 5))
-      _ = P.H ^ (5 * (198/1000 : ℝ) + 25 * P.u) *
-            P.G ^ ((198/1000 : ℝ) + 1 + 5 * P.u) := hXGU
-      _ ≤ (P.H ^ (5 * (198/1000 : ℝ) + 25 * P.u) *
-            P.G ^ ((198/1000 : ℝ) + 1 + 5 * P.u)) *
-          (P.H ^ (1 - 5 * (198/1000 : ℝ) - 25 * P.u) * S.x ^ (0:ℝ) *
-            P.G ^ (-(198/1000 : ℝ) - 1 - 5 * P.u) * S.Ω ^ (-1:ℝ)) := by
-          exact le_mul_of_one_le_right (by positivity) hkey.le
-      _ = P.H / S.Ω := hsplit
-  have hmain : ((10:ℝ) ^ 143 * (P.G * P.U ^ 5)) * S.Ω ≤ P.H := by
-    rwa [le_div_iff₀ hΩ] at htarget
-  unfold sec7_relErrF sec7_relErr sec7_cGU
-  calc
-    ((S.Ω / P.H * P.U ^ 3) * (P.G * P.U ^ 2)) * (10:ℝ) ^ 143
-        = (((10:ℝ) ^ 143 * (P.G * P.U ^ 5)) * S.Ω) / P.H := by
-            field_simp [hH.ne']
-    _ ≤ P.H / P.H := div_le_div_of_nonneg_right hmain hH.le
-    _ = 1 := by field_simp [hH.ne']
+  -- admissibility consequence of the budget: `u ≤ 2/18675`
+  have hb : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hCu1 : (1 : ℝ) ≤ Cu := hsd.hCu
+  have hCuu_nn : (0 : ℝ) ≤ Cu * P.u := mul_nonneg (le_trans zero_le_one hCu1) hu0.le
+  have hu_le : P.u ≤ 2 / 18675 := by nlinarith [hb, hg0, hCuu_nn]
+  have hU1 : (1 : ℝ) ≤ P.U := le_trans (by norm_num) hUbig
+  -- `X ≥ 10^800` from `U ≥ 10^33` and `1/u ≥ 800/33`
+  have hExp : (800 / 33 : ℝ) ≤ 1 / P.u := by
+    rw [le_div_iff₀ hu0]; nlinarith [hu_le, hu0]
+  have hXeq : (P.U) ^ (1 / P.u) = P.X := by
+    rw [Globals.U, ← Real.rpow_mul P.X_pos.le, mul_one_div, div_self hu0.ne', Real.rpow_one]
+  have hXbig : (10 : ℝ) ^ (800 : ℕ) ≤ P.X := by
+    calc (10 : ℝ) ^ (800 : ℕ)
+        = ((10 : ℝ) ^ 33) ^ (800 / 33 : ℝ) := by
+          rw [← Real.rpow_natCast (10 : ℝ) 800, ← Real.rpow_natCast (10 : ℝ) 33,
+            ← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 10)]
+          congr 1; push_cast; norm_num
+      _ ≤ (P.U) ^ (800 / 33 : ℝ) := Real.rpow_le_rpow (by positivity) hUbig (by norm_num)
+      _ ≤ (P.U) ^ (1 / P.u) := Real.rpow_le_rpow_of_exponent_le hU1 hExp
+      _ = P.X := hXeq
+  -- hence `10^143 ≤ X^{19/100}` (with room: `X^{19/100} ≥ 10^152`)
+  have hXge : (10 : ℝ) ^ 143 ≤ P.X ^ (19 / 100 : ℝ) := by
+    calc (10 : ℝ) ^ 143 ≤ (10 : ℝ) ^ 152 := by norm_num
+      _ = ((10 : ℝ) ^ (800 : ℕ)) ^ (19 / 100 : ℝ) := by
+          rw [← Real.rpow_natCast (10 : ℝ) 800, ← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 10),
+            ← Real.rpow_natCast (10 : ℝ) 152]
+          congr 1; push_cast; norm_num
+      _ ≤ P.X ^ (19 / 100 : ℝ) := Real.rpow_le_rpow (by positivity) hXbig (by norm_num)
+  -- conclude `X^{-19/100} · 10^143 ≤ 1`
+  unfold sec7_relErrF
+  have hpos : (0 : ℝ) < P.X ^ (19 / 100 : ℝ) := Real.rpow_pos_of_pos P.X_pos _
+  have heq : P.X ^ (-(19 : ℝ) / 100) = (P.X ^ (19 / 100 : ℝ))⁻¹ := by
+    rw [show (-(19 : ℝ) / 100 : ℝ) = -(19 / 100 : ℝ) by norm_num, Real.rpow_neg P.X_pos.le]
+  rw [heq]
+  calc (P.X ^ (19 / 100 : ℝ))⁻¹ * 10 ^ 143
+      ≤ (P.X ^ (19 / 100 : ℝ))⁻¹ * P.X ^ (19 / 100 : ℝ) :=
+        mul_le_mul_of_nonneg_left hXge (inv_nonneg.mpr hpos.le)
+    _ = 1 := inv_mul_cancel₀ (ne_of_gt hpos)
 
 end Squarefree

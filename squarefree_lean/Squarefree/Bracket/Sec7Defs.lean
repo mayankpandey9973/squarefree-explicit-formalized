@@ -108,9 +108,13 @@ A larger power (or `>~32×` constant) breaks `sec7_relErrF_le`. Results-invarian
 `prop_7_1`/`prop_7_3` and `δ=2/94885` are residual-magnitude-independent. -/
 noncomputable def sec7_cGU (P : Globals) (_S : Scale P) : ℝ := P.G * P.U ^ 2
 
-/-- Loosened f₁/f₃ relative-error scale. -/
-noncomputable def sec7_relErrF (P : Globals) (S : Scale P) : ℝ :=
-  sec7_relErr P S * sec7_cGU P S
+/-- Loosened f₁/f₃ relative-error scale.  After the `hG10x`-deletion re-pin this is the
+power-saving budget `X^{-19/100}` directly (the old `relErr·G·U^2` product was regime-false
+on-strip via the `x = H/Δ² = O(1)` factor; `sec7_ra_jF_powersaving` supplies `|j|/F ≤ X^{-19/100}`
+from the strip lower bound instead).  `sec7_cGU`/`sec7_relErr` are kept as defs (still used by
+f₂'s tight route and possibly other call sites). -/
+noncomputable def sec7_relErrF (P : Globals) (_S : Scale P) : ℝ :=
+  P.X ^ (-(19 : ℝ) / 100)
 
 /- md 1358–1361 (display, TRAP-1: use AS DISPLAYED, the larger `Δ⁵/(H³Ω²)` form, NOT the
    md-1352 `G²`-identity):
