@@ -56,7 +56,7 @@ theorem typeII_longArc {D : MajorLine} (hD : D ∈ typeIILines f N lam δ) :
   obtain ⟨a, b, haN, hbN, hnN, han, hnb, hoa, hon, hob, hq⟩ := witnessII_spec hn
   have hnotI : ¬ OnTypeIArc f N lam δ n := (mem_typeIISet.mp hn).2
   by_contra hle
-  push_neg at hle
+  push Not at hle
   -- `hle : properHi' − properLo' ≤ δ·√(q/λ)` ⟹ `OnTypeIArc n` via this `D`.
   apply hnotI
   refine ⟨witnessLineII f N δ n, a, b, haN, hbN, hnN, han, hnb, hoa, hon, hob, hq, ?_⟩

@@ -72,7 +72,7 @@ theorem noncollinear_triple_span {f : ℝ → ℝ} {N lam δ : ℝ} {a b c : ℤ
   have hLpos : 0 < L := by rw [hLdef]; linarith
   -- so `2λ L³ ≥ 1/2`  or  `2δ L ≥ 1/2`.
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   -- `L < dspan`, hence `L < (1/(512λ))^{1/3}` and `L < 1/(64δ)`.
   have h1 : L < (1 / (512 * lam)) ^ (1/3 : ℝ) := lt_of_lt_of_le hcon (min_le_left _ _)
   have h2 : L < 1 / (64 * δ) := lt_of_lt_of_le hcon (min_le_right _ _)
@@ -203,7 +203,7 @@ theorem residual_five_span {f : ℝ → ℝ} {N lam δ : ℝ}
       exact ⟨D, n₀, n₄, hnear hn0t, hnear hn4t, hnear hn2t,
         h01.trans (h12), h23.trans h34, hD0, hD2, hD4, hq⟩
     · -- Large denominator: the points are `q`-separated, so span `≥ q ≥ ... ≥ 1/(4δ)`.
-      push_neg at hq
+      push Not at hq
       -- `D.denom ∣ (n₄ − n₀)` (both on line; needs `gcd(num,den)=1`).
       have hdvd : D.denom ∣ (n₄ - n₀) := by
         have hcop : IsCoprime (D.slope.num) (D.denom) := by
@@ -227,11 +227,11 @@ theorem residual_five_span {f : ℝ → ℝ} {N lam δ : ℝ}
         _ ≤ (D.denom : ℝ) := hsmall
         _ ≤ (n₄ : ℝ) - (n₀ : ℝ) := hqleR
   · -- Some triple is non-collinear; pick it and apply the span bound.
-    push_neg at hcol
+    push Not at hcol
     have hexists : collinearDet f n₀ n₁ n₂ ≠ 0 ∨ collinearDet f n₀ n₁ n₃ ≠ 0
         ∨ collinearDet f n₀ n₁ n₄ ≠ 0 := by
       by_contra hall
-      push_neg at hall
+      push Not at hall
       exact absurd hall.2.2 (hcol hall.1 hall.2.1)
     rcases hexists with hne | hne | hne
     · -- non-collinear triple n₀ n₁ n₂, span n₂ - n₀ ≤ n₄ - n₀.
@@ -356,7 +356,7 @@ theorem typeI_card_bound {f : ℝ → ℝ} {N lam δ : ℝ}
   by_cases hδhalf : δ < 1/2
   · exact typeI_arc_sum hN2 hlam hδ hδhalf hf hfloor hlower hupper
   · -- `δ ≥ 1/2`: trivial cardinality bound `#typeISet ≤ N + 2 ≤ 2Nδ + 2 ≤ 384(Nδ+1)`.
-    push_neg at hδhalf
+    push Not at hδhalf
     have hN0 : (0 : ℝ) ≤ N := by linarith
     -- `typeISet ⊆ nearSet ⊆ Finset.Icc ⌊N⌋ ⌊2N⌋`.
     have hsubN : typeISet f N lam δ ⊆ nearSet f N δ := by
@@ -436,7 +436,7 @@ theorem prop43_local_explicit :
     have hNd : 0 ≤ N * δ := by positivity
     nlinarith [hres, hI, hII, hslog, hNl, hNd]
   · -- Small `N` (`N < 2`): `#nearSet ≤ ⌊2N⌋ - ⌊N⌋ + 1`, bounded by a constant.
-    push_neg at hN2
+    push Not at hN2
     have hsub : nearSet f N δ ⊆ Finset.Icc ⌊N⌋ ⌊2 * N⌋ := Finset.filter_subset _ _
     have hcardle : (nearSet f N δ).card ≤ (Finset.Icc ⌊N⌋ ⌊2 * N⌋).card :=
       Finset.card_le_card hsub

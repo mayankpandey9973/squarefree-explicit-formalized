@@ -67,7 +67,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   have hXgt : 1 < P.X := by
     -- X^{1/100} ≥ 16777216 > 1 = 1^{1/100}, and t ↦ t^{1/100} is monotone, so X > 1
     by_contra hle
-    push_neg at hle  -- hle : P.X ≤ 1
+    push Not at hle  -- hle : P.X ≤ 1
     have hX1 : P.X = 1 := le_antisymm hle hX
     have : P.X ^ (1/100 : ℝ) = 1 := by rw [hX1, Real.one_rpow]
     rw [this] at hX0big
@@ -284,7 +284,7 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
         _ ≤ max Coff Con * P.H / P.U := by
             rw [mul_div_assoc, mul_div_assoc]
             exact mul_le_mul_of_nonneg_right (le_max_left _ _) hHU
-    · push_neg at h1 h2
+    · push Not at h1 h2
       have := hon P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU h1.le h2.le D hDpos hDeq
       calc DBlock P S D ≤ Con * P.H / P.U := this
         _ ≤ max Coff Con * P.H / P.U := by

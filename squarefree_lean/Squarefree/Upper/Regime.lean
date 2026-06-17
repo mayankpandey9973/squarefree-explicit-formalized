@@ -937,7 +937,7 @@ private theorem prop6_highF :
           + C * P.H * P.X ^ (C * P.u) * RHS3 := by linarith [t1, t2, t3]
       _ = C * P.H * P.X ^ (C * P.u) * (RHS1 + RHS2 + RHS3) := by ring
   · -- ── A ≤ 1 : index set has ≤ 2 elements, count ≤ 2 per r ──
-    push_neg at hA1
+    push Not at hA1
     -- each per-r filter card ≤ 2
     have hperr2 : ∀ r ∈ Ua,
         (((Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋).filter

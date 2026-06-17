@@ -340,9 +340,9 @@ theorem lemma_3_1 : ∃ c : ℝ, 0 < c ∧
   -- `b ≥ 2a` (writeup line 283)
   have hb2a : 2 * a ≤ b := by
     have hd'ge : d + a ≤ d' := by
-      by_contra h; push_neg at h; exact hgap_d d' hdd' h hDd'
+      by_contra h; push Not at h; exact hgap_d d' hdd' h hDd'
     have hdbge : d' + a ≤ d + b := by
-      by_contra h; push_neg at h; exact hgap_d' (d + b) (by omega) h hD3
+      by_contra h; push Not at h; exact hgap_d' (d + b) (by omega) h hD3
     omega
   have hb2aR : 2 * (a : ℝ) ≤ (b : ℝ) := by exact_mod_cast hb2a
   have habR : (a : ℝ) ≤ (b : ℝ) := by linarith
@@ -473,7 +473,7 @@ theorem lemma_3_1 : ∃ c : ℝ, 0 < c ∧
     linarith [htri, tabs1, tabs2, tabs3, tabs4]
   -- Suppose the bound fails; derive the contrapositive hypothesis `b < threshold`.
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   -- range hypotheses in the `H*Δ` form the core expects
   have hd_lo' : H * Δ ≤ (d : ℝ) := by rw [← hDeq]; exact hd_lo
   have hd_hi' : (d : ℝ) ≤ 2 * (H * Δ) := by rw [← hDeq]; exact hd_hi

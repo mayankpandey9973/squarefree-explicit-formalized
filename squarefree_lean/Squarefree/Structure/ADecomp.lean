@@ -172,7 +172,7 @@ theorem a_decomposition (P : Globals) (D : ℝ)
   set Top : Finset ℤ := S.filter (fun d => ¬ (above d).Nonempty) with hTopdef
   -- S = Sgap ⊎ Top
   have hSsplit : S.card = Sgap.card + Top.card := by
-    rw [hSgapdef, hTopdef, Finset.filter_card_add_filter_neg_card_eq_card]
+    rw [hSgapdef, hTopdef, Finset.card_filter_add_card_filter_not]
   -- properties of nxt on Sgap
   have hmem_above : ∀ d e : ℤ, e ∈ above d ↔ e ∈ S ∧ d < e := by
     intro d e; rw [habovedef]; exact Finset.mem_filter
@@ -243,9 +243,9 @@ theorem a_decomposition (P : Globals) (D : ℝ)
   set Mid : Finset ℤ := Large.filter (fun d => (gap d : ℝ) ≤ Du) with hMiddef
   set Big : Finset ℤ := Large.filter (fun d => ¬ (gap d : ℝ) ≤ Du) with hBigdef
   have hpart1 : Sgap.card = Small.card + Large.card := by
-    rw [hSmalldef, hLargedef, Finset.filter_card_add_filter_neg_card_eq_card]
+    rw [hSmalldef, hLargedef, Finset.card_filter_add_card_filter_not]
   have hpart2 : Large.card = Mid.card + Big.card := by
-    rw [hMiddef, hBigdef, Finset.filter_card_add_filter_neg_card_eq_card]
+    rw [hMiddef, hBigdef, Finset.card_filter_add_card_filter_not]
   -- 2 T0 = thr ≤ D
   have hD2 : (2:ℝ) ≤ D := by linarith [hDlarge, hH1]
   have hD8X : D ≤ 8 * X := by nlinarith [hDX, hD2, hXpos]

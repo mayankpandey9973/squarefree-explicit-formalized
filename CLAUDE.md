@@ -36,6 +36,31 @@ keep the *orchestrator's* working context small and the file tree legible.
 ```
 Build/verify from the Lean project root (`squarefree_lean/`): `lake build <Module>`.
 
+### 1a. Build performance (binding — the box has 93 GB RAM, 20 cores)
+
+- **Always cap parallelism: `lake build -j 8`.** Each `import Mathlib` file holds ~6 GB; the
+  default `-j 20` needs ~120 GB → the box swaps and the build craters (10–50× slower). `-j 8`
+  (~48–64 GB) stays in RAM. Never run an uncapped full build. (RAM unchanged ⇒ this stays valid.)
+- **No wholesale `import Mathlib`.** It costs ~6 GB RAM + slower tactics per file. Import the
+  precise modules (use `lake exe shake` / `#min_imports`). New files must not `import Mathlib`.
+- **Keep modules ≤ ~400 lines (§3).** A file compiles as ONE job: a big file can't use the other
+  cores, is a serial long-pole, and forces a full recompile on every edit. Split monsters.
+- **Heartbeat smell:** a `set_option maxHeartbeats ≥ 1000000` marks an over-heavy tactic (usually
+  `nlinarith`/`norm_num` on astronomical numerals). Isolate the numeric fact into a tiny lemma.
+
+### 1b. Worktree guidelines (binding — when delegating with `isolation: worktree`)
+
+- A fresh worktree has an **empty `.lake/build`** ⇒ the agent recompiles all ~257 project modules
+  before doing any work (15–30 min of pure tax). **Default to NO worktree.** Let agents work in
+  the main tree; the orchestrator holds the clean checkpoint (commit) and reverts if needed.
+- **Use a worktree only when** the task is long, risky, or you must keep iterating in the main
+  tree concurrently. When you do, **prime it first**: `cp -r` (or hardlink) the main tree's
+  `.lake/build` into the worktree so it starts warm — never let it cold-rebuild from scratch.
+- Worktree builds are NOT the acceptance gate. The orchestrator re-verifies green + `#print axioms`
+  in the **main tree** after merging (a single-file change merges by `cp`; multi-file by `git diff`/
+  `apply`). Tear the worktree down (`git worktree remove --force` + delete branch) when merged.
+- Agents must build with `-j 8` inside worktrees too (same RAM box).
+
 ## 2. The working loop (per lemma)
 
 1. Pick the next item from `formalization_plan.md` (respect the dependency order: Params →

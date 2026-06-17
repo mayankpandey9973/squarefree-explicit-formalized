@@ -157,11 +157,11 @@ theorem prop51_combine
         have h2' : (1 : ℝ) ≤ (ℓ₂ : ℝ) := by exact_mod_cast h2
         have hL0 : Lp ≤ 0 := by
           by_contra hpos
-          push_neg at hpos
+          push Not at hpos
           have hprodpos : (0 : ℝ) < (ℓ₁ : ℝ) * (ℓ₂ : ℝ) := by nlinarith
           have hdiffpos : (0 : ℝ) < (ℓ₂ : ℝ) - (ℓ₁ : ℝ) := by
             by_contra hd
-            push_neg at hd
+            push Not at hd
             have : Lp ≤ 0 := by rw [hLp]; exact mul_nonpos_of_nonneg_of_nonpos hprodpos.le hd
             linarith
           have h12 : ℓ₁ < ℓ₂ := by exact_mod_cast (by linarith : (ℓ₁ : ℝ) < (ℓ₂ : ℝ))

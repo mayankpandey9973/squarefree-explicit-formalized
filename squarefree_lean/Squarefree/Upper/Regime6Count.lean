@@ -81,7 +81,7 @@ private theorem ftil_ext_contDiff {X r A : ℝ} (hX : 0 < X) (hr : 0 < r) (hA : 
     have hftil : ContDiffAt ℝ 2 (fun y => ftil X r y) a := ftil_contDiffAt' hX ha0 hr
     exact hbump.mul hftil
   · -- a ≤ A/16 < A/8: bump is eventually 0, so ftil_ext is eventually 0
-    push_neg at hpos
+    push Not at hpos
     have ha8 : a < A / 8 := by linarith
     have hz : ftil_ext X r A hA =ᶠ[nhds a] 0 := by
       have := ftilBump_eventuallyEq_zero hA ha8
@@ -485,7 +485,7 @@ theorem prop6_count_per_r {P : Globals} {S : Scale P} {r : ℝ} {δ : ℝ}
     rw [hfilter_eq]
     refine le_trans hkey (mul_le_mul_of_nonneg_right hcle hsumnn)
   · -- δ ≥ 1: every n has distInt(ftil) ≤ 1/2 < 1 ≤ δ, so the filter is the full image.
-    push_neg at hδ1
+    push Not at hδ1
     -- the filter equals the whole image
     have hfull :
         ((Finset.Ioc ⌊S.A⌋ ⌊2 * S.A⌋).image (Int.cast : ℤ → ℝ)).filter

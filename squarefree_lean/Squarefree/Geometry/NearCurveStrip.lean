@@ -110,7 +110,7 @@ theorem lineRes_convex_or_concave {D : MajorLine}
       exact (hall x (interior_subset hx)).le
   · -- not positive anywhere ⟹ (no zero) ⟹ negative everywhere ⟹ concave.
     right
-    push_neg at hpos
+    push Not at hpos
     have hall : ∀ x ∈ I, iteratedDeriv 2 f x < 0 := by
       intro x hxI
       have h1 : iteratedDeriv 2 f x ≤ 0 := hpos x hxI
@@ -329,7 +329,7 @@ private theorem halfCarrier'_card_le_properArc' {D : MajorLine} (dir : Bool) :
   · rw [decide_eq_true hcmp]; cases dir
     · exact hcmp
     · exact le_rfl
-  · rw [decide_eq_false hcmp]; push_neg at hcmp; cases dir
+  · rw [decide_eq_false hcmp]; push Not at hcmp; cases dir
     · exact le_rfl
     · exact hcmp.le
 

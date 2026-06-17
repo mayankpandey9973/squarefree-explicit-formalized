@@ -118,7 +118,7 @@ theorem phif_lower_max {a ℓ₁ ℓ₂ f r N : ℝ}
       _ ≤ A := hlb'
       _ ≤ A + Bv := by linarith [hBvnn]
   · -- f-small:  T₀ < 10⁵⁵·T_curv, the curvature floor carries it.
-    push_neg at hfl
+    push Not at hfl
     have hband := phif_curvature_lower_band (P := P) (S := S) (a := a) (ℓ₁ := ℓ₁) (ℓ₂ := ℓ₂)
       (f := f) (r := r) (N := N)
       hAD ha0 ha_lo ha_hi hℓ1 hℓ12 hr_lo hrl_hi hsmall hNpos hRN

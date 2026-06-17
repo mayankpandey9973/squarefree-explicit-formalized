@@ -35,7 +35,7 @@ private theorem five_U_le_H (P : Globals) (hX : (16777216 : ℝ) ≤ P.X ^ (1/10
   -- X > 1 (else X^{1/100} ≤ 1 < 16777216)
   have hX1 : (1:ℝ) ≤ P.X := by
     by_contra h
-    push_neg at h
+    push Not at h
     have hle1 : P.X ^ (1/100 : ℝ) ≤ 1 :=
       Real.rpow_le_one hX0.le h.le (by norm_num : (0:ℝ) ≤ 1/100)
     linarith
@@ -428,7 +428,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       rw [hMdef]
       by_cases hcase : ((RaOf a).card : ℝ) ≤ RW
       · linarith [hcase, mul_nonneg hC5.le hPnn]
-      · push_neg at hcase
+      · push Not at hcase
         have hpop : S.R / P.Wval ≤ ((RaOf a).card : ℝ) := by
           rw [← hRWdef]; exact hcase.le
         -- the a-window `A/5 ≤ a ≤ 11A` from `a ∈ Icc ⌈A⌉ ⌊2A⌋`

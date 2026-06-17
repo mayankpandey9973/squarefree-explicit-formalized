@@ -154,7 +154,7 @@ private theorem step2_count_window {a₀ ℓ₁ ℓ₂ f δ : ℝ}
         calc _ ≤ (1:ℝ) := this
           _ ≤ ((k:ℝ) + 1) * Cq := by nlinarith [hCqge1, (by positivity : (0:ℝ) ≤ (k:ℝ))]
       · -- `s < b`, so `s = λ²·a` (since `s = min b (λ²a) < b`), and `b ≤ λ^(k+1)a = λ^k·s`.
-        push_neg at hbs
+        push Not at hbs
         -- `min b (lam*a) < b` ⟹ `lam*a < b` ⟹ `s = lam*a`.
         have hlamab : lam * a ≤ b := by
           have hmlt : min b (lam * a) < b := by rw [← hs_def]; exact hbs

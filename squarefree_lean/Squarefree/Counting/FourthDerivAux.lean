@@ -178,7 +178,7 @@ theorem four_case_bound (K : ℝ) (hK : 1 ≤ K) :
   set z := N ^ 7 * δ / Λ
   have four : M ^ 8 ≤ 4 * K * w ∨ M ^ 8 ≤ 4 * K * x ∨ M ^ 8 ≤ 4 * K * y ∨ M ^ 8 ≤ 4 * K * z := by
     by_contra h
-    push_neg at h
+    push Not at h
     obtain ⟨h1, h2, h3, h4⟩ := h
     nlinarith [hbound]
   have t1 : (0:ℝ) ≤ N ^ (7/8 : ℝ) := by positivity

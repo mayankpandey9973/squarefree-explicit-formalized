@@ -561,7 +561,7 @@ private theorem bands_dyadic_sum :
       have hJ1nn : (0 : ℝ) ≤ (J : ℝ) + 1 := by positivity
       nlinarith [hwhole, hbandnn, hJ1nn]
     · -- not all `≥2F`: witness `z₀` with `|φ'(z₀)| < 2F`, so NOT both halves HIGH.
-      push_neg at hallHigh
+      push Not at hallHigh
       obtain ⟨z₀, hz₀mem, hz₀lt⟩ := hallHigh
       -- the LOW band-term `(2δ+1)` and HIGH band-term `(J+1)(2δ+1)`: per-half, keeping distinct.
       -- bound for a LOW half (`(2δ+1)` band-term):
@@ -697,7 +697,7 @@ private theorem bands_count_mono_mid (N T δ u v : ℝ) (φ : ℝ → ℝ)
     · rcases Nat.eq_zero_or_pos (Nat.find hex) with hz | hpos
       · rw [hz]; simp only [Nat.cast_zero]; positivity
       · have hmin : ¬ (4 * δ ≤ 2 ^ (Nat.find hex - 1) * F₀) := Nat.find_min hex (by omega)
-        push_neg at hmin
+        push Not at hmin
         have hpowlt : 2 ^ (Nat.find hex - 1) < 4 * δ / F₀ := by
           rw [lt_div_iff₀ hF₀]; linarith [hmin]
         have h1 : ((Nat.find hex - 1 : ℕ) : ℝ) < 2 ^ (Nat.find hex - 1) := by
@@ -709,7 +709,7 @@ private theorem bands_count_mono_mid (N T δ u v : ℝ) (φ : ℝ → ℝ)
     · rcases Nat.eq_zero_or_pos (Nat.find hex) with hz | hpos
       · rw [hz]; simp only [pow_zero, one_mul]; linarith [hband_u]
       · have hmin : ¬ (4 * δ ≤ 2 ^ (Nat.find hex - 1) * F₀) := Nat.find_min hex (by omega)
-        push_neg at hmin
+        push Not at hmin
         have hpoweq : (2:ℝ) ^ (Nat.find hex) = 2 * 2 ^ (Nat.find hex - 1) := by
           conv_lhs => rw [show Nat.find hex = (Nat.find hex - 1) + 1 by omega]
           rw [pow_succ]; ring

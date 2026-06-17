@@ -164,7 +164,7 @@ theorem step2_subset_count_cal_slack {a ℓ₁ ℓ₂ f r₀ r₁ δ T N cu cl :
               have : (4:ℝ) ≤ 112 * (cu / cl) := by nlinarith [hcucl1]
               nlinarith [this, hshape_nn]
       · -- gap regime:  `cl²T ≤ 4δ`, so `√(δ/T) ≥ cl/2`; crude length bound closes.
-        push_neg at htriv hactive
+        push Not at htriv hactive
         have hsqrt_lb : cl / 2 ≤ Real.sqrt (δ / T) := by
           have hratio : (cl / 2) ^ 2 ≤ δ / T := by
             rw [le_div_iff₀ hT]; nlinarith [hactive]

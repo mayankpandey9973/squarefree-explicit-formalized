@@ -453,7 +453,7 @@ private lemma large_part_B (a b : ℕ) (X H : ℝ) (lo hi : ℕ)
     have hba : (b : ℝ) - (a : ℝ) < (d : ℝ) ^ 2 := by linarith
     -- d > 0 since (d:ℝ)² ≥ X > 0
     have hdpos : 0 < d := by
-      by_contra h; push_neg at h
+      by_contra h; push Not at h
       interval_cases d
       simp at hdsq; linarith
     have hbalt : b - a < d ^ 2 := by
@@ -910,7 +910,7 @@ theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
         linarith
       linarith [hkk]
     · -- trivial bound dCard ≤ D + 1 < H/X^{uk} + 1 ≤ B
-      push_neg at hge
+      push Not at hge
       rw [← hHpow] at hge
       have htriv := dCard_le_lin X H D hDnn
       have : D + 1 ≤ B := by

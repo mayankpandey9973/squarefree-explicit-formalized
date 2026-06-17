@@ -63,7 +63,7 @@ private theorem deriv_nonpos_at_min_right {H : ℝ → ℝ} {A B x₀ : ℝ}
     smul_eq_mul] at hnn
   -- `0 ≤ (A − x₀) · deriv H x₀` with `A − x₀ < 0` ⟹ `deriv H x₀ ≤ 0`.
   by_contra hpos
-  push_neg at hpos
+  push Not at hpos
   have : (A - x₀) * deriv H x₀ < 0 := mul_neg_of_neg_of_pos (by linarith) hpos
   linarith [hnn, this]
 

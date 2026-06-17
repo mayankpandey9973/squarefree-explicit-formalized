@@ -61,7 +61,7 @@ theorem card_le_of_five_span {S : Finset ℤ} {lo hi d : ℝ}
       (S.filter (fun n => bucket lo d n = b)).card ≤ 4 := by
     intro b _
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     -- 5 ≤ fiber card ⟹ a 5-subset all in bucket `b`, spanning < d, contradicting hspan.
     obtain ⟨t, htsub, htcard⟩ :=
       Finset.exists_subset_card_eq (n := 5) (s := S.filter (fun n => bucket lo d n = b))
@@ -89,7 +89,7 @@ theorem card_le_of_five_span {S : Finset ℤ} {lo hi d : ℝ}
       rw [hcard_eqR]
       have := Int.floor_le ((hi - lo) / d)
       linarith
-    · push_neg at hlast
+    · push Not at hlast
       have : Finset.Icc (0 : ℤ) ⌊(hi - lo) / d⌋ = ∅ := by
         rw [Finset.Icc_eq_empty]; omega
       rw [this]

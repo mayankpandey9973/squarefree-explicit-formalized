@@ -211,7 +211,7 @@ theorem ftil_dtilde_window {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : 
       linarith [hrub, e1, e2, hRDhalf_lb]
     -- r = R_a(dt), R_a antitone ⟹ dt ≥ D/2
     by_contra hlt
-    push_neg at hlt
+    push Not at hlt
     have : Rfun P.X (a:ℝ) (S.D/2) ≤ Rfun P.X (a:ℝ) dt :=
       Rfun_antitone hX haR hdtpos hlt.le
     rw [hRdt] at this; linarith [hchain, this]
@@ -268,7 +268,7 @@ theorem ftil_dtilde_window {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : 
     have hchain : Rfun P.X (a:ℝ) (3 * S.D) ≤ r := by
       linarith [hgap, hRd_2D, hrlb]
     by_contra hlt
-    push_neg at hlt
+    push Not at hlt
     have : Rfun P.X (a:ℝ) dt ≤ Rfun P.X (a:ℝ) (3 * S.D) :=
       Rfun_antitone hX haR (by positivity) hlt.le
     rw [hRdt] at this; linarith [hchain, this]

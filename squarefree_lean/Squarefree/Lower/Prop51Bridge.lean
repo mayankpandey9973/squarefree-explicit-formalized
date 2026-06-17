@@ -82,7 +82,7 @@ theorem qval_round_le {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ → ℤ} {V
   have hZ : ((round (Qval P a dStar ℓ₁ ℓ₂ r)).natAbs : ℝ) ≤ (N : ℝ) := by
     have heq : |((round (Qval P a dStar ℓ₁ ℓ₂ r)) : ℝ)|
         = ((round (Qval P a dStar ℓ₁ ℓ₂ r)).natAbs : ℝ) := by
-      rw [Int.cast_natAbs]; push_cast; rfl
+      rw [Nat.cast_natAbs]; push_cast; rfl
     rwa [heq] at hround
   exact_mod_cast hZ
 

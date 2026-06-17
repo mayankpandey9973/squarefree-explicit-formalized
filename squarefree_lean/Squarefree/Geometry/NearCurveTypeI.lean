@@ -412,7 +412,7 @@ theorem typeI_offLine_gap {f : ℝ → ℝ} {D : MajorLine} {lam δ A B m₀ : �
     linarith [hspace, hmono]
   -- Dichotomy: either linear term ≥ 1/(8q) or quadratic term ≥ 1/(8q).
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   -- `g < d(A)/24 = L/(24 q δ)`.
   have hg_small : g < L / (q * δ) / 24 := hcon
   -- Bound linear: `g·(3δ/L) < (L/(24qδ))·(3δ/L) = 1/(8q)`.

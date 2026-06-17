@@ -250,7 +250,7 @@ private theorem count_window_curv {a ℓ₁ ℓ₂ f δ lo hi : ℝ}
       · have := filter_degen_curv F s q (by linarith [hqs])
         calc _ ≤ (1:ℝ) := this
           _ ≤ ((k:ℝ)+1) * Cq := by nlinarith [hCq_ge1, (by positivity : (0:ℝ) ≤ (k:ℝ))]
-      · push_neg at hqs
+      · push Not at hqs
         have h3pq : 3 * p ≤ q := by
           have hmlt : min q (3 * p) < q := by rw [← hs_def]; exact hqs
           rcases min_lt_iff.mp hmlt with h | h

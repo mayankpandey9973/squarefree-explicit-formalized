@@ -180,7 +180,7 @@ theorem dstar_decreasing {a : ℤ} {r ℓ₁ : ℕ} {d₁ d₂ : ℤ}
     linarith [h, hbt_neg, h2tol, hBpos]
   have hnum : ((d₂:ℝ) - (d₁:ℝ)) < 0 := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     exact absurd (div_nonneg hcon hℓpos.le) (not_le.mpr hslope)
   have : ((d₂ - d₁ : ℤ) : ℝ) < 0 := by push_cast; linarith
   exact le_of_lt (by exact_mod_cast this)

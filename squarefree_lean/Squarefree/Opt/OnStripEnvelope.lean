@@ -104,7 +104,7 @@ private theorem log_absorb (P : Globals) (hu : 0 ≤ P.u)
   have hX0 : (0:ℝ) < P.X := P.X_pos
   have hX1 : (1:ℝ) ≤ P.X := by
     by_contra h
-    push_neg at h
+    push Not at h
     have : P.X ^ (1/100 : ℝ) ≤ 1 :=
       Real.rpow_le_one hX0.le h.le (by norm_num)
     linarith
@@ -151,7 +151,7 @@ private theorem log_absorb_sq (P : Globals) (hu : 0 ≤ P.u)
   have hX0 : (0:ℝ) < P.X := P.X_pos
   have hX1 : (1:ℝ) ≤ P.X := by
     by_contra h
-    push_neg at h
+    push Not at h
     have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one hX0.le h.le (by norm_num)
     linarith
   set L : ℝ := 1 + Real.log P.X with hLdef

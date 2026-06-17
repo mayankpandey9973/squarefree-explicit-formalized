@@ -130,7 +130,7 @@ private theorem deriv2_const_sign {hf : ContDiff ℝ 2 f}
     · exact absurd hzero (hne x hxI)
     · exact hpos'
   · right
-    push_neg at hpos
+    push Not at hpos
     intro x hxI
     exact lt_of_le_of_ne (hpos x hxI) (hne x hxI)
 

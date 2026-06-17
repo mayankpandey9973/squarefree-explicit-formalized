@@ -107,7 +107,7 @@ theorem theorem_10_1 (ε : ℝ) (hε : 0 < ε) :
   have hex : ∃ n ∈ Finset.Icc ⌈X⌉ ⌊X + H⌋,
       (if Squarefree n.toNat then (1 : ℝ) else 0) ≠ 0 := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     have : S = 0 := Finset.sum_eq_zero hcon
     rw [this] at hSpos
     exact lt_irrefl _ hSpos

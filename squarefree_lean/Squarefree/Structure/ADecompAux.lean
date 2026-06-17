@@ -112,7 +112,7 @@ theorem tiny_gap_impossible (X H D : ℝ) (a d : ℤ)
   have hDpos : (0 : ℝ) < D := by linarith
   have hdR : (0 : ℝ) < (d : ℝ) := lt_of_lt_of_le hDpos hDd
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   -- `a < d³/(6X)` and `a ≤ d`
   have hd3 : D ^ 3 ≤ (d : ℝ) ^ 3 := by gcongr
   have haltd3 : (a : ℝ) < (d : ℝ) ^ 3 / (6 * X) := by

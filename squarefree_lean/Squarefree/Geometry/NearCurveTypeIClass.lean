@@ -74,7 +74,7 @@ theorem majorSet_card_split (f : ℝ → ℝ) (N lam δ : ℝ) :
     (majorSet f N δ).card = (typeISet f N lam δ).card + (typeIISet f N lam δ).card := by
   classical
   rw [typeISet, typeIISet]
-  exact (Finset.filter_card_add_filter_neg_card_eq_card _).symm
+  exact (Finset.card_filter_add_card_filter_not _).symm
 
 /-! ## The proper-arc span bound for Type I points (DEFINITIONAL) -/
 

@@ -136,6 +136,6 @@ theorem nearSet_card_split (f : ℝ → ℝ) (N δ : ℝ) :
     (nearSet f N δ).card = (residualSet f N δ).card + (majorSet f N δ).card := by
   classical
   rw [residualSet, majorSet, add_comm]
-  exact (Finset.filter_card_add_filter_neg_card_eq_card _).symm
+  exact (Finset.card_filter_add_card_filter_not _).symm
 
 end Squarefree.Geometry
