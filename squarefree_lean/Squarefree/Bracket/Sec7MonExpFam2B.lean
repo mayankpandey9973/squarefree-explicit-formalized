@@ -3,7 +3,7 @@ import Squarefree.Bracket.Sec7MonExpData
 /-!
 # §7 N9′ family lemma C at m=3 (Φ″ endgame): the `B_i` double differences of `f₂`
 
-The m=3-specific sibling of `build_B_exp` (Sec7MonExpFam2.lean), on the looser `sec7_cExp3`
+The m=3-specific sibling of `build_B_exp` (Sec7MonExpFam2.lean), on the looser `sec7_cExp3Lead`
 budget.  It reuses the EXISTING order-5 residual data (`e₂D` to order 5): at `m = 3` the
 diff-depth is `B = ord 5 ≤ 5`.  The m ≤ 2 path (`build_B_exp`, on `sec7_cExp`) is untouched.
 -/
@@ -21,7 +21,7 @@ variable {h₁ h₂ h₃ : ℤ}
 
 /-- **N9′ family C, m=3** (md 1618–22): the double-differenced `f₂` expansion at a
 `ξ`-shifted point, graded `m ≤ 3`, generic in the steps `(p, q)` and shift `ξ`, on the
-`sec7_cExp3` budget. -/
+`sec7_cExp3Lead` budget. -/
 theorem build_B_exp3 (RE : Sec7RaExpData P S W a Ph j)
     (hh₁ : 1 ≤ h₁) (hh₂ : 1 ≤ h₂) (hh₃ : 1 ≤ h₃) {p q : ℤ} {ξ : ℝ}
     (hp : 1 ≤ p) (hq : 1 ≤ q) (hpq : (p : ℝ) + q ≤ sec7_hSum h₁ h₂ h₃)
@@ -32,7 +32,7 @@ theorem build_B_exp3 (RE : Sec7RaExpData P S W a Ph j)
       |iteratedDeriv m (fun t =>
           diff1 (p : ℝ) (diff1 (q : ℝ) (Ph.f2D 0)) (t + ξ) -
             (-(3/16) * RE.c₂ * p * q * (S.T₂ / S.R ^ 2) * (t / S.R) ^ (-(5:ℝ)/4))) r| ≤
-        sec7_cExp3 * ((p : ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
+        sec7_cExp3Lead * ((p : ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
           (p : ℝ) * q * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3) / S.R ^ m := by
   intro m hm r hr
   have hR : 0 < S.R := sec7_R_pos S
@@ -271,7 +271,7 @@ theorem build_B_exp3 (RE : Sec7RaExpData P S W a Ph j)
     pow_le_pow_right₀ (by norm_num [sec7_cWin]) (by omega)
   have hc : |RE.c₂| ≤ 4 := RE.c₂_hi
   have hcoef : 2 * (|RE.c₂| * |sec7_aprod (3/4) (m + 3)| * (2 * sec7_cWin) ^ (m + 3)) ≤
-      sec7_cExp3 := by
+      sec7_cExp3Lead := by
     have p1 : (0:ℝ) ≤ |RE.c₂| := abs_nonneg _
     have p2 : (0:ℝ) ≤ |sec7_aprod (3/4) (m + 3)| := abs_nonneg _
     have p3 : (0:ℝ) ≤ ((2:ℝ) * sec7_cWin) ^ (m + 3) := by positivity
@@ -283,10 +283,10 @@ theorem build_B_exp3 (RE : Sec7RaExpData P S W a Ph j)
     have h2 : (0:ℝ) ≤ 32 * (2 * sec7_cWin) ^ 6 := by positivity
     calc 2 * (|RE.c₂| * |sec7_aprod (3/4) (m + 3)| * (2 * sec7_cWin) ^ (m + 3)) ≤
         2 * (32 * (2 * sec7_cWin) ^ 6) := by linarith
-      _ ≤ sec7_cExp3 := by norm_num [sec7_cWin, sec7_cExp3]
+      _ ≤ sec7_cExp3Lead := by norm_num [sec7_cWin, sec7_cExp3Lead]
   have hkey1 : C * q * p ≤
-      sec7_cExp3 * ((p:ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S) / S.R ^ m := by
-    have hIn : sec7_cExpIn ≤ sec7_cExp3 := by norm_num [sec7_cExpIn, sec7_cExp3]
+      sec7_cExp3Lead * ((p:ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S) / S.R ^ m := by
+    have hIn : sec7_cExpIn ≤ sec7_cExp3Lead := by norm_num [sec7_cExpIn, sec7_cExp3Lead]
     have hmono : (0:ℝ) ≤ (p:ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S / S.R ^ m := by
       positivity
     calc C * q * p
@@ -294,26 +294,26 @@ theorem build_B_exp3 (RE : Sec7RaExpData P S W a Ph j)
           rw [hC, pow_add]
           field_simp
           try ring
-      _ ≤ sec7_cExp3 * ((p:ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S / S.R ^ m) :=
+      _ ≤ sec7_cExp3Lead * ((p:ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S / S.R ^ m) :=
           mul_le_mul_of_nonneg_right hIn hmono
-      _ = sec7_cExp3 * ((p:ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S) / S.R ^ m := by
+      _ = sec7_cExp3Lead * ((p:ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S) / S.R ^ m := by
           ring
   have hkey2 : (p:ℝ) * q * (B * (2 * hSv)) ≤
-      sec7_cExp3 * ((p:ℝ) * q * hSv * S.T₂ / S.R ^ 3) / S.R ^ m := by
+      sec7_cExp3Lead * ((p:ℝ) * q * hSv * S.T₂ / S.R ^ 3) / S.R ^ m := by
     have hmono : (0:ℝ) ≤ (p:ℝ) * q * hSv * S.T₂ / S.R ^ (m + 3) := by positivity
     calc (p:ℝ) * q * (B * (2 * hSv))
         = 2 * (|RE.c₂| * |sec7_aprod (3/4) (m + 3)| * (2 * sec7_cWin) ^ (m + 3)) *
             ((p:ℝ) * q * hSv * S.T₂ / S.R ^ (m + 3)) := by rw [hB]; ring
-      _ ≤ sec7_cExp3 * ((p:ℝ) * q * hSv * S.T₂ / S.R ^ (m + 3)) :=
+      _ ≤ sec7_cExp3Lead * ((p:ℝ) * q * hSv * S.T₂ / S.R ^ (m + 3)) :=
           mul_le_mul_of_nonneg_right hcoef hmono
-      _ = sec7_cExp3 * ((p:ℝ) * q * hSv * S.T₂ / S.R ^ 3) / S.R ^ m := by
+      _ = sec7_cExp3Lead * ((p:ℝ) * q * hSv * S.T₂ / S.R ^ 3) / S.R ^ m := by
           rw [pow_add]
           field_simp
   calc C * q * p + (p:ℝ) * q * (B * (2 * hSv))
-      ≤ sec7_cExp3 * ((p:ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S) / S.R ^ m +
-        sec7_cExp3 * ((p:ℝ) * q * hSv * S.T₂ / S.R ^ 3) / S.R ^ m := by
+      ≤ sec7_cExp3Lead * ((p:ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S) / S.R ^ m +
+        sec7_cExp3Lead * ((p:ℝ) * q * hSv * S.T₂ / S.R ^ 3) / S.R ^ m := by
         linarith [hkey1, hkey2]
-    _ = sec7_cExp3 * ((p:ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
+    _ = sec7_cExp3Lead * ((p:ℝ) * q * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
         (p:ℝ) * q * hSv * S.T₂ / S.R ^ 3) / S.R ^ m := by ring
 end Sec7RaExpData
 
