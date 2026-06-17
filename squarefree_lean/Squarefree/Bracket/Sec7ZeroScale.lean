@@ -1,4 +1,5 @@
 import Squarefree.Bracket.Sec7ErrBound
+import Squarefree.Bracket.Sec7ErrBound3
 import Squarefree.Bracket.Sec7PhiDeriv
 import Squarefree.Bracket.Sec7PhiSmooth
 import Squarefree.Counting.Bands
@@ -2142,6 +2143,419 @@ private theorem sec7_zero_deriv_few {P : Globals} {S : Scale P} {a : ℤ} {W : �
   rw [hsetEq]
   exact sec7_finite_ncard_KZero_of_subsingleton hss
 
+set_option maxHeartbeats 4000000
+
+/-- **Order-3 subordination to the `C`-base scale** (Φ″ endgame, Cbase form): the two-scale
+`Err^{(3)}` budget `cErr3Lead·errScale_LEAD + cErr3Res·errScale_RES` is `≤ 10⁻¹²·(P·T₃/R³)`, the
+surviving `C`-monomial base of the `(r⁴Φ″)'` collapse.  Same per-term caps as
+`sec7_zero_errScale_subordinate_m3` (LEAD `≤ (12/cSub)·Cbase`, RES `≤ 2·10⁻¹⁴³·Cbase`), but
+kept against `P·T₃/R³` rather than collapsed to `T_{ρ,u}`; content `6.0·10⁻¹³ ≤ 10⁻¹²`. -/
+private theorem sec7_zero_errScale_m3_le_Cbase {P : Globals} {S : Scale P} {a : ℤ}
+    {W : ℝ} {Ph : Sec7Phase P S W a} {j h₁ h₂ h₃ : ℤ} {ξ₁ ξ₂ ξ₃ : ℝ}
+    {ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ}
+    (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
+    (Hyp : Sec7ZeroHyp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) :
+    sec7_cErr3Lead * sec7_errScale_LEAD P S h₁ h₂ h₃
+        + sec7_cErr3Res * sec7_errScale_RES P S h₁ h₂ h₃ ≤
+      (1 / 10 ^ 12) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by
+  have hR : 0 < S.R := sec7_R_pos S
+  have hT3 : 0 < S.T₃ := sec7_T₃_pos S
+  have hPP0 : 0 ≤ sec7_Pprod h₁ h₂ h₃ := by
+    have hPP1 := sec7_Pprod_ge_one_of_box Hyp.hbox
+    linarith
+  have hC0nn : 0 ≤ sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) := by positivity
+  have hrel0 : 0 ≤ sec7_relErr P S := (sec7_relErr_pos P S).le
+  have hrelF0 : 0 ≤ sec7_relErrF P S := (sec7_relErrF_pos P S).le
+  have hT1id := sec7_T₁_div_R_eq_GΩ5_T₃ S
+  have hSlePP := sec7_hSum_le_three_Pprod_of_box Hyp.hbox
+  have hGrelF := Hyp.hGΩ5F
+  have hGrelF0 : 0 ≤ P.G * S.Ω ^ 5 * sec7_relErrF P S :=
+    mul_nonneg (mul_nonneg P.G_pos.le (pow_nonneg S.Ω_pos.le 5)) hrelF0
+  have hArelF :
+      sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R) * sec7_relErrF P S ≤
+        (3 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by
+    calc
+      sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R) * sec7_relErrF P S
+          = sec7_hSum h₁ h₂ h₃ *
+              ((P.G * S.Ω ^ 5) * (S.T₃ / S.R ^ 3)) * sec7_relErrF P S := by rw [hT1id]
+      _ = sec7_hSum h₁ h₂ h₃ * (P.G * S.Ω ^ 5 * sec7_relErrF P S) *
+            (S.T₃ / S.R ^ 3) := by ring
+      _ ≤ (3 * sec7_Pprod h₁ h₂ h₃) * (1 / sec7_cSub) *
+            (S.T₃ / S.R ^ 3) := by
+            gcongr
+      _ = (3 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by ring
+  have hrel := sec7_relErr_le_inv_10_143 Hyp.hrel
+  have hrelF := sec7_relErrF_le_inv_10_143 Hyp.hrelF
+  have hCrel :
+      sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S ≤
+        (1 / (10 : ℝ) ^ 143) *
+          (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by
+    calc
+      sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S
+          ≤ sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * (1 / (10 : ℝ) ^ 143) := by
+            gcongr
+      _ = (1 / (10 : ℝ) ^ 143) *
+          (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by ring
+  have hCrelF :
+      sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErrF P S ≤
+        (1 / (10 : ℝ) ^ 143) *
+          (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by
+    calc
+      sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErrF P S
+          ≤ sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * (1 / (10 : ℝ) ^ 143) := by
+            gcongr
+      _ = (1 / (10 : ℝ) ^ 143) *
+          (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by ring
+  have hSsq := sec7_hSum_sq_le_nine_W4_Pprod Hyp.hbox
+  have hWsub := sec7_W4_GΩ5_div_R_le_inv_cSub (P := P) (S := S) Hyp.hsub1
+  have hGΩR0 : 0 ≤ (P.G * S.Ω ^ 5) / S.R :=
+    div_nonneg (mul_nonneg P.G_pos.le (pow_nonneg S.Ω_pos.le 5)) hR.le
+  have hE2 :
+      (sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2 ≤
+        (9 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by
+    calc
+      (sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2
+          = (sec7_hSum h₁ h₂ h₃) ^ 2 * (S.T₁ / S.R) / S.R := by ring
+      _ = (sec7_hSum h₁ h₂ h₃) ^ 2 *
+            ((P.G * S.Ω ^ 5) * (S.T₃ / S.R ^ 3)) / S.R := by rw [hT1id]
+      _ = (sec7_hSum h₁ h₂ h₃) ^ 2 * ((P.G * S.Ω ^ 5) / S.R) *
+            (S.T₃ / S.R ^ 3) := by ring
+      _ ≤ (9 * W ^ 4 * sec7_Pprod h₁ h₂ h₃) * ((P.G * S.Ω ^ 5) / S.R) *
+            (S.T₃ / S.R ^ 3) := by
+            gcongr
+      _ = 9 * sec7_Pprod h₁ h₂ h₃ *
+            (W ^ 4 * (P.G * S.Ω ^ 5) / S.R) * (S.T₃ / S.R ^ 3) := by ring
+      _ ≤ 9 * sec7_Pprod h₁ h₂ h₃ * (1 / sec7_cSub) * (S.T₃ / S.R ^ 3) := by
+            gcongr
+      _ = (9 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by ring
+  have hSR := sec7_hSum_R_small Hyp.env Hyp.hbox
+  have hSRdiv : sec7_hSum h₁ h₂ h₃ / S.R ≤ 1 / (10 : ℝ) ^ 149 := by
+    have hpow : 0 < (10 : ℝ) ^ 149 := by positivity
+    rw [le_div_iff₀ hpow]
+    have hdiv := div_le_div_of_nonneg_right hSR hR.le
+    calc
+      sec7_hSum h₁ h₂ h₃ / S.R * (10 : ℝ) ^ 149
+          = (sec7_hSum h₁ h₂ h₃ * (10 : ℝ) ^ 149) / S.R := by ring
+      _ ≤ S.R / S.R := hdiv
+      _ = 1 := by field_simp
+  have hE4 :
+      sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * (S.T₃ / S.R ^ 4) ≤
+        (1 / (10 : ℝ) ^ 149) *
+          (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by
+    calc
+      sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * (S.T₃ / S.R ^ 4)
+          = (sec7_hSum h₁ h₂ h₃ / S.R) *
+              (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by ring
+      _ ≤ (1 / (10 : ℝ) ^ 149) *
+              (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by
+            gcongr
+  have hLsum :
+      sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R) * sec7_relErrF P S +
+        (sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2 ≤
+      (3 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
+        (9 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) :=
+    add_le_add hArelF hE2
+  have hRsum :
+      sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErrF P S +
+        sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S +
+        sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * (S.T₃ / S.R ^ 4) ≤
+      (1 / (10 : ℝ) ^ 143) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
+        (1 / (10 : ℝ) ^ 143) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
+        (1 / (10 : ℝ) ^ 149) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) :=
+    add_le_add (add_le_add hCrelF hCrel) hE4
+  unfold sec7_errScale_LEAD sec7_errScale_RES
+  calc
+    sec7_cErr3Lead *
+          (sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R) * sec7_relErrF P S +
+            (sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2)
+        + sec7_cErr3Res *
+          (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErrF P S +
+            sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErr P S +
+            sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * (S.T₃ / S.R ^ 4))
+      ≤ sec7_cErr3Lead *
+            ((3 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
+              (9 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)))
+          + sec7_cErr3Res *
+            ((1 / (10 : ℝ) ^ 143) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
+              (1 / (10 : ℝ) ^ 143) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
+              (1 / (10 : ℝ) ^ 149) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) :=
+        add_le_add (mul_le_mul_of_nonneg_left hLsum sec7_cErr3Lead_pos.le)
+          (mul_le_mul_of_nonneg_left hRsum sec7_cErr3Res_pos.le)
+    _ ≤ (1 / 10 ^ 12) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := by
+        have hc :
+            sec7_cErr3Lead * (3 / sec7_cSub + 9 / sec7_cSub) +
+              sec7_cErr3Res * (1 / (10 : ℝ) ^ 143 + 1 / (10 : ℝ) ^ 143 + 1 / (10 : ℝ) ^ 149) ≤
+            1 / 10 ^ 12 := by
+          norm_num [sec7_cErr3Lead, sec7_cErr3Res, sec7_cSub]
+        rw [show sec7_cErr3Lead *
+                ((3 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
+                  (9 / sec7_cSub) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)))
+              + sec7_cErr3Res *
+                ((1 / (10 : ℝ) ^ 143) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
+                  (1 / (10 : ℝ) ^ 143) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) +
+                  (1 / (10 : ℝ) ^ 149) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)))
+            = (sec7_cErr3Lead * (3 / sec7_cSub + 9 / sec7_cSub) +
+                sec7_cErr3Res * (1 / (10 : ℝ) ^ 143 + 1 / (10 : ℝ) ^ 143 + 1 / (10 : ℝ) ^ 149)) *
+              (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) by ring]
+        exact mul_le_mul_of_nonneg_right hc hC0nn
+
+/-- **N12c, `Φ''` (iteratedDeriv 2) branch.**  Weight-`r⁴` / jet-grades-`2,3` analogue of
+`sec7_zero_deriv_few`: on a dyadic count sub-window `[p,q]`, the weighted jet
+`r ↦ r⁴·Φ''_{ρ,u}(r)` has a non-vanishing derivative (the `ρ₀=0` principal collapses to a single
+`−(1105/64)·C·R·r⁻⁹ᐟ⁴` monomial, dominating the order-`2,3` error by `≈101×`), hence by Rolle at
+most one zero; so `Φ''_{ρ,u}` has `≤ 1 ≤ sec7_KZero` zeros on `[p,q]`. -/
+private theorem sec7_zero_deriv2_few {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ}
+    {Ph : Sec7Phase P S W a} {j h₁ h₂ h₃ : ℤ} {ξ₁ ξ₂ ξ₃ : ℝ} {ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ}
+    (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
+    (Hyp : Sec7ZeroHyp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃)
+    (p q : ℕ) (hwin : Finset.Icc (p : ℤ) (q : ℤ) ⊆ Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋)
+    (hdyad : q ≤ 2 * p) :
+    (Set.Icc (p : ℝ) (q : ℝ) ∩
+        {r | iteratedDeriv 2
+          (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r = 0}).Finite ∧
+      (Set.Icc (p : ℝ) (q : ℝ) ∩
+        {r | iteratedDeriv 2
+          (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r = 0}).ncard ≤
+        sec7_KZero := by
+  have hR : 0 < S.R := sec7_R_pos S
+  have hh₁ : 1 ≤ h₁ := Hyp.hbox.1.1
+  have hh₂ : 1 ≤ h₂ := Hyp.hbox.2.1.1
+  have hh₃ : 1 ≤ h₃ := Hyp.hbox.2.2.1
+  have hPPpos : 0 < sec7_Pprod h₁ h₂ h₃ :=
+    lt_of_lt_of_le one_pos (sec7_Pprod_ge_one_of_box Hyp.hbox)
+  have hCbasepos : 0 < sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) :=
+    mul_pos hPPpos (div_pos (sec7_T₃_pos S) (pow_pos hR 3))
+  have hC0nn : 0 ≤ sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) := hCbasepos.le
+  have hρ0abs : |(ρ₀ : ℝ)| ≤ sec7_cCarry := by rw [Hyp.hρ₀]; norm_num [sec7_cCarry]
+  have hT1pos : 0 < S.T₁ := sec7_T₁_pos S
+  have hT3pos : 0 < S.T₃ := sec7_T₃_pos S
+  have hSv3 : (3 : ℝ) ≤ sec7_hSum h₁ h₂ h₃ := sec7_hSum_ge3 hh₁ hh₂ hh₃
+  have hS0 : (0 : ℝ) ≤ sec7_hSum h₁ h₂ h₃ := by linarith
+  have hrelF0 : 0 ≤ sec7_relErrF P S := (sec7_relErrF_pos P S).le
+  have hrel0 : 0 ≤ sec7_relErr P S := (sec7_relErr_pos P S).le
+  have hLEADnn : 0 ≤ sec7_errScale_LEAD P S h₁ h₂ h₃ := by
+    unfold sec7_errScale_LEAD
+    exact add_nonneg (mul_nonneg (mul_nonneg hS0 (div_nonneg hT1pos.le hR.le)) hrelF0)
+      (div_nonneg (mul_nonneg (sq_nonneg _) hT1pos.le) (pow_nonneg hR.le 2))
+  have hRESnn : 0 ≤ sec7_errScale_RES P S h₁ h₂ h₃ := by
+    unfold sec7_errScale_RES
+    exact add_nonneg (add_nonneg
+      (mul_nonneg (mul_nonneg hPPpos.le (div_nonneg hT3pos.le (pow_nonneg hR.le 3))) hrelF0)
+      (mul_nonneg (mul_nonneg hPPpos.le (div_nonneg hT3pos.le (pow_nonneg hR.le 3))) hrel0))
+      (mul_nonneg (mul_nonneg hPPpos.le hS0) (div_nonneg hT3pos.le (pow_nonneg hR.le 4)))
+  have hsubC := sec7_zero_errScale_le_Cbase ME Hyp
+  have hsubC3 := sec7_zero_errScale_m3_le_Cbase ME Hyp
+  have hE0nn0 : 0 ≤ sec7_cErr * sec7_errScale P S h₁ h₂ h₃ ρ₀ := by
+    have : 0 ≤ sec7_errScale P S h₁ h₂ h₃ ρ₀ := by unfold sec7_errScale; positivity
+    exact mul_nonneg sec7_cErr_pos.le this
+  have hEM3nn0 : 0 ≤ sec7_cErr3Lead * sec7_errScale_LEAD P S h₁ h₂ h₃ +
+      sec7_cErr3Res * sec7_errScale_RES P S h₁ h₂ h₃ :=
+    add_nonneg (mul_nonneg sec7_cErr3Lead_pos.le hLEADnn)
+      (mul_nonneg sec7_cErr3Res_pos.le hRESnn)
+  have hne : ∀ x ∈ Set.Ioo (p : ℝ) (q : ℝ),
+      deriv (fun r => r ^ 4 * sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 r) x ≠ 0 := by
+    intro x hx
+    have hxIcc : x ∈ Set.Icc (p : ℝ) (q : ℝ) := Set.Ioo_subset_Icc_self hx
+    have hrb := sec7_dyadic_window_bounds (S := S) hwin hxIcc
+    have hxpos : 0 < x := by nlinarith [hrb.1, hR]
+    have hrWin := sec7_dyadic_window_mem_rWin (S := S) Hyp.hW hwin hxIcc
+    have hmid := (sec7_rWin_subset_mid S Hyp.hW) hrWin
+    have hjet2 : HasDerivAt (sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2)
+        (sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x) x := by
+      have := sec7_PhiJet_chain ME hh₁ hh₂ hh₃ Hyp.hξ₁ Hyp.hξ₂ Hyp.hξ₃ Hyp.hshift
+        ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 (by norm_num) x hmid
+      simpa using this
+    have hp : HasDerivAt (fun r : ℝ => r ^ 4) (4 * x ^ 3) x := by
+      simpa using hasDerivAt_pow 4 x
+    have hFderiv : HasDerivAt (fun r => r ^ 4 * sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 r)
+        (4 * x ^ 3 * sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x +
+          x ^ 4 * sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x) x := hp.mul hjet2
+    have hsplit2 : sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x =
+        sec7_principalJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x +
+          sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x := by
+      simp only [sec7_ErrJet]; ring
+    have hsplit3 : sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x =
+        sec7_principalJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x +
+          sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x := by
+      simp only [sec7_ErrJet]; ring
+    have hcollapse := sec7_principal_weighted_collapse2 (ρ₁ := ρ₁) (ρ₂ := ρ₂) (ρ₃ := ρ₃)
+      (u₁ := u₁) (u₂ := u₂) (u₃ := u₃) ME Hyp.hρ₀ hR hxpos
+    have hErrJet2eq : sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x =
+        iteratedDeriv 2 (ME.Err ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) x :=
+      (sec7_Err_iteratedDeriv_eq ME hh₁ hh₂ hh₃ Hyp.hξ₁ Hyp.hξ₂ Hyp.hξ₃ Hyp.hW Hyp.hpad
+        Hyp.hshift ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 (by norm_num) x hrWin).symm
+    have hErrJet3eq : sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x =
+        iteratedDeriv 3 (ME.Err ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) x :=
+      (sec7_Err_iteratedDeriv_eq ME hh₁ hh₂ hh₃ Hyp.hξ₁ Hyp.hξ₂ Hyp.hξ₃ Hyp.hW Hyp.hpad
+        Hyp.hshift ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 (by norm_num) x hrWin).symm
+    have hb2 : |sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x| ≤
+        sec7_cErr * sec7_errScale P S h₁ h₂ h₃ ρ₀ / S.R ^ 2 := by
+      rw [hErrJet2eq]
+      exact sec7_err_deriv_bound (ME := ME) Hyp.env Hyp.hj Hyp.hbox Hyp.hW Hyp.hpad
+        Hyp.hshift Hyp.hrel Hyp.hrelF Hyp.hξ₁ Hyp.hξ₂ Hyp.hξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ0abs
+        Hyp.hρ₁ Hyp.hρ₂ Hyp.hρ₃ Hyp.hu₁ Hyp.hu₂ Hyp.hu₃ 2 (by norm_num) x hrWin
+    have hb3 : |sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x| ≤
+        (sec7_cErr3Lead * sec7_errScale_LEAD P S h₁ h₂ h₃ +
+          sec7_cErr3Res * sec7_errScale_RES P S h₁ h₂ h₃) / S.R ^ 3 := by
+      rw [hErrJet3eq, add_div]
+      exact sec7_err_deriv_bound_m3 ME Hyp.env Hyp.hj Hyp.hbox Hyp.hW Hyp.hpad
+        Hyp.hshift Hyp.hrel Hyp.hrelF Hyp.hξ₁ Hyp.hξ₂ Hyp.hξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ Hyp.hρ₀
+        hρ0abs Hyp.hρ₁ Hyp.hρ₂ Hyp.hρ₃ Hyp.hu₁ Hyp.hu₂ Hyp.hu₃ x hrWin
+    have hx16 : x ≤ 16 * S.R := hrb.2
+    have hxsq : x ^ 2 ≤ 256 * S.R ^ 2 := by
+      nlinarith [mul_nonneg (by linarith [hx16] : (0:ℝ) ≤ 16 * S.R - x)
+        (by linarith [hxpos, hR] : (0:ℝ) ≤ 16 * S.R + x)]
+    have hxcube : x ^ 3 ≤ 4096 * S.R ^ 3 := by
+      nlinarith [mul_le_mul hx16 hxsq (sq_nonneg x) (by linarith [hR] : (0:ℝ) ≤ 16 * S.R),
+        hR.le]
+    have hxfour : x ^ 4 ≤ 65536 * S.R ^ 4 := by
+      nlinarith [mul_le_mul hx16 hxcube (pow_nonneg hxpos.le 3)
+        (by linarith [hR] : (0:ℝ) ≤ 16 * S.R), hR.le]
+    have hyge : (1 / 512 : ℝ) ≤ (x / S.R) ^ (-(9 : ℝ) / 4) := by
+      have hxR0 : (0 : ℝ) < x / S.R := div_pos hxpos hR
+      have hxR16 : x / S.R ≤ 16 := by rw [div_le_iff₀ hR]; linarith [hx16]
+      have hmono : (16 : ℝ) ^ (-(9 : ℝ) / 4) ≤ (x / S.R) ^ (-(9 : ℝ) / 4) :=
+        Real.rpow_le_rpow_of_nonpos hxR0 hxR16 (by norm_num)
+      have h512 : (16 : ℝ) ^ (-(9 : ℝ) / 4) = 1 / 512 := by
+        rw [show (16 : ℝ) = 2 ^ (4 : ℕ) by norm_num, ← Real.rpow_natCast 2 4,
+          ← Real.rpow_mul (by norm_num : (0:ℝ) ≤ 2)]
+        rw [show ((4 : ℕ) : ℝ) * (-(9 : ℝ) / 4) = -((9:ℕ):ℝ) by norm_num,
+          Real.rpow_neg (by norm_num : (0:ℝ) ≤ 2), Real.rpow_natCast 2 9]
+        norm_num
+      rw [h512] at hmono; exact hmono
+    have hypos : 0 < (x / S.R) ^ (-(9 : ℝ) / 4) := Real.rpow_pos_of_pos (div_pos hxpos hR) _
+    have hDlb : (23205 / 134217728 : ℝ) * (S.R * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) ≤
+        |-(1105 / 64 : ℝ) * (ME.Cstar * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) * S.R *
+          (x / S.R) ^ (-(9 : ℝ) / 4)| := by
+      have hpos : (0:ℝ) < 1105 / 64 * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) * S.R *
+          (x / S.R) ^ (-(9 : ℝ) / 4) :=
+        mul_pos (mul_pos (mul_pos (by norm_num) hCbasepos) hR) hypos
+      rw [show -(1105 / 64 : ℝ) * (ME.Cstar * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) * S.R *
+            (x / S.R) ^ (-(9 : ℝ) / 4)
+          = ME.Cstar * (-(1105 / 64 * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) * S.R *
+              (x / S.R) ^ (-(9 : ℝ) / 4))) by ring, abs_mul, abs_neg, abs_of_pos hpos]
+      have hCstar : (21 / 4096 : ℝ) ≤ |ME.Cstar| := ME.Cstar_lower_tight
+      have hprod : (21 / 4096 : ℝ) * (1 / 512) ≤ |ME.Cstar| * (x / S.R) ^ (-(9 : ℝ) / 4) :=
+        mul_le_mul hCstar hyge (by norm_num) (abs_nonneg _)
+      calc (23205 / 134217728 : ℝ) * (S.R * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)))
+          = 1105 / 64 * ((21 / 4096) * (1 / 512)) *
+              (S.R * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) := by ring
+        _ ≤ 1105 / 64 * (|ME.Cstar| * (x / S.R) ^ (-(9 : ℝ) / 4)) *
+              (S.R * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) :=
+            mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hprod (by norm_num))
+              (mul_nonneg hR.le hC0nn)
+        _ = |ME.Cstar| * (1105 / 64 * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) * S.R *
+              (x / S.R) ^ (-(9 : ℝ) / 4)) := by ring
+    have hEterm_le : |4 * x ^ 3 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x +
+          x ^ 4 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x| ≤
+        4 * x ^ 3 * (sec7_cErr * sec7_errScale P S h₁ h₂ h₃ ρ₀ / S.R ^ 2) +
+          x ^ 4 * ((sec7_cErr3Lead * sec7_errScale_LEAD P S h₁ h₂ h₃ +
+            sec7_cErr3Res * sec7_errScale_RES P S h₁ h₂ h₃) / S.R ^ 3) := by
+      calc |4 * x ^ 3 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x +
+              x ^ 4 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x|
+          ≤ |4 * x ^ 3 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x| +
+              |x ^ 4 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x| := abs_add_le _ _
+        _ = 4 * x ^ 3 * |sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x| +
+              x ^ 4 * |sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x| := by
+            rw [abs_mul (4 * x ^ 3) (sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x),
+              abs_mul (x ^ 4) (sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x),
+              abs_of_nonneg (by positivity : (0:ℝ) ≤ 4 * x ^ 3),
+              abs_of_nonneg (pow_nonneg hxpos.le 4)]
+        _ ≤ 4 * x ^ 3 * (sec7_cErr * sec7_errScale P S h₁ h₂ h₃ ρ₀ / S.R ^ 2) +
+              x ^ 4 * ((sec7_cErr3Lead * sec7_errScale_LEAD P S h₁ h₂ h₃ +
+                sec7_cErr3Res * sec7_errScale_RES P S h₁ h₂ h₃) / S.R ^ 3) :=
+            add_le_add (mul_le_mul_of_nonneg_left hb2 (by positivity))
+              (mul_le_mul_of_nonneg_left hb3 (pow_nonneg hxpos.le 4))
+    have hEub : |4 * x ^ 3 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x +
+          x ^ 4 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x| ≤
+        (1703936 / 10 ^ 12 : ℝ) * (S.R * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) := by
+      set E0 := sec7_cErr * sec7_errScale P S h₁ h₂ h₃ ρ₀ with hE0def
+      set EM3 := sec7_cErr3Lead * sec7_errScale_LEAD P S h₁ h₂ h₃ +
+        sec7_cErr3Res * sec7_errScale_RES P S h₁ h₂ h₃ with hEM3def
+      have t1 : 4 * x ^ 3 * (E0 / S.R ^ 2) ≤ 16384 * S.R * E0 := by
+        rw [show 4 * x ^ 3 * (E0 / S.R ^ 2) = 4 * x ^ 3 * E0 / S.R ^ 2 by ring,
+          div_le_iff₀ (pow_pos hR 2)]
+        nlinarith [mul_nonneg hE0nn0 (sub_nonneg.2 hxcube), hE0nn0]
+      have t2 : x ^ 4 * (EM3 / S.R ^ 3) ≤ 65536 * S.R * EM3 := by
+        rw [show x ^ 4 * (EM3 / S.R ^ 3) = x ^ 4 * EM3 / S.R ^ 3 by ring,
+          div_le_iff₀ (pow_pos hR 3)]
+        nlinarith [mul_nonneg hEM3nn0 (sub_nonneg.2 hxfour), hEM3nn0]
+      have hstep1 : 16384 * S.R * E0 ≤
+          16384 * S.R * ((1 / 10 ^ 10) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) :=
+        mul_le_mul_of_nonneg_left hsubC (mul_nonneg (by norm_num) hR.le)
+      have hstep2 : 65536 * S.R * EM3 ≤
+          65536 * S.R * ((1 / 10 ^ 12) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) :=
+        mul_le_mul_of_nonneg_left hsubC3 (mul_nonneg (by norm_num) hR.le)
+      calc |4 * x ^ 3 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x +
+              x ^ 4 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x|
+          ≤ 4 * x ^ 3 * (E0 / S.R ^ 2) + x ^ 4 * (EM3 / S.R ^ 3) := hEterm_le
+        _ ≤ 16384 * S.R * E0 + 65536 * S.R * EM3 := add_le_add t1 t2
+        _ ≤ 16384 * S.R * ((1 / 10 ^ 10) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) +
+              65536 * S.R * ((1 / 10 ^ 12) * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) :=
+            add_le_add hstep1 hstep2
+        _ = (1703936 / 10 ^ 12 : ℝ) *
+              (S.R * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) := by ring
+    have hRC0 : (0:ℝ) < S.R * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) := mul_pos hR hCbasepos
+    have hlt : |4 * x ^ 3 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x +
+          x ^ 4 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x| <
+        |-(1105 / 64 : ℝ) * (ME.Cstar * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) * S.R *
+          (x / S.R) ^ (-(9 : ℝ) / 4)| := by
+      calc |4 * x ^ 3 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x +
+              x ^ 4 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x|
+          ≤ (1703936 / 10 ^ 12 : ℝ) * (S.R * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) := hEub
+        _ < (23205 / 134217728 : ℝ) * (S.R * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3))) :=
+            mul_lt_mul_of_pos_right (by norm_num) hRC0
+        _ ≤ _ := hDlb
+    have heq : deriv (fun r => r ^ 4 * sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 r) x =
+        -(1105 / 64 : ℝ) * (ME.Cstar * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) * S.R *
+          (x / S.R) ^ (-(9 : ℝ) / 4) +
+        (4 * x ^ 3 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x +
+          x ^ 4 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x) := by
+      rw [hFderiv.deriv, hsplit2, hsplit3]
+      linear_combination hcollapse
+    rw [heq]
+    intro hz
+    have hDeq : -(1105 / 64 : ℝ) * (ME.Cstar * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) * S.R *
+        (x / S.R) ^ (-(9 : ℝ) / 4) =
+        -(4 * x ^ 3 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x +
+          x ^ 4 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x) := by linarith [hz]
+    rw [hDeq, abs_neg] at hlt
+    exact lt_irrefl _ hlt
+  have hcont : ContinuousOn (fun r => r ^ 4 * sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 r)
+      (Set.Icc (p : ℝ) (q : ℝ)) := by
+    have hg : ContinuousOn (sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2)
+        (Set.Icc (p : ℝ) (q : ℝ)) := by
+      intro r hr
+      have hrWin := sec7_dyadic_window_mem_rWin (S := S) Hyp.hW hwin hr
+      have hmid := (sec7_rWin_subset_mid S Hyp.hW) hrWin
+      exact ((sec7_PhiJet_chain ME hh₁ hh₂ hh₃ Hyp.hξ₁ Hyp.hξ₂ Hyp.hξ₃ Hyp.hshift
+        ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 (by norm_num) r hmid).continuousAt).continuousWithinAt
+    exact (continuous_pow 4).continuousOn.mul hg
+  have hss := sec7_zeros_subsingleton_of_deriv_ne hcont hne
+  have hsetEq : Set.Icc (p : ℝ) (q : ℝ) ∩
+        {r | iteratedDeriv 2 (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r = 0} =
+      Set.Icc (p : ℝ) (q : ℝ) ∩
+        {r | r ^ 4 * sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 r = 0} := by
+    ext r
+    simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
+    refine and_congr_right (fun hr => ?_)
+    have hrb := sec7_dyadic_window_bounds (S := S) hwin hr
+    have hrpos : 0 < r := by nlinarith [hrb.1, hR]
+    have hrWin := sec7_dyadic_window_mem_rWin (S := S) Hyp.hW hwin hr
+    have hderiv : iteratedDeriv 2 (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r =
+        sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 r :=
+      sec7_Phi_iteratedDeriv_eq ME hh₁ hh₂ hh₃ Hyp.hξ₁ Hyp.hξ₂ Hyp.hξ₃ Hyp.hW Hyp.hshift
+        ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 (by norm_num) r hrWin
+    rw [hderiv]
+    have hr4 : (r : ℝ) ^ 4 ≠ 0 := by positivity
+    constructor
+    · intro h; rw [h]; ring
+    · intro h; rcases mul_eq_zero.mp h with h' | h'
+      · exact absurd h' hr4
+      · exact h'
+  rw [hsetEq]
+  exact sec7_finite_ncard_KZero_of_subsingleton hss
+
 /-- **N12c** (md 1735–81): `Φ'_{ρ,u}` and `Φ''_{ρ,u}` have at most `sec7_KZero` zeros on each
 dyadic sub-window `[p,q]` of the wide count range — the attempt-1 "WALL".  DERIVED over the full
 `Sec7ZeroHyp` pack (not a structure field): the proof needs the §3 `ra_e` expansion (via `ME`/`Ph`),
@@ -2169,7 +2583,7 @@ theorem sec7_zero_few_critical {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ}
         sec7_KZero) := by
   intro p q hwin hdyad
   refine ⟨sec7_zero_deriv_few ME Hyp p q hwin hdyad, ?_⟩
-  sorry -- STUB: N12c Phi'' branch needs iteratedDeriv 3 (sec7_leib_deriv is m<2; cross-file)
+  exact sec7_zero_deriv2_few ME Hyp p q hwin hdyad
 
 /- N12 (md 1739–52): "Since C* ≠ 0,  T_{ρ,u} ≫ P(T₃/R³) ≍ P/(x²G³Ω⁹),  while
    T_{ρ,u} ≪ h_Σ/(x²G²Ω⁴) + P/(x²G³Ω⁹)"  (monomial identities `T₁/R = 1/(x²G²Ω⁴)`,
