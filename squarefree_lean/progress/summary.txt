@@ -1,9 +1,16 @@
-SQUAREFREE FORMALIZATION — PROGRESS SUMMARY (2026-06-16)
+SQUAREFREE FORMALIZATION — PROGRESS SUMMARY (2026-06-17)
 =========================================================
 
-BUILD: GREEN, full project (`lake build`). Tracked stubs: exactly 1, §7:
-  - Squarefree/Bracket/Sec7ZeroScale.lean:1969   sec7_zero_few_critical Φ″ branch (order-3 blocker)
-  theorem_10_1 axioms = [propext, sorryAx, Classical.choice, Quot.sound] — sorryAx = this ONE stub.
+BUILD: GREEN, full project (`lake build`, 8548 jobs). Tracked stubs: 0 — COMPLETE.
+  theorem_10_1 axioms = [propext, Classical.choice, Quot.sound] — AXIOM-CLEAN, no sorryAx.
+
+  ✅ §7 Φ″ ENDGAME CLOSED (2026-06-17, commit 589b8df): the last sorry
+     (sec7_zero_few_critical Φ″ branch) filled by two new lemmas in Sec7ZeroScale:
+       - sec7_zero_errScale_m3_le_Cbase  (Cbase-form m=3 error budget, 6e-13 ≤ 1e-12)
+       - sec7_zero_deriv2_few  (weight-r⁴ Rolle; principal collapses to the C-monomial
+         via sec7_principal_weighted_collapse2, coeff −1105/64; two-piece error
+         dominated ≈101×: 1.70e-6 vs 1.729e-4 · R·Cbase ⇒ ≤1 zero ≤ KZero).
+     Whole tree: zero sorry/admit/axiom. The formalization of theorem_10_1 is DONE.
 
   ✅ sec7_phase_build CLOSED (2026-06-16): = sec7_phase_construct (hG10x-free) + hnear reorder.
      hG10x (G·U^10 ≤ x, regime-FALSE on-strip) DELETED tree-wide; sec7_relErrF re-pinned to the
