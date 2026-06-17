@@ -1554,6 +1554,63 @@ private theorem sec7_principal_weighted_collapse {P : Globals} {S : Scale P} {W 
   push_cast at e1 e2 e3 ⊢
   linear_combination e1 + e2 + e3
 
+/-- **Order-3 weighted monomial collapse** (Φ″ endgame; weight-r⁴ analogue of
+`sec7_powMonD_weighted_collapse`).  `(r⁴·(monomial)″)′` is the single `(x/R)^{α+1}` monomial
+with coefficient `α(α−1)(α+2)` — the extra `α−1` (vs the r³ factor `α(α+2)`) is the second
+derivative, and the `α+2` still annihilates the `B`-monomial (`α = −2`). -/
+private theorem sec7_powMonD_weighted_collapse2 {R : ℝ} (hR : 0 < R) (c α : ℝ) {x : ℝ}
+    (hx : 0 < x) :
+    4 * x ^ 3 * sec7_powMonD R c α 2 x + x ^ 4 * sec7_powMonD R c α 3 x
+      = R * c * α * (α - 1) * (α + 2) * (x / R) ^ (α + 1) := by
+  have hxR0 : (0 : ℝ) < x / R := div_pos hx hR
+  have hRne : R ≠ 0 := ne_of_gt hR
+  have hx3 : x ^ 3 * (x / R) ^ (α - 2) = R ^ 3 * (x / R) ^ (α + 1) := by
+    have hxx : x ^ 3 = R ^ 3 * (x / R) ^ (3 : ℕ) := by field_simp
+    rw [hxx, mul_assoc, ← Real.rpow_natCast (x / R) 3, ← Real.rpow_add hxR0]
+    congr 2
+    push_cast; ring
+  have hx4 : x ^ 4 * (x / R) ^ (α - 3) = R ^ 4 * (x / R) ^ (α + 1) := by
+    have hxx : x ^ 4 = R ^ 4 * (x / R) ^ (4 : ℕ) := by field_simp
+    rw [hxx, mul_assoc, ← Real.rpow_natCast (x / R) 4, ← Real.rpow_add hxR0]
+    congr 2
+    push_cast; ring
+  unfold sec7_powMonD sec7_powMon
+  have ha2 : sec7_aprod α 2 = α * (α - 1) := by simp [sec7_aprod]
+  have ha3 : sec7_aprod α 3 = α * (α - 1) * (α - 2) := by simp [sec7_aprod]
+  rw [ha2, ha3]
+  push_cast
+  rw [show (4 : ℝ) * x ^ 3 * (c * (α * (α - 1)) / R ^ 2 * (x / R) ^ (α - 2))
+        = (4 * c * (α * (α - 1)) / R ^ 2) * (x ^ 3 * (x / R) ^ (α - 2)) by ring,
+      show x ^ 4 * (c * (α * (α - 1) * (α - 2)) / R ^ 3 * (x / R) ^ (α - 3))
+        = (c * (α * (α - 1) * (α - 2)) / R ^ 3) * (x ^ 4 * (x / R) ^ (α - 3)) by ring,
+      hx3, hx4]
+  field_simp
+  ring
+
+/-- **Principal weighted collapse for `Φ″`, `ρ₀ = 0`** (Φ″ endgame; weight-r⁴ analogue of
+`sec7_principal_weighted_collapse`).  Under the `(r⁴·Φ″)'` weight both the `T₁`-monomial
+(`c = c₁·ρ₀·T₁ = 0`) and the `B`-monomial (`α+2 = 0` at `α = −2`) annihilate, leaving a single
+`C·R·y⁻⁹ᐟ⁴` monomial with coefficient `−1105/64 = (−13/4)(−17/4)(−5/4)`. -/
+private theorem sec7_principal_weighted_collapse2 {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
+    {Ph : Sec7Phase P S W a} {j h₁ h₂ h₃ : ℤ} {ξ₁ ξ₂ ξ₃ : ℝ}
+    {ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ}
+    (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃) (hρ₀ : ρ₀ = 0)
+    (hR : 0 < S.R) {x : ℝ} (hx : 0 < x) :
+    4 * x ^ 3 * sec7_principalJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x
+        + x ^ 4 * sec7_principalJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x
+      = -(1105 / 64) * (ME.Cstar * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) * S.R *
+          (x / S.R) ^ (-(9 : ℝ) / 4) := by
+  subst hρ₀
+  simp only [sec7_principalJet]
+  have e1 := sec7_powMonD_weighted_collapse2 (R := S.R) hR (ME.c₁ * (0 : ℝ) * S.T₁) (-(1 : ℝ)) hx
+  have e2 := sec7_powMonD_weighted_collapse2 (R := S.R) hR
+    (ME.Bcoef 0 ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) (-(2 : ℝ)) hx
+  have e3 := sec7_powMonD_weighted_collapse2 (R := S.R) hR
+    (ME.Cstar * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) (-(13 : ℝ) / 4) hx
+  rw [show (-(13 : ℝ) / 4 + 1) = -(9 : ℝ) / 4 by norm_num] at e3
+  push_cast at e1 e2 e3 ⊢
+  linear_combination e1 + e2 + e3
+
 
 /-- **Subordination to the `C`-base scale** (md 1701–29, TRAP-3 form): the eq-(7.5)
 remainder scale is `≪ P·T₃/R³`, the surviving `C`-monomial base.  Same chain as
