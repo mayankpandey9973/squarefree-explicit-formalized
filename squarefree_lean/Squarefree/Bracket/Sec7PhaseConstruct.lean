@@ -5151,8 +5151,8 @@ theorem sec7_ra_e₂D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
   have htOpen : IsOpen (Set.Ioi (0 : ℝ)) := isOpen_Ioi
   have hftilde_cd :
       ContDiffOn ℝ 5 (fun s => dtilde P.X s (a : ℝ) / S.D) (sec7_rWinWide S W) :=
-    sec7_ra_ftilde_contDiffOn_wide (P := P) (S := S) (W := W) (a := a)
-      ha Env hW hsd
+    (sec7_ra_ftilde_contDiffOn_wide (P := P) (S := S) (W := W) (a := a)
+      ha Env hW hsd).of_le (by norm_num)
   have hgtilde_cd :
       ContDiffOn ℝ 5 (fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) (Set.Ioi 0) :=
     sec7_ra_gtilde_contDiffOn_Ioi (P := P) (S := S) (a := a) ha
@@ -5177,7 +5177,7 @@ theorem sec7_ra_e₂D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
           (sec7_rWinWide S W) r‖ ≤ (((10 ^ 3 : ℝ) / S.R) ^ i) := by
     intro i hi₁ hi
     exact sec7_ra_ftilde_FDeriv_bound (P := P) (S := S) (W := W)
-      (a := a) (r := r) ha hAD ha_lo ha_hi Env hW hsd hr hi₁ (le_trans hi hm)
+      (a := a) (r := r) ha hAD ha_lo ha_hi Env hW hsd hr hi₁ (le_trans (le_trans hi hm) (by norm_num))
   have hcomp :
       ‖iteratedFDerivWithin ℝ m
           ((fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) ∘
@@ -5261,8 +5261,8 @@ theorem sec7_ra_e₃D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
       (40 * S.R + 6 * (W + W ^ 2 + W ^ 4))))
   have hftilde_cd :
       ContDiffOn ℝ 5 (fun s => dtilde P.X s (a : ℝ) / S.D) (sec7_rWinWide S W) :=
-    sec7_ra_ftilde_contDiffOn_wide (P := P) (S := S) (W := W) (a := a)
-      ha Env hW hsd
+    (sec7_ra_ftilde_contDiffOn_wide (P := P) (S := S) (W := W) (a := a)
+      ha Env hW hsd).of_le (by norm_num)
   have hgtilde_cd :
       ContDiffOn ℝ 5
         (fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u))
@@ -5288,7 +5288,7 @@ theorem sec7_ra_e₃D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
           (sec7_rWinWide S W) r‖ ≤ (((10 ^ 3 : ℝ) / S.R) ^ i) := by
     intro i hi₁ hi
     exact sec7_ra_ftilde_FDeriv_bound (P := P) (S := S) (W := W)
-      (a := a) (r := r) ha hAD ha_lo ha_hi Env hW hsd hr hi₁ (le_trans hi hm)
+      (a := a) (r := r) ha hAD ha_lo ha_hi Env hW hsd hr hi₁ (le_trans (le_trans hi hm) (by norm_num))
   have hcomp :
       ‖iteratedFDerivWithin ℝ m
           ((fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u)) ∘
@@ -5369,8 +5369,8 @@ theorem sec7_ra_e₁D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
       (40 * S.R + 6 * (W + W ^ 2 + W ^ 4))))
   have hftilde_cd :
       ContDiffOn ℝ 5 (fun s => dtilde P.X s (a : ℝ) / S.D) (sec7_rWinWide S W) :=
-    sec7_ra_ftilde_contDiffOn_wide (P := P) (S := S) (W := W) (a := a)
-      ha Env hW hsd
+    (sec7_ra_ftilde_contDiffOn_wide (P := P) (S := S) (W := W) (a := a)
+      ha Env hW hsd).of_le (by norm_num)
   have hgtilde_cd :
       ContDiffOn ℝ 5
         (fun u : ℝ => sec7_ra_rho1Fun P.X (a : ℝ) (j : ℝ) (S.D * u))
@@ -5396,7 +5396,7 @@ theorem sec7_ra_e₁D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
           (sec7_rWinWide S W) r‖ ≤ (((10 ^ 3 : ℝ) / S.R) ^ i) := by
     intro i hi₁ hi
     exact sec7_ra_ftilde_FDeriv_bound (P := P) (S := S) (W := W)
-      (a := a) (r := r) ha hAD ha_lo ha_hi Env hW hsd hr hi₁ (le_trans hi hm)
+      (a := a) (r := r) ha hAD ha_lo ha_hi Env hW hsd hr hi₁ (le_trans (le_trans hi hm) (by norm_num))
   have hcomp :
       ‖iteratedFDerivWithin ℝ m
           ((fun u : ℝ => sec7_ra_rho1Fun P.X (a : ℝ) (j : ℝ) (S.D * u)) ∘

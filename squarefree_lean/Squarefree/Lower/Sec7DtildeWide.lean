@@ -1,4 +1,5 @@
 import Squarefree.Lower.DefectDeriv5
+import Squarefree.Lower.DefectDeriv6
 import Squarefree.Bracket.Sec7Defs
 import Squarefree.Opt.OnStripAux
 
@@ -241,6 +242,7 @@ def sec7_ra_Cdt2 : ℝ := 10 ^ 6
 def sec7_ra_Cdt3 : ℝ := 10 ^ 9
 def sec7_ra_Cdt4 : ℝ := 10 ^ 12
 def sec7_ra_Cdt5 : ℝ := 10 ^ 15
+def sec7_ra_Cdt6 : ℝ := 10 ^ 18
 
 private theorem sec7_ra_wide_r_bounds {P : Globals} {S : Scale P} {W r : ℝ}
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W) {c₀ Cu : ℝ}
@@ -824,6 +826,123 @@ theorem sec7_ra_dtilde_wide_d5 {P : Globals} {S : Scale P} {W : ℝ}
               norm_num
             exact mul_le_mul_of_nonneg_right hcoef (by positivity)
           _ = (10 ^ 15 : ℝ) * S.D * 16384 * r ^ 5 := by ring
+  exact le_trans hNum_hi (le_trans hmain hstep)
+
+theorem sec7_ra_dtilde_wide_d6 {P : Globals} {S : Scale P} {W : ℝ}
+    {a : ℤ} {r : ℝ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
+    (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hr : r ∈ sec7_rWinWide S W) :
+    |iteratedDeriv 6 (fun s => dtilde P.X s (a : ℝ)) r|
+      ≤ sec7_ra_Cdt6 * (S.D / S.R ^ 6) := by
+  have hDpos : 0 < S.D := S.D_pos
+  have hRpos : 0 < S.R := sec7_R_pos S
+  have haR : 0 < (a : ℝ) := by exact_mod_cast ha
+  obtain ⟨hr_lo, _hr_hi⟩ :=
+    sec7_dtilde_wide_rWinWide_core (P := P) (S := S) (W := W) (r := r)
+      Env hW c₀ Cu hsd hr
+  have hr0 : 0 < r := lt_of_lt_of_le (by positivity : 0 < (107 / 18000 : ℝ) * S.R) hr_lo
+  set d := dtilde P.X r (a : ℝ) with hd_def
+  obtain ⟨hd_lo0, hd_ge_a0, hd_hi0⟩ :=
+    sec7_ra_dtilde_wide_image (P := P) (S := S) (W := W) (a := a) (r := r)
+      ha hAD ha_lo ha_hi Env hW hsd hr
+  have hd_ge_a : (a : ℝ) ≤ d := by simpa [hd_def] using hd_ge_a0
+  have hd_sharp : d ≤ 7 * S.D := by
+    simpa [hd_def] using
+      sec7_ra_dtilde_wide_d_upper_sharp (P := P) (S := S) (W := W)
+        (a := a) (r := r) ha ha_hi Env hW hsd hr
+  have hdpos : 0 < d := dtilde_pos P.X_pos haR hr0
+  rw [dtilde_r_iteratedDeriv6 P.X_pos haR hr0]
+  set Poly := 231 * (a : ℝ) ^ 10 + 4058 * (a : ℝ) ^ 9 * d + 33274 * (a : ℝ) ^ 8 * d ^ 2
+      + 165416 * (a : ℝ) ^ 7 * d ^ 3 + 548520 * (a : ℝ) ^ 6 * d ^ 4
+      + 1262872 * (a : ℝ) ^ 5 * d ^ 5 + 2039656 * (a : ℝ) ^ 4 * d ^ 6
+      + 2278528 * (a : ℝ) ^ 3 * d ^ 7 + 1683472 * (a : ℝ) ^ 2 * d ^ 8
+      + 742560 * (a : ℝ) * d ^ 9 + 148512 * d ^ 10 with hPoly_def
+  set Num := 45 * d * (d + (a : ℝ)) * Poly with hNum_def
+  set Den := 64 * r ^ 6 * ((a : ℝ) + 2 * d) ^ 11 with hDen_def
+  have hPoly_pos : 0 < Poly := by rw [hPoly_def]; positivity
+  have hNum_pos : 0 < Num := by rw [hNum_def]; positivity
+  have hDen_pos : 0 < Den := by rw [hDen_def]; positivity
+  rw [abs_of_pos (div_pos hNum_pos hDen_pos)]
+  have hf1 : 45 * d * (d + (a : ℝ)) ≤ 90 * d ^ 2 := by
+    nlinarith [hd_ge_a, hdpos]
+  have hPoly_le_d : Poly ≤ 8907099 * d ^ 10 := by
+    rw [hPoly_def]
+    have hp1 : 231 * (a : ℝ) ^ 10 ≤ 231 * d ^ 10 := by gcongr
+    have hp2 : 4058 * (a : ℝ) ^ 9 * d ≤ 4058 * d ^ 10 := by
+      calc 4058 * (a : ℝ) ^ 9 * d ≤ 4058 * d ^ 9 * d := by gcongr
+        _ = 4058 * d ^ 10 := by ring
+    have hp3 : 33274 * (a : ℝ) ^ 8 * d ^ 2 ≤ 33274 * d ^ 10 := by
+      calc 33274 * (a : ℝ) ^ 8 * d ^ 2 ≤ 33274 * d ^ 8 * d ^ 2 := by gcongr
+        _ = 33274 * d ^ 10 := by ring
+    have hp4 : 165416 * (a : ℝ) ^ 7 * d ^ 3 ≤ 165416 * d ^ 10 := by
+      calc 165416 * (a : ℝ) ^ 7 * d ^ 3 ≤ 165416 * d ^ 7 * d ^ 3 := by gcongr
+        _ = 165416 * d ^ 10 := by ring
+    have hp5 : 548520 * (a : ℝ) ^ 6 * d ^ 4 ≤ 548520 * d ^ 10 := by
+      calc 548520 * (a : ℝ) ^ 6 * d ^ 4 ≤ 548520 * d ^ 6 * d ^ 4 := by gcongr
+        _ = 548520 * d ^ 10 := by ring
+    have hp6 : 1262872 * (a : ℝ) ^ 5 * d ^ 5 ≤ 1262872 * d ^ 10 := by
+      calc 1262872 * (a : ℝ) ^ 5 * d ^ 5 ≤ 1262872 * d ^ 5 * d ^ 5 := by gcongr
+        _ = 1262872 * d ^ 10 := by ring
+    have hp7 : 2039656 * (a : ℝ) ^ 4 * d ^ 6 ≤ 2039656 * d ^ 10 := by
+      calc 2039656 * (a : ℝ) ^ 4 * d ^ 6 ≤ 2039656 * d ^ 4 * d ^ 6 := by gcongr
+        _ = 2039656 * d ^ 10 := by ring
+    have hp8 : 2278528 * (a : ℝ) ^ 3 * d ^ 7 ≤ 2278528 * d ^ 10 := by
+      calc 2278528 * (a : ℝ) ^ 3 * d ^ 7 ≤ 2278528 * d ^ 3 * d ^ 7 := by gcongr
+        _ = 2278528 * d ^ 10 := by ring
+    have hp9 : 1683472 * (a : ℝ) ^ 2 * d ^ 8 ≤ 1683472 * d ^ 10 := by
+      calc 1683472 * (a : ℝ) ^ 2 * d ^ 8 ≤ 1683472 * d ^ 2 * d ^ 8 := by gcongr
+        _ = 1683472 * d ^ 10 := by ring
+    have hp10 : 742560 * (a : ℝ) * d ^ 9 ≤ 742560 * d ^ 10 := by
+      calc 742560 * (a : ℝ) * d ^ 9 ≤ 742560 * d * d ^ 9 := by gcongr
+        _ = 742560 * d ^ 10 := by ring
+    nlinarith [hp1, hp2, hp3, hp4, hp5, hp6, hp7, hp8, hp9, hp10]
+  have hNum_hi : Num ≤ 801638910 * d ^ 12 := by
+    rw [hNum_def]
+    have hmul := mul_le_mul hf1 hPoly_le_d (by positivity : (0:ℝ) ≤ Poly)
+      (by positivity : (0:ℝ) ≤ 90 * d ^ 2)
+    calc 45 * d * (d + (a : ℝ)) * Poly
+        ≤ (90 * d ^ 2) * (8907099 * d ^ 10) := hmul
+      _ = 801638910 * d ^ 12 := by ring
+  have hs_lo_d : 2 * d ≤ (a : ℝ) + 2 * d := by nlinarith [haR]
+  have hpow11_lo_d : (2 * d) ^ 11 ≤ ((a : ℝ) + 2 * d) ^ 11 :=
+    pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ 2 * d) hs_lo_d 11
+  have hDen_lo : 131072 * r ^ 6 * d ^ 11 ≤ Den := by
+    rw [hDen_def]
+    calc 131072 * r ^ 6 * d ^ 11 = 64 * r ^ 6 * (2 * d) ^ 11 := by ring
+      _ ≤ 64 * r ^ 6 * ((a : ℝ) + 2 * d) ^ 11 := by gcongr
+  rw [div_le_iff₀ hDen_pos]
+  have hmul_nonneg : 0 ≤ sec7_ra_Cdt6 * (S.D / S.R ^ 6) := by
+    unfold sec7_ra_Cdt6
+    positivity
+  have hstep :
+      sec7_ra_Cdt6 * (S.D / S.R ^ 6) * (131072 * r ^ 6 * d ^ 11)
+        ≤ sec7_ra_Cdt6 * (S.D / S.R ^ 6) * Den :=
+    mul_le_mul_of_nonneg_left hDen_lo hmul_nonneg
+  have hr169 : S.R / 169 ≤ r := by nlinarith [hr_lo, hRpos]
+  have hR6_le : S.R ^ 6 ≤ (169 : ℝ) ^ 6 * r ^ 6 := by
+    have hpow := pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ S.R / 169) hr169 6
+    rw [show (S.R / 169) ^ 6 = S.R ^ 6 / (169 : ℝ) ^ 6 by ring] at hpow
+    rw [div_le_iff₀ (by norm_num : 0 < (169 : ℝ) ^ 6)] at hpow
+    nlinarith
+  have hmain :
+      801638910 * d ^ 12 ≤ sec7_ra_Cdt6 * (S.D / S.R ^ 6) * (131072 * r ^ 6 * d ^ 11) := by
+    unfold sec7_ra_Cdt6
+    field_simp [ne_of_gt hRpos]
+    calc
+      801638910 * d * S.R ^ 6
+          ≤ 801638910 * (7 * S.D) * S.R ^ 6 := by gcongr
+      _ ≤ 801638910 * (7 * S.D) * ((169 : ℝ) ^ 6 * r ^ 6) := by gcongr
+      _ ≤ (10 ^ 18 : ℝ) * S.D * 131072 * r ^ 6 := by
+        calc
+          801638910 * (7 * S.D) * ((169 : ℝ) ^ 6 * r ^ 6)
+              = (801638910 * 7 * (169 : ℝ) ^ 6) * (S.D * r ^ 6) := by ring
+          _ ≤ ((10 ^ 18 : ℝ) * 131072) * (S.D * r ^ 6) := by
+            have hcoef : 801638910 * 7 * (169 : ℝ) ^ 6 ≤ (10 ^ 18 : ℝ) * 131072 := by
+              norm_num
+            exact mul_le_mul_of_nonneg_right hcoef (by positivity)
+          _ = (10 ^ 18 : ℝ) * S.D * 131072 * r ^ 6 := by ring
   exact le_trans hNum_hi (le_trans hmain hstep)
 
 end Squarefree

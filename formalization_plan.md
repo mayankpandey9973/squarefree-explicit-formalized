@@ -30,6 +30,20 @@ C⁵/power-saving route loses an unbounded R/h factor in the residual finite-dif
   place (Sec7PhaseExp.lean alongside cExp/cErr) and re-check after any bump (CLAUDE.md §8).
 
 ### STAGES (strict dependency order; struct change ⇒ full rebuild each cycle)
+- **SCOPE CORRECTION (2026-06-16, found reading sec7_ra_e₂D_core:5135).** The residual core does NOT
+  consume `dtilde_dN_upper` (the loose DefectDeriv bound). It chains `sec7_ra_ftilde_FDeriv_bound`
+  (Sec7RaCompose:456, i≤5, the TIGHT `‖(d̃/D)⁽ⁱ⁾‖ ≤ (10³/R)ⁱ`) → `sec7_ra_dtilde_wide_d{1..5}`
+  (Sec7DtildeWide:700, `|d̃⁽ⁱ⁾| ≤ Cdt_i·D/R^i`, `Cdt_i=10^{3i}`), which use the CLOSED FORM
+  `dtilde_r_iteratedDeriv5` + `(a+2d)⁹≥(2d)⁹` cancellation + sharp `d≤7D` window — NOT `dtilde_d5_upper`.
+  So A0's `dtilde_d6_upper` (loose 1.38e39) is UNUSED by the core; but A0's `dtilde_r_iteratedDeriv6`
+  closed form + HasDerivAt tower ARE the inputs for the tight `sec7_ra_dtilde_wide_d6`. The real
+  data-layer heavy piece = **A2a** below.
+- **A2a — C⁶ derivative-bound data layer (Lower/, delegatable, independent of the struct change).**
+  Sec7DtildeWide.lean: `def sec7_ra_Cdt6 := 10^18`; `sec7_ra_dtilde_wide_d6 : |d̃⁽⁶⁾| ≤ Cdt6·(D/R⁶)`
+  (mirror wide_d5:700; uses A0 `dtilde_r_iteratedDeriv6`; `(a+2d)¹¹≥(2d)¹¹` cancels the P₁₀·d¹⁰ ⟹ ~6e15·
+  D/R⁶ ≤ 10¹⁸, 170× margin); import DefectDeriv6. Sec7RaCompose.lean: `sec7_ra_ftilde_contDiffOn_wide`
+  C⁵→C⁶ (sec7_ra_dtilde_r_contDiffAt n:=5→6, generic-n), `sec7_ra_ftilde_FDeriv_bound` i≤5→i≤6 (add
+  i=6 via wide_d6), `sec7_ra_gtilde_contDiffOn_Ioi` C⁵→C⁶, `sec7_ra_rho_rescaled_FDeriv_bound` i≤6.
 - **A — §3 residual data C⁵ → C⁶.**
   - A0 ✅ DONE (2026-06-16, green, Lower/DefectDeriv6.lean, 372 ln): `dtilde_d6_upper : |d̃⁽⁶⁾(r)| ≤
     C₆·(D/R⁶)` with **C₆ = 1381746600000000000000000000000000000000 (≈1.38·10³⁹)** (larger than the

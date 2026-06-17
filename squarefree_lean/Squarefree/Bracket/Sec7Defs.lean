@@ -61,6 +61,12 @@ def sec7_cWin : ℝ := 10 ^ 3
 /-- Input-side residual-expansion constant for the §3→§7 monomial package. -/
 def sec7_cExpIn : ℝ := 10 ^ 25
 
+/-- **m=6 path** input-side residual constant (Φ″ endgame; ledger 2026-06-16). The residual
+bound at order 6 has producer constant `≈ 6!·8e7·(10³)⁶ = 5.76e28`, which overflows the order-≤5
+`sec7_cExpIn = 10²⁵` by `5760×`; pinned at `10²⁹` (1.74×). Used only by the `ra_e*D_bound6` fields
+/ `sec7_ra_e*D_core6` cores; the m≤5 path keeps `sec7_cExpIn`. -/
+def sec7_cExpIn6 : ℝ := 10 ^ 29
+
 /-- `j`-band constant: the §7 shifts satisfy `|j| ≤ sec7_cJ·(1 + H/A²)` (md 1307–09).
 G1+U3: `10²⁰ ≥ 2·10¹⁸`, the `ftil_prox` discharge level (ledger U4). -/
 def sec7_cJ : ℝ := 10 ^ 20
@@ -88,6 +94,7 @@ def sec7_envC2 : ℝ := 10 ^ 300
 theorem sec7_cPh_pos : (0:ℝ) < sec7_cPh := by norm_num [sec7_cPh]
 theorem sec7_cWin_pos : (0:ℝ) < sec7_cWin := by norm_num [sec7_cWin]
 theorem sec7_cExpIn_pos : (0:ℝ) < sec7_cExpIn := by norm_num [sec7_cExpIn]
+theorem sec7_cExpIn6_pos : (0:ℝ) < sec7_cExpIn6 := by norm_num [sec7_cExpIn6]
 theorem sec7_cJ_pos : (0:ℝ) < sec7_cJ := by norm_num [sec7_cJ]
 theorem sec7_cTay_pos : (0:ℝ) < sec7_cTay := by norm_num [sec7_cTay]
 theorem sec7_cdMar_pos : (0:ℝ) < sec7_cdMar := by norm_num [sec7_cdMar]

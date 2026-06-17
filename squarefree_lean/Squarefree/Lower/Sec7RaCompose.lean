@@ -421,11 +421,11 @@ theorem sec7_ra_rho3Target_uniqueDiffOn {P : Globals} {S : Scale P} {a : ℝ}
     simpa [q_hi, q_lo] using div_lt_div_of_pos_right hq_order hDpos
   simpa [sec7_ra_rho3Target] using uniqueDiffOn_Icc htarget_order
 
-/-- Normalized `dtilde/S.D` is `C⁵` on the wide §7 window. -/
+/-- Normalized `dtilde/S.D` is `C⁶` on the wide §7 window. -/
 theorem sec7_ra_ftilde_contDiffOn_wide {P : Globals} {S : Scale P} {W : ℝ}
     {a : ℤ} (ha : 0 < a) (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu) :
-    ContDiffOn ℝ 5 (fun s => dtilde P.X s (a : ℝ) / S.D) (sec7_rWinWide S W) := by
+    ContDiffOn ℝ 6 (fun s => dtilde P.X s (a : ℝ) / S.D) (sec7_rWinWide S W) := by
   intro r hr
   have haR : 0 < (a : ℝ) := by exact_mod_cast ha
   obtain ⟨hr_lo, _hr_hi⟩ :=
@@ -434,7 +434,7 @@ theorem sec7_ra_ftilde_contDiffOn_wide {P : Globals} {S : Scale P} {W : ℝ}
   have hRpos : 0 < S.R := sec7_R_pos S
   have hr0 : 0 < r := lt_of_lt_of_le
     (mul_pos (by norm_num : (0 : ℝ) < 107 / 18000) hRpos) hr_lo
-  exact ((sec7_ra_dtilde_r_contDiffAt (n := 5) (X := P.X) (a := (a : ℝ))
+  exact ((sec7_ra_dtilde_r_contDiffAt (n := 6) (X := P.X) (a := (a : ℝ))
     P.X_pos haR hr0).div_const S.D).contDiffWithinAt
 
 /-- The normalized wide image lies in `(0, ∞)`. -/
@@ -458,7 +458,7 @@ theorem sec7_ra_ftilde_FDeriv_bound {P : Globals} {S : Scale P} {W : ℝ}
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
-    (hr : r ∈ sec7_rWinWide S W) {i : ℕ} (hi₁ : 1 ≤ i) (hi₅ : i ≤ 5) :
+    (hr : r ∈ sec7_rWinWide S W) {i : ℕ} (hi₁ : 1 ≤ i) (hi₆ : i ≤ 6) :
     ‖iteratedFDerivWithin ℝ i (fun s => dtilde P.X s (a : ℝ) / S.D)
         (sec7_rWinWide S W) r‖ ≤ ((10 ^ 3 : ℝ) / S.R) ^ i := by
   have hDpos : 0 < S.D := S.D_pos
@@ -519,6 +519,16 @@ theorem sec7_ra_ftilde_FDeriv_bound {P : Globals} {S : Scale P} {W : ℝ}
             div_le_div_of_nonneg_right hdt hDpos.le
       _ = ((10 ^ 3 : ℝ) / S.R) ^ 5 := by
             norm_num [sec7_ra_Cdt5]
+            field_simp [ne_of_gt hDpos, ne_of_gt hRpos]
+            ring
+  · have hdt := sec7_ra_dtilde_wide_d6 (P := P) (S := S) (W := W)
+      (a := a) (r := r) ha hAD ha_lo ha_hi Env hW hsd hr
+    calc
+      |iteratedDeriv 6 (fun s => dtilde P.X s (a : ℝ)) r| / S.D
+          ≤ (sec7_ra_Cdt6 * (S.D / S.R ^ 6)) / S.D :=
+            div_le_div_of_nonneg_right hdt hDpos.le
+      _ = ((10 ^ 3 : ℝ) / S.R) ^ 6 := by
+            norm_num [sec7_ra_Cdt6]
             field_simp [ne_of_gt hDpos, ne_of_gt hRpos]
             ring
 
