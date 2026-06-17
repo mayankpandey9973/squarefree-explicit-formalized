@@ -36,17 +36,25 @@ keep the *orchestrator's* working context small and the file tree legible.
 ```
 Build/verify from the Lean project root (`squarefree_lean/`): `lake build <Module>`.
 
-### 1a. Build performance (binding — the box has 93 GB RAM, 20 cores)
+### 1a. Build performance (binding — the box has 93 GB RAM, 20 cores; numbers measured 2026-06-17)
 
-- **Always cap parallelism: `lake build -j 8`.** Each `import Mathlib` file holds ~6 GB; the
-  default `-j 20` needs ~120 GB → the box swaps and the build craters (10–50× slower). `-j 8`
-  (~48–64 GB) stays in RAM. Never run an uncapped full build. (RAM unchanged ⇒ this stays valid.)
-- **No wholesale `import Mathlib`.** It costs ~6 GB RAM + slower tactics per file. Import the
-  precise modules (use `lake exe shake` / `#min_imports`). New files must not `import Mathlib`.
-- **Keep modules ≤ ~400 lines (§3).** A file compiles as ONE job: a big file can't use the other
-  cores, is a serial long-pole, and forces a full recompile on every edit. Split monsters.
-- **Heartbeat smell:** a `set_option maxHeartbeats ≥ 1000000` marks an over-heavy tactic (usually
-  `nlinarith`/`norm_num` on astronomical numerals). Isolate the numeric fact into a tiny lemma.
+- **Always cap concurrency: `LEAN_NUM_THREADS=10 lake build …`.** Lake 5.0.0 has NO `-j` flag;
+  concurrency = Lean's task-pool size, set by `LEAN_NUM_THREADS` (default = 20 cores). EVERY heavy
+  module holds **6–9 GB** while compiling (the mathlib analysis closure — NOT just `import Mathlib`
+  files; minimal-import §7 files are just as big). 20 × ~7 GB ≈ 140 GB ≫ 93 GB → swap → 10–50× slower.
+  `LEAN_NUM_THREADS=10` (~70 GB) stays in RAM. Never run an uncapped full build.
+- **Per-module time is driven by TACTICS, not line count.** Measured: Sec7ZeroScale (3.9k lines)
+  took 3:25 — longer than Sec7RaResidual (8.1k lines, 2:32) — because of its `maxHeartbeats`
+  `nlinarith` lemmas. A `set_option maxHeartbeats ≥ 1000000` is a red flag: isolate the numeric
+  fact (esp. astronomical numerals like 10^143) into a tiny dedicated lemma proved on a clean goal.
+- **Minimal imports save little MEMORY here** (the analysis closure dominates), but still help
+  elaboration time + rebuild fan-out. Worth doing on pure `import Mathlib` files; not a memory fix.
+- **Splitting a monster only speeds the FULL build if the pieces are independent siblings.** A
+  proof file usually splits into a *chain* (later parts need earlier) → same serial work, no full-
+  build win; the payoff is *incremental* (a 1-line edit recompiles a 400-line module, not 3.9k).
+  Keep modules ≤ ~400 lines (§3) for editing ergonomics, but don't expect chain-splits to cut CI.
+- **Lake rebuilds by content hash, not mtime.** `touch` does NOT force a recompile; delete the
+  `.olean` (and `.ilean`/`.c`) to truly re-time a module.
 
 ### 1b. Worktree guidelines (binding — when delegating with `isolation: worktree`)
 
@@ -59,7 +67,7 @@ Build/verify from the Lean project root (`squarefree_lean/`): `lake build <Modul
 - Worktree builds are NOT the acceptance gate. The orchestrator re-verifies green + `#print axioms`
   in the **main tree** after merging (a single-file change merges by `cp`; multi-file by `git diff`/
   `apply`). Tear the worktree down (`git worktree remove --force` + delete branch) when merged.
-- Agents must build with `-j 8` inside worktrees too (same RAM box).
+- Agents must build with `LEAN_NUM_THREADS=10` inside worktrees too (same RAM box).
 
 ## 2. The working loop (per lemma)
 
