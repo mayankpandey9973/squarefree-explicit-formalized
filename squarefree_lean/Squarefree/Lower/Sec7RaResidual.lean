@@ -71,6 +71,7 @@ private noncomputable def sec7_ra_A3Scale : ℕ → ℝ
   | 3 => 15 / 8
   | 4 => 105 / 16
   | 5 => 945 / 32
+  | 6 => 10395 / 64
   | _ => 0
 
 noncomputable def sec7_ra_A1Scale : ℕ → ℝ
@@ -928,6 +929,46 @@ theorem sec7_ra_dBreve_contDiffAt5_Ffun_public {X a d : ℝ}
     (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) :
     ContDiffAt ℝ 5 (dBreve X a) (Ffun X a d) :=
   sec7_ra_dBreve_contDiffAt5_Ffun hX ha hd
+
+private theorem sec7_ra_dBreve_contDiffAt6_Ffun {X a d : ℝ}
+    (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) :
+    ContDiffAt ℝ 6 (dBreve X a) (Ffun X a d) := by
+  have hda : d + a ≠ 0 := by positivity
+  have hfcd : ContDiffAt ℝ 6 (fun t => Ffun X a t) d :=
+    Ffun_contDiffAt6 (X := X) (a := a) (d := d) (ne_of_gt hd) hda
+  have hraw : HasDerivAt (fun t => Ffun X a t)
+      (-2 * X / d ^ 3 + 2 * X / (d + a) ^ 3) d :=
+    Ffun_hasDerivAt_d X a d (ne_of_gt hd) hda
+  have hfder : HasDerivAt (fun t => Ffun X a t)
+      (deriv (fun t => Ffun X a t) d) d := by
+    rw [hraw.deriv]
+    exact hraw
+  have hder_ne : deriv (fun t => Ffun X a t) d ≠ 0 := by
+    have hpos : 0 < |deriv (fun t => Ffun X a t) d| := by
+      rw [Ffun_deriv1_abs_eq (X := X) (a := a) (d := d) hX ha hd]
+      positivity
+    exact abs_pos.mp hpos
+  let e : ℝ ≃L[ℝ] ℝ :=
+    (ContinuousLinearEquiv.unitsEquivAut ℝ)
+      (Units.mk0 (deriv (fun t => Ffun X a t) d) hder_ne)
+  have hf' : HasFDerivAt (fun t => Ffun X a t) (e : ℝ →L[ℝ] ℝ) d := by
+    simpa [e] using hfder.hasFDerivAt_equiv hder_ne
+  have hn : ((6 : ℕ) : WithTop ℕ∞) ≠ 0 := by norm_num
+  have hsmooth : ContDiffAt ℝ 6 (hfcd.localInverse hf' hn) (Ffun X a d) :=
+    hfcd.to_localInverse hf' hn
+  have hleft : ∀ᶠ x in nhds d, dBreve X a (Ffun X a x) = x := by
+    filter_upwards [eventually_gt_nhds hd] with x hx
+    exact dBreve_spec (X := X) (a := a) (d := x) hX ha hx
+  have hstrict : HasStrictFDerivAt (fun t => Ffun X a t) (e : ℝ →L[ℝ] ℝ) d :=
+    hfcd.hasStrictFDerivAt' hf' hn
+  have heq : dBreve X a =ᶠ[nhds (Ffun X a d)] hfcd.localInverse hf' hn := by
+    simpa [ContDiffAt.localInverse] using hstrict.localInverse_unique (g := dBreve X a) hleft
+  exact hsmooth.congr_of_eventuallyEq heq
+
+theorem sec7_ra_dBreve_contDiffAt6_Ffun_public {X a d : ℝ}
+    (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) :
+    ContDiffAt ℝ 6 (dBreve X a) (Ffun X a d) :=
+  sec7_ra_dBreve_contDiffAt6_Ffun hX ha hd
 
 private theorem sec7_ra_Ffun_dBreve_eventually {X a d : ℝ}
     (hX : 0 < X) (ha : 0 < a) (hd : 0 < d) :
@@ -7594,7 +7635,7 @@ theorem sec7_ra_h_atomic_bound {a d d_lo : ℝ} {k : ℕ}
           ring
 
 private theorem sec7_ra_sqrt_bound {d d_lo : ℝ} {k : ℕ}
-    (hk : k ≤ 5) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
+    (hk : k ≤ 6) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
     |iteratedDeriv k (fun t : ℝ => Real.sqrt t) d|
       ≤ sec7_ra_sqrtScale k * d ^ ((1 : ℝ) / 2 - k) := by
   have hd : 0 < d := lt_of_lt_of_le hdlo hlo
@@ -7744,7 +7785,7 @@ private theorem sec7_ra_hsq_bound {a d d_lo : ℝ} {k : ℕ}
   rw [← Finset.sum_mul, ← Finset.sum_mul, hconst]
 
 private theorem sec7_ra_A3_bound {a d d_lo : ℝ} {k : ℕ}
-    (hk : k ≤ 5) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
+    (hk : k ≤ 6) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
     |iteratedDeriv k (fun t => t - Real.sqrt (t * (t + a))) d|
       ≤ sec7_ra_A3Scale k * a * d ^ (-(k : ℝ)) := by
   have hd : 0 < d := lt_of_lt_of_le hdlo hlo
@@ -7783,11 +7824,11 @@ private theorem sec7_ra_A3_bound {a d d_lo : ℝ} {k : ℕ}
             * a * d ^ (-(k : ℝ)) := by
     intro i hi
     have hi_le_k : i ≤ k := Nat.lt_succ_iff.mp (Finset.mem_range.mp hi)
-    have hi5 : i ≤ 5 := le_trans hi_le_k hk
-    have hki5 : k - i ≤ 5 := le_trans (Nat.sub_le k i) hk
+    have hi5 : i ≤ 6 := le_trans hi_le_k hk
+    have hki5 : k - i ≤ 6 := le_trans (Nat.sub_le k i) hk
     have hb_i := sec7_ra_sqrt_bound (d := d) (d_lo := d_lo) (k := i) hi5 hdlo hlo
     have hb_ki := (sec7_ra_h_atomic_bound (a := a) (d := d) (d_lo := d_lo)
-      (k := k - i) (hki5.trans (by norm_num)) ha hdlo hlo).2
+      (k := k - i) hki5 ha hdlo hlo).2
     have hb_i' :
         |iteratedDeriv i p d| ≤ sec7_ra_sqrtScale i * d ^ ((1 : ℝ) / 2 - i) := by
       simpa [p] using hb_i
@@ -7843,7 +7884,7 @@ theorem sec7_ra_A3_bound_public {a d d_lo : ℝ} {k : ℕ}
     |iteratedDeriv k (fun t => t - Real.sqrt (t * (t + a))) d|
       ≤ (30 : ℝ) * a * d ^ (-(k : ℝ)) := by
   have hraw := sec7_ra_A3_bound (a := a) (d := d) (d_lo := d_lo) (k := k)
-    hk ha hdlo hlo
+    (hk.trans (by norm_num)) ha hdlo hlo
   have hscale : sec7_ra_A3Scale k ≤ (30 : ℝ) := by
     interval_cases k <;> norm_num [sec7_ra_A3Scale]
   have hd : 0 < d := lt_of_lt_of_le hdlo hlo
@@ -7856,6 +7897,27 @@ theorem sec7_ra_A3_bound_public {a d d_lo : ℝ} {k : ℕ}
     _ ≤ (30 : ℝ) * (a * d ^ (-(k : ℝ))) :=
           mul_le_mul_of_nonneg_right hscale htail
     _ = (30 : ℝ) * a * d ^ (-(k : ℝ)) := by ring
+
+/-- Order-6 public A₃ bound: same shape as `sec7_ra_A3_bound_public` but valid up
+to `k = 6`, with the looser absolute scale `10395/64 = max_{k≤6} A3Scale k`. -/
+theorem sec7_ra_A3_bound_public6 {a d d_lo : ℝ} {k : ℕ}
+    (hk : k ≤ 6) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
+    |iteratedDeriv k (fun t => t - Real.sqrt (t * (t + a))) d|
+      ≤ (10395 / 64 : ℝ) * a * d ^ (-(k : ℝ)) := by
+  have hraw := sec7_ra_A3_bound (a := a) (d := d) (d_lo := d_lo) (k := k)
+    hk ha hdlo hlo
+  have hscale : sec7_ra_A3Scale k ≤ (10395 / 64 : ℝ) := by
+    interval_cases k <;> norm_num [sec7_ra_A3Scale]
+  have hd : 0 < d := lt_of_lt_of_le hdlo hlo
+  have htail : 0 ≤ a * d ^ (-(k : ℝ)) :=
+    mul_nonneg ha.le (Real.rpow_pos_of_pos hd _).le
+  calc
+    |iteratedDeriv k (fun t => t - Real.sqrt (t * (t + a))) d|
+        ≤ sec7_ra_A3Scale k * (a * d ^ (-(k : ℝ))) := by
+          simpa [mul_assoc] using hraw
+    _ ≤ (10395 / 64 : ℝ) * (a * d ^ (-(k : ℝ))) :=
+          mul_le_mul_of_nonneg_right hscale htail
+    _ = (10395 / 64 : ℝ) * a * d ^ (-(k : ℝ)) := by ring
 
 private theorem sec7_ra_hsq_inv_bound {a d d_lo : ℝ} {k : ℕ}
     (hk : k ≤ 6) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :

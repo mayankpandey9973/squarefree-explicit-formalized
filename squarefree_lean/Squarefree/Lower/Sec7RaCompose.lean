@@ -843,7 +843,7 @@ theorem sec7_ra_gtilde3_contDiffOn_target {P : Globals} {S : Scale P} {W : ℝ}
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
     (hj : sec7_jBand P S j) :
-    ContDiffOn ℝ 5
+    ContDiffOn ℝ 6
       (fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u))
       (sec7_ra_rho3Target P S (a : ℝ)) := by
   intro u hu
@@ -941,28 +941,28 @@ theorem sec7_ra_gtilde3_contDiffOn_target {P : Globals} {S : Scale P} {W : ℝ}
     dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := t)
       hAD ha_lo_w ha_hi_w (by simpa [t] using htWin)
   have hdb :=
-    sec7_ra_dBreve_contDiffAt5_Ffun_public (X := P.X) (a := (a : ℝ))
+    sec7_ra_dBreve_contDiffAt6_Ffun_public (X := P.X) (a := (a : ℝ))
       (d := dBreve P.X (a : ℝ) t) P.X_pos haR dBreve_pos
-  have hdb_at : ContDiffAt ℝ 5 (dBreve P.X (a : ℝ)) t := by
+  have hdb_at : ContDiffAt ℝ 6 (dBreve P.X (a : ℝ)) t := by
     simpa [himg] using hdb
-  have hlin : ContDiffAt ℝ 5 (fun y : ℝ => S.D * y) u :=
+  have hlin : ContDiffAt ℝ 6 (fun y : ℝ => S.D * y) u :=
     contDiffAt_const.mul contDiffAt_id
-  have hFbase : ContDiffAt ℝ 5 (fun d : ℝ => Ffun P.X (a : ℝ) d) (S.D * u) :=
-    Ffun_contDiffAt5 (X := P.X) (a := (a : ℝ)) (d := S.D * u)
+  have hFbase : ContDiffAt ℝ 6 (fun d : ℝ => Ffun P.X (a : ℝ) d) (S.D * u) :=
+    Ffun_contDiffAt6 (X := P.X) (a := (a : ℝ)) (d := S.D * u)
       (ne_of_gt hdu_pos) (by positivity)
-  have hFarg : ContDiffAt ℝ 5 (fun y : ℝ => Ffun P.X (a : ℝ) (S.D * y)) u :=
+  have hFarg : ContDiffAt ℝ 6 (fun y : ℝ => Ffun P.X (a : ℝ) (S.D * y)) u :=
     hFbase.comp u hlin
-  have harg : ContDiffAt ℝ 5
+  have harg : ContDiffAt ℝ 6
       (fun y : ℝ => Ffun P.X (a : ℝ) (S.D * y) + (j : ℝ)) u :=
     hFarg.add contDiffAt_const
-  have hB : ContDiffAt ℝ 5
+  have hB : ContDiffAt ℝ 6
       (fun y : ℝ => dBreve P.X (a : ℝ)
         (Ffun P.X (a : ℝ) (S.D * y) + (j : ℝ))) u := by
     simpa [t] using hdb_at.comp u harg
-  have hrad : ContDiffAt ℝ 5
+  have hrad : ContDiffAt ℝ 6
       (fun y : ℝ => (S.D * y) * (S.D * y + (a : ℝ))) u :=
     hlin.mul (hlin.add contDiffAt_const)
-  have hsqrt : ContDiffAt ℝ 5
+  have hsqrt : ContDiffAt ℝ 6
       (fun y : ℝ => Real.sqrt ((S.D * y) * (S.D * y + (a : ℝ)))) u := by
     refine ContDiffAt.sqrt hrad ?_
     positivity

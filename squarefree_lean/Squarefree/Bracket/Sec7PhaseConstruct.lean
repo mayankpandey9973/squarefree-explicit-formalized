@@ -233,6 +233,62 @@ private theorem sec7_iteratedDeriv_comp_const_mul_at5 {f : ℝ → ℝ} {x c : �
             rw [hcomp_der.deriv]
         _ = c ^ (n + 1) * iteratedDeriv (n + 1) f (c * x) := by ring
 
+private theorem sec7_hasDerivAt_iteratedDeriv_of_contDiffAt6 {g : ℝ → ℝ} {r : ℝ} {m : ℕ}
+    (hg : ContDiffAt ℝ 6 g r) (hm : m < 6) :
+    HasDerivAt (iteratedDeriv m g) (iteratedDeriv (m + 1) g r) r := by
+  rw [iteratedDeriv_succ]
+  refine (?_ : DifferentiableAt ℝ (iteratedDeriv m g) r).hasDerivAt
+  have hF : DifferentiableAt ℝ (iteratedFDeriv ℝ m g) r := by
+    exact hg.differentiableAt_iteratedFDeriv (by exact_mod_cast hm)
+  rw [iteratedDeriv_eq_equiv_comp]
+  exact ((ContinuousMultilinearMap.piFieldEquiv ℝ (Fin m) ℝ).symm.differentiableAt).comp r hF
+
+private theorem sec7_iteratedDeriv_comp_const_mul_at6 {f : ℝ → ℝ} {x c : ℝ} {n : ℕ}
+    (hn : n ≤ 6) (hf : ContDiffAt ℝ 6 f (c * x)) :
+    iteratedDeriv n (fun y : ℝ => f (c * y)) x =
+      c ^ n * iteratedDeriv n f (c * x) := by
+  induction n generalizing x with
+  | zero =>
+      simp
+  | succ n ih =>
+      have hnlt : n < 6 := Nat.lt_of_succ_le hn
+      have hnle : n ≤ 6 := le_trans (Nat.le_succ n) hn
+      let g : ℝ → ℝ := fun y => f (c * y)
+      have hlin_cd : ContDiffAt ℝ 6 (fun y : ℝ => c * y) x :=
+        contDiffAt_const.mul contDiffAt_id
+      have hg_cd : ContDiffAt ℝ 6 g x := by
+        exact hf.comp x hlin_cd
+      have hnear_f : ∀ᶠ z in 𝓝 (c * x), ContDiffAt ℝ 6 f z :=
+        hf.eventually (by simp)
+      have hnear : ∀ᶠ y in 𝓝 x, ContDiffAt ℝ 6 f (c * y) :=
+        hlin_cd.continuousAt.tendsto.eventually hnear_f
+      have hev : (fun y : ℝ => iteratedDeriv n g y) =ᶠ[𝓝 x]
+          (fun y : ℝ => c ^ n * iteratedDeriv n f (c * y)) := by
+        filter_upwards [hnear] with y hy
+        exact ih hnle hy
+      have hder_g :=
+        sec7_hasDerivAt_iteratedDeriv_of_contDiffAt6 (g := g) (r := x) (m := n)
+          hg_cd hnlt
+      have hder_f :=
+        sec7_hasDerivAt_iteratedDeriv_of_contDiffAt6 (g := f) (r := c * x) (m := n)
+          hf hnlt
+      have hlin_der : HasDerivAt (fun y : ℝ => c * y) c x := by
+        simpa using (hasDerivAt_id x).const_mul c
+      have hcomp_der :
+          HasDerivAt (fun y : ℝ => iteratedDeriv n f (c * y))
+            (iteratedDeriv (n + 1) f (c * x) * c) x := by
+        simpa [Function.comp_def, mul_comm] using hder_f.comp x hlin_der
+      calc
+        iteratedDeriv (n + 1) g x
+            = deriv (iteratedDeriv n g) x := by rw [iteratedDeriv_succ]
+        _ = deriv (fun y : ℝ => c ^ n * iteratedDeriv n f (c * y)) x :=
+            Filter.EventuallyEq.deriv_eq hev
+        _ = c ^ n * deriv (fun y : ℝ => iteratedDeriv n f (c * y)) x := by
+            rw [deriv_const_mul_field]
+        _ = c ^ n * (iteratedDeriv (n + 1) f (c * x) * c) := by
+            rw [hcomp_der.deriv]
+        _ = c ^ (n + 1) * iteratedDeriv (n + 1) f (c * x) := by ring
+
 private theorem sec7_Ffun_contDiffAt {n : WithTop ℕ∞} {X a d : ℝ}
     (hd : d ≠ 0) (hda : d + a ≠ 0) :
     ContDiffAt ℝ n (fun t => Ffun X a t) d := by
@@ -1110,6 +1166,37 @@ private theorem sec7_phase_f3_base_contDiffAt5 {P : Globals} {S : Scale P} {W : 
     hftil.add contDiffAt_const
   simpa [sec7_phase_dBreve, t, ht] using hdb_at.comp r harg
 
+private theorem sec7_phase_f3_base_contDiffAt6 {P : Globals} {S : Scale P} {W : ℝ}
+    {a j : ℤ} {r : ℝ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
+    (ha_lo : S.A / 5 ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 11 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hj : sec7_jBand P S j) (hr : r ∈ sec7_rWinWide S W) :
+    ContDiffAt ℝ 6
+      (fun x => sec7_phase_dBreve P a (sec7_phase_ftil P S a x + (j : ℝ))) r := by
+  have hr0 : 0 < r := sec7_phase_rWinWide_pos Env hW c₀ Cu hsd r hr
+  have haR : 0 < (a : ℝ) := by exact_mod_cast ha
+  have hftil : ContDiffAt ℝ 6 (sec7_phase_ftil P S a) r :=
+    sec7_phase_ftil_contDiffAt (n := 6) (P := P) (S := S) (a := a) ha hr0
+  set t : ℝ := sec7_phase_ftil P S a r + (j : ℝ) with ht
+  have htWin : t ∈ sec7_tWin S := by
+    have h :=
+      sec7_phase_shift_mem_wide_zero P S W a ha hAD hG1 ha_lo ha_hi Env hW c₀ Cu hsd
+        r hr j hj
+    simpa [t, ht] using h
+  have himg :=
+    dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := t)
+      hAD ha_lo ha_hi htWin
+  have hd0 : 0 < dBreve P.X (a : ℝ) t := dBreve_pos
+  have hdb :=
+    sec7_dBreve_contDiffAt6_Ffun (X := P.X) (a := (a : ℝ))
+      (d := dBreve P.X (a : ℝ) t) P.X_pos haR hd0
+  have hdb_at : ContDiffAt ℝ 6 (dBreve P.X (a : ℝ)) t := by
+    simpa [himg.1] using hdb
+  have harg : ContDiffAt ℝ 6 (fun x => sec7_phase_ftil P S a x + (j : ℝ)) r :=
+    hftil.add contDiffAt_const
+  simpa [sec7_phase_dBreve, t, ht] using hdb_at.comp r harg
+
 private theorem sec7_phase_f1_base_contDiffAt5 {P : Globals} {S : Scale P} {W : ℝ}
     {a j : ℤ} {r : ℝ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
     (ha_lo : S.A / 5 ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 11 * S.A)
@@ -1149,6 +1236,13 @@ private theorem sec7_phase_rpow_div_contDiffAt5 {P : Globals} {S : Scale P}
     ContDiffAt ℝ 5 (fun t : ℝ => (t / S.R) ^ α) r := by
   have hR : 0 < S.R := sec7_R_pos S
   have harg : ContDiffAt ℝ 5 (fun t : ℝ => t / S.R) r := contDiffAt_id.div_const S.R
+  exact harg.rpow_const_of_ne (div_ne_zero (ne_of_gt hr) (ne_of_gt hR))
+
+private theorem sec7_phase_rpow_div_contDiffAt6 {P : Globals} {S : Scale P}
+    {r α : ℝ} (hr : 0 < r) :
+    ContDiffAt ℝ 6 (fun t : ℝ => (t / S.R) ^ α) r := by
+  have hR : 0 < S.R := sec7_R_pos S
+  have harg : ContDiffAt ℝ 6 (fun t : ℝ => t / S.R) r := contDiffAt_id.div_const S.R
   exact harg.rpow_const_of_ne (div_ne_zero (ne_of_gt hr) (ne_of_gt hR))
 
 private theorem sec7_phase_powMon_iteratedDeriv_eq {P : Globals} {S : Scale P}
@@ -1950,6 +2044,57 @@ private theorem sec7_phase_ra_e₃_base_contDiffAt5 {P : Globals} {S : Scale P} 
             * S.T₃) r).mul hpow)
   exact hbase.sub hmon
 
+private theorem sec7_phase_ra_e₂_base_contDiffAt6 {P : Globals} {S : Scale P} {W : ℝ}
+    {a j : ℤ} {r : ℝ} (ha : 0 < a)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hr : r ∈ sec7_rWinWide S W) :
+    ContDiffAt ℝ 6
+      (fun t => sec7_phase_f2D P S a 0 t
+        - sec7_phase_ra_c₂ P S a j * S.T₂ * (t / S.R) ^ ((3 : ℝ) / 4)) r := by
+  have hr0 : 0 < r := sec7_phase_rWinWide_pos Env hW c₀ Cu hsd r hr
+  have hbase0 : ContDiffAt ℝ 6 (sec7_phase_ftil P S a) r :=
+    sec7_phase_ftil_contDiffAt (n := 6) (P := P) (S := S) (a := a) ha hr0
+  have hbase : ContDiffAt ℝ 6 (fun t => sec7_phase_f2D P S a 0 t) r := by
+    simpa [sec7_phase_f2D] using hbase0
+  have hpow := sec7_phase_rpow_div_contDiffAt6 (P := P) (S := S)
+    (r := r) (α := ((3 : ℝ) / 4)) hr0
+  have hmon : ContDiffAt ℝ 6
+      (fun t => sec7_phase_ra_c₂ P S a j * S.T₂ * (t / S.R) ^ ((3 : ℝ) / 4)) r := by
+    simpa [mul_assoc] using
+      ((contDiffAt_const :
+        ContDiffAt ℝ 6 (fun _ : ℝ => sec7_phase_ra_c₂ P S a j * S.T₂) r).mul hpow)
+  exact hbase.sub hmon
+
+private theorem sec7_phase_ra_e₃_base_contDiffAt6 {P : Globals} {S : Scale P} {W : ℝ}
+    {a j : ℤ} {r : ℝ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
+    (ha_lo : S.A / 5 ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 11 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hj : sec7_jBand P S j) (hr : r ∈ sec7_rWinWide S W) :
+    ContDiffAt ℝ 6
+      (fun t => sec7_phase_f3D P S a j 0 t
+        - 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
+            * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4)) r := by
+  have hr0 : 0 < r := sec7_phase_rWinWide_pos Env hW c₀ Cu hsd r hr
+  have hbase0 : ContDiffAt ℝ 6
+      (fun x => sec7_phase_dBreve P a (sec7_phase_ftil P S a x + (j : ℝ))) r :=
+    sec7_phase_f3_base_contDiffAt6 (P := P) (S := S) (W := W) (a := a) (j := j)
+      (r := r) ha hAD hG1 ha_lo ha_hi Env hW c₀ Cu hsd hj hr
+  have hbase : ContDiffAt ℝ 6 (fun t => sec7_phase_f3D P S a j 0 t) r := by
+    simpa [sec7_phase_f3D] using hbase0
+  have hpow := sec7_phase_rpow_div_contDiffAt6 (P := P) (S := S)
+    (r := r) (α := (-(1 : ℝ) / 4)) hr0
+  have hmon : ContDiffAt ℝ 6
+      (fun t => 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
+          * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4)) r := by
+    simpa [mul_assoc] using
+      ((contDiffAt_const :
+        ContDiffAt ℝ 6
+          (fun _ : ℝ => 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
+            * S.T₃) r).mul hpow)
+  exact hbase.sub hmon
+
 /-- Budget absorption for the `f₂` residual tower after the cancellation has produced an
 `(Ω/H)^2` pointwise scale. -/
 private theorem sec7_phase_ra_e₂D_budget_absorb {P : Globals} {S : Scale P} {W : ℝ}
@@ -2415,7 +2560,7 @@ private theorem sec7_ra_rho3_contDiffOn_DTarget {P : Globals} {S : Scale P} {W :
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
     (hj : sec7_jBand P S j) :
-    ContDiffOn ℝ 5 (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ))
+    ContDiffOn ℝ 6 (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ))
       (sec7_ra_rho3DTarget P S (a : ℝ)) := by
   intro d hdmem
   have haR : 0 < (a : ℝ) := by exact_mod_cast ha
@@ -2491,21 +2636,21 @@ private theorem sec7_ra_rho3_contDiffOn_DTarget {P : Globals} {S : Scale P} {W :
     dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := t)
       hAD ha_lo_w ha_hi_w (by simpa [t] using htWin)
   have hdb :=
-    sec7_dBreve_contDiffAt5_Ffun (X := P.X) (a := (a : ℝ))
+    sec7_dBreve_contDiffAt6_Ffun (X := P.X) (a := (a : ℝ))
       (d := dBreve P.X (a : ℝ) t) P.X_pos haR dBreve_pos
-  have hdb_at : ContDiffAt ℝ 5 (dBreve P.X (a : ℝ)) t := by
+  have hdb_at : ContDiffAt ℝ 6 (dBreve P.X (a : ℝ)) t := by
     simpa [himg] using hdb
-  have hFbase : ContDiffAt ℝ 5 (fun y : ℝ => Ffun P.X (a : ℝ) y) d :=
-    sec7_Ffun_contDiffAt (n := 5) (X := P.X) (a := (a : ℝ)) (d := d)
+  have hFbase : ContDiffAt ℝ 6 (fun y : ℝ => Ffun P.X (a : ℝ) y) d :=
+    sec7_Ffun_contDiffAt (n := 6) (X := P.X) (a := (a : ℝ)) (d := d)
       (ne_of_gt hdpos) (by positivity)
-  have harg : ContDiffAt ℝ 5 (fun y : ℝ => Ffun P.X (a : ℝ) y + (j : ℝ)) d :=
+  have harg : ContDiffAt ℝ 6 (fun y : ℝ => Ffun P.X (a : ℝ) y + (j : ℝ)) d :=
     hFbase.add contDiffAt_const
-  have hB : ContDiffAt ℝ 5
+  have hB : ContDiffAt ℝ 6
       (fun y : ℝ => dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) y + (j : ℝ))) d := by
     simpa [t] using hdb_at.comp d harg
-  have hrad : ContDiffAt ℝ 5 (fun y : ℝ => y * (y + (a : ℝ))) d :=
+  have hrad : ContDiffAt ℝ 6 (fun y : ℝ => y * (y + (a : ℝ))) d :=
     contDiffAt_id.mul (contDiffAt_id.add contDiffAt_const)
-  have hsqrt : ContDiffAt ℝ 5 (fun y : ℝ => Real.sqrt (y * (y + (a : ℝ)))) d := by
+  have hsqrt : ContDiffAt ℝ 6 (fun y : ℝ => Real.sqrt (y * (y + (a : ℝ)))) d := by
     refine ContDiffAt.sqrt hrad ?_
     positivity
   simpa [sec7_ra_rho3Fun] using (hB.sub hsqrt).contDiffWithinAt
@@ -2828,7 +2973,7 @@ private theorem sec7_ra_rho3_contDiffAt_dtilde {P : Globals} {S : Scale P} {W : 
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
     (hj : sec7_jBand P S j) (hr : r ∈ sec7_rWinWide S W) :
-    ContDiffAt ℝ 5 (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ))
+    ContDiffAt ℝ 6 (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ))
       (dtilde P.X r (a : ℝ)) := by
   have haR : 0 < (a : ℝ) := by exact_mod_cast ha
   have hrcore := sec7_phase_rWinWide_core Env hW c₀ Cu hsd hr
@@ -2865,21 +3010,21 @@ private theorem sec7_ra_rho3_contDiffAt_dtilde {P : Globals} {S : Scale P} {W : 
       hAD (sec7_phase_a_lo_wide ha_lo) (sec7_phase_a_hi_wide ha_hi)
       (by simpa [t] using hshift)
   have hdb :=
-    sec7_dBreve_contDiffAt5_Ffun (X := P.X) (a := (a : ℝ))
+    sec7_dBreve_contDiffAt6_Ffun (X := P.X) (a := (a : ℝ))
       (d := dBreve P.X (a : ℝ) t) P.X_pos haR dBreve_pos
-  have hdb_at : ContDiffAt ℝ 5 (dBreve P.X (a : ℝ)) t := by
+  have hdb_at : ContDiffAt ℝ 6 (dBreve P.X (a : ℝ)) t := by
     simpa [himg] using hdb
-  have hFbase : ContDiffAt ℝ 5 (fun y : ℝ => Ffun P.X (a : ℝ) y) d :=
-    sec7_Ffun_contDiffAt (n := 5) (X := P.X) (a := (a : ℝ)) (d := d)
+  have hFbase : ContDiffAt ℝ 6 (fun y : ℝ => Ffun P.X (a : ℝ) y) d :=
+    sec7_Ffun_contDiffAt (n := 6) (X := P.X) (a := (a : ℝ)) (d := d)
       (ne_of_gt hdpos) (by positivity)
-  have harg : ContDiffAt ℝ 5 (fun y : ℝ => Ffun P.X (a : ℝ) y + (j : ℝ)) d :=
+  have harg : ContDiffAt ℝ 6 (fun y : ℝ => Ffun P.X (a : ℝ) y + (j : ℝ)) d :=
     hFbase.add contDiffAt_const
-  have hB : ContDiffAt ℝ 5
+  have hB : ContDiffAt ℝ 6
       (fun y : ℝ => dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) y + (j : ℝ))) d := by
     simpa [t] using hdb_at.comp d harg
-  have hrad : ContDiffAt ℝ 5 (fun y : ℝ => y * (y + (a : ℝ))) d :=
+  have hrad : ContDiffAt ℝ 6 (fun y : ℝ => y * (y + (a : ℝ))) d :=
     contDiffAt_id.mul (contDiffAt_id.add contDiffAt_const)
-  have hsqrt : ContDiffAt ℝ 5 (fun y : ℝ => Real.sqrt (y * (y + (a : ℝ)))) d := by
+  have hsqrt : ContDiffAt ℝ 6 (fun y : ℝ => Real.sqrt (y * (y + (a : ℝ)))) d := by
     refine ContDiffAt.sqrt hrad ?_
     positivity
   simpa [sec7_ra_rho3Fun, d, hd_def] using (hB.sub hsqrt)
@@ -3161,26 +3306,26 @@ private noncomputable def sec7_ra_rhoFun (X a : ℝ) : ℝ → ℝ :=
   fun d => Ffun X a d
     - 2 * X * a / (d ^ ((3 : ℝ) / 2) * (d + a) ^ ((3 : ℝ) / 2))
 
-private theorem sec7_ra_rhoFun_contDiffOn_Ioi {X a : ℝ} (ha : 0 < a) :
-    ContDiffOn ℝ 5 (sec7_ra_rhoFun X a) (Set.Ioi 0) := by
-  have hF : ContDiffOn ℝ 5 (fun d => Ffun X a d) (Set.Ioi 0) := by
+private theorem sec7_ra_rhoFun_contDiffOn_Ioi {n : WithTop ℕ∞} {X a : ℝ} (ha : 0 < a) :
+    ContDiffOn ℝ n (sec7_ra_rhoFun X a) (Set.Ioi 0) := by
+  have hF : ContDiffOn ℝ n (fun d => Ffun X a d) (Set.Ioi 0) := by
     intro d hd
     have hd0 : 0 < d := hd
     exact (sec7_Ffun_contDiffAt (X := X) (a := a) (d := d)
       (ne_of_gt hd0) (ne_of_gt (by linarith))).contDiffWithinAt
-  have hid : ContDiffOn ℝ 5 (fun d : ℝ => d) (Set.Ioi 0) := contDiff_id.contDiffOn
-  have hp₁ : ContDiffOn ℝ 5 (fun d : ℝ => d ^ ((3 : ℝ) / 2)) (Set.Ioi 0) :=
+  have hid : ContDiffOn ℝ n (fun d : ℝ => d) (Set.Ioi 0) := contDiff_id.contDiffOn
+  have hp₁ : ContDiffOn ℝ n (fun d : ℝ => d ^ ((3 : ℝ) / 2)) (Set.Ioi 0) :=
     hid.rpow_const_of_ne (by intro d hd; exact ne_of_gt hd)
-  have hp₂ : ContDiffOn ℝ 5 (fun d : ℝ => (d + a) ^ ((3 : ℝ) / 2)) (Set.Ioi 0) :=
+  have hp₂ : ContDiffOn ℝ n (fun d : ℝ => (d + a) ^ ((3 : ℝ) / 2)) (Set.Ioi 0) :=
     (hid.add contDiffOn_const).rpow_const_of_ne
       (by
         intro d hd
         have hd0 : 0 < d := hd
         exact ne_of_gt (by linarith))
-  have hden : ContDiffOn ℝ 5
+  have hden : ContDiffOn ℝ n
       (fun d : ℝ => d ^ ((3 : ℝ) / 2) * (d + a) ^ ((3 : ℝ) / 2)) (Set.Ioi 0) :=
     hp₁.mul hp₂
-  have hterm : ContDiffOn ℝ 5
+  have hterm : ContDiffOn ℝ n
       (fun d : ℝ => 2 * X * a /
         (d ^ ((3 : ℝ) / 2) * (d + a) ^ ((3 : ℝ) / 2))) (Set.Ioi 0) := by
     exact contDiffOn_const.div hden (by
@@ -3250,7 +3395,7 @@ private theorem sec7_ra_pow_div_cancel_20 {D d : ℝ} {i : ℕ}
       rw [div_pow, inv_div]
       field_simp [ne_of_gt hD, pow_ne_zero _ (ne_of_gt hD)]
 
-private theorem sec7_ra_rho_rescale_const_bound {i : ℕ} (hi : i ≤ 5) :
+private theorem sec7_ra_rho_rescale_const_bound {i : ℕ} (hi : i ≤ 6) :
     sec7_ra_rhoScale i * 20 ^ (5 + i) ≤ (10 ^ 20 : ℝ) := by
   interval_cases i <;> norm_num [sec7_ra_rhoScale]
 
@@ -3259,7 +3404,7 @@ private theorem sec7_ra_rho_rescaled_FDeriv_bound {P : Globals} {S : Scale P} {W
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
-    (hr : r ∈ sec7_rWinWide S W) {i : ℕ} (hi : i ≤ 5) :
+    (hr : r ∈ sec7_rWinWide S W) {i : ℕ} (hi : i ≤ 6) :
     ‖iteratedFDerivWithin ℝ i
         (fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) (Set.Ioi 0)
         (dtilde P.X r (a : ℝ) / S.D)‖
@@ -3281,7 +3426,7 @@ private theorem sec7_ra_rho_rescaled_FDeriv_bound {P : Globals} {S : Scale P} {W
   have hmaps : Set.MapsTo (fun y : ℝ => S.D * y) (Set.Ioi 0) (Set.Ioi 0) := by
     intro y hy
     exact mul_pos hDpos hy
-  have hrho5 : ContDiffOn ℝ 5 (sec7_ra_rhoFun P.X (a : ℝ)) (Set.Ioi 0) :=
+  have hrho5 : ContDiffOn ℝ 6 (sec7_ra_rhoFun P.X (a : ℝ)) (Set.Ioi 0) :=
     sec7_ra_rhoFun_contDiffOn_Ioi (X := P.X) (a := (a : ℝ)) haR
   have hrhoi : ContDiffOn ℝ i (sec7_ra_rhoFun P.X (a : ℝ)) (Set.Ioi 0) :=
     hrho5.of_le (by exact_mod_cast hi)
@@ -3299,7 +3444,7 @@ private theorem sec7_ra_rho_rescaled_FDeriv_bound {P : Globals} {S : Scale P} {W
         ≤ sec7_ra_rhoScale i * P.X * (a : ℝ) ^ 3 * (S.D * u) ^ ((-5 : ℝ) - i) := by
     simpa [sec7_ra_rhoFun] using
       sec7_ra_rho_tower (X := P.X) (a := (a : ℝ)) (d := S.D * u)
-        (d_lo := S.D / 20) (hi.trans (by norm_num)) P.X_pos haR (by positivity)
+        (d_lo := S.D / 20) hi P.X_pos haR (by positivity)
         (by simpa [hSDu, d] using hd_lo)
         (by simpa [hSDu, d] using hd_ge_a)
   have hcancel :
@@ -3357,9 +3502,9 @@ private theorem sec7_raC_ftilde_contDiffOn_wide {P : Globals} {S : Scale P} {W :
   exact ((sec7_dtilde_r_contDiffAt (n := 5) (X := P.X) (a := (a : ℝ))
     P.X_pos haR hr0).div_const S.D).contDiffWithinAt
 
-private theorem sec7_ra_gtilde_contDiffOn_Ioi {P : Globals} {S : Scale P} {a : ℤ}
-    (ha : 0 < a) :
-    ContDiffOn ℝ 5 (fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) (Set.Ioi 0) := by
+private theorem sec7_ra_gtilde_contDiffOn_Ioi {n : WithTop ℕ∞} {P : Globals} {S : Scale P}
+    {a : ℤ} (ha : 0 < a) :
+    ContDiffOn ℝ n (fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) (Set.Ioi 0) := by
   have haR : 0 < (a : ℝ) := by exact_mod_cast ha
   exact (sec7_ra_rhoFun_contDiffOn_Ioi (X := P.X) (a := (a : ℝ)) haR).comp
     (by fun_prop)
@@ -3971,6 +4116,87 @@ private theorem sec7_ra_rho3_A_rescaled_bound_sharp {P : Globals} {S : Scale P} 
     _ ≤ (7 * 10 ^ 7 : ℝ) * (S.T₃ * sec7_relErrF P S) :=
           mul_le_mul_of_nonneg_left hAbridge (by positivity)
 
+private theorem sec7_ra_rho3_A_rescaled_bound_sharp6 {P : Globals} {S : Scale P} {W : ℝ}
+    {a : ℤ} {r : ℝ} {i : ℕ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
+    (hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
+    (hr : r ∈ sec7_rWinWide S W) (hi : i ≤ 6) :
+    S.D ^ i *
+        |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ))))
+          (dtilde P.X r (a : ℝ))|
+      ≤ (6 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S) := by
+  have haR : 0 < (a : ℝ) := by exact_mod_cast ha
+  have hApos : 0 < S.A := by
+    unfold Scale.A
+    exact mul_pos S.Δ_pos S.Ω_pos
+  have hDpos : 0 < S.D := S.D_pos
+  have hrcore := sec7_phase_rWinWide_core Env hW c₀ Cu hsd hr
+  obtain ⟨hft_lo, hft_hi⟩ :=
+    sec7_phase_ftil_scale (P := P) (S := S) (r := r) (a := a)
+      ha hAD (sec7_phase_a_lo_wide ha_lo) (sec7_phase_a_hi_wide ha_hi)
+      hrcore.1 hrcore.2
+  have htWin : sec7_phase_ftil P S a r ∈ sec7_tWin S := by
+    have hFpos : 0 < S.F := sec7_phase_F_pos S
+    simp only [sec7_tWin, Set.mem_Icc]
+    constructor
+    · rw [sec7_cWin]
+      nlinarith
+    · rw [sec7_cWin]
+      nlinarith
+  set d : ℝ := dtilde P.X r (a : ℝ) with hd_def
+  have hr0 : 0 < r := sec7_phase_rWinWide_pos Env hW c₀ Cu hsd r hr
+  have hdpos : 0 < d := by
+    simpa [d, hd_def] using dtilde_pos P.X_pos haR hr0
+  have hdb_eq : dBreve P.X (a : ℝ) (sec7_phase_ftil P S a r) = d := by
+    simpa [d, hd_def, sec7_phase_ftil] using dBreve_spec P.X_pos haR hdpos
+  obtain ⟨_himg, hdlo16_raw, _hdhi30_raw⟩ :=
+    dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ))
+      (t := sec7_phase_ftil P S a r) hAD (sec7_phase_a_lo_wide ha_lo)
+      (sec7_phase_a_hi_wide ha_hi) htWin
+  have hdlo16 : S.D / 16 ≤ d := by
+    simpa [hdb_eq] using hdlo16_raw
+  have hA3 :=
+    sec7_ra_A3_bound_public6 (a := (a : ℝ)) (d := d) (d_lo := S.D / 16)
+      (k := i) hi haR (by positivity) hdlo16
+  have hcancel := sec7_ra_rpow_neg_cancel_unit (D := S.D) (d := d) (i := i)
+    hDpos hdlo16
+  have hmain :
+      S.D ^ i *
+          |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ)))) d|
+        ≤ (6 * 10 ^ 9 : ℝ) * S.A := by
+    calc
+      S.D ^ i *
+          |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ)))) d|
+          ≤ S.D ^ i * ((10395 / 64 : ℝ) * (a : ℝ) * d ^ (-(i : ℝ))) := by
+            exact mul_le_mul_of_nonneg_left hA3 (by positivity)
+      _ = (10395 / 64 : ℝ) * (a : ℝ) * (S.D ^ i * d ^ (-(i : ℝ))) := by ring
+      _ ≤ (10395 / 64 : ℝ) * (a : ℝ) * 16 ^ i := by
+            exact mul_le_mul_of_nonneg_left hcancel (by positivity)
+      _ ≤ (10395 / 64 : ℝ) * (2 * S.A) * 16 ^ i := by
+            gcongr
+      _ ≤ (6 * 10 ^ 9 : ℝ) * S.A := by
+            have hconst : (10395 / 64 : ℝ) * (2 : ℝ) * 16 ^ i ≤ 6 * 10 ^ 9 := by
+              interval_cases i <;> norm_num
+            calc
+              (10395 / 64 : ℝ) * (2 * S.A) * 16 ^ i =
+                  ((10395 / 64 : ℝ) * (2 : ℝ) * 16 ^ i) * S.A := by ring
+              _ ≤ (6 * 10 ^ 9 : ℝ) * S.A :=
+                  mul_le_mul_of_nonneg_right hconst hApos.le
+  have hAbridge : S.A ≤ S.T₃ * sec7_relErrF P S :=
+    sec7_A_le_T₃_relErrF hsd hbud hg0 hu0
+  calc
+    S.D ^ i *
+        |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ))))
+          (dtilde P.X r (a : ℝ))|
+        = S.D ^ i *
+          |iteratedDeriv i (fun t : ℝ => t - Real.sqrt (t * (t + (a : ℝ)))) d| := by
+            rw [hd_def]
+    _ ≤ (6 * 10 ^ 9 : ℝ) * S.A := hmain
+    _ ≤ (6 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S) :=
+          mul_le_mul_of_nonneg_left hAbridge (by positivity)
+
 private theorem sec7_ra_B3_close_scale {P : Globals} {S : Scale P} {W : ℝ}
     {a d : ℝ} {j : ℤ} (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
@@ -4395,6 +4621,122 @@ private theorem sec7_ra_rho3_B_rescaled_prebound {P : Globals} {S : Scale P} {W 
       _ ≤ (7 * 10 ^ 11 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃ :=
             hfinish (by norm_num)
 
+private theorem sec7_ra_rho3_B_rescaled_prebound6 {P : Globals} {S : Scale P} {W : ℝ}
+    {a j : ℤ} {r : ℝ} {i : ℕ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
+    (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hj : sec7_jBand P S j) (hr : r ∈ sec7_rWinWide S W) (hi : i ≤ 6) :
+    S.D ^ i *
+        |iteratedDeriv i
+          (fun t : ℝ => dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) t + (j : ℝ)) - t)
+          (dtilde P.X r (a : ℝ))|
+      ≤ (25 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃ := by
+  have hFpos : 0 < S.F := sec7_phase_F_pos S
+  have hsn : 0 ≤ (|(j : ℝ)| / S.F) * S.T₃ :=
+    mul_nonneg (div_nonneg (abs_nonneg _) hFpos.le) (sec7_T₃_pos S).le
+  rcases Nat.lt_or_ge i 6 with hlt | hge
+  · have hi5 : i ≤ 5 := Nat.lt_succ_iff.mp hlt
+    have h5 := sec7_ra_rho3_B_rescaled_prebound (P := P) (S := S) (W := W)
+      (a := a) (j := j) (r := r) (i := i) ha hAD ha_lo ha_hi Env hW hsd hj hr hi5
+    refine le_trans h5 ?_
+    calc (7 * 10 ^ 11 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃
+        = (7 * 10 ^ 11 : ℝ) * ((|(j : ℝ)| / S.F) * S.T₃) := by ring
+      _ ≤ (25 * 10 ^ 15 : ℝ) * ((|(j : ℝ)| / S.F) * S.T₃) :=
+          mul_le_mul_of_nonneg_right (by norm_num) hsn
+      _ = (25 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃ := by ring
+  · have hi6 : i = 6 := le_antisymm hi hge
+    subst hi6
+    have haR : 0 < (a : ℝ) := by exact_mod_cast ha
+    have hDpos : 0 < S.D := S.D_pos
+    have hdenpos : 0 < P.X * (a : ℝ) := mul_pos P.X_pos haR
+    set d : ℝ := dtilde P.X r (a : ℝ) with hd_def
+    obtain ⟨hdlo20, hd_ge_a, hdhi40⟩ :=
+      sec7_ra_dtilde_wide_image (P := P) (S := S) (W := W) (a := a) (r := r)
+        ha hAD ha_lo ha_hi Env hW hsd hr
+    have hdpos : 0 < d :=
+      lt_of_lt_of_le (by positivity : 0 < S.D / 20) (by simpa [d, hd_def] using hdlo20)
+    have hrcore := sec7_phase_rWinWide_core Env hW c₀ Cu hsd hr
+    obtain ⟨hft_lo, hft_hi⟩ :=
+      sec7_phase_ftil_scale (P := P) (S := S) (r := r) (a := a)
+        ha hAD (sec7_phase_a_lo_wide ha_lo) (sec7_phase_a_hi_wide ha_hi)
+        hrcore.1 hrcore.2
+    have hFd : Ffun P.X (a : ℝ) d = sec7_phase_ftil P S a r := by
+      simp [d, sec7_phase_ftil]
+    have hpert0 :=
+      sec7_phase_shift_error_bound (P := P) (S := S) (W := W) (θ := 0) (j := j)
+        Env hW c₀ Cu hsd hj (by norm_num)
+    have hjF : |(j : ℝ)| ≤ S.F / 1000 := by nlinarith
+    have hshift : Ffun P.X (a : ℝ) d + (j : ℝ) ∈ sec7_tWin S := by
+      simp only [sec7_tWin, Set.mem_Icc]
+      constructor
+      · rw [sec7_cWin, hFd]
+        have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
+          have h := neg_abs_le (j : ℝ)
+          nlinarith
+        nlinarith
+      · rw [sec7_cWin, hFd]
+        have hjhi : (j : ℝ) ≤ S.F / 1000 := by
+          have h := le_abs_self (j : ℝ)
+          nlinarith
+        nlinarith
+    have hclose :
+        |dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) d + (j : ℝ)) - d| ≤ d / 100 := by
+      simpa [d, hd_def] using
+        sec7_ra_B3_dtilde_close (P := P) (S := S) (W := W) (a := a) (j := j)
+          (r := r) ha hAD ha_lo ha_hi Env hW c₀ Cu hsd hj hr
+    have hb :=
+      sec7_ra_B3_bound_sharp_aled (P := P) (S := S) (a := (a : ℝ)) (d := d)
+        (j := (j : ℝ)) (k := 6) (by norm_num) hAD (sec7_phase_a_lo_wide ha_lo)
+        (sec7_phase_a_hi_wide ha_hi) hdpos (by simpa [d, hd_def] using hd_ge_a)
+        hshift hclose
+    have hD4scale : S.D ^ 4 / (P.X * (a : ℝ)) ≤ S.T₃ / S.F :=
+      sec7_ra_D_fourth_div_Xa_le_T₃_div_F (P := P) (S := S) (a := (a : ℝ)) ha_lo
+    have hb6 :
+        |iteratedDeriv 6
+          (fun t : ℝ => dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) t + (j : ℝ)) - t)
+          d| ≤ 60985797208000 * |(j : ℝ)| / (d ^ 2 * (P.X * (a : ℝ))) := by
+      simpa using hb
+    have hDle : S.D ≤ 20 * d := by nlinarith [hdlo20]
+    have hD6le : S.D ^ 6 ≤ (400 * S.D ^ 4) * d ^ 2 := by
+      calc
+        S.D ^ 6 = S.D ^ 4 * S.D ^ 2 := by ring
+        _ ≤ S.D ^ 4 * (20 * d) ^ 2 := by
+              exact mul_le_mul_of_nonneg_left (by nlinarith [hDle, hDpos.le, hdpos.le])
+                (pow_nonneg hDpos.le 4)
+        _ = (400 * S.D ^ 4) * d ^ 2 := by ring
+    have hD6div : S.D ^ 6 / d ^ 2 ≤ 400 * S.D ^ 4 := by
+      rw [div_le_iff₀ (by positivity : (0 : ℝ) < d ^ 2)]
+      simpa [mul_comm, mul_left_comm, mul_assoc] using hD6le
+    calc
+      S.D ^ 6 *
+          |iteratedDeriv 6
+            (fun t : ℝ => dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) t + (j : ℝ)) - t)
+            (dtilde P.X r (a : ℝ))|
+          ≤ S.D ^ 6 * (60985797208000 * |(j : ℝ)| / (d ^ 2 * (P.X * (a : ℝ)))) := by
+            simpa [d, hd_def] using mul_le_mul_of_nonneg_left hb6 (by positivity)
+      _ = 60985797208000 * |(j : ℝ)| * (S.D ^ 6 / d ^ 2) / (P.X * (a : ℝ)) := by
+            field_simp [hdpos.ne', hdenpos.ne']
+      _ ≤ (60985797208000 * 400) * |(j : ℝ)| * S.D ^ 4 / (P.X * (a : ℝ)) := by
+            have hnum :
+                60985797208000 * |(j : ℝ)| * (S.D ^ 6 / d ^ 2) ≤
+                  (60985797208000 * 400) * |(j : ℝ)| * S.D ^ 4 := by
+              calc
+                60985797208000 * |(j : ℝ)| * (S.D ^ 6 / d ^ 2) ≤
+                    60985797208000 * |(j : ℝ)| * (400 * S.D ^ 4) := by gcongr
+                _ = (60985797208000 * 400) * |(j : ℝ)| * S.D ^ 4 := by ring
+            exact div_le_div_of_nonneg_right hnum hdenpos.le
+      _ = (60985797208000 * 400) * |(j : ℝ)| * (S.D ^ 4 / (P.X * (a : ℝ))) := by ring
+      _ ≤ (60985797208000 * 400) * |(j : ℝ)| * (S.T₃ / S.F) := by
+            exact mul_le_mul_of_nonneg_left hD4scale (by positivity)
+      _ = (60985797208000 * 400) * (|(j : ℝ)| / S.F) * S.T₃ := by ring
+      _ ≤ (25 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃ := by
+            calc (60985797208000 * 400 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃
+                = (60985797208000 * 400 : ℝ) * ((|(j : ℝ)| / S.F) * S.T₃) := by ring
+              _ ≤ (25 * 10 ^ 15 : ℝ) * ((|(j : ℝ)| / S.F) * S.T₃) :=
+                  mul_le_mul_of_nonneg_right (by norm_num) hsn
+              _ = (25 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃ := by ring
+
 private theorem sec7_ra_rho1_B_rescaled_prebound {P : Globals} {S : Scale P} {W : ℝ}
     {a j : ℤ} {r : ℝ} {i : ℕ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
@@ -4586,13 +4928,14 @@ private theorem sec7_ra_rho3_rescaled_FDeriv_prebound {P : Globals} {S : Scale P
   have hrho_on :
       ContDiffOn ℝ 5 (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ))
         (sec7_ra_rho3DTarget P S (a : ℝ)) :=
-    sec7_ra_rho3_contDiffOn_DTarget (P := P) (S := S) (W := W)
-      (a := a) (j := j) ha hAD ha_lo ha_hi Env hW c₀ Cu hsd hj
+    (sec7_ra_rho3_contDiffOn_DTarget (P := P) (S := S) (W := W)
+      (a := a) (j := j) ha hAD ha_lo ha_hi Env hW c₀ Cu hsd hj).of_le (by norm_num)
   have hrho_at :
       ContDiffAt ℝ 5 (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ)) (S.D * u) := by
     simpa [hSDu, d, hd_def] using
-      sec7_ra_rho3_contDiffAt_dtilde (P := P) (S := S) (W := W)
-        (a := a) (j := j) (r := r) ha hAD ha_lo ha_hi Env hW c₀ Cu hsd hj hr
+      (sec7_ra_rho3_contDiffAt_dtilde (P := P) (S := S) (W := W)
+        (a := a) (j := j) (r := r) ha hAD ha_lo ha_hi Env hW c₀ Cu hsd hj hr).of_le
+        (by norm_num)
   have hlin_cd : ContDiffAt ℝ 5 (fun y : ℝ => S.D * y) u :=
     contDiffAt_const.mul contDiffAt_id
   have hg_at : ContDiffAt ℝ 5
@@ -4717,6 +5060,166 @@ private theorem sec7_ra_rho3_rescaled_FDeriv_prebound {P : Globals} {S : Scale P
       S.D ^ i * |iteratedDeriv i (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ)) (S.D * u)|
         ≤ (7 * 10 ^ 7 : ℝ) * (S.T₃ * sec7_relErrF P S) +
           (7 * 10 ^ 11 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃ := by
+    simpa [hSDu] using hmain
+  rw [norm_iteratedFDerivWithin_eq_norm_iteratedDerivWithin, Real.norm_eq_abs]
+  rw [hwithin, hscale]
+  simpa [abs_mul,
+    abs_of_nonneg (pow_nonneg hDpos.le i)] using hmain'
+
+private theorem sec7_ra_rho3_rescaled_FDeriv_prebound6 {P : Globals} {S : Scale P} {W : ℝ}
+    {a j : ℤ} {r : ℝ} {i : ℕ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
+    (hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g)
+    (hj : sec7_jBand P S j) (hu0 : 0 < P.u)
+    (hr : r ∈ sec7_rWinWide S W) (hi : i ≤ 6) :
+    ‖iteratedFDerivWithin ℝ i
+        (fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u))
+        (sec7_ra_rho3Target P S (a : ℝ))
+        (dtilde P.X r (a : ℝ) / S.D)‖
+      ≤ (6 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S) +
+          (25 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃ := by
+  have haR : 0 < (a : ℝ) := by exact_mod_cast ha
+  have hDpos : 0 < S.D := S.D_pos
+  set d : ℝ := dtilde P.X r (a : ℝ) with hd_def
+  set u : ℝ := d / S.D with hu_def
+  have hSDu : S.D * u = d := by
+    rw [hu_def]
+    field_simp [ne_of_gt hDpos]
+  have humem : u ∈ sec7_ra_rho3Target P S (a : ℝ) := by
+    rw [hu_def]
+    exact sec7_ra_ftilde_mapsTo_rho3Target (P := P) (S := S) (W := W) (a := a)
+      ha hAD ha_lo ha_hi Env hW hsd hr
+  have hrho_at :
+      ContDiffAt ℝ 6 (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ)) (S.D * u) := by
+    simpa [hSDu, d, hd_def] using
+      sec7_ra_rho3_contDiffAt_dtilde (P := P) (S := S) (W := W)
+        (a := a) (j := j) (r := r) ha hAD ha_lo ha_hi Env hW c₀ Cu hsd hj hr
+  have hlin_cd : ContDiffAt ℝ 6 (fun y : ℝ => S.D * y) u :=
+    contDiffAt_const.mul contDiffAt_id
+  have hg_at : ContDiffAt ℝ 6
+      (fun y : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * y)) u :=
+    hrho_at.comp u hlin_cd
+  have hwithin :
+      iteratedDerivWithin i
+          (fun y : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * y))
+          (sec7_ra_rho3Target P S (a : ℝ)) u =
+        iteratedDeriv i
+          (fun y : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * y)) u :=
+    iteratedDerivWithin_eq_iteratedDeriv
+      (sec7_ra_rho3Target_uniqueDiffOn (P := P) (S := S) (a := (a : ℝ))
+        hAD (sec7_phase_a_lo_wide ha_lo) (sec7_phase_a_hi_wide ha_hi))
+      (hg_at.of_le (by exact_mod_cast hi)) humem
+  have hscale :
+      iteratedDeriv i
+          (fun y : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * y)) u =
+        S.D ^ i * iteratedDeriv i (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ)) (S.D * u) :=
+    sec7_iteratedDeriv_comp_const_mul_at6 (f := sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ))
+      (x := u) (c := S.D) hi hrho_at
+  have hrcore := sec7_phase_rWinWide_core Env hW c₀ Cu hsd hr
+  obtain ⟨hft_lo, hft_hi⟩ :=
+    sec7_phase_ftil_scale (P := P) (S := S) (r := r) (a := a)
+      ha hAD (sec7_phase_a_lo_wide ha_lo) (sec7_phase_a_hi_wide ha_hi)
+      hrcore.1 hrcore.2
+  have hr0 : 0 < r := sec7_phase_rWinWide_pos Env hW c₀ Cu hsd r hr
+  have hdpos : 0 < d := by
+    simpa [d, hd_def] using dtilde_pos P.X_pos haR hr0
+  have hFd : Ffun P.X (a : ℝ) d = sec7_phase_ftil P S a r := by
+    simp [d, sec7_phase_ftil]
+  have hpert :=
+    sec7_phase_shift_error_bound (P := P) (S := S) (W := W) (θ := 0) (j := j)
+      Env hW c₀ Cu hsd hj (by norm_num)
+  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by nlinarith
+  have hshift : Ffun P.X (a : ℝ) d + (j : ℝ) ∈ sec7_tWin S := by
+    simp only [sec7_tWin, Set.mem_Icc]
+    constructor
+    · rw [sec7_cWin, hFd]
+      have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
+        have h := neg_abs_le (j : ℝ)
+        nlinarith
+      nlinarith
+    · rw [sec7_cWin, hFd]
+      have hjhi : (j : ℝ) ≤ S.F / 1000 := by
+        have h := le_abs_self (j : ℝ)
+        nlinarith
+      nlinarith
+  set Bfun : ℝ → ℝ :=
+    fun t => dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) t + (j : ℝ)) - t
+  set Afun : ℝ → ℝ := fun t => t - Real.sqrt (t * (t + (a : ℝ)))
+  have hBcd : ContDiffAt ℝ i Bfun d := by
+    set t₀ : ℝ := Ffun P.X (a : ℝ) d + (j : ℝ)
+    obtain ⟨himg, _hlo, _hhi⟩ :=
+      dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := t₀)
+        hAD (sec7_phase_a_lo_wide ha_lo) (sec7_phase_a_hi_wide ha_hi)
+        (by simpa [t₀] using hshift)
+    have hdb :=
+      sec7_dBreve_contDiffAt6_Ffun (X := P.X) (a := (a : ℝ))
+        (d := dBreve P.X (a : ℝ) t₀) P.X_pos haR dBreve_pos
+    have hdb_at : ContDiffAt ℝ 6 (dBreve P.X (a : ℝ)) t₀ := by
+      simpa [himg] using hdb
+    have hFbase : ContDiffAt ℝ 6 (fun y : ℝ => Ffun P.X (a : ℝ) y) d :=
+      sec7_Ffun_contDiffAt (n := 6) (X := P.X) (a := (a : ℝ)) (d := d)
+        (ne_of_gt hdpos) (by positivity)
+    have harg : ContDiffAt ℝ 6
+        (fun y : ℝ => Ffun P.X (a : ℝ) y + (j : ℝ)) d :=
+      hFbase.add contDiffAt_const
+    have hB : ContDiffAt ℝ 6
+        (fun y : ℝ => dBreve P.X (a : ℝ)
+          (Ffun P.X (a : ℝ) y + (j : ℝ)) - y) d := by
+      exact (hdb_at.comp d harg).sub contDiffAt_id
+    simpa [Bfun] using hB.of_le (by exact_mod_cast hi)
+  have hAcd : ContDiffAt ℝ i Afun d := by
+    have hrad : ContDiffAt ℝ 6 (fun y : ℝ => y * (y + (a : ℝ))) d :=
+      contDiffAt_id.mul (contDiffAt_id.add contDiffAt_const)
+    have hsqrt : ContDiffAt ℝ 6 (fun y : ℝ => Real.sqrt (y * (y + (a : ℝ)))) d := by
+      refine ContDiffAt.sqrt hrad ?_
+      positivity
+    have hA : ContDiffAt ℝ 6 (fun y : ℝ => y - Real.sqrt (y * (y + (a : ℝ)))) d :=
+      contDiffAt_id.sub hsqrt
+    simpa [Afun] using hA.of_le (by exact_mod_cast hi)
+  have hsplit :
+      iteratedDeriv i (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ)) d =
+        iteratedDeriv i Bfun d + iteratedDeriv i Afun d := by
+    have hfun :
+        sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) =
+          fun t : ℝ => Bfun t + Afun t := by
+      funext t
+      simp [sec7_ra_rho3Fun, Bfun, Afun]
+    rw [hfun]
+    exact iteratedDeriv_fun_add (x := d) hBcd hAcd
+  have hA_bound :=
+    sec7_ra_rho3_A_rescaled_bound_sharp6 (P := P) (S := S) (W := W)
+      (a := a) (r := r) (i := i) ha hAD hG1 ha_lo ha_hi Env hW hsd hbud hg0 hu0 hr hi
+  have hB_bound :=
+    sec7_ra_rho3_B_rescaled_prebound6 (P := P) (S := S) (W := W)
+      (a := a) (j := j) (r := r) (i := i) ha hAD ha_lo ha_hi Env hW hsd hj hr hi
+  have hmain :
+      S.D ^ i * |iteratedDeriv i (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ)) d|
+        ≤ (6 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S) +
+          (25 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃ := by
+    have htri :
+        |iteratedDeriv i (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ)) d|
+          ≤ |iteratedDeriv i Bfun d| + |iteratedDeriv i Afun d| := by
+      rw [hsplit]
+      exact abs_add_le _ _
+    calc
+      S.D ^ i * |iteratedDeriv i (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ)) d|
+          ≤ S.D ^ i * (|iteratedDeriv i Bfun d| + |iteratedDeriv i Afun d|) := by
+            exact mul_le_mul_of_nonneg_left htri (pow_nonneg hDpos.le i)
+      _ = S.D ^ i * |iteratedDeriv i Bfun d| +
+          S.D ^ i * |iteratedDeriv i Afun d| := by ring
+      _ ≤ (25 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃ +
+          (6 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S) := by
+            exact add_le_add
+              (by simpa [Bfun, d, hd_def] using hB_bound)
+              (by simpa [Afun, d, hd_def] using hA_bound)
+      _ = (6 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S) +
+          (25 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃ := by ring
+  have hmain' :
+      S.D ^ i * |iteratedDeriv i (sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ)) (S.D * u)|
+        ≤ (6 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S) +
+          (25 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃ := by
     simpa [hSDu] using hmain
   rw [norm_iteratedFDerivWithin_eq_norm_iteratedDerivWithin, Real.norm_eq_abs]
   rw [hwithin, hscale]
@@ -5019,6 +5522,68 @@ private theorem sec7_ra_rho3_rescaled_FDeriv_bound {P : Globals} {S : Scale P} {
           exact add_le_add le_rfl hB
     _ = (8 * 10 ^ 7 : ℝ) * (S.T₃ * sec7_relErrF P S) := by ring
 
+private theorem sec7_ra_rho3_B_budget_absorb6 {P : Globals} {S : Scale P}
+    {c₀ Cu : ℝ} {j : ℤ}
+    (hsd : OnStripAux.StripData P S c₀ Cu) (hbud : OnStripAux.Budget P.g P.u Cu)
+    (hj : sec7_jBand P S j) (hG1 : 1 ≤ P.G)
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
+    (25 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃
+      ≤ (3 * 10 ^ 7 : ℝ) * (S.T₃ * sec7_relErrF P S) := by
+  have hJ :=
+    sec7_ra_j_over_F_le_relErrF_tiny (P := P) (S := S) (c₀ := c₀) (Cu := Cu)
+      (j := j) hsd hbud hj hG1 hUbig
+  have hT0 : 0 ≤ S.T₃ := (sec7_T₃_pos S).le
+  have hcoef0 : 0 ≤ (25 * 10 ^ 15 : ℝ) := by norm_num
+  have hbase0 : 0 ≤ S.T₃ * sec7_relErrF P S :=
+    mul_nonneg hT0 (sec7_relErrF_pos P S).le
+  calc
+    (25 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃
+        = (25 * 10 ^ 15 : ℝ) * ((|(j : ℝ)| / S.F) * S.T₃) := by ring
+    _ ≤ (25 * 10 ^ 15 : ℝ) * (((1 / (10 : ℝ) ^ 9) * sec7_relErrF P S) * S.T₃) := by
+          exact mul_le_mul_of_nonneg_left
+            (mul_le_mul_of_nonneg_right hJ hT0) hcoef0
+    _ = (25 * 10 ^ 15 : ℝ) * ((1 / (10 : ℝ) ^ 9) * sec7_relErrF P S) * S.T₃ := by ring
+    _ = (25 * 10 ^ 6 : ℝ) * (S.T₃ * sec7_relErrF P S) := by ring
+    _ ≤ (3 * 10 ^ 7 : ℝ) * (S.T₃ * sec7_relErrF P S) := by
+          exact mul_le_mul_of_nonneg_right (by norm_num) hbase0
+
+private theorem sec7_ra_rho3_rescaled_FDeriv_bound6 {P : Globals} {S : Scale P} {W : ℝ}
+    {a j : ℤ} {r : ℝ} {i : ℕ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
+    (hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g)
+    (hj : sec7_jBand P S j) (hu0 : 0 < P.u)
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U)
+    (hr : r ∈ sec7_rWinWide S W) (hi : i ≤ 6) :
+    ‖iteratedFDerivWithin ℝ i
+        (fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u))
+        (sec7_ra_rho3Target P S (a : ℝ))
+        (dtilde P.X r (a : ℝ) / S.D)‖
+      ≤ (7 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S) := by
+  have hbase0 : 0 ≤ S.T₃ * sec7_relErrF P S :=
+    mul_nonneg (sec7_T₃_pos S).le (sec7_relErrF_pos P S).le
+  have hpre :=
+    sec7_ra_rho3_rescaled_FDeriv_prebound6 (P := P) (S := S) (W := W)
+      (a := a) (j := j) (r := r) (i := i) ha hAD hG1 ha_lo ha_hi
+      Env hW c₀ Cu hsd hbud hg0 hj hu0 hr hi
+  have hB :=
+    sec7_ra_rho3_B_budget_absorb6 (P := P) (S := S) (c₀ := c₀) (Cu := Cu)
+      (j := j) hsd hbud hj hG1 hUbig
+  calc
+    ‖iteratedFDerivWithin ℝ i
+        (fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u))
+        (sec7_ra_rho3Target P S (a : ℝ))
+        (dtilde P.X r (a : ℝ) / S.D)‖
+        ≤ (6 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S) +
+            (25 * 10 ^ 15 : ℝ) * (|(j : ℝ)| / S.F) * S.T₃ := hpre
+    _ ≤ (6 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S) +
+          (3 * 10 ^ 7 : ℝ) * (S.T₃ * sec7_relErrF P S) := by
+          exact add_le_add le_rfl hB
+    _ = ((6 * 10 ^ 9 : ℝ) + 3 * 10 ^ 7) * (S.T₃ * sec7_relErrF P S) := by ring
+    _ ≤ (7 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S) := by
+          exact mul_le_mul_of_nonneg_right (by norm_num) hbase0
+
 private theorem sec7_ra_residual_scale_le {P : Globals} {S : Scale P} {a : ℝ}
     (ha0 : 0 < a) (ha_hi : a ≤ 2 * S.A) :
     P.X * a ^ 3 / S.D ^ 5 ≤ 8 * (S.T₂ * (S.Ω / P.H) ^ 2) := by
@@ -5037,6 +5602,46 @@ private theorem sec7_ra_residual_scale_le {P : Globals} {S : Scale P} {a : ℝ}
 
 private theorem sec7_ra_e₂D_comp_scale_absorb {P : Globals} {S : Scale P} {a : ℝ} {m : ℕ}
     (hm : m ≤ 5) (ha0 : 0 < a) (ha_hi : a ≤ 2 * S.A) :
+    (m.factorial : ℝ) * ((10 ^ 20 : ℝ) * (P.X * a ^ 3 / S.D ^ 5)) *
+        (((10 ^ 3 : ℝ) / S.R) ^ m)
+      ≤ (10 ^ 80 : ℝ) * (S.T₂ / S.R ^ m) * (S.Ω / P.H) ^ 2 := by
+  have hRpos : 0 < S.R := sec7_R_pos S
+  have hscale := sec7_ra_residual_scale_le (P := P) (S := S) (a := a) ha0 ha_hi
+  have hscale_nonneg : 0 ≤ S.T₂ * (S.Ω / P.H) ^ 2 :=
+    mul_nonneg (sec7_T₂_pos S).le (sq_nonneg _)
+  calc
+    (m.factorial : ℝ) * ((10 ^ 20 : ℝ) * (P.X * a ^ 3 / S.D ^ 5)) *
+        (((10 ^ 3 : ℝ) / S.R) ^ m)
+        ≤ (m.factorial : ℝ) * ((10 ^ 20 : ℝ) *
+            (8 * (S.T₂ * (S.Ω / P.H) ^ 2))) *
+              (((10 ^ 3 : ℝ) / S.R) ^ m) := by
+          gcongr
+    _ = ((m.factorial : ℝ) * 8 * (10 ^ 20 : ℝ) * (10 ^ 3 : ℝ) ^ m) *
+          (S.T₂ / S.R ^ m) * (S.Ω / P.H) ^ 2 := by
+          rw [div_pow]
+          field_simp [ne_of_gt hRpos]
+          rw [div_pow]
+          field_simp [ne_of_gt hRpos]
+    _ ≤ (10 ^ 80 : ℝ) * (S.T₂ / S.R ^ m) * (S.Ω / P.H) ^ 2 := by
+          have hconst :
+              (m.factorial : ℝ) * 8 * (10 ^ 20 : ℝ) * (10 ^ 3 : ℝ) ^ m
+                ≤ (10 ^ 80 : ℝ) := by
+            interval_cases m <;> norm_num
+          have hB : 0 ≤ (S.T₂ / S.R ^ m) * (S.Ω / P.H) ^ 2 :=
+            mul_nonneg
+              (div_nonneg (sec7_T₂_pos S).le (pow_nonneg hRpos.le m))
+              (sq_nonneg _)
+          calc
+            ((m.factorial : ℝ) * 8 * (10 ^ 20 : ℝ) * (10 ^ 3 : ℝ) ^ m) *
+                (S.T₂ / S.R ^ m) * (S.Ω / P.H) ^ 2
+                = ((m.factorial : ℝ) * 8 * (10 ^ 20 : ℝ) * (10 ^ 3 : ℝ) ^ m) *
+                    ((S.T₂ / S.R ^ m) * (S.Ω / P.H) ^ 2) := by ring
+            _ ≤ (10 ^ 80 : ℝ) * ((S.T₂ / S.R ^ m) * (S.Ω / P.H) ^ 2) :=
+                mul_le_mul_of_nonneg_right hconst hB
+            _ = (10 ^ 80 : ℝ) * (S.T₂ / S.R ^ m) * (S.Ω / P.H) ^ 2 := by ring
+
+private theorem sec7_ra_e₂D_comp_scale_absorb6 {P : Globals} {S : Scale P} {a : ℝ} {m : ℕ}
+    (hm : m ≤ 6) (ha0 : 0 < a) (ha_hi : a ≤ 2 * S.A) :
     (m.factorial : ℝ) * ((10 ^ 20 : ℝ) * (P.X * a ^ 3 / S.D ^ 5)) *
         (((10 ^ 3 : ℝ) / S.R) ^ m)
       ≤ (10 ^ 80 : ℝ) * (S.T₂ / S.R ^ m) * (S.Ω / P.H) ^ 2 := by
@@ -5125,6 +5730,31 @@ private theorem sec7_ra_e₃D_comp_scale_absorb {P : Globals} {S : Scale P} {m :
           exact mul_le_mul_of_nonneg_right hconst hbase
     _ = sec7_cExpIn * (S.T₃ / S.R ^ m) * sec7_relErrF P S := by ring
 
+private theorem sec7_ra_e₃D_comp_scale_absorb6 {P : Globals} {S : Scale P} {m : ℕ}
+    (hm : m ≤ 6) :
+    (m.factorial : ℝ) * ((7 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S)) *
+        (((10 ^ 3 : ℝ) / S.R) ^ m)
+      ≤ sec7_cExpIn6 * (S.T₃ / S.R ^ m) * sec7_relErrF P S := by
+  have hRpos : 0 < S.R := sec7_R_pos S
+  have hbase : 0 ≤ (S.T₃ / S.R ^ m) * sec7_relErrF P S := by
+    exact mul_nonneg
+      (div_nonneg (sec7_T₃_pos S).le (pow_nonneg hRpos.le m))
+      (sec7_relErrF_pos P S).le
+  calc
+    (m.factorial : ℝ) * ((7 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S)) *
+        (((10 ^ 3 : ℝ) / S.R) ^ m)
+        = ((m.factorial : ℝ) * (7 * 10 ^ 9 : ℝ) * (10 ^ 3 : ℝ) ^ m) *
+            ((S.T₃ / S.R ^ m) * sec7_relErrF P S) := by
+          rw [div_pow]
+          field_simp [ne_of_gt hRpos]
+    _ ≤ sec7_cExpIn6 * ((S.T₃ / S.R ^ m) * sec7_relErrF P S) := by
+          have hconst :
+              (m.factorial : ℝ) * (7 * 10 ^ 9 : ℝ) * (10 ^ 3 : ℝ) ^ m
+                ≤ sec7_cExpIn6 := by
+            interval_cases m <;> norm_num [sec7_cExpIn6]
+          exact mul_le_mul_of_nonneg_right hconst hbase
+    _ = sec7_cExpIn6 * (S.T₃ / S.R ^ m) * sec7_relErrF P S := by ring
+
 /-- **STUB (N24-PHASE/ra-expansion, f₂ core).** The §3 next-order residual tower for `f₂`:
 `|ra_e₂D^{(m)}| ≤ sec7_cExpIn·(T₂/Rᵐ)·sec7_relErr` on the wide window, `m ≤ 5`.
 Native progress below the stub has established the pointwise bridge
@@ -5171,7 +5801,7 @@ theorem sec7_ra_e₂D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
         ≤ (10 ^ 20 : ℝ) * (P.X * (a : ℝ) ^ 3 / S.D ^ 5) := by
     intro i hi
     exact sec7_ra_rho_rescaled_FDeriv_bound (P := P) (S := S) (W := W)
-      (a := a) (r := r) ha hAD ha_lo ha_hi Env hW hsd hr (le_trans hi hm)
+      (a := a) (r := r) ha hAD ha_lo ha_hi Env hW hsd hr ((le_trans hi hm).trans (by norm_num))
   have hD : ∀ i : ℕ, 1 ≤ i → i ≤ m →
       ‖iteratedFDerivWithin ℝ i (fun s => dtilde P.X s (a : ℝ) / S.D)
           (sec7_rWinWide S W) r‖ ≤ (((10 ^ 3 : ℝ) / S.R) ^ i) := by
@@ -5243,6 +5873,129 @@ theorem sec7_ra_e₂D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
     (sec7_phase_ra_e₂D_budget_absorb (P := P) (S := S) (W := W)
       Env hW hsd hbud hg0 hu0 hX24 m))
 
+theorem sec7_ra_e₂D_core6 (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
+    (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (_hG1 : 1 ≤ P.G)
+    (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
+    (hX24 : (16777216 : ℝ) ≤ P.X ^ (1 / 100 : ℝ)) :
+    ∀ j, sec7_jBand P S j → ∀ m ≤ 6, ∀ r ∈ sec7_rWinWide S W,
+      |sec7_phase_ra_e₂D P S a j m r| ≤
+        sec7_cExpIn6 * (S.T₂ / S.R ^ m) * sec7_relErr P S := by
+  intro j _hj m hm r hr
+  have haR : 0 < (a : ℝ) := by exact_mod_cast ha
+  have hwideOpen : IsOpen (sec7_rWinWide S W) := by
+    simpa [sec7_rWinWide] using (isOpen_Ioo : IsOpen (Set.Ioo
+      (S.R / 144 - 6 * (W + W ^ 2 + W ^ 4))
+      (40 * S.R + 6 * (W + W ^ 2 + W ^ 4))))
+  have htOpen : IsOpen (Set.Ioi (0 : ℝ)) := isOpen_Ioi
+  have hftilde_cd :
+      ContDiffOn ℝ 6 (fun s => dtilde P.X s (a : ℝ) / S.D) (sec7_rWinWide S W) :=
+    sec7_ra_ftilde_contDiffOn_wide (P := P) (S := S) (W := W) (a := a)
+      ha Env hW hsd
+  have hgtilde_cd :
+      ContDiffOn ℝ 6 (fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) (Set.Ioi 0) :=
+    sec7_ra_gtilde_contDiffOn_Ioi (n := 6) (P := P) (S := S) (a := a) ha
+  have hmaps : Set.MapsTo (fun s => dtilde P.X s (a : ℝ) / S.D)
+      (sec7_rWinWide S W) (Set.Ioi 0) := by
+    intro x hx
+    have hDpos : 0 < S.D := S.D_pos
+    obtain ⟨hd_lo, _hd_ge, _hd_hi⟩ :=
+      sec7_ra_dtilde_wide_image (P := P) (S := S) (W := W) (a := a) (r := x)
+        ha hAD ha_lo ha_hi Env hW hsd hx
+    exact div_pos (lt_of_lt_of_le (by positivity : 0 < S.D / 20) hd_lo) hDpos
+  have hC : ∀ i, i ≤ m →
+      ‖iteratedFDerivWithin ℝ i
+          (fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) (Set.Ioi 0)
+          ((fun s => dtilde P.X s (a : ℝ) / S.D) r)‖
+        ≤ (10 ^ 20 : ℝ) * (P.X * (a : ℝ) ^ 3 / S.D ^ 5) := by
+    intro i hi
+    exact sec7_ra_rho_rescaled_FDeriv_bound (P := P) (S := S) (W := W)
+      (a := a) (r := r) ha hAD ha_lo ha_hi Env hW hsd hr (le_trans hi hm)
+  have hD : ∀ i : ℕ, 1 ≤ i → i ≤ m →
+      ‖iteratedFDerivWithin ℝ i (fun s => dtilde P.X s (a : ℝ) / S.D)
+          (sec7_rWinWide S W) r‖ ≤ (((10 ^ 3 : ℝ) / S.R) ^ i) := by
+    intro i hi₁ hi
+    exact sec7_ra_ftilde_FDeriv_bound (P := P) (S := S) (W := W)
+      (a := a) (r := r) ha hAD ha_lo ha_hi Env hW hsd hr hi₁ (le_trans hi hm)
+  have hcomp :
+      ‖iteratedFDerivWithin ℝ m
+          ((fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) ∘
+            (fun s => dtilde P.X s (a : ℝ) / S.D))
+          (sec7_rWinWide S W) r‖
+        ≤ (m.factorial : ℝ) * ((10 ^ 20 : ℝ) * (P.X * (a : ℝ) ^ 3 / S.D ^ 5)) *
+            (((10 ^ 3 : ℝ) / S.R) ^ m) :=
+    norm_iteratedFDerivWithin_comp_le hgtilde_cd hftilde_cd
+      (by exact_mod_cast hm) htOpen.uniqueDiffOn hwideOpen.uniqueDiffOn hmaps hr hC hD
+  have hcomp_deriv :
+      |iteratedDeriv m
+          (((fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) ∘
+            (fun s => dtilde P.X s (a : ℝ) / S.D))) r|
+        ≤ (m.factorial : ℝ) * ((10 ^ 20 : ℝ) * (P.X * (a : ℝ) ^ 3 / S.D ^ 5)) *
+            (((10 ^ 3 : ℝ) / S.R) ^ m) := by
+    have hwithin :
+        iteratedFDerivWithin ℝ m
+          (((fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) ∘
+            (fun s => dtilde P.X s (a : ℝ) / S.D)))
+          (sec7_rWinWide S W) r =
+        iteratedFDeriv ℝ m
+          (((fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) ∘
+            (fun s => dtilde P.X s (a : ℝ) / S.D))) r :=
+      (iteratedFDerivWithin_of_isOpen (𝕜 := ℝ) (n := m)
+        (f := ((fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) ∘
+          (fun s => dtilde P.X s (a : ℝ) / S.D))) hwideOpen) hr
+    rw [hwithin, norm_iteratedFDeriv_eq_norm_iteratedDeriv] at hcomp
+    simpa [Real.norm_eq_abs] using hcomp
+  have hres_eq : (fun t =>
+      sec7_phase_f2D P S a 0 t
+        - sec7_phase_ra_c₂ P S a j * S.T₂ * (t / S.R) ^ ((3 : ℝ) / 4))
+        =ᶠ[𝓝 r]
+      (((fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) ∘
+        (fun s => dtilde P.X s (a : ℝ) / S.D))) := by
+    filter_upwards [hwideOpen.mem_nhds hr] with t ht
+    have ht0 : 0 < t := sec7_phase_rWinWide_pos Env hW c₀ Cu hsd t ht
+    have hbridge := sec7_ra_e₂D_residual_bridge_point (P := P) (S := S)
+      (a := a) (j := j) (r := t) ha ht0
+    have hDpos : 0 < S.D := S.D_pos
+    simpa [Function.comp_def, sec7_ra_rhoFun, mul_div_cancel₀, hDpos.ne'] using hbridge
+  have hres_deriv :
+      iteratedDeriv m
+        (fun t =>
+          sec7_phase_f2D P S a 0 t
+            - sec7_phase_ra_c₂ P S a j * S.T₂ * (t / S.R) ^ ((3 : ℝ) / 4)) r
+      =
+      iteratedDeriv m
+        (((fun u : ℝ => sec7_ra_rhoFun P.X (a : ℝ) (S.D * u)) ∘
+          (fun s => dtilde P.X s (a : ℝ) / S.D))) r :=
+    Filter.EventuallyEq.iteratedDeriv_eq m hres_eq
+  have hnative :
+      |sec7_phase_ra_e₂D P S a j m r|
+        ≤ (m.factorial : ℝ) * ((10 ^ 20 : ℝ) * (P.X * (a : ℝ) ^ 3 / S.D ^ 5)) *
+            (((10 ^ 3 : ℝ) / S.R) ^ m) := by
+    simpa [sec7_phase_ra_e₂D, hres_deriv] using hcomp_deriv
+  have hscale :
+      (m.factorial : ℝ) * ((10 ^ 20 : ℝ) * (P.X * (a : ℝ) ^ 3 / S.D ^ 5)) *
+          (((10 ^ 3 : ℝ) / S.R) ^ m)
+        ≤ (10 ^ 80 : ℝ) * (S.T₂ / S.R ^ m) * (S.Ω / P.H) ^ 2 :=
+    sec7_ra_e₂D_comp_scale_absorb6 (P := P) (S := S) (a := (a : ℝ)) (m := m)
+      hm haR ha_hi
+  have hwiden : sec7_cExpIn * (S.T₂ / S.R ^ m) * sec7_relErr P S ≤
+      sec7_cExpIn6 * (S.T₂ / S.R ^ m) * sec7_relErr P S := by
+    have hpos : 0 ≤ (S.T₂ / S.R ^ m) * sec7_relErr P S :=
+      mul_nonneg (div_nonneg (sec7_T₂_pos S).le (pow_nonneg (sec7_R_pos S).le m))
+        (sec7_relErr_pos P S).le
+    have hcE : sec7_cExpIn ≤ sec7_cExpIn6 := by
+      norm_num [sec7_cExpIn, sec7_cExpIn6]
+    calc sec7_cExpIn * (S.T₂ / S.R ^ m) * sec7_relErr P S
+        = sec7_cExpIn * ((S.T₂ / S.R ^ m) * sec7_relErr P S) := by ring
+      _ ≤ sec7_cExpIn6 * ((S.T₂ / S.R ^ m) * sec7_relErr P S) :=
+          mul_le_mul_of_nonneg_right hcE hpos
+      _ = sec7_cExpIn6 * (S.T₂ / S.R ^ m) * sec7_relErr P S := by ring
+  exact le_trans hnative (le_trans hscale (le_trans
+    (sec7_phase_ra_e₂D_budget_absorb (P := P) (S := S) (W := W)
+      Env hW hsd hbud hg0 hu0 hX24 m) hwiden))
+
 theorem sec7_ra_e₃D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
     (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
@@ -5267,8 +6020,8 @@ theorem sec7_ra_e₃D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
       ContDiffOn ℝ 5
         (fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u))
         (sec7_ra_rho3Target P S (a : ℝ)) :=
-    sec7_ra_gtilde3_contDiffOn_target (P := P) (S := S) (W := W)
-      (a := a) (j := j) ha hAD ha_lo ha_hi Env hW c₀ Cu hsd hj
+    (sec7_ra_gtilde3_contDiffOn_target (P := P) (S := S) (W := W)
+      (a := a) (j := j) ha hAD ha_lo ha_hi Env hW c₀ Cu hsd hj).of_le (by norm_num)
   have hmaps : Set.MapsTo (fun s => dtilde P.X s (a : ℝ) / S.D)
       (sec7_rWinWide S W) (sec7_ra_rho3Target P S (a : ℝ)) :=
     sec7_ra_ftilde_mapsTo_rho3Target (P := P) (S := S) (W := W)
@@ -5350,6 +6103,114 @@ theorem sec7_ra_e₃D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
             (((10 ^ 3 : ℝ) / S.R) ^ m) := by
     simpa [sec7_phase_ra_e₃D, hres_deriv] using hcomp_deriv
   exact le_trans hnative (sec7_ra_e₃D_comp_scale_absorb (P := P) (S := S) (m := m) hm)
+
+theorem sec7_ra_e₃D_core6 (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
+    (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
+    (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+    (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
+    (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g)
+    (hu0 : 0 < P.u)
+    (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
+    ∀ j, sec7_jBand P S j → ∀ m ≤ 6, ∀ r ∈ sec7_rWinWide S W,
+      |sec7_phase_ra_e₃D P S a j m r| ≤
+        sec7_cExpIn6 * (S.T₃ / S.R ^ m) * sec7_relErrF P S := by
+  intro j hj m hm r hr
+  have hwideOpen : IsOpen (sec7_rWinWide S W) := by
+    simpa [sec7_rWinWide] using (isOpen_Ioo : IsOpen (Set.Ioo
+      (S.R / 144 - 6 * (W + W ^ 2 + W ^ 4))
+      (40 * S.R + 6 * (W + W ^ 2 + W ^ 4))))
+  have hftilde_cd :
+      ContDiffOn ℝ 6 (fun s => dtilde P.X s (a : ℝ) / S.D) (sec7_rWinWide S W) :=
+    sec7_ra_ftilde_contDiffOn_wide (P := P) (S := S) (W := W) (a := a)
+      ha Env hW hsd
+  have hgtilde_cd :
+      ContDiffOn ℝ 6
+        (fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u))
+        (sec7_ra_rho3Target P S (a : ℝ)) :=
+    sec7_ra_gtilde3_contDiffOn_target (P := P) (S := S) (W := W)
+      (a := a) (j := j) ha hAD ha_lo ha_hi Env hW c₀ Cu hsd hj
+  have hmaps : Set.MapsTo (fun s => dtilde P.X s (a : ℝ) / S.D)
+      (sec7_rWinWide S W) (sec7_ra_rho3Target P S (a : ℝ)) :=
+    sec7_ra_ftilde_mapsTo_rho3Target (P := P) (S := S) (W := W)
+      (a := a) ha hAD ha_lo ha_hi Env hW hsd
+  have hC : ∀ i, i ≤ m →
+      ‖iteratedFDerivWithin ℝ i
+          (fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u))
+          (sec7_ra_rho3Target P S (a : ℝ))
+          ((fun s => dtilde P.X s (a : ℝ) / S.D) r)‖
+        ≤ (7 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S) := by
+    intro i hi
+    exact sec7_ra_rho3_rescaled_FDeriv_bound6 (P := P) (S := S) (W := W)
+      (a := a) (j := j) (r := r) (i := i) ha hAD hG1 ha_lo ha_hi
+      Env hW c₀ Cu hsd hbud hg0 hj hu0 hUbig hr (le_trans hi hm)
+  have hD : ∀ i : ℕ, 1 ≤ i → i ≤ m →
+      ‖iteratedFDerivWithin ℝ i (fun s => dtilde P.X s (a : ℝ) / S.D)
+          (sec7_rWinWide S W) r‖ ≤ (((10 ^ 3 : ℝ) / S.R) ^ i) := by
+    intro i hi₁ hi
+    exact sec7_ra_ftilde_FDeriv_bound (P := P) (S := S) (W := W)
+      (a := a) (r := r) ha hAD ha_lo ha_hi Env hW hsd hr hi₁ (le_trans hi hm)
+  have hcomp :
+      ‖iteratedFDerivWithin ℝ m
+          ((fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u)) ∘
+            (fun s => dtilde P.X s (a : ℝ) / S.D))
+          (sec7_rWinWide S W) r‖
+        ≤ (m.factorial : ℝ) * ((7 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S)) *
+            (((10 ^ 3 : ℝ) / S.R) ^ m) :=
+    norm_iteratedFDerivWithin_comp_le hgtilde_cd hftilde_cd
+      (by exact_mod_cast hm)
+      (sec7_ra_rho3Target_uniqueDiffOn (P := P) (S := S) (a := (a : ℝ))
+        hAD (sec7_phase_a_lo_wide ha_lo) (sec7_phase_a_hi_wide ha_hi))
+      hwideOpen.uniqueDiffOn hmaps hr hC hD
+  have hcomp_deriv :
+      |iteratedDeriv m
+          (((fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u)) ∘
+            (fun s => dtilde P.X s (a : ℝ) / S.D))) r|
+        ≤ (m.factorial : ℝ) * ((7 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S)) *
+            (((10 ^ 3 : ℝ) / S.R) ^ m) := by
+    have hwithin :
+        iteratedFDerivWithin ℝ m
+          (((fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u)) ∘
+            (fun s => dtilde P.X s (a : ℝ) / S.D)))
+          (sec7_rWinWide S W) r =
+        iteratedFDeriv ℝ m
+          (((fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u)) ∘
+            (fun s => dtilde P.X s (a : ℝ) / S.D))) r :=
+      (iteratedFDerivWithin_of_isOpen (𝕜 := ℝ) (n := m)
+        (f := ((fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u)) ∘
+          (fun s => dtilde P.X s (a : ℝ) / S.D))) hwideOpen) hr
+    rw [hwithin, norm_iteratedFDeriv_eq_norm_iteratedDeriv] at hcomp
+    simpa [Real.norm_eq_abs] using hcomp
+  have hres_eq : (fun t =>
+      sec7_phase_f3D P S a j 0 t
+        - 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
+            * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4))
+        =ᶠ[𝓝 r]
+      (((fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u)) ∘
+        (fun s => dtilde P.X s (a : ℝ) / S.D))) := by
+    filter_upwards [hwideOpen.mem_nhds hr] with t ht
+    have ht0 : 0 < t := sec7_phase_rWinWide_pos Env hW c₀ Cu hsd t ht
+    have hbridge := sec7_ra_e₃D_residual_bridge_point (P := P) (S := S)
+      (a := a) (j := j) (r := t) ha ht0
+    have hDpos : 0 < S.D := S.D_pos
+    simpa [Function.comp_def, sec7_ra_rho3Fun, mul_div_cancel₀, hDpos.ne'] using hbridge
+  have hres_deriv :
+      iteratedDeriv m
+        (fun t =>
+          sec7_phase_f3D P S a j 0 t
+            - 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
+                * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4)) r
+      =
+      iteratedDeriv m
+        (((fun u : ℝ => sec7_ra_rho3Fun P.X (a : ℝ) (j : ℝ) (S.D * u)) ∘
+          (fun s => dtilde P.X s (a : ℝ) / S.D))) r :=
+    Filter.EventuallyEq.iteratedDeriv_eq m hres_eq
+  have hnative :
+      |sec7_phase_ra_e₃D P S a j m r|
+        ≤ (m.factorial : ℝ) * ((7 * 10 ^ 9 : ℝ) * (S.T₃ * sec7_relErrF P S)) *
+            (((10 ^ 3 : ℝ) / S.R) ^ m) := by
+    simpa [sec7_phase_ra_e₃D, hres_deriv] using hcomp_deriv
+  exact le_trans hnative (sec7_ra_e₃D_comp_scale_absorb6 (P := P) (S := S) (m := m) hm)
 
 theorem sec7_ra_e₁D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
     (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
