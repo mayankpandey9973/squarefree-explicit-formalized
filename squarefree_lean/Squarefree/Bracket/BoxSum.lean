@@ -388,7 +388,7 @@ private theorem sec7_zero_hsub2 {P : Globals} {S : Scale P} (c₀ Cu : ℝ)
 /-- **Power-saving f₁/f₃ residual floor** (replaces the old `relErr·G·U²` subordination
 form after the `hG10x`-deletion re-pin): `G·Ω⁵·relErrF ≤ 1/cSub` with `relErrF = X^{-19/100}`.
 Proof: `G·Ω⁵ ≤ G·U⁵ = X^{g+5u} ≤ X^{1/100}` (band `Ω ≤ U`, admissibility `g+5u ≤ 1/100`),
-so `G·Ω⁵·relErrF ≤ X^{-18/100} ≤ 1/cSub` since `X^{18/100} ≥ (2^24)^18 ≥ 10^55 = cSub`. -/
+so `G·Ω⁵·relErrF ≤ X^{-18/100} ≤ 1/cSub` since `X^{18/100} ≥ (2^24)^18 = 2^432 ≫ 2·10^57 = cSub`. -/
 private theorem sec7_zero_hGΩ5F {P : Globals} {S : Scale P} (c₀ Cu : ℝ)
     (hsd : OnStripAux.StripData P S c₀ Cu) (hbud : OnStripAux.Budget P.g P.u Cu)
     (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
@@ -424,8 +424,8 @@ private theorem sec7_zero_hGΩ5F {P : Globals} {S : Scale P} (c₀ Cu : ℝ)
     rw [← Real.rpow_natCast (P.X ^ (1 / 100 : ℝ)) 18, ← Real.rpow_mul P.X_pos.le]
     congr 1; norm_num
   have hXge : sec7_cSub ≤ P.X ^ (18 / 100 : ℝ) := by
-    rw [hXpow18, show sec7_cSub = (10 : ℝ) ^ 55 from rfl]
-    calc (10 : ℝ) ^ 55
+    rw [hXpow18, show sec7_cSub = 2 * (10 : ℝ) ^ 57 from rfl]
+    calc 2 * (10 : ℝ) ^ 57
           ≤ (16777216 : ℝ) ^ (18 : ℕ) := by norm_num
       _ ≤ (P.X ^ (1 / 100 : ℝ)) ^ (18 : ℕ) := pow_le_pow_left₀ (by norm_num) hX24 18
   have hrelF0 : (0 : ℝ) ≤ sec7_relErrF P S := (sec7_relErrF_pos P S).le

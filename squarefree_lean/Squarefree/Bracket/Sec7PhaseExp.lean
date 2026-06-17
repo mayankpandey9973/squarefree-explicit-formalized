@@ -45,16 +45,15 @@ def sec7_cExp : ℝ := 10 ^ 25
 (`4·cExp·c_M0 ≈ 4·10⁴⁰`) — at the tight `[1/16,4]` coefficient windows; ≥10× margin). -/
 def sec7_cErr : ℝ := 10 ^ 42
 
-/-- **m=3 path** monomial-expansion ceiling (Φ″ endgame; ledger 2026-06-16). The m≤2 path keeps
-`sec7_cExp = 10²⁵`; the order-3 expansion `build_d3f3_exp@m=3` (residual fold @order 6) needs the
-larger floor `max(d3f3@m3 = 1.31e28, cExpIn6-fold = 5.76e28)`; pinned at `10²⁹` (1.74×). -/
-def sec7_cExp3 : ℝ := 10 ^ 29
+/-- **m=3 path** monomial-expansion ceiling (Φ″ endgame; re-pinned 2026-06-17). The m≤2 path keeps
+`sec7_cExp = 10²⁵`; the order-3 expansion `build_d3f3_exp@m=3` folds the order-6 residual, so
+`cExp3 ≥ max(d3f3@m3 = 1.31e28, cExpIn6-fold = 3.92e30)`; pinned at `10³¹` (2.55× over the fold). -/
+def sec7_cExp3 : ℝ := 10 ^ 31
 
-/-- **m=3 path** `Err^{(3)}` bound ceiling (Φ″ endgame; ledger 2026-06-16). Window `[assembly
-9.6e44 = 9.6e15·cExp3 , domination 1.76e45]`; pinned at `1.3·10⁴⁵` (1.35× each side). The m≤2 path
-keeps `sec7_cErr = 10⁴²`. TIGHT — re-confirm the `9.6e15` assembly factor at the err_deriv_bound m=3
-extension. -/
-def sec7_cErr3 : ℝ := 13 * 10 ^ 44
+/-- **m=3 path** `Err^{(3)}` bound ceiling (Φ″ endgame; re-pinned 2026-06-17). Window `[assembly
+floor 9.6e15·cExp3 = 9.6e46 , domination ceiling 2.2e-10·cSub = 4.4e47]` (with `cSub = 2·10⁵⁷`);
+pinned at `2·10⁴⁷` (2.08× / 2.20× each side). The m≤2 path keeps `sec7_cErr = 10⁴²`. -/
+def sec7_cErr3 : ℝ := 2 * 10 ^ 47
 
 /-- Carry-tuple multiplicity constant of the N7 cover (ARB-1, A6; ledger: `9·7³ = 3087`). -/
 def sec7_cMult : ℝ := 10 ^ 4

@@ -32,10 +32,10 @@ subordination inputs are stated as `X^{-c}`-smallness hypotheses in monomial for
 * AM-2 (G1/U4): N12/N13 are PARAMETERIZED by a dyadic sub-window `(p q : ℕ)` with
   `[p,q] ⊆ [⌈R/72⌉,⌊16R⌋]` and `q ≤ 2p`; the 11-window dyadic sum over `[R/72,16R]`
   happens in the triple split (BoxSum).
-* `sec7_cSub = 10⁵⁵` (N11 re-pin 2026-06-12: `≥ 2.6·cErr = 2.6·10⁴²`, 38×) — the
-  subordination-hypothesis constant of `hsub1/hsub2/hrel`; corner capacity `10^{64.3}`
-  (X-exponent margins hsub1 −0.089, hsub2 −0.199, hrel −0.200; asserted in
-  tools/sec7_ledger.py).  cSub is what keeps `cErr` OUT of `cDer`/`cTup`.
+* `sec7_cSub = 2·10⁵⁷` (Φ″ re-pin 2026-06-17, was 10⁵⁵; `≥ 2.6·cErr`) — the
+  subordination-hypothesis constant of `hsub1/hsub2/hrel`; capped by `sec7_cSub_le_X_2_25`
+  at `2¹⁹² = X^{2/25} ≈ 6.3·10⁵⁷` (3.14× margin), well within corner capacity `10^{64.3}`.
+  cSub is what keeps `cErr` OUT of `cDer`/`cTup`.
 -/
 
 open Classical Finset Squarefree.FiniteDiff
@@ -65,9 +65,12 @@ def sec7_KZero : ℕ := 100
 def sec7_cN13 : ℝ := 10 ^ 43
 
 /-- Subordination-hypothesis constant of `Sec7ZeroHyp.hsub1/hsub2/hrel` (ARB-1:
-`≥ 2.6·cErr`; N11 re-pin 2026-06-12: `cErr = 10⁴²` forces `cSub = 10⁴⁴ ≥ 2.6·10⁴²`,
-within the binding-corner capacity `10^{64.3}`; X-exponent margins −0.089/−0.199/−0.200). -/
-def sec7_cSub : ℝ := 10 ^ 55
+`≥ 2.6·cErr`; N11 re-pin 2026-06-12: `cErr = 10⁴²` forces `cSub ≥ 2.6·10⁴²`).
+**Φ″ re-pin 2026-06-17: `10⁵⁵ → 2·10⁵⁷`** — the m=3 (Φ″) domination ceiling is `2.2·10⁻¹⁰·cSub`,
+and the honest e₃ order-6 residual const (`3.9·10³⁰`, vs the stale `8e7`-based `10²⁹`) forces
+`cErr3 ≥ 9.6·10⁴⁶`, needing `cSub ≥ 4.4·10⁵⁶`.  `2·10⁵⁷ ≤ 2¹⁹² = X^{2/25}` (the `sec7_cSub_le_X_2_25`
+cap, 3.14× margin under `hX24`) and well within the binding-corner capacity `10^{64.3}`. -/
+def sec7_cSub : ℝ := 2 * 10 ^ 57
 
 theorem sec7_cCal_pos : (0:ℝ) < sec7_cCal := by norm_num [sec7_cCal]
 theorem sec7_cDer_pos : (0:ℝ) < sec7_cDer := by norm_num [sec7_cDer]

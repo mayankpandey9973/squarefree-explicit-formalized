@@ -61,11 +61,13 @@ def sec7_cWin : ℝ := 10 ^ 3
 /-- Input-side residual-expansion constant for the §3→§7 monomial package. -/
 def sec7_cExpIn : ℝ := 10 ^ 25
 
-/-- **m=6 path** input-side residual constant (Φ″ endgame; ledger 2026-06-16). The residual
-bound at order 6 has producer constant `≈ 6!·8e7·(10³)⁶ = 5.76e28`, which overflows the order-≤5
-`sec7_cExpIn = 10²⁵` by `5760×`; pinned at `10²⁹` (1.74×). Used only by the `ra_e*D_bound6` fields
-/ `sec7_ra_e*D_core6` cores; the m≤5 path keeps `sec7_cExpIn`. -/
-def sec7_cExpIn6 : ℝ := 10 ^ 29
+/-- **m=6 path** input-side residual constant (Φ″ endgame; re-pinned 2026-06-17). The HONEST e₃
+order-6 composition const is `6!·K·(10³)⁶ = 720·5.45e9·10¹⁸ = 3.92e30` (K = A3Scale(6)·2·16⁶, the
+descPochhammer × 16⁶ wide-d-window × 10¹⁸ inner aperture) — the stale `8e7`-outer estimate gave a
+too-small `10²⁹`.  Pinned at `10³¹` (2.55× over 3.92e30).  Used only by `ra_e*D_bound6` /
+`sec7_ra_e*D_core6`; the m≤5 path keeps `sec7_cExpIn`.  Coupled: `cExp3 ≥ cExpIn6`, and via the
+`9.6e15` assembly factor `cErr3 ≥ 9.6e46`, forcing the `cSub → 2·10⁵⁷` re-pin. -/
+def sec7_cExpIn6 : ℝ := 10 ^ 31
 
 /-- `j`-band constant: the §7 shifts satisfy `|j| ≤ sec7_cJ·(1 + H/A²)` (md 1307–09).
 G1+U3: `10²⁰ ≥ 2·10¹⁸`, the `ftil_prox` discharge level (ledger U4). -/
