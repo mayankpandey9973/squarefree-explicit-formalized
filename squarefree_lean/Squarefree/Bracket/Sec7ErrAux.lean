@@ -170,6 +170,71 @@ theorem sec7_leib_bound {F G : ℕ → ℝ → ℝ} {R a b : ℝ} {t : ℝ} (hR 
           rw [abs_mul]; norm_num
       _ ≤ 4 * (a * b / R ^ 2) := by linarith
 
+/-- **Order-3 value bound** for the Leibniz family (m=3 path; const `8 = Σ_{i≤3} C(3,i)`).
+`|F_k| ≤ a/R^k`, `|G_k| ≤ b/R^k` (`k ≤ 3`) give `|leib m| ≤ 8ab/R^m` (`m ≤ 3`).  Additive
+companion of `sec7_leib_bound` — the m≤2 path keeps its tight const `4`. -/
+theorem sec7_leib_bound3 {F G : ℕ → ℝ → ℝ} {R a b : ℝ} {t : ℝ} (hR : 0 < R)
+    (ha : 0 ≤ a) (hb : 0 ≤ b)
+    (hFb : ∀ k ≤ 3, |F k t| ≤ a / R ^ k) (hGb : ∀ k ≤ 3, |G k t| ≤ b / R ^ k) :
+    ∀ m ≤ 3, |sec7_leib F G m t| ≤ 8 * (a * b) / R ^ m := by
+  have key : ∀ i j : ℕ, i + j ≤ 3 → |F i t * G j t| ≤ a * b / R ^ (i + j) := by
+    intro i j hij
+    rw [abs_mul, pow_add]
+    have h1 := hFb i (by omega)
+    have h2 := hGb j (by omega)
+    have hF0 : 0 ≤ |F i t| := abs_nonneg _
+    have hG0 : 0 ≤ |G j t| := abs_nonneg _
+    have hRi : 0 < R ^ i := pow_pos hR i
+    have hRj : 0 < R ^ j := pow_pos hR j
+    calc |F i t| * |G j t| ≤ (a / R ^ i) * (b / R ^ j) := by
+          exact mul_le_mul h1 h2 hG0 (by positivity)
+      _ = a * b / (R ^ i * R ^ j) := by field_simp
+  intro m hm
+  have hRm : 0 < R ^ m := pow_pos hR m
+  rw [mul_div_assoc]
+  interval_cases m
+  · rw [sec7_leib_zero]
+    have k1 : |F 0 t * G 0 t| ≤ a * b / R ^ 0 := key 0 0 (by norm_num)
+    have hab : 0 ≤ a * b / R ^ 0 := by positivity
+    linarith
+  · rw [sec7_leib_one]
+    have k1 : |F 0 t * G 1 t| ≤ a * b / R ^ 1 := key 0 1 (by norm_num)
+    have k2 : |F 1 t * G 0 t| ≤ a * b / R ^ 1 := key 1 0 (by norm_num)
+    have hab : 0 ≤ a * b / R ^ 1 := by positivity
+    calc |F 0 t * G 1 t + F 1 t * G 0 t| ≤ |F 0 t * G 1 t| + |F 1 t * G 0 t| :=
+          abs_add_le _ _
+      _ ≤ 8 * (a * b / R ^ 1) := by linarith
+  · rw [sec7_leib_two]
+    have k1 : |F 0 t * G 2 t| ≤ a * b / R ^ 2 := key 0 2 (by norm_num)
+    have k2 : |F 1 t * G 1 t| ≤ a * b / R ^ 2 := key 1 1 (by norm_num)
+    have k3 : |F 2 t * G 0 t| ≤ a * b / R ^ 2 := key 2 0 (by norm_num)
+    have hab : 0 ≤ a * b / R ^ 2 := by positivity
+    calc |F 0 t * G 2 t + 2 * (F 1 t * G 1 t) + F 2 t * G 0 t|
+        ≤ |F 0 t * G 2 t + 2 * (F 1 t * G 1 t)| + |F 2 t * G 0 t| := abs_add_le _ _
+      _ ≤ |F 0 t * G 2 t| + 2 * |F 1 t * G 1 t| + |F 2 t * G 0 t| := by
+          have := abs_add_le (F 0 t * G 2 t) (2 * (F 1 t * G 1 t))
+          rw [abs_mul] at this; norm_num at this ⊢; linarith
+      _ ≤ 8 * (a * b / R ^ 2) := by linarith
+  · rw [sec7_leib_three]
+    have k1 : |F 0 t * G 3 t| ≤ a * b / R ^ 3 := key 0 3 (by norm_num)
+    have k2 : |F 1 t * G 2 t| ≤ a * b / R ^ 3 := key 1 2 (by norm_num)
+    have k3 : |F 2 t * G 1 t| ≤ a * b / R ^ 3 := key 2 1 (by norm_num)
+    have k4 : |F 3 t * G 0 t| ≤ a * b / R ^ 3 := key 3 0 (by norm_num)
+    have hab : 0 ≤ a * b / R ^ 3 := by positivity
+    calc |F 0 t * G 3 t + 3 * (F 1 t * G 2 t) + 3 * (F 2 t * G 1 t) + F 3 t * G 0 t|
+        ≤ |F 0 t * G 3 t| + 3 * |F 1 t * G 2 t| + 3 * |F 2 t * G 1 t| + |F 3 t * G 0 t| := by
+          have e1 := abs_add_le
+            (F 0 t * G 3 t + 3 * (F 1 t * G 2 t) + 3 * (F 2 t * G 1 t)) (F 3 t * G 0 t)
+          have e2 := abs_add_le
+            (F 0 t * G 3 t + 3 * (F 1 t * G 2 t)) (3 * (F 2 t * G 1 t))
+          have e3 := abs_add_le (F 0 t * G 3 t) (3 * (F 1 t * G 2 t))
+          have h2 : |3 * (F 1 t * G 2 t)| = 3 * |F 1 t * G 2 t| := by
+            rw [abs_mul]; norm_num
+          have h3 : |3 * (F 2 t * G 1 t)| = 3 * |F 2 t * G 1 t| := by
+            rw [abs_mul]; norm_num
+          linarith
+      _ ≤ 8 * (a * b / R ^ 3) := by linarith
+
 /-! ## Uniform value bound for the graded power monomials -/
 
 /-- Value bound on the wide window with a banked numeric cap `K` for

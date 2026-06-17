@@ -4,6 +4,60 @@ Companion to `math_audit.md` (which verifies the mathematics). This plan covers 
 organize a Lean/mathlib formalization of the theorem
 `θ_* ≤ 1/5 - 2/94885` and the order in which to attack it.
 
+## §7 Φ″ ENDGAME — C⁶ extension, A–E plan + DECIDED constant ledger (2026-06-16)
+
+THE ONLY remaining sorry in the tree: `sec7_zero_few_critical` Φ″ branch (Sec7ZeroScale.lean:1969).
+theorem_10_1 axioms = [propext, sorryAx, Classical.choice, Quot.sound]; sorryAx = this one stub.
+Stage-0 de-risk (math-auditor ×2) VERDICT: the tight C⁶ route is GENUINELY required (the crude
+C⁵/power-saving route loses an unbounded R/h factor in the residual finite-difference `diff3[e₃D]`
+— NOT an hG10x-style over-tightness). Φ′ branch already PROVEN (weight r³); Φ″ mirrors it (weight r⁴).
+
+### DECIDED CONSTANT LEDGER (path-local; existing m≤2 constants UNCHANGED)
+- KEEP (m≤2 path, verbatim): `sec7_cExp=10²⁵`, `sec7_cErr=10⁴²`, `sec7_cExpIn=10²⁵`.
+- NEW `sec7_cExpIn6 = 10²⁹` — residual INPUT bound at order 6 (producer const `≈ 6!·8e7·(10³)⁶ = 5.76e28`,
+  margin 1.74×). The old cExpIn=10²⁵ FAILS at m=6 by 5760×, hence a separate m=6 constant.
+- NEW `sec7_cExp3 = 10²⁹` — m=3 monomial-expansion ceiling. Floor = max(d3f3@m=3 = 48·|aprod(−¼,7)|·
+  2000^{29/4} = 1.31e28, cExpIn6-fold = 5.76e28) = 5.76e28; margin 1.74× (7.6× vs the monomial alone).
+- NEW `sec7_cErr3 = 1.3·10⁴⁵` — m=3 error-bound ceiling. Window `[assembly 9.6e44 , domination 1.76e45]`
+  ⟹ margin 1.35× on EACH side. (assembly floor = 9.6e15·cExp3; domination ceiling = (1105/64)(21/4096)
+  (1/512)·cSub / (16⁴·12) with cSub=10⁵⁵.)
+- `sec7_leib_bound` constant 4 → 8 (= Σ_{i≤3} binom(3,i)) at the m≤3 arm.
+- ⚠ TIGHT (~1.35×), NOT ≥2×. Binding driver = the r⁴-weight `16⁴` penalty (err-mult 81920 vs Φ′'s 4864,
+  from r ≤ 16R on the wide window). Two ledger inputs are auditor ESTIMATES — re-confirm EXACTLY during
+  build: (i) cExpIn6 producer const 5.76e28 (Stage A), (ii) err-assembly factor 9.6e15 ("env cap 4e14
+  reusable at k≤3", Stage C). FALLBACK if either is larger: tighten the per-dyadic bound r ≤ 12R
+  (err-mult → 27648 ⟹ ceiling 5.2e45 ⟹ ≥2× restored) or piggyback an r³-weight. Freeze these in ONE
+  place (Sec7PhaseExp.lean alongside cExp/cErr) and re-check after any bump (CLAUDE.md §8).
+
+### STAGES (strict dependency order; struct change ⇒ full rebuild each cycle)
+- **A — §3 residual data C⁵ → C⁶.**
+  - A0 ✅ DONE (2026-06-16, green, Lower/DefectDeriv6.lean, 372 ln): `dtilde_d6_upper : |d̃⁽⁶⁾(r)| ≤
+    C₆·(D/R⁶)` with **C₆ = 1381746600000000000000000000000000000000 (≈1.38·10³⁹)** (larger than the
+    10³⁵–10³⁶ guess — denom floor 72⁶·5¹¹ is big; one-sided, fine). d̃⁽⁶⁾ = 45·d̃·(d̃+a)·P₁₀/(64 r⁶
+    (a+2d̃)¹¹), POSITIVE; P₁₀=231a¹⁰+4058a⁹d̃+33274a⁸d̃²+165416a⁷d̃³+548520a⁶d̃⁴+1262872a⁵d̃⁵+2039656a⁴d̃⁶
+    +2278528a³d̃⁷+1683472a²d̃⁸+742560a d̃⁹+148512d̃¹⁰. + dtil5/dtil5_hasDerivAt/dtilde_r_iteratedDeriv6/
+    dtilde_iteratedDeriv5_hasDerivAt. C₆≪10⁸⁰ ⟹ does NOT threaten cExpIn6 (producer const is expansion
+    combinatorics, not C_m-driven; dtilde_dN_upper only feeds via the absorbed structure).
+  - A1: `Sec7Defs.lean` Sec7Phase fields (290–314): `ra_e₁D/₂D/₃D_deriv` `m<5→m<6`; `…_bound` `m≤5→m≤6`
+    (the m=6 bound uses cExpIn6 on its line; e₂D keeps relErr, e₁D/e₃D keep relErrF).
+  - A2: `Sec7PhaseConstruct.lean` — add `…_contDiffAt6` instances (bases generic-n; dBreve6 exists);
+    producers `sec7_phase_f{1,2,3}D_eq_powMonD_add_ra_e_iD` (~2967/3024/3093) `m≤5→m≤6`; the residual
+    bound cores (~5479–5567) at m=6 (consume dtilde_d6, const ≤ cExpIn6); field assignments in
+    `sec7_phase_concrete` (6017–6069) extended to m=6.
+  - A3: `Sec7MonExpData.lean` Sec7RaExpData (108) + `sec7_raExpData_of_phase` (BoxSum.lean:124) forward
+    order 6.
+- **B — monomial expansion m≤2 → m≤3** (`Sec7MonExpFam{1,2,3}.lean`, `Sec7MonExpBuild.lean`): extend the
+  5 `build_*_exp` to m=3 on the cExp3 path; worst = `build_d3f3_exp` (Fam3:341, the m+3=6 residual fold).
+  Sec7MonExp fields B03_exp/d3f3_exp etc. at m=3.
+- **C — error engine m≤2 → m≤3.** `Sec7ErrAux.lean` `sec7_leib_bound` `m≤2→m≤3` (const 4→8, interval_cases
+  0..3; leib_deriv already m<3). `Sec7ErrBound.lean` `sec7_err_deriv_bound` (175) `m≤2→m≤3` on the cErr3
+  path (re-derive `sec7E_num_final` for m=3, the 9 hb* calls). Confirm Sec7Nonzero T₁/10¹⁰⁰ absorbs cErr3.
+- **D — order-3 principal formula.** `Sec7ZeroScale.lean` extend `sec7_zero_principal_deriv_formula` (~948)
+  to order 3: `(r⁴Φ″)′` single-monomial collapse `−(1105/64)·C*·P·(T₃/R³)·y⁻⁹ᐟ⁴`.
+- **E — fill the sorry.** `Sec7ZeroScale.lean` write `sec7_zero_deriv2_few` mirroring `sec7_zero_deriv_few`
+  (1815–1890) with weight r⁴ (principal ≥1.729e-4·R·Cbase; E₂ = 4r³ErrJet2+r⁴ErrJet3 dominated via
+  cErr3·errScale + |C*|≥21/4096; Rolle ⟹ ≤1 ≤ KZero=100), replace sorry (1969) with the call.
+
 ## STATUS — 2026-06-11: §§1,4,5,6,8,9 COMPLETE. prop_5_1 PROVED (Prop51.lean:37, axiom-clean
 [propext, Classical.choice, Quot.sound], full tree green 8513 jobs). Live stubs = §7 ONLY:
 prop_7_1/prop_7_3 (BoxSum.lean) + 4 BoxPowerSums power-sum stubs. GAP 3 CLOSED 2026-06-11:
