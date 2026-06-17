@@ -45,15 +45,23 @@ def sec7_cExp : ℝ := 10 ^ 25
 (`4·cExp·c_M0 ≈ 4·10⁴⁰`) — at the tight `[1/16,4]` coefficient windows; ≥10× margin). -/
 def sec7_cErr : ℝ := 10 ^ 42
 
-/-- **m=3 path** monomial-expansion ceiling (Φ″ endgame; re-pinned 2026-06-17). The m≤2 path keeps
-`sec7_cExp = 10²⁵`; the order-3 expansion `build_d3f3_exp@m=3` folds the order-6 residual, so
-`cExp3 ≥ max(d3f3@m3 = 1.31e28, cExpIn6-fold = 3.92e30)`; pinned at `10³¹` (2.55× over the fold). -/
+/-- **m=3 path** monomial-expansion ceiling for the order-6-RESIDUAL families `B03/d3f3`
+(Φ″ endgame). Folds the order-6 residual, so `cExp3 ≥ cExpIn6-fold ≈ 3.92e30`; pinned `10³¹`. -/
 def sec7_cExp3 : ℝ := 10 ^ 31
 
-/-- **m=3 path** `Err^{(3)}` bound ceiling (Φ″ endgame; re-pinned 2026-06-17). Window `[assembly
-floor 9.6e15·cExp3 = 9.6e46 , domination ceiling 2.2e-10·cSub = 4.4e47]` (with `cSub = 2·10⁵⁷`);
-pinned at `2·10⁴⁷` (2.08× / 2.20× each side). The m≤2 path keeps `sec7_cErr = 10⁴²`. -/
-def sec7_cErr3 : ℝ := 2 * 10 ^ 47
+/-- **m=3 path** monomial-expansion ceiling for the LEADING families `f1/d1f1/B` (Φ″ endgame,
+two-scale split 2026-06-17). These carry NO order-6 residual (orders ≤5), true const `~10²²–10²⁵`;
+pinned `10²⁶` so the `1/cSub`-scaled err slots stay ≪ the `1.38e48` domination ceiling. -/
+def sec7_cExp3Lead : ℝ := 10 ^ 26
+
+/-- **m=3 path** `Err^{(3)}` ceiling on the `1/cSub`-scaled errScale slots (hArelF/hE2; Φ″ two-scale
+split). The leading f₁ slots are `~10⁴¹` ≤ this ≤ the domination ceiling `2.2e-10·cSub = 4.4e47`. -/
+def sec7_cErr3Lead : ℝ := 10 ^ 44
+
+/-- **m=3 path** `Err^{(3)}` ceiling on the `relErrF`/`10⁻¹⁴³`-scaled errScale slots (hCrelF/hCrel/hE4;
+Φ″ two-scale split). Covers the residual `cExpIn6·cap ≈ 3.6e50`; the relErrF smallness gives a
+domination ceiling `~10¹³²`, so this is dominated with ~10⁸¹× slack. -/
+def sec7_cErr3Res : ℝ := 10 ^ 52
 
 /-- Carry-tuple multiplicity constant of the N7 cover (ARB-1, A6; ledger: `9·7³ = 3087`). -/
 def sec7_cMult : ℝ := 10 ^ 4
@@ -69,7 +77,9 @@ theorem sec7_cMon_pos : (0:ℝ) < sec7_cMon := by norm_num [sec7_cMon]
 theorem sec7_cExp_pos : (0:ℝ) < sec7_cExp := by norm_num [sec7_cExp]
 theorem sec7_cErr_pos : (0:ℝ) < sec7_cErr := by norm_num [sec7_cErr]
 theorem sec7_cExp3_pos : (0:ℝ) < sec7_cExp3 := by norm_num [sec7_cExp3]
-theorem sec7_cErr3_pos : (0:ℝ) < sec7_cErr3 := by norm_num [sec7_cErr3]
+theorem sec7_cExp3Lead_pos : (0:ℝ) < sec7_cExp3Lead := by norm_num [sec7_cExp3Lead]
+theorem sec7_cErr3Lead_pos : (0:ℝ) < sec7_cErr3Lead := by norm_num [sec7_cErr3Lead]
+theorem sec7_cErr3Res_pos : (0:ℝ) < sec7_cErr3Res := by norm_num [sec7_cErr3Res]
 theorem sec7_cMult_pos : (0:ℝ) < sec7_cMult := by norm_num [sec7_cMult]
 
 /- md 1463–66 (Lemma 7.2): "integer shifts 1 ≤ h₁ ≤ ⌊W⌋, 1 ≤ h₂ ≤ ⌊W²⌋, 1 ≤ h₃ ≤ ⌊W⁴⌋". -/
