@@ -321,6 +321,17 @@ structure Sec7Phase (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) where
     |ra_e₂D j m r| ≤ sec7_cExpIn * (S.T₂ / S.R ^ m) * sec7_relErr P S
   ra_e₃D_bound : ∀ j, sec7_jBand P S j → ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
     |ra_e₃D j m r| ≤ sec7_cExpIn * (S.T₃ / S.R ^ m) * sec7_relErrF P S
+  /-- **m=6 path** (Φ″ endgame): the f₂/f₃ residual derivative chains + value bounds reach
+  order 6 on the looser `cExpIn6` budget (consumed by the m=3 monomial expansion
+  `build_d3f3_exp`).  f₁ stays order ≤5. -/
+  ra_e₂D_deriv6 : ∀ j, sec7_jBand P S j → ∀ m < 6, ∀ r ∈ sec7_rWinWide S W,
+    HasDerivAt (ra_e₂D j m) (ra_e₂D j (m + 1) r) r
+  ra_e₃D_deriv6 : ∀ j, sec7_jBand P S j → ∀ m < 6, ∀ r ∈ sec7_rWinWide S W,
+    HasDerivAt (ra_e₃D j m) (ra_e₃D j (m + 1) r) r
+  ra_e₂D_bound6 : ∀ j, sec7_jBand P S j → ∀ m ≤ 6, ∀ r ∈ sec7_rWinWide S W,
+    |ra_e₂D j m r| ≤ sec7_cExpIn6 * (S.T₂ / S.R ^ m) * sec7_relErr P S
+  ra_e₃D_bound6 : ∀ j, sec7_jBand P S j → ∀ m ≤ 6, ∀ r ∈ sec7_rWinWide S W,
+    |ra_e₃D j m r| ≤ sec7_cExpIn6 * (S.T₃ / S.R ^ m) * sec7_relErrF P S
   /-- Global `C²` regularity of the branch phase used by the counting engines. -/
   phiContDiff : ∀ (j h₁ h₂ h₃ : ℤ) (ξ₁ ξ₂ ξ₃ : ℝ)
       (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ),

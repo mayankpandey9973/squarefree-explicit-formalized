@@ -6927,6 +6927,33 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
           - 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
               * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4))
         (r := r) (m := m) hcd hm
+  ra_e₂D_deriv6 := by
+    intro j hj m hm r hr
+    have hcd : ContDiffAt ℝ 6
+        (fun t => sec7_phase_f2D P S a 0 t
+          - sec7_phase_ra_c₂ P S a j * S.T₂ * (t / S.R) ^ ((3 : ℝ) / 4)) r :=
+      sec7_phase_ra_e₂_base_contDiffAt6 (P := P) (S := S) (W := W) (a := a) (j := j)
+        (r := r) ha Env hW c₀ Cu hsd hr
+    simpa [sec7_phase_ra_e₂D] using
+      sec7_hasDerivAt_iteratedDeriv_of_contDiffAt6
+        (g := fun t => sec7_phase_f2D P S a 0 t
+          - sec7_phase_ra_c₂ P S a j * S.T₂ * (t / S.R) ^ ((3 : ℝ) / 4))
+        (r := r) (m := m) hcd hm
+  ra_e₃D_deriv6 := by
+    intro j hj m hm r hr
+    have hcd : ContDiffAt ℝ 6
+        (fun t => sec7_phase_f3D P S a j 0 t
+          - 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
+              * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4)) r :=
+      sec7_phase_ra_e₃_base_contDiffAt6 (P := P) (S := S) (W := W) (a := a) (j := j)
+        (r := r) ha hAD _hG1 (sec7_phase_a_lo_wide ha_lo)
+        (sec7_phase_a_hi_wide ha_hi) Env hW c₀ Cu hsd hj hr
+    simpa [sec7_phase_ra_e₃D] using
+      sec7_hasDerivAt_iteratedDeriv_of_contDiffAt6
+        (g := fun t => sec7_phase_f3D P S a j 0 t
+          - 3 * sec7_phase_ra_c₁ P S a j * sec7_phase_ra_c₂ P S a j
+              * S.T₃ * (t / S.R) ^ (-(1 : ℝ) / 4))
+        (r := r) (m := m) hcd hm
   ra_e₁D_bound := by
     intro j hj m hm r hr
     exact sec7_ra_e₁D_core P S W a ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd
@@ -6938,6 +6965,14 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
   ra_e₃D_bound := by
     intro j hj m hm r hr
     exact sec7_ra_e₃D_core P S W a ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd
+      hbud hg0 hu0 hUbig j hj m hm r hr
+  ra_e₂D_bound6 := by
+    intro j hj m hm r hr
+    exact sec7_ra_e₂D_core6 P S W a ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd
+      hbud hg0 hu0 hX24 j hj m hm r hr
+  ra_e₃D_bound6 := by
+    intro j hj m hm r hr
+    exact sec7_ra_e₃D_core6 P S W a ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd
       hbud hg0 hu0 hUbig j hj m hm r hr
   phiContDiff := by
     intro j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hj hbound

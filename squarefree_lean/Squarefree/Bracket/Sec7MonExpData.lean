@@ -130,4 +130,12 @@ structure Sec7RaExpData (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (Ph : Se
     |e₂D m r| ≤ sec7_cExpIn * (S.T₂ / S.R ^ m) * sec7_relErr P S
   e₃D_bound : ∀ m ≤ 5, ∀ r ∈ sec7_rWinWide S W,
     |e₃D m r| ≤ sec7_cExpIn * (S.T₃ / S.R ^ m) * sec7_relErrF P S
+  /-- **m=6 path** (Φ″ endgame): f₂/f₃ residual chains + value bounds on the looser
+  `cExpIn6` budget. -/
+  e₂D_deriv6 : ∀ m < 6, ∀ r ∈ sec7_rWinWide S W, HasDerivAt (e₂D m) (e₂D (m + 1) r) r
+  e₃D_deriv6 : ∀ m < 6, ∀ r ∈ sec7_rWinWide S W, HasDerivAt (e₃D m) (e₃D (m + 1) r) r
+  e₂D_bound6 : ∀ m ≤ 6, ∀ r ∈ sec7_rWinWide S W,
+    |e₂D m r| ≤ sec7_cExpIn6 * (S.T₂ / S.R ^ m) * sec7_relErr P S
+  e₃D_bound6 : ∀ m ≤ 6, ∀ r ∈ sec7_rWinWide S W,
+    |e₃D m r| ≤ sec7_cExpIn6 * (S.T₃ / S.R ^ m) * sec7_relErrF P S
 end Squarefree

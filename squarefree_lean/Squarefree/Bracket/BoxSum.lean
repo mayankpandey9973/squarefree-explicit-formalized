@@ -146,6 +146,14 @@ private noncomputable def sec7_raExpData_of_phase (P : Globals) (S : Scale P) (W
   e₃D_bound := by
     intro m hm r hr
     simpa [sec7_cExpIn, sec7_relErrF] using Ph.ra_e₃D_bound j hj m hm r hr
+  e₂D_deriv6 := Ph.ra_e₂D_deriv6 j hj
+  e₃D_deriv6 := Ph.ra_e₃D_deriv6 j hj
+  e₂D_bound6 := by
+    intro m hm r hr
+    simpa [sec7_cExpIn6, sec7_relErr] using Ph.ra_e₂D_bound6 j hj m hm r hr
+  e₃D_bound6 := by
+    intro m hm r hr
+    simpa [sec7_cExpIn6, sec7_relErrF] using Ph.ra_e₃D_bound6 j hj m hm r hr
 
 /-- The `Sec7Phase` regularity field in the exact `sec7_Phi` shape used by N13/N19. -/
 private theorem sec7_phase_phi_contDiff {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
