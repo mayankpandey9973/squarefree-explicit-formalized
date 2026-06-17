@@ -21,6 +21,7 @@ private noncomputable def sec7_ra_hCoeff : ℕ → ℝ
   | 3 => 3 / 8
   | 4 => -15 / 16
   | 5 => 105 / 32
+  | 6 => -945 / 64
   | _ => 0
 
 private noncomputable def sec7_ra_hScale : ℕ → ℝ
@@ -30,6 +31,7 @@ private noncomputable def sec7_ra_hScale : ℕ → ℝ
   | 3 => 15 / 16
   | 4 => 105 / 32
   | 5 => 945 / 64
+  | 6 => 10395 / 128
   | _ => 0
 
 private noncomputable def sec7_ra_sqrtScale : ℕ → ℝ
@@ -39,6 +41,7 @@ private noncomputable def sec7_ra_sqrtScale : ℕ → ℝ
   | 3 => 3 / 8
   | 4 => 15 / 16
   | 5 => 105 / 32
+  | 6 => 945 / 64
   | _ => 0
 
 private noncomputable def sec7_ra_inv2Scale : ℕ → ℝ
@@ -48,6 +51,7 @@ private noncomputable def sec7_ra_inv2Scale : ℕ → ℝ
   | 3 => 24
   | 4 => 120
   | 5 => 720
+  | 6 => 5040
   | _ => 0
 
 private noncomputable def sec7_ra_hsqScale : ℕ → ℝ
@@ -57,6 +61,7 @@ private noncomputable def sec7_ra_hsqScale : ℕ → ℝ
   | 3 => 3 / 2
   | 4 => 6
   | 5 => 30
+  | 6 => 180
   | _ => 0
 
 private noncomputable def sec7_ra_A3Scale : ℕ → ℝ
@@ -177,6 +182,7 @@ private noncomputable def sec7_ra_hsqInvScale : ℕ → ℝ
   | 3 => 15
   | 4 => 90
   | 5 => 630
+  | 6 => 5040
   | _ => 0
 
 noncomputable def sec7_ra_rhoScale : ℕ → ℝ
@@ -186,6 +192,7 @@ noncomputable def sec7_ra_rhoScale : ℕ → ℝ
   | 3 => 105 / 2
   | 4 => 420
   | 5 => 3780
+  | 6 => 37800
   | _ => 0
 
 noncomputable def sec7_ra_B3q (X a j : ℝ) (d : ℝ) : ℝ :=
@@ -2634,16 +2641,39 @@ private noncomputable def sec7_ra_B3E (P : Globals) (a j : ℝ) : ℕ → ℝ �
         10 * iteratedDeriv 1 (fun t => Ffun P.X a t) d ^ 3 *
           iteratedDeriv 2 (fun t => Ffun P.X a t) d * sec7_ra_B3H P.X a j 4 d +
         iteratedDeriv 1 (fun t => Ffun P.X a t) d ^ 5 * sec7_ra_B3H P.X a j 5 d
+  | 6 => fun d =>
+      iteratedDeriv 6 (fun t => Ffun P.X a t) d * sec7_ra_B3H P.X a j 1 d +
+        (6 * iteratedDeriv 1 (fun t => Ffun P.X a t) d *
+            iteratedDeriv 5 (fun t => Ffun P.X a t) d +
+          15 * iteratedDeriv 2 (fun t => Ffun P.X a t) d *
+            iteratedDeriv 4 (fun t => Ffun P.X a t) d +
+          10 * iteratedDeriv 3 (fun t => Ffun P.X a t) d ^ 2) *
+          sec7_ra_B3H P.X a j 2 d +
+        (15 * iteratedDeriv 1 (fun t => Ffun P.X a t) d ^ 2 *
+            iteratedDeriv 4 (fun t => Ffun P.X a t) d +
+          60 * iteratedDeriv 1 (fun t => Ffun P.X a t) d *
+            iteratedDeriv 2 (fun t => Ffun P.X a t) d *
+            iteratedDeriv 3 (fun t => Ffun P.X a t) d +
+          15 * iteratedDeriv 2 (fun t => Ffun P.X a t) d ^ 3) *
+          sec7_ra_B3H P.X a j 3 d +
+        (20 * iteratedDeriv 1 (fun t => Ffun P.X a t) d ^ 3 *
+            iteratedDeriv 3 (fun t => Ffun P.X a t) d +
+          45 * iteratedDeriv 1 (fun t => Ffun P.X a t) d ^ 2 *
+            iteratedDeriv 2 (fun t => Ffun P.X a t) d ^ 2) *
+          sec7_ra_B3H P.X a j 4 d +
+        15 * iteratedDeriv 1 (fun t => Ffun P.X a t) d ^ 4 *
+          iteratedDeriv 2 (fun t => Ffun P.X a t) d * sec7_ra_B3H P.X a j 5 d +
+        iteratedDeriv 1 (fun t => Ffun P.X a t) d ^ 6 * sec7_ra_B3H P.X a j 6 d
   | _ => fun _ => 0
 
 theorem sec7_ra_Ffun_iter_hasDerivAt {P : Globals} {a r : ℝ} {m : ℕ}
-    (ha : 0 < a) (hr : 0 < r) (hm : m < 5) :
+    (ha : 0 < a) (hr : 0 < r) (hm : m < 6) :
     HasDerivAt (iteratedDeriv m (fun t => Ffun P.X a t))
       (iteratedDeriv (m + 1) (fun t => Ffun P.X a t) r) r := by
   rw [iteratedDeriv_succ]
   refine (?_ : DifferentiableAt ℝ (iteratedDeriv m (fun t => Ffun P.X a t)) r).hasDerivAt
-  have hg : ContDiffAt ℝ 5 (fun t => Ffun P.X a t) r :=
-    Ffun_contDiffAt5 (X := P.X) (a := a) (d := r) (ne_of_gt hr)
+  have hg : ContDiffAt ℝ 6 (fun t => Ffun P.X a t) r :=
+    Ffun_contDiffAt6 (X := P.X) (a := a) (d := r) (ne_of_gt hr)
       (by exact ne_of_gt (add_pos hr ha))
   have hF : DifferentiableAt ℝ (iteratedFDeriv ℝ m (fun t => Ffun P.X a t)) r := by
     exact hg.differentiableAt_iteratedFDeriv (by exact_mod_cast hm)
@@ -2651,7 +2681,7 @@ theorem sec7_ra_Ffun_iter_hasDerivAt {P : Globals} {a r : ℝ} {m : ℕ}
   exact ((ContinuousMultilinearMap.piFieldEquiv ℝ (Fin m) ℝ).symm.differentiableAt).comp r hF
 
 private theorem sec7_ra_B3E_hasDerivAt {P : Globals} {a j r : ℝ} {m : ℕ}
-    (ha : 0 < a) (hr : 0 < r) (hm : m < 5)
+    (ha : 0 < a) (hr : 0 < r) (hm : m < 6)
     (hH : ∀ l ≤ 5,
       HasDerivAt (sec7_ra_B3H P.X a j l)
         (iteratedDeriv 1 (fun t => Ffun P.X a t) r * sec7_ra_B3H P.X a j (l + 1) r) r) :
@@ -2726,10 +2756,44 @@ private theorem sec7_ra_B3E_hasDerivAt {P : Globals} {a j r : ℝ} {m : ℕ}
         ring_nf
       | simp [sec7_ra_B3E]
         ring_nf
+  · have hF1 := sec7_ra_Ffun_iter_hasDerivAt (P := P) (a := a) (r := r) (m := 1)
+      ha hr (by norm_num)
+    have hF2 := sec7_ra_Ffun_iter_hasDerivAt (P := P) (a := a) (r := r) (m := 2)
+      ha hr (by norm_num)
+    have hF3 := sec7_ra_Ffun_iter_hasDerivAt (P := P) (a := a) (r := r) (m := 3)
+      ha hr (by norm_num)
+    have hF4 := sec7_ra_Ffun_iter_hasDerivAt (P := P) (a := a) (r := r) (m := 4)
+      ha hr (by norm_num)
+    have hF5 := sec7_ra_Ffun_iter_hasDerivAt (P := P) (a := a) (r := r) (m := 5)
+      ha hr (by norm_num)
+    have hH1 := hH 1 (by norm_num)
+    have hH2 := hH 2 (by norm_num)
+    have hH3 := hH 3 (by norm_num)
+    have hH4 := hH 4 (by norm_num)
+    have hH5 := hH 5 (by norm_num)
+    have hterm1 := hF5.mul hH1
+    have hcoef2a := (hF1.mul hF4).const_mul 5
+    have hcoef2b := (hF2.mul hF3).const_mul 10
+    have hterm2 := (hcoef2a.add hcoef2b).mul hH2
+    have hcoef3a := ((hF1.pow 2).mul hF3).const_mul 10
+    have hcoef3b := (hF1.mul (hF2.pow 2)).const_mul 15
+    have hterm3 := (hcoef3a.add hcoef3b).mul hH3
+    have hcoef4 := ((hF1.pow 3).mul hF2).const_mul 10
+    have hterm4 := hcoef4.mul hH4
+    have hterm5 := (hF1.pow 5).mul hH5
+    have hmain := ((((hterm1.add hterm2).add hterm3).add hterm4).add hterm5)
+    convert hmain using 1
+    all_goals
+      first
+      | funext x
+        simp [sec7_ra_B3E]
+        ring_nf
+      | simp [sec7_ra_B3E]
+        ring_nf
 
 private theorem sec7_ra_B3_iteratedDeriv_eq {P : Globals} {S : Scale P} {a d j : ℝ} {k : ℕ}
     (hAD : 10 * S.A ≤ S.D) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
-    (hd : 0 < d) (hshift : Ffun P.X a d + j ∈ sec7_tWin S) (hk : k ≤ 5) :
+    (hd : 0 < d) (hshift : Ffun P.X a d + j ∈ sec7_tWin S) (hk : k ≤ 6) :
     iteratedDeriv k (fun t => dBreve P.X a (Ffun P.X a t + j) - t) d =
       sec7_ra_B3E P a j k d := by
   have hApos : 0 < S.A := by
@@ -2740,7 +2804,7 @@ private theorem sec7_ra_B3_iteratedDeriv_eq {P : Globals} {S : Scale P} {a d j :
     sec7_ra_B3H_chain_open (P := P) (S := S) (a := a) (d := d) (j := j)
       hAD ha_lo ha_hi hd hshift
   have hEchain :
-      ∀ m < 5, ∀ r ∈ s,
+      ∀ m < 6, ∀ r ∈ s,
         HasDerivAt (sec7_ra_B3E P a j m) (sec7_ra_B3E P a j (m + 1) r) r := by
     intro m hm r hrs
     have hH' : ∀ l ≤ 5,
@@ -3673,6 +3737,7 @@ private noncomputable def sec7_ra_B3SharpScaleAled : ℕ → ℝ
   | 3 => 1176600
   | 4 => 144344400
   | 5 => 30084656000
+  | 6 => 60985797208000
   | _ => 0
 
 private theorem sec7_ra_Ffun_deriv1_lower_sharp_close_aled {X a d z : ℝ}
@@ -5649,8 +5714,180 @@ private theorem sec7_ra_B3_bound_sharp_aled_k5 {P : Globals} {S : Scale P} {a d 
     _ = sec7_ra_B3SharpScaleAled 5 * |j| / (d * (P.X * a)) := by
           simp [sec7_ra_B3SharpScaleAled]
 
+private theorem sec7_ra_B3_bound_sharp_aled_k6 {P : Globals} {S : Scale P} {a d j : ℝ}
+    (hAD : 10 * S.A ≤ S.D) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (hd : 0 < d) (ha2 : a ≤ d)
+    (hshift : Ffun P.X a d + j ∈ sec7_tWin S)
+    (hclose : |sec7_ra_B3q P.X a j d - d| ≤ d / 100) :
+    |iteratedDeriv 6 (fun t => dBreve P.X a (Ffun P.X a t + j) - t) d|
+      ≤ sec7_ra_B3SharpScaleAled 6 * |j| / (d ^ 2 * (P.X * a)) := by
+  have hApos : 0 < S.A := by
+    unfold Scale.A
+    exact mul_pos S.Δ_pos S.Ω_pos
+  have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
+  have hX : (0 : ℝ) < P.X := P.X_pos
+  let F1 : ℝ := deriv (fun t => Ffun P.X a t) d
+  let F2 : ℝ := iteratedDeriv 2 (fun t => Ffun P.X a t) d
+  let F3 : ℝ := iteratedDeriv 3 (fun t => Ffun P.X a t) d
+  let F4 : ℝ := iteratedDeriv 4 (fun t => Ffun P.X a t) d
+  let F5 : ℝ := iteratedDeriv 5 (fun t => Ffun P.X a t) d
+  let F6 : ℝ := iteratedDeriv 6 (fun t => Ffun P.X a t) d
+  let H1 : ℝ := sec7_ra_B3H P.X a j 1 d
+  let H2 : ℝ := sec7_ra_B3H P.X a j 2 d
+  let H3 : ℝ := sec7_ra_B3H P.X a j 3 d
+  let H4 : ℝ := sec7_ra_B3H P.X a j 4 d
+  let H5 : ℝ := sec7_ra_B3H P.X a j 5 d
+  let H6 : ℝ := sec7_ra_B3H P.X a j 6 d
+  have hiter :
+      iteratedDeriv 6 (fun t => dBreve P.X a (Ffun P.X a t + j) - t) d =
+        F6 * H1 + (6 * F1 * F5 + 15 * F2 * F4 + 10 * F3 ^ 2) * H2 +
+          (15 * F1 ^ 2 * F4 + 60 * F1 * F2 * F3 + 15 * F2 ^ 3) * H3 +
+          (20 * F1 ^ 3 * F3 + 45 * F1 ^ 2 * F2 ^ 2) * H4 +
+          15 * F1 ^ 4 * F2 * H5 + F1 ^ 6 * H6 := by
+    have h := sec7_ra_B3_iteratedDeriv_eq (P := P) (S := S) (a := a)
+      (d := d) (j := j) (k := 6) hAD ha_lo ha_hi hd hshift (by norm_num)
+    simpa [F1, F2, F3, F4, F5, F6, H1, H2, H3, H4, H5, H6, sec7_ra_B3E] using h
+  rcases sec7_ra_Ffun_upper_base_sharp (X := P.X) (a := a) (d := d)
+      P.X_pos ha0 hd with ⟨hF1, hF2, hF3, hF4, hF5⟩
+  have hF6 : |F6| ≤ 197009794800 * P.X * a / d ^ 9 :=
+    (Ffun_deriv6_abs_bounds (X := P.X) (a := a) (d := d) P.X_pos ha0 hd
+      (by linarith)).2
+  rcases sec7_ra_B3H_bounds12_sharp_aled (P := P) (S := S) (a := a) (d := d)
+      (j := j) hAD ha_lo ha_hi hd ha2 hshift hclose with ⟨hH1, hH2⟩
+  have hH3 := sec7_ra_B3H_bound3_sharp_aled (P := P) (S := S) (a := a) (d := d)
+    (j := j) hAD ha_lo ha_hi hd ha2 hshift hclose
+  have hH4 := sec7_ra_B3H_bound4_sharp_aled (P := P) (S := S) (a := a) (d := d)
+    (j := j) hAD ha_lo ha_hi hd ha2 hshift hclose
+  have hH5 := sec7_ra_B3H_bound5_sharp_aled (P := P) (S := S) (a := a) (d := d)
+    (j := j) hAD ha_lo ha_hi hd ha2 hshift hclose
+  have hH6 := sec7_ra_B3H_bound6_sharp_aled (P := P) (S := S) (a := a) (d := d)
+    (j := j) hAD ha_lo ha_hi hd ha2 hshift hclose
+  have htri3 : ∀ x y z : ℝ, |x + y + z| ≤ |x| + |y| + |z| := by
+    intro x y z
+    calc |x + y + z| ≤ |x + y| + |z| := abs_add_le _ _
+      _ ≤ |x| + |y| + |z| := by have := abs_add_le x y; linarith
+  -- coefficient bound for H2
+  have hc2 : |6 * F1 * F5 + 15 * F2 * F4 + 10 * F3 ^ 2| ≤
+      6 * (7 * P.X * a / d ^ 4) * (6000 * P.X * a / d ^ 8) +
+        15 * (26 * P.X * a / d ^ 5) * (800 * P.X * a / d ^ 7) +
+        10 * (128 * P.X * a / d ^ 6) ^ 2 := by
+    refine (htri3 _ _ _).trans (add_le_add (add_le_add ?_ ?_) ?_)
+    · rw [abs_mul, abs_mul, abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 6)]; gcongr
+    · rw [abs_mul, abs_mul, abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 15)]; gcongr
+    · rw [abs_mul, abs_pow, abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 10)]; gcongr
+  have hc2nn : 0 ≤ 6 * (7 * P.X * a / d ^ 4) * (6000 * P.X * a / d ^ 8) +
+        15 * (26 * P.X * a / d ^ 5) * (800 * P.X * a / d ^ 7) +
+        10 * (128 * P.X * a / d ^ 6) ^ 2 := by positivity
+  -- coefficient bound for H3
+  have hc3 : |15 * F1 ^ 2 * F4 + 60 * F1 * F2 * F3 + 15 * F2 ^ 3| ≤
+      15 * (7 * P.X * a / d ^ 4) ^ 2 * (800 * P.X * a / d ^ 7) +
+        60 * (7 * P.X * a / d ^ 4) * (26 * P.X * a / d ^ 5) * (128 * P.X * a / d ^ 6) +
+        15 * (26 * P.X * a / d ^ 5) ^ 3 := by
+    refine (htri3 _ _ _).trans (add_le_add (add_le_add ?_ ?_) ?_)
+    · rw [abs_mul, abs_mul, abs_pow, abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 15)]; gcongr
+    · rw [abs_mul, abs_mul, abs_mul, abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 60)]; gcongr
+    · rw [abs_mul, abs_pow, abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 15)]; gcongr
+  have hc3nn : 0 ≤ 15 * (7 * P.X * a / d ^ 4) ^ 2 * (800 * P.X * a / d ^ 7) +
+        60 * (7 * P.X * a / d ^ 4) * (26 * P.X * a / d ^ 5) * (128 * P.X * a / d ^ 6) +
+        15 * (26 * P.X * a / d ^ 5) ^ 3 := by positivity
+  -- coefficient bound for H4
+  have hc4 : |20 * F1 ^ 3 * F3 + 45 * F1 ^ 2 * F2 ^ 2| ≤
+      20 * (7 * P.X * a / d ^ 4) ^ 3 * (128 * P.X * a / d ^ 6) +
+        45 * (7 * P.X * a / d ^ 4) ^ 2 * (26 * P.X * a / d ^ 5) ^ 2 := by
+    refine (abs_add_le _ _).trans (add_le_add ?_ ?_)
+    · rw [abs_mul, abs_mul, abs_pow, abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 20)]; gcongr
+    · rw [abs_mul, abs_mul, abs_pow, abs_pow, abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 45)]; gcongr
+  have hc4nn : 0 ≤ 20 * (7 * P.X * a / d ^ 4) ^ 3 * (128 * P.X * a / d ^ 6) +
+        45 * (7 * P.X * a / d ^ 4) ^ 2 * (26 * P.X * a / d ^ 5) ^ 2 := by positivity
+  -- coefficient bound for H5
+  have hc5 : |15 * F1 ^ 4 * F2| ≤
+      15 * (7 * P.X * a / d ^ 4) ^ 4 * (26 * P.X * a / d ^ 5) := by
+    rw [abs_mul, abs_mul, abs_pow, abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 15)]; gcongr
+  have hc5nn : 0 ≤ 15 * (7 * P.X * a / d ^ 4) ^ 4 * (26 * P.X * a / d ^ 5) := by positivity
+  -- coefficient bound for H6
+  have hc6 : |F1 ^ 6| ≤ (7 * P.X * a / d ^ 4) ^ 6 := by
+    rw [abs_pow]; gcongr
+  have hG6nn : 0 ≤ 197009794800 * P.X * a / d ^ 9 := by positivity
+  -- term bounds
+  have hterm1 : |F6 * H1| ≤
+      (197009794800 * P.X * a / d ^ 9) * ((300 * d ^ 7 / (P.X * a) ^ 2) * |j|) := by
+    rw [abs_mul]; exact mul_le_mul hF6 hH1 (abs_nonneg _) hG6nn
+  have hterm2 : |(6 * F1 * F5 + 15 * F2 * F4 + 10 * F3 ^ 2) * H2| ≤
+      (6 * (7 * P.X * a / d ^ 4) * (6000 * P.X * a / d ^ 8) +
+          15 * (26 * P.X * a / d ^ 5) * (800 * P.X * a / d ^ 7) +
+          10 * (128 * P.X * a / d ^ 6) ^ 2) *
+        ((200 * d ^ 10 / (P.X * a) ^ 3) * |j|) := by
+    rw [abs_mul]; exact mul_le_mul hc2 hH2 (abs_nonneg _) hc2nn
+  have hterm3 : |(15 * F1 ^ 2 * F4 + 60 * F1 * F2 * F3 + 15 * F2 ^ 3) * H3| ≤
+      (15 * (7 * P.X * a / d ^ 4) ^ 2 * (800 * P.X * a / d ^ 7) +
+          60 * (7 * P.X * a / d ^ 4) * (26 * P.X * a / d ^ 5) * (128 * P.X * a / d ^ 6) +
+          15 * (26 * P.X * a / d ^ 5) ^ 3) *
+        ((3000 * d ^ 13 / (P.X * a) ^ 4) * |j|) := by
+    rw [abs_mul]; exact mul_le_mul hc3 hH3 (abs_nonneg _) hc3nn
+  have hterm4 : |(20 * F1 ^ 3 * F3 + 45 * F1 ^ 2 * F2 ^ 2) * H4| ≤
+      (20 * (7 * P.X * a / d ^ 4) ^ 3 * (128 * P.X * a / d ^ 6) +
+          45 * (7 * P.X * a / d ^ 4) ^ 2 * (26 * P.X * a / d ^ 5) ^ 2) *
+        ((50000 * d ^ 16 / (P.X * a) ^ 5) * |j|) := by
+    rw [abs_mul]; exact mul_le_mul hc4 hH4 (abs_nonneg _) hc4nn
+  have hterm5 : |15 * F1 ^ 4 * F2 * H5| ≤
+      (15 * (7 * P.X * a / d ^ 4) ^ 4 * (26 * P.X * a / d ^ 5)) *
+        ((1500000 * d ^ 19 / (P.X * a) ^ 6) * |j|) := by
+    rw [abs_mul]; exact mul_le_mul hc5 hH5 (abs_nonneg _) hc5nn
+  have hterm6 : |F1 ^ 6 * H6| ≤
+      (7 * P.X * a / d ^ 4) ^ 6 * ((3000000 * d ^ 22 / (P.X * a) ^ 7) * |j|) := by
+    rw [abs_mul]; exact mul_le_mul hc6 hH6 (abs_nonneg _) (by positivity)
+  calc
+    |iteratedDeriv 6 (fun t => dBreve P.X a (Ffun P.X a t + j) - t) d|
+        = |F6 * H1 + (6 * F1 * F5 + 15 * F2 * F4 + 10 * F3 ^ 2) * H2 +
+            (15 * F1 ^ 2 * F4 + 60 * F1 * F2 * F3 + 15 * F2 ^ 3) * H3 +
+            (20 * F1 ^ 3 * F3 + 45 * F1 ^ 2 * F2 ^ 2) * H4 +
+            15 * F1 ^ 4 * F2 * H5 + F1 ^ 6 * H6| := by rw [hiter]
+    _ ≤ |F6 * H1| + |(6 * F1 * F5 + 15 * F2 * F4 + 10 * F3 ^ 2) * H2| +
+        |(15 * F1 ^ 2 * F4 + 60 * F1 * F2 * F3 + 15 * F2 ^ 3) * H3| +
+        |(20 * F1 ^ 3 * F3 + 45 * F1 ^ 2 * F2 ^ 2) * H4| +
+        |15 * F1 ^ 4 * F2 * H5| + |F1 ^ 6 * H6| := by
+          nlinarith [abs_add_le
+            (F6 * H1 + (6 * F1 * F5 + 15 * F2 * F4 + 10 * F3 ^ 2) * H2 +
+              (15 * F1 ^ 2 * F4 + 60 * F1 * F2 * F3 + 15 * F2 ^ 3) * H3 +
+              (20 * F1 ^ 3 * F3 + 45 * F1 ^ 2 * F2 ^ 2) * H4 +
+              15 * F1 ^ 4 * F2 * H5) (F1 ^ 6 * H6),
+            abs_add_le
+              (F6 * H1 + (6 * F1 * F5 + 15 * F2 * F4 + 10 * F3 ^ 2) * H2 +
+                (15 * F1 ^ 2 * F4 + 60 * F1 * F2 * F3 + 15 * F2 ^ 3) * H3 +
+                (20 * F1 ^ 3 * F3 + 45 * F1 ^ 2 * F2 ^ 2) * H4) (15 * F1 ^ 4 * F2 * H5),
+            abs_add_le
+              (F6 * H1 + (6 * F1 * F5 + 15 * F2 * F4 + 10 * F3 ^ 2) * H2 +
+                (15 * F1 ^ 2 * F4 + 60 * F1 * F2 * F3 + 15 * F2 ^ 3) * H3)
+              ((20 * F1 ^ 3 * F3 + 45 * F1 ^ 2 * F2 ^ 2) * H4),
+            abs_add_le
+              (F6 * H1 + (6 * F1 * F5 + 15 * F2 * F4 + 10 * F3 ^ 2) * H2)
+              ((15 * F1 ^ 2 * F4 + 60 * F1 * F2 * F3 + 15 * F2 ^ 3) * H3),
+            abs_add_le (F6 * H1)
+              ((6 * F1 * F5 + 15 * F2 * F4 + 10 * F3 ^ 2) * H2)]
+    _ ≤ (197009794800 * P.X * a / d ^ 9) * ((300 * d ^ 7 / (P.X * a) ^ 2) * |j|) +
+        (6 * (7 * P.X * a / d ^ 4) * (6000 * P.X * a / d ^ 8) +
+            15 * (26 * P.X * a / d ^ 5) * (800 * P.X * a / d ^ 7) +
+            10 * (128 * P.X * a / d ^ 6) ^ 2) *
+          ((200 * d ^ 10 / (P.X * a) ^ 3) * |j|) +
+        (15 * (7 * P.X * a / d ^ 4) ^ 2 * (800 * P.X * a / d ^ 7) +
+            60 * (7 * P.X * a / d ^ 4) * (26 * P.X * a / d ^ 5) * (128 * P.X * a / d ^ 6) +
+            15 * (26 * P.X * a / d ^ 5) ^ 3) *
+          ((3000 * d ^ 13 / (P.X * a) ^ 4) * |j|) +
+        (20 * (7 * P.X * a / d ^ 4) ^ 3 * (128 * P.X * a / d ^ 6) +
+            45 * (7 * P.X * a / d ^ 4) ^ 2 * (26 * P.X * a / d ^ 5) ^ 2) *
+          ((50000 * d ^ 16 / (P.X * a) ^ 5) * |j|) +
+        (15 * (7 * P.X * a / d ^ 4) ^ 4 * (26 * P.X * a / d ^ 5)) *
+          ((1500000 * d ^ 19 / (P.X * a) ^ 6) * |j|) +
+        (7 * P.X * a / d ^ 4) ^ 6 * ((3000000 * d ^ 22 / (P.X * a) ^ 7) * |j|) := by
+          nlinarith [hterm1, hterm2, hterm3, hterm4, hterm5, hterm6]
+    _ = 60985797208000 * |j| / (d ^ 2 * (P.X * a)) := by
+          field_simp [P.X_pos.ne', ha0.ne', hd.ne']
+          ring
+    _ = sec7_ra_B3SharpScaleAled 6 * |j| / (d ^ 2 * (P.X * a)) := by
+          simp [sec7_ra_B3SharpScaleAled]
+
 theorem sec7_ra_B3_bound_sharp_aled {P : Globals} {S : Scale P} {a d j : ℝ} {k : ℕ}
-    (hk : k ≤ 5)
+    (hk : k ≤ 6)
     (hAD : 10 * S.A ≤ S.D) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
     (hd : 0 < d) (ha2 : a ≤ d)
     (hshift : Ffun P.X a d + j ∈ sec7_tWin S)
@@ -5663,6 +5900,7 @@ theorem sec7_ra_B3_bound_sharp_aled {P : Globals} {S : Scale P} {a d j : ℝ} {k
       | 3 => (1176600 : ℝ) * |j| * d / (P.X * a)
       | 4 => (144344400 : ℝ) * |j| / (P.X * a)
       | 5 => (30084656000 : ℝ) * |j| / (d * (P.X * a))
+      | 6 => (60985797208000 : ℝ) * |j| / (d ^ 2 * (P.X * a))
       | _ => 0 := by
   have hclose' : |sec7_ra_B3q P.X a j d - d| ≤ d / 100 := by
     simpa [sec7_ra_B3q] using hclose
@@ -5684,6 +5922,9 @@ theorem sec7_ra_B3_bound_sharp_aled {P : Globals} {S : Scale P} {a d j : ℝ} {k
         hAD ha_lo ha_hi hd ha2 hshift hclose'
   · simpa [sec7_ra_B3SharpScaleAled] using
       sec7_ra_B3_bound_sharp_aled_k5 (P := P) (S := S) (a := a) (d := d) (j := j)
+        hAD ha_lo ha_hi hd ha2 hshift hclose'
+  · simpa [sec7_ra_B3SharpScaleAled] using
+      sec7_ra_B3_bound_sharp_aled_k6 (P := P) (S := S) (a := a) (d := d) (j := j)
         hAD ha_lo ha_hi hd ha2 hshift hclose'
 
 private theorem sec7_ra_B3_k2_scale {P : Globals} {S : Scale P} {a d : ℝ}
@@ -7257,7 +7498,7 @@ private theorem sec7_ra_residual_rho_factor_rpow {X a d : ℝ} (hd : 0 < d) (ha 
   field_simp [ne_of_gt hd, ne_of_gt hda]
 
 private theorem sec7_ra_h_iteratedDeriv_eq {a d : ℝ} {k : ℕ}
-    (hk : k ≤ 5) (ha : 0 < a) (hd : 0 < d) :
+    (hk : k ≤ 6) (ha : 0 < a) (hd : 0 < d) :
     iteratedDeriv k (fun t => Real.sqrt (t + a) - Real.sqrt t) d =
       sec7_ra_hCoeff k * ((d + a) ^ ((1 : ℝ) / 2 - k) - d ^ ((1 : ℝ) / 2 - k)) := by
   have hda : 0 < d + a := by linarith
@@ -7319,7 +7560,7 @@ private theorem sec7_ra_rpow_forward_abs_le {p a d : ℝ}
   simpa [Real.norm_eq_abs, abs_of_nonneg ha, add_sub_cancel_left] using hmvt
 
 theorem sec7_ra_h_atomic_bound {a d d_lo : ℝ} {k : ℕ}
-    (hk : k ≤ 5) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
+    (hk : k ≤ 6) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
     iteratedDeriv k (fun t => Real.sqrt (t + a) - Real.sqrt t) d =
         sec7_ra_hCoeff k * ((d + a) ^ ((1 : ℝ) / 2 - k) - d ^ ((1 : ℝ) / 2 - k))
       ∧ |iteratedDeriv k (fun t => Real.sqrt (t + a) - Real.sqrt t) d|
@@ -7368,7 +7609,7 @@ private theorem sec7_ra_sqrt_bound {d d_lo : ℝ} {k : ℕ}
   rw [abs_mul, hcoeff, abs_of_nonneg hpow_nonneg]
 
 private theorem sec7_ra_inv2_bound {d d_lo : ℝ} {k : ℕ}
-    (hk : k ≤ 5) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
+    (hk : k ≤ 6) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
     |iteratedDeriv k (fun t : ℝ => t ^ (-2 : ℝ)) d|
       ≤ sec7_ra_inv2Scale k * d ^ ((-2 : ℝ) - k) := by
   have hd : 0 < d := lt_of_lt_of_le hdlo hlo
@@ -7380,7 +7621,7 @@ private theorem sec7_ra_inv2_bound {d d_lo : ℝ} {k : ℕ}
   rw [abs_mul, hcoeff, abs_of_nonneg hpow_nonneg]
 
 private theorem sec7_ra_shift_inv2_bound {a d d_lo : ℝ} {k : ℕ}
-    (hk : k ≤ 5) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
+    (hk : k ≤ 6) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
     |iteratedDeriv k (fun t : ℝ => (t + a) ^ (-2 : ℝ)) d|
       ≤ sec7_ra_inv2Scale k * d ^ ((-2 : ℝ) - k) := by
   have hd : 0 < d := lt_of_lt_of_le hdlo hlo
@@ -7424,7 +7665,7 @@ private theorem sec7_ra_h_contDiffAt {a d : ℝ} {k : ℕ} (ha : 0 < a) (hd : 0 
   rwa [hfun] at hsub
 
 private theorem sec7_ra_hsq_bound {a d d_lo : ℝ} {k : ℕ}
-    (hk : k ≤ 5) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
+    (hk : k ≤ 6) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
     |iteratedDeriv k (fun t => (Real.sqrt (t + a) - Real.sqrt t) ^ 2) d|
       ≤ sec7_ra_hsqScale k * a ^ 2 * d ^ ((-1 : ℝ) - k) := by
   have hd : 0 < d := lt_of_lt_of_le hdlo hlo
@@ -7449,8 +7690,8 @@ private theorem sec7_ra_hsq_bound {a d d_lo : ℝ} {k : ℕ}
             * a ^ 2 * d ^ ((-1 : ℝ) - k) := by
     intro i hi
     have hi_le_k : i ≤ k := Nat.lt_succ_iff.mp (Finset.mem_range.mp hi)
-    have hi5 : i ≤ 5 := le_trans hi_le_k hk
-    have hki5 : k - i ≤ 5 := le_trans (Nat.sub_le k i) hk
+    have hi5 : i ≤ 6 := le_trans hi_le_k hk
+    have hki5 : k - i ≤ 6 := le_trans (Nat.sub_le k i) hk
     have hb_i := (sec7_ra_h_atomic_bound (a := a) (d := d) (d_lo := d_lo)
       (k := i) hi5 ha hdlo hlo).2
     have hb_ki := (sec7_ra_h_atomic_bound (a := a) (d := d) (d_lo := d_lo)
@@ -7546,7 +7787,7 @@ private theorem sec7_ra_A3_bound {a d d_lo : ℝ} {k : ℕ}
     have hki5 : k - i ≤ 5 := le_trans (Nat.sub_le k i) hk
     have hb_i := sec7_ra_sqrt_bound (d := d) (d_lo := d_lo) (k := i) hi5 hdlo hlo
     have hb_ki := (sec7_ra_h_atomic_bound (a := a) (d := d) (d_lo := d_lo)
-      (k := k - i) hki5 ha hdlo hlo).2
+      (k := k - i) (hki5.trans (by norm_num)) ha hdlo hlo).2
     have hb_i' :
         |iteratedDeriv i p d| ≤ sec7_ra_sqrtScale i * d ^ ((1 : ℝ) / 2 - i) := by
       simpa [p] using hb_i
@@ -7617,7 +7858,7 @@ theorem sec7_ra_A3_bound_public {a d d_lo : ℝ} {k : ℕ}
     _ = (30 : ℝ) * a * d ^ (-(k : ℝ)) := by ring
 
 private theorem sec7_ra_hsq_inv_bound {a d d_lo : ℝ} {k : ℕ}
-    (hk : k ≤ 5) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
+    (hk : k ≤ 6) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
     |iteratedDeriv k
         (fun t => (Real.sqrt (t + a) - Real.sqrt t) ^ 2 * t ^ (-2 : ℝ)) d|
       ≤ sec7_ra_hsqInvScale k * a ^ 2 * d ^ ((-3 : ℝ) - k) := by
@@ -7648,8 +7889,8 @@ private theorem sec7_ra_hsq_inv_bound {a d d_lo : ℝ} {k : ℕ}
             * a ^ 2 * d ^ ((-3 : ℝ) - k) := by
     intro i hi
     have hi_le_k : i ≤ k := Nat.lt_succ_iff.mp (Finset.mem_range.mp hi)
-    have hi5 : i ≤ 5 := le_trans hi_le_k hk
-    have hki5 : k - i ≤ 5 := le_trans (Nat.sub_le k i) hk
+    have hi5 : i ≤ 6 := le_trans hi_le_k hk
+    have hki5 : k - i ≤ 6 := le_trans (Nat.sub_le k i) hk
     have hb_i := sec7_ra_hsq_bound (a := a) (d := d) (d_lo := d_lo)
       (k := i) hi5 ha hdlo hlo
     have hb_ki := sec7_ra_inv2_bound (d := d) (d_lo := d_lo)
@@ -7702,7 +7943,7 @@ private theorem sec7_ra_hsq_inv_bound {a d d_lo : ℝ} {k : ℕ}
   rw [← Finset.sum_mul, ← Finset.sum_mul, hconst]
 
 private theorem sec7_ra_rho_model_bound {a d d_lo : ℝ} {k : ℕ}
-    (hk : k ≤ 5) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
+    (hk : k ≤ 6) (ha : 0 < a) (hdlo : 0 < d_lo) (hlo : d_lo ≤ d) :
     |iteratedDeriv k
         (fun t => ((Real.sqrt (t + a) - Real.sqrt t) ^ 2 * t ^ (-2 : ℝ))
           * (t + a) ^ (-2 : ℝ)) d|
@@ -7740,8 +7981,8 @@ private theorem sec7_ra_rho_model_bound {a d d_lo : ℝ} {k : ℕ}
             * a ^ 2 * d ^ ((-5 : ℝ) - k) := by
     intro i hi
     have hi_le_k : i ≤ k := Nat.lt_succ_iff.mp (Finset.mem_range.mp hi)
-    have hi5 : i ≤ 5 := le_trans hi_le_k hk
-    have hki5 : k - i ≤ 5 := le_trans (Nat.sub_le k i) hk
+    have hi5 : i ≤ 6 := le_trans hi_le_k hk
+    have hki5 : k - i ≤ 6 := le_trans (Nat.sub_le k i) hk
     have hb_i := sec7_ra_hsq_inv_bound (a := a) (d := d) (d_lo := d_lo)
       (k := i) hi5 ha hdlo hlo
     have hb_ki := sec7_ra_shift_inv2_bound (a := a) (d := d) (d_lo := d_lo)
@@ -7794,7 +8035,7 @@ private theorem sec7_ra_rho_model_bound {a d d_lo : ℝ} {k : ℕ}
   rw [← Finset.sum_mul, ← Finset.sum_mul, hconst]
 
 theorem sec7_ra_rho_tower {X a d d_lo : ℝ} {k : ℕ}
-    (hk : k ≤ 5) (hX : 0 < X) (ha : 0 < a) (hdlo : 0 < d_lo)
+    (hk : k ≤ 6) (hX : 0 < X) (ha : 0 < a) (hdlo : 0 < d_lo)
     (hlo : d_lo ≤ d) (_had : a ≤ d) :
     |iteratedDeriv k
         (fun t => Ffun X a t

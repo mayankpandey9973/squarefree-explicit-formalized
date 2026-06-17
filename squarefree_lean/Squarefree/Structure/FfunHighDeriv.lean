@@ -276,6 +276,19 @@ theorem Ffun_contDiffAt5 {X a d : ℝ} (hd : d ≠ 0) (hda : d + a ≠ 0) :
   rw [hfun]
   exact h
 
+theorem Ffun_contDiffAt6 {X a d : ℝ} (hd : d ≠ 0) (hda : d + a ≠ 0) :
+    ContDiffAt ℝ 6 (fun t => Ffun X a t) d := by
+  have h1 : ContDiffAt ℝ 6 (fun t : ℝ => X / t ^ 2) d :=
+    (contDiffAt_const).div (contDiffAt_id.pow 2) (pow_ne_zero 2 hd)
+  have h2 : ContDiffAt ℝ 6 (fun t : ℝ => X / (t + a) ^ 2) d :=
+    (contDiffAt_const).div ((contDiffAt_id.add contDiffAt_const).pow 2) (pow_ne_zero 2 hda)
+  have h := h1.sub h2
+  have hfun : (fun t => Ffun X a t) = (fun t : ℝ => X / t ^ 2) - (fun t : ℝ => X / (t + a) ^ 2) := by
+    funext t
+    simp [Ffun, Pi.sub_apply]
+  rw [hfun]
+  exact h
+
 /-! ## Closed factored forms and exact magnitudes -/
 
 /-- Factored first `d`-derivative:

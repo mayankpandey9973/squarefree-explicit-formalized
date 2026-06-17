@@ -3299,7 +3299,7 @@ private theorem sec7_ra_rho_rescaled_FDeriv_bound {P : Globals} {S : Scale P} {W
         ≤ sec7_ra_rhoScale i * P.X * (a : ℝ) ^ 3 * (S.D * u) ^ ((-5 : ℝ) - i) := by
     simpa [sec7_ra_rhoFun] using
       sec7_ra_rho_tower (X := P.X) (a := (a : ℝ)) (d := S.D * u)
-        (d_lo := S.D / 20) hi P.X_pos haR (by positivity)
+        (d_lo := S.D / 20) (hi.trans (by norm_num)) P.X_pos haR (by positivity)
         (by simpa [hSDu, d] using hd_lo)
         (by simpa [hSDu, d] using hd_ge_a)
   have hcancel :
@@ -4195,7 +4195,7 @@ private theorem sec7_ra_rho3_B_rescaled_prebound {P : Globals} {S : Scale P} {W 
         (r := r) ha hAD ha_lo ha_hi Env hW c₀ Cu hsd hj hr
   have hb :=
     sec7_ra_B3_bound_sharp_aled (P := P) (S := S) (a := (a : ℝ)) (d := d)
-      (j := (j : ℝ)) (k := i) hi hAD (sec7_phase_a_lo_wide ha_lo)
+      (j := (j : ℝ)) (k := i) (hi.trans (by norm_num)) hAD (sec7_phase_a_lo_wide ha_lo)
       (sec7_phase_a_hi_wide ha_hi) hdpos (by simpa [d, hd_def] using hd_ge_a)
       hshift hclose
   have hD4scale :

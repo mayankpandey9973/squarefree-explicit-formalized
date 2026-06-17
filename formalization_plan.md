@@ -44,6 +44,29 @@ C⁵/power-saving route loses an unbounded R/h factor in the residual finite-dif
   D/R⁶ ≤ 10¹⁸, 170× margin); import DefectDeriv6. Sec7RaCompose.lean: `sec7_ra_ftilde_contDiffOn_wide`
   C⁵→C⁶ (sec7_ra_dtilde_r_contDiffAt n:=5→6, generic-n), `sec7_ra_ftilde_FDeriv_bound` i≤5→i≤6 (add
   i=6 via wide_d6), `sec7_ra_gtilde_contDiffOn_Ioi` C⁵→C⁶, `sec7_ra_rho_rescaled_FDeriv_bound` i≤6.
+- **A2a-OUTER — the ρ-derivative tower C⁵→C⁶ (NOT in the original map; found 2026-06-16 when core6
+  blocked). This is the BULK of Stage A.** The residual core's composition needs BOTH inner (dtilde,
+  done by A2a) AND outer (ρ) derivatives at order 6. The outer tower is pervasively k≤5-capped:
+  • `Lower/Sec7RaResidual.lean` (7826 ln): ~13 Scale defs (`hCoeff/hScale/sqrtScale/inv2Scale/hsqScale/
+    A3Scale/A1Scale/hsqInvScale/rhoScale/B3SharpScale/B3Scale/B3HScale/dBreveD`) each `| _ => 0` past 5 —
+    add `| 6 =>` descPochhammer values (inv2Scale 6=5040=6!, hsqScale 6=180 [ratios 1,2,3,4,5,6], the
+    ±(2k-3)!!/2^k families 6=∓945/64 or 10395/128 etc.; sympy-verify each); + the A1P/A1Ppoly/A1E,
+    B3 towers, dBreve tower bound lemmas k≤5→k≤6.
+  • `Sec7PhaseConstruct.lean`: ~10 `sec7_ra_rho{,1,3}_rescaled_FDeriv_{pre,}bound` (3257/3373/3772/3899/
+    4151/4403/4559/4726/4926/4989) i≤5→i≤6 + `sec7_ra_rho_rescale_const_bound` (3253).
+  CONSTANT LEDGER CONFIRMED at first real contact (agent ae2a287c069b055f3): m=6 comp const for e₁/e₃ =
+  6!·8e7·(10³)⁶ = 5.76e28 ≤ cExpIn6=10²⁹ (1.74×); e₂ → 5.76e41 ≤ 10⁸⁰ then budget_absorb → cExpIn=10²⁵.
+  No bump needed.
+  **SCOPE REDUCED by family-depth audit (a9111cacfd805a02a, 2026-06-16).** Err's m=3 term needs residual
+  at order `3 + diff-depth`: eA=f1_exp(e₁,depth0,ord3), eQ=d1f1_exp(e₁,depth1,ord4), eK=B_exp(e₂,depth2,
+  ord5), eB0=B03_exp(e₂,depth3,ord6), eP3=d3f3_exp(e₃,depth3,ord6). ⟹ **e₁/B1 needs NOTHING** (max ord4≤5,
+  existing data); **e₂/rho-model → ord6 (CHEAP)**; **e₃/B3 → ord6 (the only expensive piece)**. So the
+  minimal order-6 work = e₂ rho-model k6 + e₃ B3 k6 (Sec7RaResidual) + the e₂/e₃ rho/rho3 FDeriv bounds
+  i≤6 (PhaseConstruct, SKIP rho1) + core6 for e₂/e₃ ONLY. Struct change: extend ra_e₂D/e₃D_deriv m<5→m<6
+  + add ra_e₂D/e₃D_bound6 (e₁D unchanged). B3 k6 leans on the dBreve derivative tower at order 6 (the
+  genuinely heavy bit; B3H_bound6_sharp_aled @5358 may partly exist). Each grade is an explicit per-grade
+  lemma (not a generic induction — that's WHY +1 order = +1 heavy lemma; same as A0's d5→d6). IN PROGRESS
+  agent a65d8c220487db37a.
 - **A — §3 residual data C⁵ → C⁶.**
   - A0 ✅ DONE (2026-06-16, green, Lower/DefectDeriv6.lean, 372 ln): `dtilde_d6_upper : |d̃⁽⁶⁾(r)| ≤
     C₆·(D/R⁶)` with **C₆ = 1381746600000000000000000000000000000000 (≈1.38·10³⁹)** (larger than the
