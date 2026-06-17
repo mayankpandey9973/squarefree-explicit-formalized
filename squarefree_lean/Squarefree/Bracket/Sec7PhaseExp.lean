@@ -210,6 +210,72 @@ structure Sec7MonExp (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (Ph : Sec7P
             (t / S.R) ^ (-(13:ℝ)/4))) r| ≤
       sec7_cExp * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErrF P S +
         sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₃ / S.R ^ 4) / S.R ^ m
+  /-- **m=3 path** (Φ″ endgame): `f₁` shift expansion graded `m ≤ 3`, on `sec7_cExp3`. -/
+  f1_exp3 : ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
+    |iteratedDeriv m (fun t =>
+        Ph.f1D j 0 (t + sec7_hSum h₁ h₂ h₃) -
+          (c₁ * S.T₁ * (t / S.R) ^ (-(1:ℝ)) -
+            c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R) * (t / S.R) ^ (-(2:ℝ)))) r| ≤
+      sec7_cExp3 * ((sec7_hSum h₁ h₂ h₃) ^ 2 * S.T₁ / S.R ^ 2 + S.T₁ * sec7_relErrF P S) /
+        S.R ^ m
+  /-- **m=3 path** (Φ″ endgame): `Δ_{h₁}f₁` expansion graded `m ≤ 3`, on `sec7_cExp3`. -/
+  d1f1_exp₁₃ : ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
+    |iteratedDeriv m (fun t =>
+        diff1 (h₁ : ℝ) (Ph.f1D j 0) (t + sec7_hSum h₁ h₂ h₃ - h₁) -
+          (-(c₁ * h₁ * (S.T₁ / S.R)) * (t / S.R) ^ (-(2:ℝ)))) r| ≤
+      sec7_cExp3 * ((h₁ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
+        (h₁ : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ m
+  /-- **m=3 path** (Φ″ endgame): `Δ_{h₂}f₁` expansion graded `m ≤ 3`, on `sec7_cExp3`. -/
+  d1f1_exp₂₃ : ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
+    |iteratedDeriv m (fun t =>
+        diff1 (h₂ : ℝ) (Ph.f1D j 0) (t + sec7_hSum h₁ h₂ h₃ - h₂) -
+          (-(c₁ * h₂ * (S.T₁ / S.R)) * (t / S.R) ^ (-(2:ℝ)))) r| ≤
+      sec7_cExp3 * ((h₂ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
+        (h₂ : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ m
+  /-- **m=3 path** (Φ″ endgame): `Δ_{h₃}f₁` expansion graded `m ≤ 3`, on `sec7_cExp3`. -/
+  d1f1_exp₃₃ : ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
+    |iteratedDeriv m (fun t =>
+        diff1 (h₃ : ℝ) (Ph.f1D j 0) (t + sec7_hSum h₁ h₂ h₃ - h₃) -
+          (-(c₁ * h₃ * (S.T₁ / S.R)) * (t / S.R) ^ (-(2:ℝ)))) r| ≤
+      sec7_cExp3 * ((h₃ : ℝ) * sec7_hSum h₁ h₂ h₃ * S.T₁ / S.R ^ 2 +
+        (h₃ : ℝ) * (S.T₁ / S.R) * sec7_relErrF P S) / S.R ^ m
+  /-- **m=3 path** (Φ″ endgame): `B₁` double difference graded `m ≤ 3`, on `sec7_cExp3`. -/
+  B_exp₁₃ : ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
+    |iteratedDeriv m (fun t =>
+        diff1 (h₂ : ℝ) (diff1 (h₃ : ℝ) (Ph.f2D 0)) (t + ξ₁) -
+          (-(3/16) * c₂ * h₂ * h₃ * (S.T₂ / S.R ^ 2) * (t / S.R) ^ (-(5:ℝ)/4))) r| ≤
+      sec7_cExp3 * ((h₂ : ℝ) * h₃ * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
+        (h₂ : ℝ) * h₃ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3) / S.R ^ m
+  /-- **m=3 path** (Φ″ endgame): `B₂` double difference graded `m ≤ 3`, on `sec7_cExp3`. -/
+  B_exp₂₃ : ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
+    |iteratedDeriv m (fun t =>
+        diff1 (h₁ : ℝ) (diff1 (h₃ : ℝ) (Ph.f2D 0)) (t + ξ₂) -
+          (-(3/16) * c₂ * h₁ * h₃ * (S.T₂ / S.R ^ 2) * (t / S.R) ^ (-(5:ℝ)/4))) r| ≤
+      sec7_cExp3 * ((h₁ : ℝ) * h₃ * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
+        (h₁ : ℝ) * h₃ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3) / S.R ^ m
+  /-- **m=3 path** (Φ″ endgame): `B₃` double difference graded `m ≤ 3`, on `sec7_cExp3`. -/
+  B_exp₃₃ : ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
+    |iteratedDeriv m (fun t =>
+        diff1 (h₁ : ℝ) (diff1 (h₂ : ℝ) (Ph.f2D 0)) (t + ξ₃) -
+          (-(3/16) * c₂ * h₁ * h₂ * (S.T₂ / S.R ^ 2) * (t / S.R) ^ (-(5:ℝ)/4))) r| ≤
+      sec7_cExp3 * ((h₁ : ℝ) * h₂ * (S.T₂ / S.R ^ 2) * sec7_relErr P S +
+        (h₁ : ℝ) * h₂ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3) / S.R ^ m
+  /-- **m=3 path** (Φ″ endgame): `B₀₃` triple difference graded `m ≤ 3`, on `sec7_cExp3`. -/
+  B03_exp3 : ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
+    |iteratedDeriv m (fun t =>
+        diff3 (h₁ : ℝ) h₂ h₃ (Ph.f2D 0) t -
+          (15/64) * c₂ * sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) * (t / S.R) ^ (-(9:ℝ)/4)) r| ≤
+      sec7_cExp3 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) * sec7_relErr P S +
+        sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 4) / S.R ^ m
+  /-- **m=3 path** (Φ″ endgame): `Δ_{h₁,h₂,h₃}f₃` triple difference graded `m ≤ 3`, on
+  `sec7_cExp3`. -/
+  d3f3_exp3 : ∀ m ≤ 3, ∀ r ∈ sec7_rWin S W,
+    |iteratedDeriv m (fun t =>
+        diff3 (h₁ : ℝ) h₂ h₃ (Ph.f3D j 0) t -
+          (-(45/64) * c₃ * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) *
+            (t / S.R) ^ (-(13:ℝ)/4))) r| ≤
+      sec7_cExp3 * (sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3) * sec7_relErrF P S +
+        sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₃ / S.R ^ 4) / S.R ^ m
 
 /- N9 (md 1589–1633): the expansions hold for every fiber `a ∼ A`, every `j` in the §7 band,
    every triple in the shift box, and the `ξ_i`-shifted points with `|ξ_i| ≤ h_Σ` (md 1547–53).

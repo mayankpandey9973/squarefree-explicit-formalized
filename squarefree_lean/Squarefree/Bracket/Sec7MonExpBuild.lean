@@ -1,6 +1,9 @@
 import Squarefree.Bracket.Sec7MonExpFam1
 import Squarefree.Bracket.Sec7MonExpFam2
 import Squarefree.Bracket.Sec7MonExpFam3
+import Squarefree.Bracket.Sec7MonExpFam1B
+import Squarefree.Bracket.Sec7MonExpFam2B
+import Squarefree.Bracket.Sec7MonExpFam3B
 
 /-!
 # §7 N9′ — the `Sec7MonExp` constructor at the §3 site (A3 gate ruling)
@@ -120,5 +123,29 @@ noncomputable def sec7_monExp_build {P : Globals} {S : Scale P} {W : ℝ} {a : �
         show (h₁:ℝ) + h₂ ≤ (h₁:ℝ) + h₂ + h₃; linarith) hξ₃ hW hpad hshift
   B03_exp := RE.build_B03_exp hh₁ hh₂ hh₃ hW hpad hshift
   d3f3_exp := RE.build_d3f3_exp hh₁ hh₂ hh₃ hW hpad hshift
+  f1_exp3 := RE.build_f1_exp3 hh₁ hh₂ hh₃ hW hpad hshift
+  d1f1_exp₁₃ := RE.build_d1f1_exp3 hh₁ hh₂ hh₃ hh₁
+    (by have a2 : (1:ℝ) ≤ (h₂:ℝ) := by exact_mod_cast hh₂
+        have a3 : (1:ℝ) ≤ (h₃:ℝ) := by exact_mod_cast hh₃
+        show (h₁:ℝ) ≤ (h₁:ℝ) + h₂ + h₃; linarith) hW hpad hshift
+  d1f1_exp₂₃ := RE.build_d1f1_exp3 hh₁ hh₂ hh₃ hh₂
+    (by have a1 : (1:ℝ) ≤ (h₁:ℝ) := by exact_mod_cast hh₁
+        have a3 : (1:ℝ) ≤ (h₃:ℝ) := by exact_mod_cast hh₃
+        show (h₂:ℝ) ≤ (h₁:ℝ) + h₂ + h₃; linarith) hW hpad hshift
+  d1f1_exp₃₃ := RE.build_d1f1_exp3 hh₁ hh₂ hh₃ hh₃
+    (by have a1 : (1:ℝ) ≤ (h₁:ℝ) := by exact_mod_cast hh₁
+        have a2 : (1:ℝ) ≤ (h₂:ℝ) := by exact_mod_cast hh₂
+        show (h₃:ℝ) ≤ (h₁:ℝ) + h₂ + h₃; linarith) hW hpad hshift
+  B_exp₁₃ := RE.build_B_exp3 hh₁ hh₂ hh₃ hh₂ hh₃
+    (by have a1 : (1:ℝ) ≤ (h₁:ℝ) := by exact_mod_cast hh₁
+        show (h₂:ℝ) + h₃ ≤ (h₁:ℝ) + h₂ + h₃; linarith) hξ₁ hW hpad hshift
+  B_exp₂₃ := RE.build_B_exp3 hh₁ hh₂ hh₃ hh₁ hh₃
+    (by have a2 : (1:ℝ) ≤ (h₂:ℝ) := by exact_mod_cast hh₂
+        show (h₁:ℝ) + h₃ ≤ (h₁:ℝ) + h₂ + h₃; linarith) hξ₂ hW hpad hshift
+  B_exp₃₃ := RE.build_B_exp3 hh₁ hh₂ hh₃ hh₁ hh₂
+    (by have a3 : (1:ℝ) ≤ (h₃:ℝ) := by exact_mod_cast hh₃
+        show (h₁:ℝ) + h₂ ≤ (h₁:ℝ) + h₂ + h₃; linarith) hξ₃ hW hpad hshift
+  B03_exp3 := RE.build_B03_exp3 hh₁ hh₂ hh₃ hW hpad hshift
+  d3f3_exp3 := RE.build_d3f3_exp3 hh₁ hh₂ hh₃ hW hpad hshift
 
 end Squarefree
