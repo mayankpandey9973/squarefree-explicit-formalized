@@ -55,6 +55,9 @@ Build/verify from the Lean project root (`squarefree_lean/`): `lake build <Modul
   Keep modules ≤ ~400 lines (§3) for editing ergonomics, but don't expect chain-splits to cut CI.
 - **Lake rebuilds by content hash, not mtime.** `touch` does NOT force a recompile; delete the
   `.olean` (and `.ilean`/`.c`) to truly re-time a module.
+- **NEVER `lake clean`.** It deletes the prebuilt **mathlib** oleans too → Lake recompiles all of
+  mathlib from source (HOURS). To force a project-only rebuild, `rm` just the `Squarefree/*.olean`
+  you want, or if you did clean, run `lake exe cache get` first to restore mathlib before building.
 
 ### 1b. Worktree guidelines (binding — when delegating with `isolation: worktree`)
 
