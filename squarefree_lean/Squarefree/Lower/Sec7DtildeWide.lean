@@ -16,7 +16,6 @@ open scoped Topology
 
 namespace Squarefree
 
-set_option maxHeartbeats 4000000
 set_option exponentiation.threshold 1000
 
 private theorem sec7_dtilde_wide_shift_margin {P : Globals} {S : Scale P} {W : ℝ}
@@ -100,7 +99,7 @@ theorem sec7_dtilde_wide_rWinWide_core {P : Globals} {S : Scale P} {W r : ℝ}
   have hR : 0 < S.R := sec7_R_pos S
   have hs := sec7_dtilde_wide_shift_margin_strong Env hW c₀ Cu hsd
   simp only [sec7_rWinWide, Set.mem_Ioo] at hr
-  constructor <;> nlinarith
+  constructor <;> linarith only [hr.1, hr.2, hs, hR]
 
 theorem sec7_dtilde_wide_AD_omega_le {P : Globals} {S : Scale P}
     (hAD : 10 * S.A ≤ S.D) : 10 * S.Ω ≤ P.H := by
@@ -171,37 +170,37 @@ theorem sec7_ra_dtilde_wide_image {P : Globals} {S : Scale P} {W : ℝ}
         (by simpa [hRdef] using hr_lo)
     refine hstep.trans ?_
     rw [div_le_iff₀ (by positivity : 0 < (107 / 18000 : ℝ) * R)]
-    nlinarith [hXA3, hRpos, pow_pos hDpos 4]
+    nlinarith only [hXA3, hRpos, pow_pos hDpos 4]
   have hd2_lt_w : d ^ 2 < w := by
-    have : d ^ 2 < d * (d + (a : ℝ)) := by nlinarith [hdpos, haR]
+    have : d ^ 2 < d * (d + (a : ℝ)) := by nlinarith only [hdpos, haR]
     linarith [hprod, this]
   have hw_le : w ≤ 800 * D ^ 2 := by
-    nlinarith [hw2_hi, sq_nonneg (w - 800 * D ^ 2), hwpos, hDpos,
+    nlinarith only [hw2_hi, sq_nonneg (w - 800 * D ^ 2), hwpos, hDpos,
       pow_pos hDpos 2, mul_pos hwpos hwpos]
   have hd_upper : d ≤ 40 * D := by
-    nlinarith [hd2_lt_w, hw_le, sq_nonneg (d - 40 * D), hdpos, hDpos,
+    nlinarith only [hd2_lt_w, hw_le, sq_nonneg (d - 40 * D), hdpos, hDpos,
       pow_pos hDpos 2, mul_pos hdpos hdpos]
   have hd_ge_a : (a : ℝ) ≤ d := by
     by_contra hcon
     rw [not_le] at hcon
     have hw_lt : w < 2 * (a : ℝ) ^ 2 := by
       have : d * (d + (a : ℝ)) < (a : ℝ) * (2 * (a : ℝ)) := by
-        nlinarith [hdpos, haR, hcon]
-      nlinarith [hprod, this]
+        nlinarith only [hdpos, haR, hcon]
+      nlinarith only [hprod, this]
     have hw2_lt : w ^ 2 < 4 * (a : ℝ) ^ 4 := by
-      nlinarith [hw_lt, hwpos, haR, sq_nonneg (a : ℝ), mul_pos haR haR]
+      nlinarith only [hw_lt, hwpos, haR, sq_nonneg (a : ℝ), mul_pos haR haR]
     rw [hwsq] at hw2_lt
     have hXar : X < 4 * (a : ℝ) * r := by
       have hcross : X * (a : ℝ) ^ 3 < 4 * (a : ℝ) ^ 4 * r := by
         have := (div_lt_iff₀ hr0).mp hw2_lt
         linarith [this]
       have ha3pos : 0 < (a : ℝ) ^ 3 := by positivity
-      nlinarith [hcross, ha3pos, haR]
+      nlinarith only [hcross, ha3pos, haR]
     have hbound : 4 * (a : ℝ) * r ≤ 400 * (A * R) := by
       have haA : (a : ℝ) ≤ 2 * A := by simpa [hAdef] using ha_hi
       have hrR : r ≤ (40001 / 1000 : ℝ) * R := by simpa [hRdef] using hr_hi
       have hmul := mul_le_mul haA hrR hr0.le (by positivity : 0 ≤ 2 * A)
-      nlinarith [hmul, hApos, hRpos]
+      nlinarith only [hmul, hApos, hRpos]
     have hHge : 10 * S.Ω ≤ P.H := sec7_dtilde_wide_AD_omega_le hAD
     have hAR : A * R = P.H * P.G * S.Ω ^ 4 := by
       rw [hAeq, hReq]
@@ -211,9 +210,9 @@ theorem sec7_ra_dtilde_wide_image {P : Globals} {S : Scale P} {W : ℝ}
       have hH4 : (400 : ℝ) * S.Ω ^ 4 < P.H ^ 4 := by
         have hmono : (10 * S.Ω) ^ 4 ≤ P.H ^ 4 :=
           pow_le_pow_left₀ (by positivity) hHge 4
-        nlinarith [hmono, pow_pos hΩpos 4]
+        nlinarith only [hmono, pow_pos hΩpos 4]
       have hfac : 0 < P.G * P.H := by positivity
-      nlinarith [mul_lt_mul_of_pos_left hH4 hfac, hfac]
+      nlinarith only [mul_lt_mul_of_pos_left hH4 hfac, hfac]
     linarith
   have hw2_lo : D ^ 4 / 100 ≤ w ^ 2 := by
     rw [hwsq]
@@ -225,15 +224,15 @@ theorem sec7_ra_dtilde_wide_image {P : Globals} {S : Scale P} {W : ℝ}
       apply div_le_div₀ (by positivity) hnum hr0 hrR
     refine le_trans ?_ hstep
     rw [le_div_iff₀ (by positivity : 0 < (40001 / 1000 : ℝ) * R)]
-    nlinarith [hXA3, hRpos, pow_pos hDpos 4]
+    nlinarith only [hXA3, hRpos, pow_pos hDpos 4]
   have hw_ge : D ^ 2 / 10 ≤ w := by
-    nlinarith [hw2_lo, sq_nonneg (w - D ^ 2 / 10), hwpos, hDpos,
+    nlinarith only [hw2_lo, sq_nonneg (w - D ^ 2 / 10), hwpos, hDpos,
       pow_pos hDpos 2, mul_pos hwpos hwpos]
   have hw_le_2d2 : w ≤ 2 * d ^ 2 := by
-    have : d * (d + (a : ℝ)) ≤ 2 * d ^ 2 := by nlinarith [hdpos, hd_ge_a]
+    have : d * (d + (a : ℝ)) ≤ 2 * d ^ 2 := by nlinarith only [hdpos, hd_ge_a]
     linarith [hprod, this]
   have hd_lower : D / 20 ≤ d := by
-    nlinarith [hw_le_2d2, hw_ge, sq_nonneg (d - D / 20), hdpos, hDpos,
+    nlinarith only [hw_le_2d2, hw_ge, sq_nonneg (d - D / 20), hdpos, hDpos,
       pow_pos hDpos 2, mul_pos hdpos hdpos]
   simpa [hDdef, hXdef, hddef] using ⟨hd_lower, hd_ge_a, hd_upper⟩
 
@@ -253,8 +252,8 @@ private theorem sec7_ra_wide_r_bounds {P : Globals} {S : Scale P} {W r : ℝ}
     sec7_dtilde_wide_rWinWide_core (P := P) (S := S) (W := W) (r := r)
       Env hW c₀ Cu hsd hr
   constructor
-  · nlinarith [hr_lo, hR]
-  · nlinarith [hr_hi, hR]
+  · nlinarith only [hr_lo, hR]
+  · nlinarith only [hr_hi, hR]
 
 private theorem sec7_ra_dtilde_wide_d_upper_sharp {P : Globals} {S : Scale P} {W : ℝ}
     {a : ℤ} {r : ℝ} (ha : 0 < a) (ha_hi : (a : ℝ) ≤ 2 * S.A)
@@ -308,15 +307,15 @@ private theorem sec7_ra_dtilde_wide_d_upper_sharp {P : Globals} {S : Scale P} {W
         (by simpa [hRdef] using hr_lo)
     refine hstep.trans ?_
     rw [div_le_iff₀ (by positivity : 0 < (107 / 18000 : ℝ) * R)]
-    nlinarith [hXA3, hRpos, pow_pos hDpos 4]
+    nlinarith only [hXA3, hRpos, pow_pos hDpos 4]
   have hd2_lt_w : d ^ 2 < w := by
-    have : d ^ 2 < d * (d + (a : ℝ)) := by nlinarith [hdpos, haR]
+    have : d ^ 2 < d * (d + (a : ℝ)) := by nlinarith only [hdpos, haR]
     linarith [hprod, this]
   have hw_le : w ≤ 49 * D ^ 2 := by
-    nlinarith [hw2_hi, sq_nonneg (w - 49 * D ^ 2), hwpos, hDpos,
+    nlinarith only [hw2_hi, sq_nonneg (w - 49 * D ^ 2), hwpos, hDpos,
       pow_pos hDpos 2, mul_pos hwpos hwpos]
   have hd_upper : d ≤ 7 * D := by
-    nlinarith [hd2_lt_w, hw_le, sq_nonneg (d - 7 * D), hdpos, hDpos,
+    nlinarith only [hd2_lt_w, hw_le, sq_nonneg (d - 7 * D), hdpos, hDpos,
       pow_pos hDpos 2, mul_pos hdpos hdpos]
   simpa [hDdef, hXdef, hddef] using hd_upper
 
@@ -366,10 +365,10 @@ theorem sec7_ra_dtilde_wide_d1 {P : Globals} {S : Scale P} {W : ℝ}
   rw [habs]
   have hNum_hi : Num ≤ 2 * d ^ 2 := by
     rw [hNum_def]
-    nlinarith [hd_ge_a, hdpos]
+    nlinarith only [hd_ge_a, hdpos]
   have hDen_lo : 4 * r * d ≤ Den := by
     rw [hDen_def]
-    nlinarith [haR, hdpos, hr0]
+    nlinarith only [haR, hdpos, hr0]
   rw [div_le_iff₀ hDen_pos]
   have hmul_nonneg : 0 ≤ sec7_ra_Cdt1 * (S.D / S.R) := by
     unfold sec7_ra_Cdt1
@@ -381,7 +380,7 @@ theorem sec7_ra_dtilde_wide_d1 {P : Globals} {S : Scale P} {W : ℝ}
   have hmain : 2 * d ^ 2 ≤ sec7_ra_Cdt1 * (S.D / S.R) * (4 * r * d) := by
     unfold sec7_ra_Cdt1
     field_simp [ne_of_gt hRpos]
-    nlinarith [hd_sharp, hr_lo, hdpos, hDpos, hRpos]
+    nlinarith only [hd_sharp, hr_lo, hdpos, hDpos, hRpos]
   exact le_trans hNum_hi (le_trans hmain hstep)
 
 /-- Wide-window second derivative bound for `dtilde`. -/
@@ -425,14 +424,14 @@ theorem sec7_ra_dtilde_wide_d2 {P : Globals} {S : Scale P} {W : ℝ}
     exact abs_of_pos (div_pos (by positivity) (by positivity))
   rw [hmatch]
   have hf1 : d * (d + (a : ℝ)) ≤ 2 * d ^ 2 := by
-    nlinarith [hd_ge_a, hdpos]
+    nlinarith only [hd_ge_a, hdpos]
   have hf2 : Poly ≤ 23 * d ^ 2 := by
     rw [hPoly_def]
     have hp1 : 3 * (a : ℝ) ^ 2 ≤ 3 * d ^ 2 := by gcongr
     have hp2 : 10 * (a : ℝ) * d ≤ 10 * d ^ 2 := by
       calc 10 * (a : ℝ) * d ≤ 10 * d * d := by gcongr
         _ = 10 * d ^ 2 := by ring
-    nlinarith [hp1, hp2]
+    nlinarith only [hp1, hp2]
   have hNum_hi : Num ≤ 46 * d ^ 4 := by
     rw [hNum_def]
     have hmul := mul_le_mul hf1 hf2 (le_of_lt hPoly_pos)
@@ -440,7 +439,7 @@ theorem sec7_ra_dtilde_wide_d2 {P : Globals} {S : Scale P} {W : ℝ}
     calc d * (d + (a : ℝ)) * Poly
         ≤ (2 * d ^ 2) * (23 * d ^ 2) := hmul
       _ = 46 * d ^ 4 := by ring
-  have hs_lo_d : 2 * d ≤ (a : ℝ) + 2 * d := by nlinarith [haR]
+  have hs_lo_d : 2 * d ≤ (a : ℝ) + 2 * d := by nlinarith only [haR]
   have hpow3_lo_d : (2 * d) ^ 3 ≤ ((a : ℝ) + 2 * d) ^ 3 :=
     pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ 2 * d) hs_lo_d 3
   have hDen_lo : 32 * r ^ 2 * d ^ 3 ≤ Den := by
@@ -465,7 +464,7 @@ theorem sec7_ra_dtilde_wide_d2 {P : Globals} {S : Scale P} {W : ℝ}
       46 * d ^ 4 ≤ sec7_ra_Cdt2 * (S.D / S.R ^ 2) * (32 * r ^ 2 * d ^ 3) := by
     unfold sec7_ra_Cdt2
     field_simp [ne_of_gt hRpos]
-    nlinarith [hd4_le, hr2_lo, hdpos, hDpos, hRpos]
+    nlinarith only [hd_sharp, hr2_lo, hdpos, hDpos, hRpos, mul_pos hRpos hRpos]
   exact le_trans hNum_hi (le_trans hmain hstep)
 
 /-- Wide-window third derivative bound for `dtilde`. -/
@@ -510,7 +509,7 @@ theorem sec7_ra_dtilde_wide_d3 {P : Globals} {S : Scale P} {W : ℝ}
     congr 1
     have hmul_pos : 0 < 3 * d * (d + (a : ℝ)) * Poly := by positivity
     rw [abs_of_neg (show -3 * d * (d + (a : ℝ)) * Poly < 0 by
-      nlinarith [hmul_pos])]
+      nlinarith only [hmul_pos])]
     ring
   have hmatch :
       (-3 * d * (d + (a : ℝ))
@@ -521,7 +520,7 @@ theorem sec7_ra_dtilde_wide_d3 {P : Globals} {S : Scale P} {W : ℝ}
     rw [hPoly_def, hDen_def]
   rw [hmatch, habs]
   have hf1 : 3 * d * (d + (a : ℝ)) ≤ 6 * d ^ 2 := by
-    nlinarith [hd_ge_a, hdpos]
+    nlinarith only [hd_ge_a, hdpos]
   have hPoly_le_d : Poly ≤ 313 * d ^ 4 := by
     rw [hPoly_def]
     have hp1 : 5 * (a : ℝ) ^ 4 ≤ 5 * d ^ 4 := by gcongr
@@ -534,7 +533,7 @@ theorem sec7_ra_dtilde_wide_d3 {P : Globals} {S : Scale P} {W : ℝ}
     have hp4 : 120 * (a : ℝ) * d ^ 3 ≤ 120 * d ^ 4 := by
       calc 120 * (a : ℝ) * d ^ 3 ≤ 120 * d * d ^ 3 := by gcongr
         _ = 120 * d ^ 4 := by ring
-    nlinarith [hp1, hp2, hp3, hp4]
+    nlinarith only [hp1, hp2, hp3, hp4]
   have hNum_hi : Num ≤ 1878 * d ^ 6 := by
     rw [hNum_def]
     have hmul := mul_le_mul hf1 hPoly_le_d (by positivity : (0:ℝ) ≤ Poly)
@@ -542,7 +541,7 @@ theorem sec7_ra_dtilde_wide_d3 {P : Globals} {S : Scale P} {W : ℝ}
     calc 3 * d * (d + (a : ℝ)) * Poly
         ≤ (6 * d ^ 2) * (313 * d ^ 4) := hmul
       _ = 1878 * d ^ 6 := by ring
-  have hs_lo_d : 2 * d ≤ (a : ℝ) + 2 * d := by nlinarith [haR]
+  have hs_lo_d : 2 * d ≤ (a : ℝ) + 2 * d := by nlinarith only [haR]
   have hpow5_lo_d : (2 * d) ^ 5 ≤ ((a : ℝ) + 2 * d) ^ 5 :=
     pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ 2 * d) hs_lo_d 5
   have hDen_lo : 256 * r ^ 3 * d ^ 5 ≤ Den := by
@@ -557,12 +556,12 @@ theorem sec7_ra_dtilde_wide_d3 {P : Globals} {S : Scale P} {W : ℝ}
       sec7_ra_Cdt3 * (S.D / S.R ^ 3) * (256 * r ^ 3 * d ^ 5)
         ≤ sec7_ra_Cdt3 * (S.D / S.R ^ 3) * Den :=
     mul_le_mul_of_nonneg_left hDen_lo hmul_nonneg
-  have hr169 : S.R / 169 ≤ r := by nlinarith [hr_lo, hRpos]
+  have hr169 : S.R / 169 ≤ r := by nlinarith only [hr_lo, hRpos]
   have hR3_le : S.R ^ 3 ≤ (169 : ℝ) ^ 3 * r ^ 3 := by
     have hpow := pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ S.R / 169) hr169 3
     rw [show (S.R / 169) ^ 3 = S.R ^ 3 / (169 : ℝ) ^ 3 by ring] at hpow
     rw [div_le_iff₀ (by norm_num : 0 < (169 : ℝ) ^ 3)] at hpow
-    nlinarith
+    linarith only [hpow]
   have hmain :
       1878 * d ^ 6 ≤ sec7_ra_Cdt3 * (S.D / S.R ^ 3) * (256 * r ^ 3 * d ^ 5) := by
     unfold sec7_ra_Cdt3
@@ -631,7 +630,7 @@ theorem sec7_ra_dtilde_wide_d4 {P : Globals} {S : Scale P} {W : ℝ}
     rw [hPoly_def, hDen_def]
   rw [hmatch, habs]
   have hf1 : 3 * d * (d + (a : ℝ)) ≤ 6 * d ^ 2 := by
-    nlinarith [hd_ge_a, hdpos]
+    nlinarith only [hd_ge_a, hdpos]
   have hPoly_le_d : Poly ≤ 18391 * d ^ 6 := by
     rw [hPoly_def]
     have hp1 : 35 * (a : ℝ) ^ 6 ≤ 35 * d ^ 6 := by gcongr
@@ -650,7 +649,7 @@ theorem sec7_ra_dtilde_wide_d4 {P : Globals} {S : Scale P} {W : ℝ}
     have hp6 : 4680 * (a : ℝ) * d ^ 5 ≤ 4680 * d ^ 6 := by
       calc 4680 * (a : ℝ) * d ^ 5 ≤ 4680 * d * d ^ 5 := by gcongr
         _ = 4680 * d ^ 6 := by ring
-    nlinarith [hp1, hp2, hp3, hp4, hp5, hp6]
+    nlinarith only [hp1, hp2, hp3, hp4, hp5, hp6]
   have hNum_hi : Num ≤ 110346 * d ^ 8 := by
     rw [hNum_def]
     have hmul := mul_le_mul hf1 hPoly_le_d (by positivity : (0:ℝ) ≤ Poly)
@@ -658,7 +657,7 @@ theorem sec7_ra_dtilde_wide_d4 {P : Globals} {S : Scale P} {W : ℝ}
     calc 3 * d * (d + (a : ℝ)) * Poly
         ≤ (6 * d ^ 2) * (18391 * d ^ 6) := hmul
       _ = 110346 * d ^ 8 := by ring
-  have hs_lo_d : 2 * d ≤ (a : ℝ) + 2 * d := by nlinarith [haR]
+  have hs_lo_d : 2 * d ≤ (a : ℝ) + 2 * d := by nlinarith only [haR]
   have hpow7_lo_d : (2 * d) ^ 7 ≤ ((a : ℝ) + 2 * d) ^ 7 :=
     pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ 2 * d) hs_lo_d 7
   have hDen_lo : 2048 * r ^ 4 * d ^ 7 ≤ Den := by
@@ -673,12 +672,12 @@ theorem sec7_ra_dtilde_wide_d4 {P : Globals} {S : Scale P} {W : ℝ}
       sec7_ra_Cdt4 * (S.D / S.R ^ 4) * (2048 * r ^ 4 * d ^ 7)
         ≤ sec7_ra_Cdt4 * (S.D / S.R ^ 4) * Den :=
     mul_le_mul_of_nonneg_left hDen_lo hmul_nonneg
-  have hr169 : S.R / 169 ≤ r := by nlinarith [hr_lo, hRpos]
+  have hr169 : S.R / 169 ≤ r := by nlinarith only [hr_lo, hRpos]
   have hR4_le : S.R ^ 4 ≤ (169 : ℝ) ^ 4 * r ^ 4 := by
     have hpow := pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ S.R / 169) hr169 4
     rw [show (S.R / 169) ^ 4 = S.R ^ 4 / (169 : ℝ) ^ 4 by ring] at hpow
     rw [div_le_iff₀ (by norm_num : 0 < (169 : ℝ) ^ 4)] at hpow
-    nlinarith
+    linarith only [hpow]
   have hmain :
       110346 * d ^ 8 ≤ sec7_ra_Cdt4 * (S.D / S.R ^ 4) * (2048 * r ^ 4 * d ^ 7) := by
     unfold sec7_ra_Cdt4
@@ -742,7 +741,7 @@ theorem sec7_ra_dtilde_wide_d5 {P : Globals} {S : Scale P} {W : ℝ}
     congr 1
     have hmul_pos : 0 < 15 * d * (d + (a : ℝ)) * Poly := by positivity
     rw [abs_of_neg (show -15 * d * (d + (a : ℝ)) * Poly < 0 by
-      nlinarith [hmul_pos])]
+      nlinarith only [hmul_pos])]
     ring
   have hmatch :
       (-15 * d * (d + (a : ℝ))
@@ -755,7 +754,7 @@ theorem sec7_ra_dtilde_wide_d5 {P : Globals} {S : Scale P} {W : ℝ}
     rw [hPoly_def, hDen_def]
   rw [hmatch, habs]
   have hf1 : 15 * d * (d + (a : ℝ)) ≤ 30 * d ^ 2 := by
-    nlinarith [hd_ge_a, hdpos]
+    nlinarith only [hd_ge_a, hdpos]
   have hPoly_le_d : Poly ≤ 282187 * d ^ 8 := by
     rw [hPoly_def]
     have hp1 : 63 * (a : ℝ) ^ 8 ≤ 63 * d ^ 8 := by gcongr
@@ -780,7 +779,7 @@ theorem sec7_ra_dtilde_wide_d5 {P : Globals} {S : Scale P} {W : ℝ}
     have hp8 : 42432 * (a : ℝ) * d ^ 7 ≤ 42432 * d ^ 8 := by
       calc 42432 * (a : ℝ) * d ^ 7 ≤ 42432 * d * d ^ 7 := by gcongr
         _ = 42432 * d ^ 8 := by ring
-    nlinarith [hp1, hp2, hp3, hp4, hp5, hp6, hp7, hp8]
+    nlinarith only [hp1, hp2, hp3, hp4, hp5, hp6, hp7, hp8]
   have hNum_hi : Num ≤ 8465610 * d ^ 10 := by
     rw [hNum_def]
     have hmul := mul_le_mul hf1 hPoly_le_d (by positivity : (0:ℝ) ≤ Poly)
@@ -788,7 +787,7 @@ theorem sec7_ra_dtilde_wide_d5 {P : Globals} {S : Scale P} {W : ℝ}
     calc 15 * d * (d + (a : ℝ)) * Poly
         ≤ (30 * d ^ 2) * (282187 * d ^ 8) := hmul
       _ = 8465610 * d ^ 10 := by ring
-  have hs_lo_d : 2 * d ≤ (a : ℝ) + 2 * d := by nlinarith [haR]
+  have hs_lo_d : 2 * d ≤ (a : ℝ) + 2 * d := by nlinarith only [haR]
   have hpow9_lo_d : (2 * d) ^ 9 ≤ ((a : ℝ) + 2 * d) ^ 9 :=
     pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ 2 * d) hs_lo_d 9
   have hDen_lo : 16384 * r ^ 5 * d ^ 9 ≤ Den := by
@@ -803,12 +802,12 @@ theorem sec7_ra_dtilde_wide_d5 {P : Globals} {S : Scale P} {W : ℝ}
       sec7_ra_Cdt5 * (S.D / S.R ^ 5) * (16384 * r ^ 5 * d ^ 9)
         ≤ sec7_ra_Cdt5 * (S.D / S.R ^ 5) * Den :=
     mul_le_mul_of_nonneg_left hDen_lo hmul_nonneg
-  have hr169 : S.R / 169 ≤ r := by nlinarith [hr_lo, hRpos]
+  have hr169 : S.R / 169 ≤ r := by nlinarith only [hr_lo, hRpos]
   have hR5_le : S.R ^ 5 ≤ (169 : ℝ) ^ 5 * r ^ 5 := by
     have hpow := pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ S.R / 169) hr169 5
     rw [show (S.R / 169) ^ 5 = S.R ^ 5 / (169 : ℝ) ^ 5 by ring] at hpow
     rw [div_le_iff₀ (by norm_num : 0 < (169 : ℝ) ^ 5)] at hpow
-    nlinarith
+    linarith only [hpow]
   have hmain :
       8465610 * d ^ 10 ≤ sec7_ra_Cdt5 * (S.D / S.R ^ 5) * (16384 * r ^ 5 * d ^ 9) := by
     unfold sec7_ra_Cdt5
@@ -866,7 +865,7 @@ theorem sec7_ra_dtilde_wide_d6 {P : Globals} {S : Scale P} {W : ℝ}
   have hDen_pos : 0 < Den := by rw [hDen_def]; positivity
   rw [abs_of_pos (div_pos hNum_pos hDen_pos)]
   have hf1 : 45 * d * (d + (a : ℝ)) ≤ 90 * d ^ 2 := by
-    nlinarith [hd_ge_a, hdpos]
+    nlinarith only [hd_ge_a, hdpos]
   have hPoly_le_d : Poly ≤ 8907099 * d ^ 10 := by
     rw [hPoly_def]
     have hp1 : 231 * (a : ℝ) ^ 10 ≤ 231 * d ^ 10 := by gcongr
@@ -897,7 +896,7 @@ theorem sec7_ra_dtilde_wide_d6 {P : Globals} {S : Scale P} {W : ℝ}
     have hp10 : 742560 * (a : ℝ) * d ^ 9 ≤ 742560 * d ^ 10 := by
       calc 742560 * (a : ℝ) * d ^ 9 ≤ 742560 * d * d ^ 9 := by gcongr
         _ = 742560 * d ^ 10 := by ring
-    nlinarith [hp1, hp2, hp3, hp4, hp5, hp6, hp7, hp8, hp9, hp10]
+    nlinarith only [hp1, hp2, hp3, hp4, hp5, hp6, hp7, hp8, hp9, hp10]
   have hNum_hi : Num ≤ 801638910 * d ^ 12 := by
     rw [hNum_def]
     have hmul := mul_le_mul hf1 hPoly_le_d (by positivity : (0:ℝ) ≤ Poly)
@@ -905,7 +904,7 @@ theorem sec7_ra_dtilde_wide_d6 {P : Globals} {S : Scale P} {W : ℝ}
     calc 45 * d * (d + (a : ℝ)) * Poly
         ≤ (90 * d ^ 2) * (8907099 * d ^ 10) := hmul
       _ = 801638910 * d ^ 12 := by ring
-  have hs_lo_d : 2 * d ≤ (a : ℝ) + 2 * d := by nlinarith [haR]
+  have hs_lo_d : 2 * d ≤ (a : ℝ) + 2 * d := by nlinarith only [haR]
   have hpow11_lo_d : (2 * d) ^ 11 ≤ ((a : ℝ) + 2 * d) ^ 11 :=
     pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ 2 * d) hs_lo_d 11
   have hDen_lo : 131072 * r ^ 6 * d ^ 11 ≤ Den := by
@@ -920,12 +919,12 @@ theorem sec7_ra_dtilde_wide_d6 {P : Globals} {S : Scale P} {W : ℝ}
       sec7_ra_Cdt6 * (S.D / S.R ^ 6) * (131072 * r ^ 6 * d ^ 11)
         ≤ sec7_ra_Cdt6 * (S.D / S.R ^ 6) * Den :=
     mul_le_mul_of_nonneg_left hDen_lo hmul_nonneg
-  have hr169 : S.R / 169 ≤ r := by nlinarith [hr_lo, hRpos]
+  have hr169 : S.R / 169 ≤ r := by nlinarith only [hr_lo, hRpos]
   have hR6_le : S.R ^ 6 ≤ (169 : ℝ) ^ 6 * r ^ 6 := by
     have hpow := pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ S.R / 169) hr169 6
     rw [show (S.R / 169) ^ 6 = S.R ^ 6 / (169 : ℝ) ^ 6 by ring] at hpow
     rw [div_le_iff₀ (by norm_num : 0 < (169 : ℝ) ^ 6)] at hpow
-    nlinarith
+    linarith only [hpow]
   have hmain :
       801638910 * d ^ 12 ≤ sec7_ra_Cdt6 * (S.D / S.R ^ 6) * (131072 * r ^ 6 * d ^ 11) := by
     unfold sec7_ra_Cdt6

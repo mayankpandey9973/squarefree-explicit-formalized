@@ -27,7 +27,6 @@ open Squarefree.Counting
 
 namespace Squarefree
 
-set_option maxHeartbeats 4000000
 
 /-- A small-constant power bound: `c·10^k ≤ 10¹⁹⁹` whenever `c ≤ 10²` and `2+k ≤ 199`. -/
 private theorem hperv_cle {c : ℝ} {k : ℕ} (hc2 : c ≤ 10 ^ 2)
@@ -49,7 +48,7 @@ private theorem perv_countR {P : Globals} {S : Scale P} {ℓ₁ Lr W δ len n : 
     (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H) (hΩU : S.Ω ≤ P.U)
     (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4) (hδhalf : δ ≤ 1 / 2)
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
-    (hDeW : 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) ≤ S.Δ)
+    (_hDeW : 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) ≤ S.Δ)
     (hℓ1lo : 1 ≤ ℓ₁) (hℓ1W : ℓ₁ ≤ 130 * (P.G * P.U ^ 5))
     (hLrlo : 1 ≤ Lr)
     (hδ : δ = 10 ^ 70 * ((1 / S.Δ) * P.G ^ 4 * P.U ^ 15 / S.Ω ^ 5))
@@ -91,19 +90,19 @@ private theorem perv_countR {P : Globals} {S : Scale P} {ℓ₁ Lr W δ len n : 
       have hU5 : (130:ℝ) ≤ P.U ^ 5 := by
         calc (130:ℝ) ≤ 10 ^ 33 := by norm_num
           _ ≤ P.U := hUbig
-          _ ≤ P.U ^ 5 := by nlinarith [one_le_pow₀ (n := 4) hU1, hUpos]
-      nlinarith [hU5, one_le_pow₀ (n := 3) hG1, pow_pos hUpos 5]
+          _ ≤ P.U ^ 5 := by nlinarith only [one_le_pow₀ (n := 4) hU1, hUpos]
+      nlinarith only [hU5, one_le_pow₀ (n := 3) hG1, pow_pos hUpos 5]
     have hkey := mul_le_mul_of_nonneg_right h130
       (le_of_lt (mul_pos hGpos (pow_pos hUpos 5)))
-    nlinarith [hkey]
+    linarith [hkey]
   -- H ≥ Δ²GU¹⁰
   have hHlo : S.Δ ^ 2 * P.G * P.U ^ 10 ≤ P.H := by
-    rw [le_div_iff₀ (by positivity)] at h1; nlinarith [h1]
+    rw [le_div_iff₀ (by positivity)] at h1; linarith [h1]
   have hΔGU6 : (1:ℝ) ≤ S.Δ * P.G * P.U ^ 6 :=
     one_le_mul_of_one_le_of_one_le (one_le_mul_of_one_le_of_one_le hΔ1 hG1)
       (one_le_pow₀ hU1)
   have hΔU4H : S.Δ * P.U ^ 4 ≤ P.H := by
-    nlinarith [hHlo, mul_le_mul_of_nonneg_left hΔGU6
+    nlinarith only [hHlo, mul_le_mul_of_nonneg_left hΔGU6
       (by positivity : (0:ℝ) ≤ S.Δ * P.U ^ 4)]
   have hΔHGΩ : S.Δ ≤ P.H * P.G * S.Ω ^ 3 := by
     have hpay3 := band_pay3 (P := P) (S := S) hband hΩU
@@ -124,7 +123,7 @@ private theorem perv_countR {P : Globals} {S : Scale P} {ℓ₁ Lr W δ len n : 
       have hX : (0:ℝ) ≤ ℓ₁ ^ 2 * Lr * P.U ^ 10 / S.Ω ^ 8 := by positivity
       calc 10 ^ 57 * ℓ₁ ^ 2 * Lr * P.U ^ 10 / S.Ω ^ 8
           = 10 ^ 57 * (ℓ₁ ^ 2 * Lr * P.U ^ 10 / S.Ω ^ 8) := by ring
-        _ ≤ 10 ^ 58 * (ℓ₁ ^ 2 * Lr * P.U ^ 10 / S.Ω ^ 8) := by nlinarith [hX]
+        _ ≤ 10 ^ 58 * (ℓ₁ ^ 2 * Lr * P.U ^ 10 / S.Ω ^ 8) := by nlinarith only [hX]
         _ = ((10:ℝ) ^ 29 * (ℓ₁ * Real.sqrt Lr * P.U ^ 5 / S.Ω ^ 4)) ^ 2 := by
             rw [mul_pow, hXsq, show ((10:ℝ) ^ 29) ^ 2 = 10 ^ 58 by norm_num]
     calc Real.sqrt n ≤ Real.sqrt (10 ^ 57 * ℓ₁ ^ 2 * Lr * P.U ^ 10 / S.Ω ^ 8) :=
@@ -151,7 +150,7 @@ private theorem perv_countR {P : Globals} {S : Scale P} {ℓ₁ Lr W δ len n : 
     rw [hprod]
     have hold : P.H * P.G * ℓ₁ * P.U ^ 5 / (S.Δ ^ 2 * S.Ω ^ 2) ≤ b := by
       rw [hb_def, div_le_div_iff₀ (by positivity) (by positivity)]
-      nlinarith [mul_le_mul_of_nonneg_right hℓ1G4
+      nlinarith only [mul_le_mul_of_nonneg_right hℓ1G4
           (by positivity : (0:ℝ) ≤ P.H * P.G * P.U ^ 5 * (S.Δ ^ 2 * S.Ω ^ 2)),
         hHpos, hGpos, hΔpos, hΩpos, pow_pos hUpos 5]
     linarith [hold]
@@ -164,7 +163,7 @@ private theorem perv_countR {P : Globals} {S : Scale P} {ℓ₁ Lr W δ len n : 
     rw [hδ, hb_def, hcontent]
     refine mul_le_mul_of_nonneg_left ?_ (by norm_num : (0:ℝ) ≤ (10:ℝ) ^ 70)
     rw [div_le_div_iff₀ (by positivity) (by positivity)]
-    nlinarith [mul_le_mul_of_nonneg_right hΔHGΩ
+    nlinarith only [mul_le_mul_of_nonneg_right hΔHGΩ
         (by positivity : (0:ℝ) ≤ P.G ^ 4 * P.U ^ 15 * (S.Δ * S.Ω ^ 2)),
       hHpos, hGpos, hΩpos, hΔpos, pow_pos hGpos 4, pow_pos hUpos 15]
   -- 2δ ≤ 1   (δ tiny: Δ ≥ 10¹⁵G⁴U²⁰, U ≥ 10³³)
@@ -204,7 +203,7 @@ private theorem perv_countR {P : Globals} {S : Scale P} {ℓ₁ Lr W δ len n : 
           = 10 ^ 41 * (P.G ^ 4 * P.U ^ 10) / ℓ₁ by
         rw [show (10:ℝ) ^ 70 = 10 ^ 41 * 10 ^ 29 by norm_num]; field_simp,
         le_div_iff₀ hℓ1pos, one_mul]
-    nlinarith [hℓ1G4, (by positivity : (0:ℝ) ≤ P.G ^ 4 * P.U ^ 10)]
+    nlinarith only [hℓ1G4, (by positivity : (0:ℝ) ≤ P.G ^ 4 * P.U ^ 10)]
   -- ===== ASSEMBLY =====
   set M : ℝ := 10 ^ 13 * W * len with hM_def
   set Q : ℝ := 2 * δ / (W / 10 ^ 50) with hQ_def
@@ -283,7 +282,7 @@ private theorem perv_countR {P : Globals} {S : Scale P} {ℓ₁ Lr W δ len n : 
   rw [show (6:ℝ) * (10 ^ 199 * (b + DC)) = (6 * 10 ^ 199) * (b + DC) by ring]
   refine mul_le_mul_of_nonneg_right ?_ hbDC_nn
   have hp : (10:ℝ) ^ 200 = 10 ^ 199 * 10 := pow_succ 10 199
-  rw [hp]; nlinarith [pow_pos (show (0:ℝ) < 10 by norm_num) 199]
+  rw [hp]; nlinarith only [pow_pos (show (0:ℝ) < 10 by norm_num) 199]
 
 /-- **§5 Step-4 per-`(s,v)` r-count `hperv` (FAITHFUL bare `Rδ`, writeup 1086–1088).**  For a
 fixed admissible `(s,v)` (the `w`-value, `|w|` large per the v-band), the positions `r ∈ Fib`

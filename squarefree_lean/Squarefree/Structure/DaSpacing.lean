@@ -81,7 +81,7 @@ private theorem lemma_3_1_core (X H Δ a b d : ℝ)
     (hX : 0 < X) (hH : 0 < H) (hΔ : (16777216 : ℝ) ≤ Δ)
     (ha : 0 < a) (hb : 0 < b) (hb2a : 2 * a ≤ b)
     (hd_lo : H * Δ ≤ d) (hd_hi : d ≤ 2 * (H * Δ))
-    (hab_small : a + b ≤ H * Δ) (hbD : b ≤ H * Δ / 2)
+    (_hab_small : a + b ≤ H * Δ) (hbD : b ≤ H * Δ / 2)
     (ha_lo : (1/4 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ) ≤ a)
     (b_bound : b < (1 / 10 : ℝ) * a ^ (-1/3 : ℝ) * Δ ^ (5/3 : ℝ) * (H ^ 5 / X) ^ (1/3 : ℝ)) :
     |Sab X a b d| < 1 / 2 ∧
@@ -157,7 +157,7 @@ private theorem lemma_3_1_core (X H Δ a b d : ℝ)
     calc X * a * b * (b - a) * (a + b) * (a + b + 2 * d)
             * (a * b + 2 * a * d + 2 * b * d + 2 * d ^ 2)
         ≤ X * a * b * b * (2 * b) * (5 * Dv) * (17 * Dv ^ 2) := by
-          gcongr <;> first | linarith | exact hF4_ub | positivity
+          gcongr <;> linarith
       _ = 170 * X * a * b ^ 3 * Dv ^ 3 := by ring
   have hNum_lb : 2 * X * a * b ^ 3 * Dv ^ 3 ≤ Num := by
     rw [hNumdef]
@@ -165,18 +165,18 @@ private theorem lemma_3_1_core (X H Δ a b d : ℝ)
         = X * a * b * (b / 2) * b * (2 * Dv) * (2 * Dv ^ 2) := by ring
       _ ≤ X * a * b * (b - a) * (a + b) * (a + b + 2 * d)
             * (a * b + 2 * a * d + 2 * b * d + 2 * d ^ 2) := by
-          gcongr <;> first | linarith | exact hF4_lb | positivity
+          gcongr <;> linarith
   -- Den bounds
   have hDen_lb : Dv ^ 8 ≤ Den := by
     rw [hDendef]
     calc Dv ^ 8 = Dv ^ 2 * Dv ^ 2 * Dv ^ 2 * Dv ^ 2 := by ring
       _ ≤ d ^ 2 * (d + a) ^ 2 * (d + b) ^ 2 * (d + a + b) ^ 2 := by
-          gcongr <;> first | exact hDpos.le | exact hd_lo | exact hp2_lo | exact hp3_lo | exact hp4_lo
+          gcongr
   have hDen_ub : Den ≤ 6561 * Dv ^ 8 := by
     rw [hDendef]
     calc d ^ 2 * (d + a) ^ 2 * (d + b) ^ 2 * (d + a + b) ^ 2
         ≤ (3 * Dv) ^ 2 * ((3 * Dv)) ^ 2 * ((3 * Dv)) ^ 2 * ((3 * Dv)) ^ 2 := by
-          gcongr <;> first | exact hp1_hi | exact hp2_hi | exact hp3_hi | exact hp4_hi | positivity
+          gcongr
       _ = 6561 * Dv ^ 8 := by ring
   -- |Sab| upper and lower in terms of X a b³ / Dv⁵
   have hDv5 : (0:ℝ) < Dv ^ 5 := by positivity
@@ -204,7 +204,7 @@ private theorem lemma_3_1_core (X H Δ a b d : ℝ)
         have h3 : (0:ℝ) < (H ^ 5 / X) ^ (1/3 : ℝ) := Real.rpow_pos_of_pos (by positivity) _
         positivity
       calc b ^ 3 < ((1 / 10 : ℝ) * a ^ (-1/3 : ℝ) * Δ ^ (5/3 : ℝ) * (H ^ 5 / X) ^ (1/3 : ℝ)) ^ 3 := by
-            gcongr ?_ ^ 3 <;> first | exact hbpos | exact b_bound
+            gcongr ?_ ^ 3
         _ = (1 / 10 : ℝ) ^ 3 * Δ ^ (5 : ℕ) * (H ^ 5 / X) / a :=
             thresh_cube (1/10) a Δ H X ha hΔpos (by positivity)
         _ = (1 / 1000 : ℝ) * Δ ^ (5 : ℕ) * (H ^ 5 / X) / a := by norm_num
@@ -218,12 +218,12 @@ private theorem lemma_3_1_core (X H Δ a b d : ℝ)
         field_simp
       rw [hsimp] at step
       rw [div_lt_iff₀ hDv5]
-      have hDv5eq : Dv ^ 5 = H ^ 5 * Δ ^ (5 : ℕ) := by rw [hDvdef]; push_cast; ring
+      have hDv5eq : Dv ^ 5 = H ^ 5 * Δ ^ (5 : ℕ) := by rw [hDvdef]; ring
       rw [hDv5eq]
       have hΔ5pos : (0:ℝ) ≤ Δ ^ (5 : ℕ) := by positivity
       have hH5pos : (0:ℝ) ≤ H ^ 5 := by positivity
       have hgap : (170 / 1000 : ℝ) * Δ ^ (5 : ℕ) * H ^ 5 ≤ (1 / 2) * (H ^ 5 * Δ ^ (5 : ℕ)) := by
-        nlinarith [mul_nonneg hΔ5pos hH5pos]
+        nlinarith only [mul_nonneg hΔ5pos hH5pos]
       linarith [step, hgap]
     exact lt_of_le_of_lt hSub hkey
   · -- error ≤ (1/2)|Sab|, via |Sab| ≥ (2/6561) X a b³/Dv⁵ and ha_lo
@@ -248,7 +248,7 @@ private theorem lemma_3_1_core (X H Δ a b d : ℝ)
     -- key cross-multiplied inequality: 8 b H Dv³ ≤ (1/6561) X a b³
     have hcross : 8 * b * H * Dv ^ 3 ≤ (1 / 6561 : ℝ) * X * a * b ^ 3 := by
       -- reduce to 8 H Dv³ ≤ (1/6561) X a b²
-      have hba2 : a ^ 2 ≤ b ^ 2 := by nlinarith [hb2a, hapos, hbpos]
+      have hba2 : a ^ 2 ≤ b ^ 2 := by nlinarith only [hb2a, hapos, hbpos]
       have hXa3 : (1/64 : ℝ) * Δ ^ (4 : ℕ) * H ^ 4 ≤ X * a ^ 3 := by
         have hXpos := hX
         have : (1/64 : ℝ) * Δ ^ (4 : ℕ) * (H ^ 4 / X) * X ≤ a ^ 3 * X :=
@@ -256,7 +256,7 @@ private theorem lemma_3_1_core (X H Δ a b d : ℝ)
         have hdiv : (1/64 : ℝ) * Δ ^ (4 : ℕ) * (H ^ 4 / X) * X = (1/64:ℝ) * Δ ^ (4:ℕ) * H ^ 4 := by
           field_simp
         rw [hdiv] at this
-        nlinarith [this]
+        nlinarith only [this]
       -- 8 H Dv³ ≤ (1/6561) X a³  (uses Δ ≥ 3359232, Dv = HΔ)
       have hDv3 : Dv ^ 3 = H ^ 3 * Δ ^ 3 := by rw [hDvdef]; ring
       have hstep : 8 * H * Dv ^ 3 ≤ (1 / 6561 : ℝ) * X * a ^ 3 := by
@@ -270,11 +270,11 @@ private theorem lemma_3_1_core (X H Δ a b d : ℝ)
         have hH4pos : (0:ℝ) < H ^ 4 := by positivity
         have hid : (1 / 6561 : ℝ) * ((1/64) * Δ ^ (4:ℕ) * H ^ 4) - 8 * H * (H ^ 3 * Δ ^ 3)
             = (Δ ^ 3 * H ^ 4) * ((1 / 419904 : ℝ) * Δ - 8) := by rw [hΔ4]; ring
-        nlinarith [hub2, mul_nonneg hΔ3pos.le hH4pos.le, hΔ, hid]
+        nlinarith only [hub2, mul_nonneg hΔ3pos.le hH4pos.le, hΔ, hid]
       -- now multiply by b > 0 and use a²·(ab) ≤ b²·(ab)
       have hlast : (1 / 6561 : ℝ) * X * a ^ 3 * b ≤ (1 / 6561 : ℝ) * X * a * b ^ 3 := by
         have hcoef : (0:ℝ) ≤ (1 / 6561 : ℝ) * X * a * b := by positivity
-        nlinarith [hba2, hcoef, mul_nonneg hapos hbpos]
+        nlinarith only [hba2, hcoef, mul_nonneg hapos hbpos]
       have heqb : 8 * b * H * Dv ^ 3 = b * (8 * H * Dv ^ 3) := by ring
       rw [heqb]
       calc b * (8 * H * Dv ^ 3) ≤ b * ((1 / 6561 : ℝ) * X * a ^ 3) :=

@@ -10,8 +10,6 @@ namespace Squarefree
 
 open Set
 
-set_option maxHeartbeats 4000000
-
 private noncomputable def sec7_ra_B1SharpScaleAled : ℕ → ℝ
   | 0 => 300
   | 1 => 1400
@@ -386,13 +384,13 @@ private theorem sec7_ra_B1_bound_sharp_aled_k3 {P : Globals} {S : Scale P} {a d 
           dBreve' P.X a (Ffun P.X a t)) d|
         = |F3 * H2 + 3 * F1 * F2 * H3 + F1 ^ 3 * H4| := by rw [hiter, abs_neg]
     _ ≤ |F3 * H2| + |3 * F1 * F2 * H3| + |F1 ^ 3 * H4| := by
-          nlinarith [abs_add_le (F3 * H2 + 3 * F1 * F2 * H3) (F1 ^ 3 * H4),
+          linarith [abs_add_le (F3 * H2 + 3 * F1 * F2 * H3) (F1 ^ 3 * H4),
             abs_add_le (F3 * H2) (3 * F1 * F2 * H3)]
     _ ≤ (128 * P.X * a / d ^ 6) * ((200 * d ^ 10 / (P.X * a) ^ 3) * |j|) +
         (3 * (7 * P.X * a / d ^ 4) * (26 * P.X * a / d ^ 5)) *
           ((3000 * d ^ 13 / (P.X * a) ^ 4) * |j|) +
         (7 * P.X * a / d ^ 4) ^ 3 * ((50000 * d ^ 16 / (P.X * a) ^ 5) * |j|) := by
-          nlinarith [hterm1, hterm2, hterm3]
+          linarith [hterm1, hterm2, hterm3]
     _ = sec7_ra_B1SharpScaleAled 3 * |j| * d ^ 4 / (P.X * a) ^ 2 := by
           simp [sec7_ra_B1SharpScaleAled]
           field_simp [P.X_pos.ne', ha0.ne', hd.ne']
@@ -509,7 +507,7 @@ private theorem sec7_ra_B1_bound_sharp_aled_k4 {P : Globals} {S : Scale P} {a d 
                     6 * F1 ^ 2 * F2 * H4| + |F1 ^ 4 * H5| := abs_add_le _ _
             _ ≤ |F4 * H2| + |(4 * F1 * F3 + 3 * F2 ^ 2) * H3| +
                 |6 * F1 ^ 2 * F2 * H4| + |F1 ^ 4 * H5| := by
-                  nlinarith [abs_add_le (F4 * H2 + (4 * F1 * F3 + 3 * F2 ^ 2) * H3)
+                  linarith [abs_add_le (F4 * H2 + (4 * F1 * F3 + 3 * F2 ^ 2) * H3)
                     (6 * F1 ^ 2 * F2 * H4),
                     abs_add_le (F4 * H2) ((4 * F1 * F3 + 3 * F2 ^ 2) * H3)]
     _ ≤ (800 * P.X * a / d ^ 7) * ((200 * d ^ 10 / (P.X * a) ^ 3) * |j|) +
@@ -519,7 +517,7 @@ private theorem sec7_ra_B1_bound_sharp_aled_k4 {P : Globals} {S : Scale P} {a d 
         6 * (7 * P.X * a / d ^ 4) ^ 2 * (26 * P.X * a / d ^ 5) *
           ((50000 * d ^ 16 / (P.X * a) ^ 5) * |j|) +
         (7 * P.X * a / d ^ 4) ^ 4 * ((1500000 * d ^ 19 / (P.X * a) ^ 6) * |j|) := by
-          nlinarith [hterm1, hterm2, hterm3, hterm4]
+          linarith [hterm1, hterm2, hterm3, hterm4]
     _ = sec7_ra_B1SharpScaleAled 4 * |j| * d ^ 3 / (P.X * a) ^ 2 := by
           simp [sec7_ra_B1SharpScaleAled]
           field_simp [P.X_pos.ne', ha0.ne', hd.ne']
@@ -576,7 +574,7 @@ private theorem sec7_ra_B1_bound_sharp_aled_k5 {P : Globals} {S : Scale P} {a d 
     have hza_pos : 0 < z + a := by positivity
     rw [Ffun_deriv1_abs_eq (X := P.X) (a := a) (d := z) P.X_pos ha0 hzpos]
     have hQ_nonneg : 0 ≤ a ^ 2 + 3 * a * z + 3 * z ^ 2 := by positivity
-    have ha_z : a ≤ (100 / 99 : ℝ) * z := by nlinarith [ha2, hzlo]
+    have ha_z : a ≤ (100 / 99 : ℝ) * z := by linarith [ha2, hzlo]
     have ha2z :
         a ^ 2 * z ≤ (((100 / 99 : ℝ) * z) ^ 2) * z := by
       exact mul_le_mul_of_nonneg_right (pow_le_pow_left₀ ha0.le ha_z 2) hzpos.le
@@ -595,8 +593,8 @@ private theorem sec7_ra_B1_bound_sharp_aled_k5 {P : Globals} {S : Scale P} {a d 
       have hnonneg :
           0 ≤ 3 * z * (a ^ 2 + 3 * a * z + 3 * z ^ 2) -
             2 * (z + a) ^ 3 := by
-        nlinarith [ha2z, ha3, hconstz, hpos_term]
-      nlinarith
+        nlinarith only [ha2z, ha3, hconstz, hpos_term]
+      linarith
     have hz4_le : z ^ 4 ≤ (((101 / 100 : ℝ) * d) ^ 4) :=
       pow_le_pow_left₀ hzpos.le hzhi 4
     have hden_core :
@@ -653,7 +651,7 @@ private theorem sec7_ra_B1_bound_sharp_aled_k5 {P : Globals} {S : Scale P} {a d 
           sec7_ra_Ffun_mvt_local (X := P.X) (a := a) (p := qd) (q := d) ha0
             (lt_of_lt_of_le (by positivity : 0 < (99 / 100 : ℝ) * d) hqwin.1) hlt
         have hc_win_lo : (99 / 100 : ℝ) * d ≤ c := le_trans hqwin.1 (le_of_lt hc_lo)
-        have hc_win_hi : c ≤ (101 / 100 : ℝ) * d := le_trans (le_of_lt hc_hi) (by nlinarith)
+        have hc_win_hi : c ≤ (101 / 100 : ℝ) * d := le_trans (le_of_lt hc_hi) (by linarith)
         have hder := hF1lower hc_win_lo hc_win_hi
         have hj_abs : |j| = |deriv (fun t => Ffun P.X a t) c| * |qd - d| := by
           have hj : j = -(Ffun P.X a d - Ffun P.X a qd) := by
@@ -664,7 +662,7 @@ private theorem sec7_ra_B1_bound_sharp_aled_k5 {P : Globals} {S : Scale P} {a d 
         exact mul_le_mul_of_nonneg_right hder (abs_nonneg _)
       · obtain ⟨c, hc_lo, hc_hi, hc_mvt⟩ :=
           sec7_ra_Ffun_mvt_local (X := P.X) (a := a) (p := d) (q := qd) ha0 hd hlt
-        have hc_win_lo : (99 / 100 : ℝ) * d ≤ c := by nlinarith
+        have hc_win_lo : (99 / 100 : ℝ) * d ≤ c := by linarith
         have hc_win_hi : c ≤ (101 / 100 : ℝ) * d := le_trans (le_of_lt hc_hi) hqwin.2
         have hder := hF1lower hc_win_lo hc_win_hi
         have hj_abs : |j| = |deriv (fun t => Ffun P.X a t) c| * |qd - d| := by
@@ -721,10 +719,10 @@ private theorem sec7_ra_B1_bound_sharp_aled_k5 {P : Globals} {S : Scale P} {a d 
         · rw [uIcc_of_le hqd_le] at hu
           constructor
           · exact le_trans hqwin.1 hu.1
-          · nlinarith [hd, hu.2]
+          · linarith [hd, hu.2]
         · rw [uIcc_of_ge hd_le] at hu
           constructor
-          · nlinarith [hd, hu.1]
+          · linarith [hd, hu.1]
           · exact le_trans hu.2 hqwin.2
       simpa [L, hL_def] using
         sec7_ra_dBreve6ImageK_deriv_bound_aled (X := P.X) (a := a) (d := d)
@@ -895,7 +893,7 @@ private theorem sec7_ra_B1_bound_sharp_aled_k5 {P : Globals} {S : Scale P} {a d 
     _ ≤ |F5 * H2| + |(5 * F1 * F4 + 10 * F2 * F3) * H3| +
         |5 * F1 * (2 * F1 * F3 + 3 * F2 ^ 2) * H4| +
         |10 * F1 ^ 3 * F2 * H5| + |F1 ^ 5 * H6| := by
-          nlinarith [abs_add_le
+          linarith [abs_add_le
             (F5 * H2 + (5 * F1 * F4 + 10 * F2 * F3) * H3 +
               5 * F1 * (2 * F1 * F3 + 3 * F2 ^ 2) * H4 +
               10 * F1 ^ 3 * F2 * H5) (F1 ^ 5 * H6),
@@ -919,7 +917,7 @@ private theorem sec7_ra_B1_bound_sharp_aled_k5 {P : Globals} {S : Scale P} {a d 
           ((1500000 * d ^ 19 / (P.X * a) ^ 6) * |j|) +
         (7 * P.X * a / d ^ 4) ^ 5 *
           ((1500000 * d ^ 22 / (P.X * a) ^ 7) * |j|) := by
-          nlinarith [hterm1, hterm2, hterm3, hterm4, hterm5]
+          linarith [hterm1, hterm2, hterm3, hterm4, hterm5]
     _ = 165850540000 * |j| * d ^ 2 / (P.X * a) ^ 2 := by
           field_simp [P.X_pos.ne', ha0.ne', hd.ne']
           ring

@@ -40,7 +40,6 @@ noncomputable def sec7_harvM : ℝ := 10 ^ 3
 theorem sec7_cTriple_pos : (0:ℝ) < sec7_cTriple := by norm_num [sec7_cTriple]
 theorem sec7_harvM_pos : (0:ℝ) < sec7_harvM := by norm_num [sec7_harvM]
 
-set_option maxHeartbeats 2000000
 set_option exponentiation.threshold 1000
 
 /-- The per-summand harvest comparison constant: 18 expanded zero-branch summands. -/
@@ -68,7 +67,7 @@ private theorem sec7_le_of_fourth {a b : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b)
     (h : a ^ 4 ≤ b ^ 4) : a ≤ b := by
   apply sec7_le_of_sq ha hb
   apply sec7_le_of_sq (sq_nonneg a) (sq_nonneg b)
-  nlinarith [h]
+  nlinarith only [h]
 
 private theorem sec7_T₁_pos_local {P : Globals} (S : Scale P) : 0 < S.T₁ := by
   have := P.H_pos; have := P.G_pos; have := S.Δ_pos; have := S.Ω_pos
@@ -179,7 +178,7 @@ private theorem sec7_zero_fit_z1 {P : Globals} {S : Scale P} {W : ℝ}
   have hG := P.G_pos
   have hΩ := S.Ω_pos
   have hx := OnStripAux.x_pos P S
-  have hL2 : (1 : ℝ) ≤ (1 + Real.log P.X) ^ 2 := by nlinarith
+  have hL2 : (1 : ℝ) ≤ (1 + Real.log P.X) ^ 2 := by nlinarith only [hlog0]
   have hC :
       sec7_harvC ^ 2 * W ^ 16 ≤ P.H * S.x ^ 5 * S.Ω ^ 4 := by
     calc
@@ -310,7 +309,7 @@ private theorem sec7_zero_fit_res1 {P : Globals} {S : Scale P} {W : ℝ}
   have hW0 : 0 ≤ W := le_trans zero_le_one hW
   have hH := P.H_pos; have hG := P.G_pos; have hΩ := S.Ω_pos
   have hx := OnStripAux.x_pos P S
-  have hL2 : (1 : ℝ) ≤ (1 + Real.log P.X) ^ 2 := by nlinarith
+  have hL2 : (1 : ℝ) ≤ (1 + Real.log P.X) ^ 2 := by nlinarith only [hlog0]
   have hC : sec7_harvC ^ 2 * W ^ 16 ≤ P.H ^ 3 * S.x * P.G ^ 2 * S.Ω ^ 2 := by
     calc
       sec7_harvC ^ 2 * W ^ 16 ≤ sec7_envC * W ^ 16 := by
@@ -339,7 +338,7 @@ private theorem sec7_zero_fit_n2_base {P : Globals} {S : Scale P} {W : ℝ}
   have hW0 : 0 ≤ W := le_trans zero_le_one hW
   have hH := P.H_pos; have hG := P.G_pos; have hΩ := S.Ω_pos
   have hx := OnStripAux.x_pos P S
-  have hL2 : (1 : ℝ) ≤ (1 + Real.log P.X) ^ 2 := by nlinarith
+  have hL2 : (1 : ℝ) ≤ (1 + Real.log P.X) ^ 2 := by nlinarith only [hlog0]
   have hC : sec7_harvC ^ 2 * W ^ 28 ≤ P.H * S.x ^ 5 * P.G ^ 2 * S.Ω ^ 14 := by
     calc
       sec7_harvC ^ 2 * W ^ 28 ≤ sec7_envC * W ^ 28 := by
@@ -366,7 +365,7 @@ private theorem sec7_zero_fit_n2_base {P : Globals} {S : Scale P} {W : ℝ}
           field_simp [hx.ne', hG.ne', hΩ.ne']
     _ ≤ P.H * S.x * P.G ^ 2 * S.Ω ^ 6 := by
           have hG2pos : 0 < P.G ^ 2 := pow_pos hG 2
-          have hG2 : (1 : ℝ) ≤ P.G ^ 2 := by nlinarith [hG1]
+          have hG2 : (1 : ℝ) ≤ P.G ^ 2 := by nlinarith only [hG1]
           have hdiv : 1 / P.G ^ 2 ≤ P.G ^ 2 := by
             rw [one_div]
             exact (inv_le_one_of_one_le₀ hG2).trans hG2
@@ -384,7 +383,7 @@ private theorem sec7_zero_fit_n2_fiber {P : Globals} {S : Scale P} {W : ℝ}
   have hW0 : 0 ≤ W := le_trans zero_le_one hW
   have hH := P.H_pos; have hG := P.G_pos; have hΩ := S.Ω_pos
   have hx := OnStripAux.x_pos P S
-  have hL2 : (1 : ℝ) ≤ (1 + Real.log P.X) ^ 2 := by nlinarith
+  have hL2 : (1 : ℝ) ≤ (1 + Real.log P.X) ^ 2 := by nlinarith only [hlog0]
   have hC : sec7_harvC ^ 2 * W ^ 28 ≤ P.H * S.x ^ 5 * P.G ^ 2 * S.Ω ^ 14 := by
     calc
       sec7_harvC ^ 2 * W ^ 28 ≤ sec7_envC * W ^ 28 := by
@@ -414,7 +413,7 @@ private theorem sec7_zero_fit_n3 {P : Globals} {S : Scale P} {W : ℝ}
   have hW0 : 0 ≤ W := le_trans zero_le_one hW
   have hH := P.H_pos; have hG := P.G_pos; have hΩ := S.Ω_pos
   have hx := OnStripAux.x_pos P S
-  have hL2 : (1 : ℝ) ≤ (1 + Real.log P.X) ^ 2 := by nlinarith
+  have hL2 : (1 : ℝ) ≤ (1 + Real.log P.X) ^ 2 := by nlinarith only [hlog0]
   have hC : sec7_harvC ^ 2 * W ^ 40 ≤ P.H * S.x ^ 5 * P.G ^ 8 * S.Ω ^ 24 := by
     calc
       sec7_harvC ^ 2 * W ^ 40 ≤ sec7_envC * W ^ 40 := by
@@ -502,7 +501,7 @@ private theorem sec7_zero_fit_res2 {P : Globals} {S : Scale P} {W : ℝ}
   have hW0 : 0 ≤ W := le_trans zero_le_one hW
   have hH := P.H_pos; have hG := P.G_pos; have hΩ := S.Ω_pos
   have hx := OnStripAux.x_pos P S
-  have hL2 : (1 : ℝ) ≤ (1 + Real.log P.X) ^ 2 := by nlinarith
+  have hL2 : (1 : ℝ) ≤ (1 + Real.log P.X) ^ 2 := by nlinarith only [hlog0]
   have hC : sec7_harvC ^ 2 * W ^ 28 ≤ P.H ^ 3 * S.x * P.G ^ 4 * S.Ω ^ 12 := by
     calc
       sec7_harvC ^ 2 * W ^ 28 ≤ sec7_envC * W ^ 28 := by
@@ -591,7 +590,7 @@ private theorem sec7_zero_fit_tc4 {P : Globals} {S : Scale P} {W : ℝ}
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W) (hlog0 : 0 ≤ Real.log P.X) :
     sec7_harvC * W ^ 8 ≤ S.R := by
   have hW0 : 0 ≤ W := le_trans zero_le_one hW
-  have hlog1 : (1 : ℝ) ≤ 1 + Real.log P.X := by nlinarith
+  have hlog1 : (1 : ℝ) ≤ 1 + Real.log P.X := by linarith only [hlog0]
   calc
     sec7_harvC * W ^ 8 ≤ sec7_envC * W ^ 8 := by
       exact mul_le_mul_of_nonneg_right sec7_harvC_le_envC (pow_nonneg hW0 8)
@@ -606,7 +605,7 @@ private theorem sec7_zero_fit_tc8 {P : Globals} {S : Scale P} {W : ℝ}
     sec7_harvC * W ^ 14 * (1 / (P.G * S.Ω ^ 5)) ≤ S.R := by
   have hW0 : 0 ≤ W := le_trans zero_le_one hW
   have hG := P.G_pos; have hΩ := S.Ω_pos
-  have hlog1 : (1 : ℝ) ≤ 1 + Real.log P.X := by nlinarith
+  have hlog1 : (1 : ℝ) ≤ 1 + Real.log P.X := by linarith only [hlog0]
   have hC : sec7_harvC * W ^ 14 ≤
       P.H ^ ((1:ℝ)/2) * S.x ^ ((1:ℝ)/2) * P.G ^ 2 * S.Ω ^ 8 := by
     calc
@@ -1184,7 +1183,7 @@ private theorem sec7_nonzero_fit_n2_sden {P : Globals} {S : Scale P} {W : ℝ}
     _ = P.H * S.x * S.Ω ^ 6 / P.G ^ 2 := by
           field_simp [hx.ne', hG.ne', hΩ.ne']
     _ ≤ P.H * S.x * P.G ^ 2 * S.Ω ^ 6 := by
-          have hG2 : (1 : ℝ) ≤ P.G ^ 2 := by nlinarith [hG1]
+          have hG2 : (1 : ℝ) ≤ P.G ^ 2 := by nlinarith only [hG1]
           have hdiv : 1 / P.G ^ 2 ≤ P.G ^ 2 := by
             rw [one_div]
             exact (inv_le_one_of_one_le₀ hG2).trans hG2
@@ -2307,7 +2306,7 @@ theorem sec7_harvest_nonzero :
         _ = 16 * D := by ring
     calc
       sec7_cTriple * sec7_cBox * Z ≤ 16 * D := hsumSlices
-      _ ≤ 18 * D := by nlinarith [hD0]
+      _ ≤ 18 * D := by linarith only [hD0]
       _ = S.R / (W * sec7_harvM) := by
         dsimp [D]
         field_simp [hWpos.ne', sec7_harvM_pos.ne']
