@@ -1,8 +1,15 @@
-SQUAREFREE FORMALIZATION — PROGRESS SUMMARY (2026-06-17)
+SQUAREFREE FORMALIZATION — PROGRESS SUMMARY (2026-06-18)
 =========================================================
 
 BUILD: GREEN, full project (`lake build`, 8548 jobs). Tracked stubs: 0 — COMPLETE.
   theorem_10_1 axioms = [propext, Classical.choice, Quot.sound] — AXIOM-CLEAN, no sorryAx.
+
+PERF (2026-06-18): full clean project build 48m17s → 27m41s (~43% faster), still axiom-clean.
+  ~30 modules sped up 2–9× by nlinarith→`nlinarith only`/linarith (the linear-goal-in-huge-context
+  anti-pattern); dozens of maxHeartbeats bumps removed/lowered (incl. 25.6M, 10M, 6.4M). Warnings
+  406 → 295 (111 cleared). Use LEAN_NUM_THREADS=10 (no -j flag); never `lake clean`. See CLAUDE.md §1a.
+  REMAINING wall-time gates resist nlinarith (need simp/elab work): Step2D2ZeroCorr (199s simp),
+  DyadicAssembly (136s elab), Prop51Assembly (96s). 295 warnings remain in un-optimized modules.
 
   ✅ §7 Φ″ ENDGAME CLOSED (2026-06-17, commit 589b8df): the last sorry
      (sec7_zero_few_critical Φ″ branch) filled by two new lemmas in Sec7ZeroScale:

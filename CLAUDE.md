@@ -48,11 +48,18 @@ Build/verify from the Lean project root (`squarefree_lean/`): `lake build <Modul
   `nlinarith` lemmas. A `set_option maxHeartbeats ≥ 1000000` is a red flag: isolate the numeric
   fact (esp. astronomical numerals like 10^143) into a tiny dedicated lemma proved on a clean goal.
 - **`nlinarith`-on-LINEAR-goals is the #1 cost anti-pattern (project-wide).** Many slow `nlinarith`
-  calls are actually *linear* goals sitting in a huge rpow-laden context; `nlinarith` still runs its
-  O(n²) Positivstellensatz product search over every atom. Fix: `linarith [explicit hints]`, or
-  pull the numeric step into `have … := by norm_num`/`positivity`/`gcongr` on a clean goal, then
-  `linarith`. Reserve bare `nlinarith` for genuinely nonlinear goals in SMALL contexts. (This one
-  change took Sec7ZeroScale 3:25 → 1:14 and dropped two `maxHeartbeats 4000000` bumps; 2026-06-17.)
+  calls are actually *linear* (or single-product) goals sitting in a huge rpow-laden context;
+  `nlinarith` still runs its O(n²) Positivstellensatz product search over every ambient atom. Fixes,
+  in order of preference: **`nlinarith only [hints]`** (the `only` drops the ambient context but keeps
+  ring normalization — the single most effective fix, often 5–10×); `linarith [hints]` for purely
+  linear goals; or pull the numeric step into `have … := by norm_num`/`positivity` then `linarith`.
+  Reserve bare `nlinarith` for genuinely nonlinear goals in SMALL contexts. This took the full clean
+  build 48m17s → 27m41s across ~30 modules (2026-06-18), all proof-body-only.
+- **Parallelizing perf passes on a dependency CHAIN:** have agents verify/time with `lake env lean
+  <file>` (compiles the file against EXISTING dep oleans, does NOT rebuild deps) instead of
+  `lake build <module>`. Then many agents can edit chained modules in parallel without clobbering
+  each other's oleans (proof-only edits don't change interfaces); the orchestrator runs ONE final
+  integrated `lake build Squarefree.Main` (the real gate) and commits only after it's green.
 - **Minimal imports save little MEMORY here** (the analysis closure dominates), but still help
   elaboration time + rebuild fan-out. Worth doing on pure `import Mathlib` files; not a memory fix.
 - **Splitting a monster only speeds the FULL build if the pieces are independent siblings.** A
