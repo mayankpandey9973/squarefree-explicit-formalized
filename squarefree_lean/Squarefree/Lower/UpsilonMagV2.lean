@@ -22,7 +22,7 @@ open Real
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 3200000 in
+set_option maxHeartbeats 1000000 in
 /-- **§5 Step-4 magnitude residual (v²-form).**  With the local cancellation-avoidance bound
 `hvlo`, every monomial of `P₁+P₂/d` other than the leading `3·ℓ₁³ℓ₂(ℓ₂−ℓ₁)b₀v²` contributes
 `≤ T := ℓ₁³ℓ₂(ℓ₂−ℓ₁)|b₀|v²` in total.  This is the shared core of both the lower bound
@@ -42,6 +42,7 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     |Pone b₀ v ℓ₁ ℓ₂ + Ptwo b₀ v ℓ₁ ℓ₂ / d - 3 * ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * b₀ * v ^ 2|
       ≤ ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2 := by
   -- positivity / basic facts
+  have _ha := a  -- `a` is a vestigial signature parameter (callers pass it by name)
   have hHpos : 0 < P.H := P.H_pos
   have hGpos : 0 < P.G := P.G_pos
   have hUpos : 0 < P.U := P.U_pos
@@ -69,9 +70,14 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
   -- a few derived numeric scale facts
   have hΔ1 : (1:ℝ) ≤ S.Δ := by
     have : (10:ℝ) ^ 15 * (P.G ^ 4 * P.U ^ 20) ≥ 1 := by
-      have := one_le_pow₀ (n := 4) hG1
-      have := one_le_pow₀ (n := 20) hU1
-      nlinarith [one_le_pow₀ (n := 4) hG1, one_le_pow₀ (n := 20) hU1]
+      have hp : (1:ℝ) ≤ P.G ^ 4 * P.U ^ 20 :=
+        calc (1:ℝ) = 1 * 1 := (mul_one 1).symm
+          _ ≤ P.G ^ 4 * P.U ^ 20 :=
+            mul_le_mul (one_le_pow₀ hG1) (one_le_pow₀ hU1) zero_le_one (by positivity)
+      calc (1:ℝ) ≤ P.G ^ 4 * P.U ^ 20 := hp
+        _ = 1 * (P.G ^ 4 * P.U ^ 20) := (one_mul _).symm
+        _ ≤ 10 ^ 15 * (P.G ^ 4 * P.U ^ 20) :=
+            mul_le_mul_of_nonneg_right (by norm_num) (by positivity)
     linarith [hDeW]
   -- abbreviations
   set T : ℝ := ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2 with hTdef
@@ -92,7 +98,6 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
   -- chain A:  8·10^26 · G U⁵ ≤ Δ   (from hDeW, hUbig)
   have hΔbig : 8 * 10 ^ 26 * (P.G * P.U ^ 5) ≤ S.Δ := by
     -- Δ ≥ 10^15 G⁴ U²⁰ = 10^15 G⁴ U⁵ · U¹⁵ ≥ 10^15 · G U⁵ · U¹⁵
-    have hG3 : (1:ℝ) ≤ P.G ^ 3 := one_le_pow₀ hG1
     have hU15 : (8:ℝ) * 10 ^ 26 ≤ P.U ^ 15 := by
       have h2 : ((10:ℝ) ^ 33) ^ 15 = (10:ℝ) ^ 495 := by rw [← pow_mul]
       have h3 : ((10:ℝ) ^ 33) ^ 15 ≤ P.U ^ 15 := pow_le_pow_left₀ (by positivity) hUbig 15
@@ -106,8 +111,12 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     have step1 : 8 * 10 ^ 26 * (P.G * P.U ^ 5) ≤ P.U ^ 15 * (P.G * P.U ^ 5) :=
       mul_le_mul_of_nonneg_right hU15 (by positivity)
     have step2 : P.U ^ 15 * (P.G * P.U ^ 5) ≤ 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) := by
-      have hGG : P.G ≤ 10 ^ 15 * P.G ^ 4 := by nlinarith [hG3, hGpos, pow_pos hGpos 4]
-      nlinarith [hGG, pow_pos hUpos 20, pow_pos hUpos 15, pow_pos hUpos 5]
+      have hGG : P.G ≤ 10 ^ 27 * P.G ^ 4 :=
+        le_trans (le_self_pow₀ hG1 (n := 4) (by norm_num))
+          (le_mul_of_one_le_left (by positivity) (by norm_num))
+      calc P.U ^ 15 * (P.G * P.U ^ 5) = P.U ^ 20 * P.G := by ring
+        _ ≤ P.U ^ 20 * (10 ^ 27 * P.G ^ 4) := mul_le_mul_of_nonneg_left hGG (by positivity)
+        _ = 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) := by ring
     calc 8 * 10 ^ 26 * (P.G * P.U ^ 5) ≤ P.U ^ 15 * (P.G * P.U ^ 5) := step1
       _ ≤ 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) := step2
       _ ≤ S.Δ := hDeW
@@ -136,7 +145,6 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     -- Use that Δ ≥ 10^15 G⁴U²⁰ ≥ huge; redo directly.
     -- 32e26 G U⁵ ≤ Δ
     have hgoal : 32 * 10 ^ 26 * (P.G * P.U ^ 5) ≤ S.Δ := by
-      have hG3 : (1:ℝ) ≤ P.G ^ 3 := one_le_pow₀ hG1
       have hU15 : (32:ℝ) * 10 ^ 26 ≤ P.U ^ 15 := by
         have h2 : ((10:ℝ) ^ 33) ^ 15 = (10:ℝ) ^ 495 := by rw [← pow_mul]
         have h3 : ((10:ℝ) ^ 33) ^ 15 ≤ P.U ^ 15 := pow_le_pow_left₀ (by positivity) hUbig 15
@@ -148,9 +156,13 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
           _ ≤ P.U ^ 15 := h3
       have step1 : 32 * 10 ^ 26 * (P.G * P.U ^ 5) ≤ P.U ^ 15 * (P.G * P.U ^ 5) :=
         mul_le_mul_of_nonneg_right hU15 (by positivity)
-      have hGG : P.G ≤ 10 ^ 15 * P.G ^ 4 := by nlinarith [hG3, hGpos, pow_pos hGpos 4]
+      have hGG : P.G ≤ 10 ^ 27 * P.G ^ 4 :=
+        le_trans (le_self_pow₀ hG1 (n := 4) (by norm_num))
+          (le_mul_of_one_le_left (by positivity) (by norm_num))
       have step2 : P.U ^ 15 * (P.G * P.U ^ 5) ≤ 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) := by
-        nlinarith [hGG, pow_pos hUpos 20, pow_pos hUpos 15, pow_pos hUpos 5]
+        calc P.U ^ 15 * (P.G * P.U ^ 5) = P.U ^ 20 * P.G := by ring
+          _ ≤ P.U ^ 20 * (10 ^ 27 * P.G ^ 4) := mul_le_mul_of_nonneg_left hGG (by positivity)
+          _ = 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) := by ring
       calc 32 * 10 ^ 26 * (P.G * P.U ^ 5) ≤ P.U ^ 15 * (P.G * P.U ^ 5) := step1
         _ ≤ 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) := step2
         _ ≤ S.Δ := hDeW
@@ -185,10 +197,14 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
         apply mul_le_mul_of_nonneg_left (by linarith [hbig_b0v]) (by positivity)
       have h3 : 2 * ℓ₂ * (|b₀| / 16) ≤ (1/8) * (ℓ₂ * (ℓ₂ - ℓ₁) * |b₀|) := by
         rw [show (1/8) * (ℓ₂ * (ℓ₂ - ℓ₁) * |b₀|) = (ℓ₂ - ℓ₁) * (2 * ℓ₂ * (|b₀|/16)) by ring]
-        nlinarith [mul_nonneg hℓ2nn hb0nn, h21]
+        exact le_mul_of_one_le_left
+          (mul_nonneg (mul_nonneg (by norm_num) hℓ2nn) (div_nonneg hb0nn (by norm_num))) h21
       linarith [h1, h2, h3]
-    nlinarith [hkey, hℓ13pos, sq_nonneg (|v|), mul_nonneg hℓ13nn (sq_nonneg (|v|)),
-      mul_pos hℓ13pos (by positivity : (0:ℝ) < |v| ^ 2 + 1)]
+    calc ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) * (|v| ^ 2 * |v|)
+        = (ℓ₁ ^ 3 * |v| ^ 2) * ((2 * ℓ₂ - ℓ₁) * |v|) := by ring
+      _ ≤ (ℓ₁ ^ 3 * |v| ^ 2) * (1 / 8 * (ℓ₂ * (ℓ₂ - ℓ₁) * |b₀|)) :=
+            mul_le_mul_of_nonneg_left hkey (by positivity)
+      _ = 1 / 8 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v| ^ 2) := by ring
   -- ===== term 2:  −5ℓ₁³ℓ₂²(ℓ₂−ℓ₁)²b₀³v/d ;  |t2| ≤ (1/2)T  via hvlo =====
   have ht2 : |(-5 * ℓ₁ ^ 3 * ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) ^ 2 * b₀ ^ 3 * v) / d| ≤ (1/2) * T := by
     rw [abs_div, abs_of_pos hd_pos]
@@ -212,7 +228,12 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     --   (1/2)ℓ₁³ℓ₂(ℓ₂-ℓ₁)|b₀||v|·10ℓ₂(ℓ₂-ℓ₁)|b₀|² ≤ (1/2)ℓ₁³ℓ₂(ℓ₂-ℓ₁)|b₀||v|·|v|d
     --  LHS = 5ℓ₁³ℓ₂²(ℓ₂-ℓ₁)²|b₀|³|v|, RHS = (1/2)ℓ₁³ℓ₂(ℓ₂-ℓ₁)|b₀||v|²d. exactly the goal.
     have hcoef : (0:ℝ) ≤ (1/2) * ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v| := by positivity
-    nlinarith [mul_le_mul_of_nonneg_left hvlo' hcoef, hℓ13nn, hℓ2nn, h21nn, hb0nn, hvnn]
+    calc 5 * ℓ₁ ^ 3 * ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) ^ 2 * (|b₀| ^ 3 * |v|)
+        = (1 / 2 * ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v|) * (10 * (ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| ^ 2)) := by
+          ring
+      _ ≤ (1 / 2 * ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v|) * (|v| * d) :=
+            mul_le_mul_of_nonneg_left hvlo' hcoef
+      _ = 1 / 2 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v| ^ 2) * d := by ring
   -- ===== term 3:  −15ℓ₁³ℓ₂²(ℓ₂−ℓ₁)b₀²v²/d ;  |t3| ≤ (1/8)T  via 15ℓ₂|b₀|/d tiny =====
   -- ratio = 15 ℓ₂ |b₀| / d ;  bound 15 ℓ₂ |b₀| ≤ (1/8) d.
   have hsmall3 : 15 * ℓ₂ * |b₀| ≤ (1/8) * d := by
@@ -229,7 +250,10 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     rw [heq] at hℓ2b0
     -- 15 ℓ₂ |b₀| ≤ 15·3e12·U⁵Δ²/Ω³ = 4.5e13 U⁵Δ²/Ω³
     have h15 : 15 * ℓ₂ * |b₀| ≤ 5850000000000000 * (P.U ^ 5 * S.Δ ^ 2 / S.Ω ^ 3) := by
-      nlinarith [hℓ2b0, hℓ2nn, hb0nn]
+      calc 15 * ℓ₂ * |b₀| = 15 * (ℓ₂ * |b₀|) := by ring
+        _ ≤ 15 * (390000000000000 * (P.U ^ 5 * S.Δ ^ 2 / S.Ω ^ 3)) :=
+              mul_le_mul_of_nonneg_left hℓ2b0 (by norm_num)
+        _ = 5850000000000000 * (P.U ^ 5 * S.Δ ^ 2 / S.Ω ^ 3) := by ring
     refine le_trans h15 ?_
     -- 4.5e13 U⁵Δ²/Ω³ ≤ (1/8) d ;  d ≥ HΔ
     have hdge : P.H * S.Δ / 2 ≤ d := by rw [← hDval]; exact hdD
@@ -237,12 +261,19 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     have hstep : 5850000000000000 * (P.U ^ 5 * S.Δ ^ 2 / S.Ω ^ 3) ≤ (1/16) * (P.H * S.Δ) := by
       rw [mul_div_assoc', div_le_iff₀ (by positivity : (0:ℝ) < S.Ω ^ 3)]
       -- 45e12 U⁵ Δ² ≤ (1/16) H Δ Ω³  ⟸ 720e12 U⁵ Δ ≤ H Ω³ via hReg, Δ≥720e12
-      have hΔbd : (93600000000000000:ℝ) ≤ S.Δ :=
-        by nlinarith [hΔbig, mul_pos hGpos (pow_pos hUpos 5), hGpos, pow_pos hUpos 5,
-          one_le_pow₀ (n := 5) hU1, hG1]
-      nlinarith [hReg, hΔbd, hΔpos, pow_pos hUpos 5, hHpos, pow_pos hΩpos 3,
-        mul_pos hΔpos (pow_pos hUpos 5),
-        mul_le_mul_of_nonneg_right hΔbd (by positivity : (0:ℝ) ≤ P.U ^ 5 * S.Δ)]
+      have hGU : (1:ℝ) ≤ P.G * P.U ^ 5 :=
+        calc (1:ℝ) = 1 * 1 := (mul_one (1:ℝ)).symm
+          _ ≤ P.G * P.U ^ 5 := mul_le_mul hG1 (one_le_pow₀ hU1) zero_le_one hGpos.le
+      have hΔbd : (93600000000000000:ℝ) ≤ S.Δ := by linarith [hΔbig, hGU]
+      have hk : (93600000000000000:ℝ) * (P.U ^ 5 * S.Δ) ≤ P.H * S.Ω ^ 3 :=
+        calc (93600000000000000:ℝ) * (P.U ^ 5 * S.Δ)
+            ≤ S.Δ * (P.U ^ 5 * S.Δ) := mul_le_mul_of_nonneg_right hΔbd (by positivity)
+          _ = S.Δ ^ 2 * P.U ^ 5 := by ring
+          _ ≤ P.H * S.Ω ^ 3 := hReg
+      calc 5850000000000000 * (P.U ^ 5 * S.Δ ^ 2)
+          = S.Δ / 16 * (93600000000000000 * (P.U ^ 5 * S.Δ)) := by ring
+        _ ≤ S.Δ / 16 * (P.H * S.Ω ^ 3) := mul_le_mul_of_nonneg_left hk (by positivity)
+        _ = 1 / 16 * (P.H * S.Δ) * S.Ω ^ 3 := by ring
     linarith [hstep, hdge]
   -- term3 |t3| ≤ (1/8) T
   have ht3 : |(-15 * ℓ₁ ^ 3 * ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) * b₀ ^ 2 * v ^ 2) / d| ≤ (1/8) * T := by
@@ -257,14 +288,20 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     -- = (1/8)·ℓ₁³ℓ₂(ℓ₂-ℓ₁)|b₀|v²·d ;  multiply hsmall3 (15ℓ₂|b₀|≤(1/8)d) by ℓ₁³ℓ₂(ℓ₂-ℓ₁)|b₀|v²? careful
     -- hsmall3·(ℓ₁³ℓ₂(ℓ₂-ℓ₁)|b₀|v²): LHS 15ℓ₂|b₀|·(ℓ₁³ℓ₂(ℓ₂-ℓ₁)|b₀|v²)=15ℓ₁³ℓ₂²(ℓ₂-ℓ₁)|b₀|²v²
     have hc : (0:ℝ) ≤ ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2 := by positivity
-    nlinarith [mul_le_mul_of_nonneg_right hsmall3 hc, hℓ13nn, hℓ2nn, h21nn, hb0nn, sq_nonneg v]
+    calc 15 * ℓ₁ ^ 3 * ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) * (|b₀| ^ 2 * v ^ 2)
+        = (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2) * (15 * ℓ₂ * |b₀|) := by ring
+      _ ≤ (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2) * (1 / 8 * d) :=
+            mul_le_mul_of_nonneg_left hsmall3 hc
+      _ = 1 / 8 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2) * d := by ring
   -- term4 |t4| ≤ (1/8) T ;  need 120 ℓ₂ |v| ≤ d
   have hsmall4 : 120 * ℓ₂ * |v| ≤ d := by
     -- ℓ₂ ≤ W=GU⁵ ; |v| ≤ M=1e20 ΔU⁵/Ω³ ; d ≥ HΔ.
     have hℓ2v : ℓ₂ * |v| ≤ (130 * (P.G * P.U ^ 5)) * (10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3)) := by
       rw [← hMdef]; exact mul_le_mul hℓ2W' hv hvnn (by positivity)
     have h120 : 120 * ℓ₂ * |v| ≤ 120 * ((130 * (P.G * P.U ^ 5)) * (10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))) := by
-      nlinarith [hℓ2v, hℓ2nn, hvnn]
+      calc 120 * ℓ₂ * |v| = 120 * (ℓ₂ * |v|) := by ring
+        _ ≤ 120 * ((130 * (P.G * P.U ^ 5)) * (10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))) :=
+              mul_le_mul_of_nonneg_left hℓ2v (by norm_num)
     refine le_trans h120 ?_
     have hdge : P.H * S.Δ / 2 ≤ d := by rw [← hDval]; exact hdD
     refine le_trans ?_ hdge
@@ -275,8 +312,11 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     -- 1.2e22 G U¹⁰ Δ ≤ (HΔ/2) Ω³ ⟸ 2.4e22 G U¹⁰ ≤ HΩ³ ⟸ via hReg Δ²U⁵≤HΩ³ and 2.4e22 GU⁵≤Δ²
     have hGU5Δ2 : (312 * 10 ^ 22 : ℝ) * (P.G * P.U ^ 5) ≤ S.Δ ^ 2 := by
       -- Δ ≥ 8e26 GU⁵, Δ≥1 ⟹ Δ² ≥ Δ·8e26 GU⁵ ≥ 8e26 GU⁵ ≥ 2.4e22 GU⁵
-      have h1 : (8:ℝ) * 10 ^ 26 * (P.G * P.U ^ 5) ≤ S.Δ := hΔbig
-      nlinarith [h1, hΔ1, mul_pos hGpos (pow_pos hUpos 5), hΔpos]
+      calc (312 * 10 ^ 22 : ℝ) * (P.G * P.U ^ 5)
+          ≤ 8 * 10 ^ 26 * (P.G * P.U ^ 5) :=
+            mul_le_mul_of_nonneg_right (by norm_num) (by positivity)
+        _ ≤ S.Δ := hΔbig
+        _ ≤ S.Δ ^ 2 := by rw [pow_two]; exact le_mul_of_one_le_left hΔpos.le hΔ1
     have hkey : (312 * 10 ^ 22 : ℝ) * (P.G * P.U ^ 10) ≤ P.H * S.Ω ^ 3 := by
       -- 2.4e22 G U¹⁰ = (2.4e22 G U⁵)·U⁵ ≤ Δ²·U⁵ ≤ HΩ³
       have hm : (312 * 10 ^ 22 : ℝ) * (P.G * P.U ^ 5) * P.U ^ 5 ≤ S.Δ ^ 2 * P.U ^ 5 :=
@@ -285,8 +325,10 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
         ring
       rw [heq2] at hm
       exact le_trans hm hReg
-    nlinarith [hkey, hΔpos, mul_pos hGpos (pow_pos hUpos 10), hHpos, pow_pos hΩpos 3,
-      mul_le_mul_of_nonneg_right hkey hΔpos.le]
+    calc (156 * 10 ^ 22) * (P.G * P.U ^ 10) * S.Δ
+        = S.Δ / 2 * (312 * 10 ^ 22 * (P.G * P.U ^ 10)) := by ring
+      _ ≤ S.Δ / 2 * (P.H * S.Ω ^ 3) := mul_le_mul_of_nonneg_left hkey (by positivity)
+      _ = P.H * S.Δ / 2 * S.Ω ^ 3 := by ring
   have ht4 : |(-5 * ℓ₁ ^ 3 * ℓ₂ * (3 * ℓ₂ - 2 * ℓ₁) * b₀ * v ^ 3) / d| ≤ (1/8) * T := by
     rw [abs_div, abs_of_pos hd_pos]
     rw [show -5 * ℓ₁ ^ 3 * ℓ₂ * (3 * ℓ₂ - 2 * ℓ₁) * b₀ * v ^ 3
@@ -302,20 +344,28 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
         apply mul_le_mul_of_nonneg_right _ hvnn; linarith
       have h2 : 15 * ℓ₂ * |v| ≤ (1/8) * d := by linarith [hsmall4]
       have h3 : (1/8) * d ≤ (1/8) * ((ℓ₂ - ℓ₁) * d) := by
-        have : d ≤ (ℓ₂ - ℓ₁) * d := by nlinarith [h21, hd_pos.le]
+        have : d ≤ (ℓ₂ - ℓ₁) * d := le_mul_of_one_le_left hd_pos.le h21
         linarith
       linarith [h1, h2, h3]
     -- multiply hred by ℓ₁³ℓ₂|b₀||v|² (≥0)
     have hc : (0:ℝ) ≤ ℓ₁ ^ 3 * ℓ₂ * |b₀| * |v| ^ 2 := by positivity
-    nlinarith [mul_le_mul_of_nonneg_left hred hc, hℓ13nn, hℓ2nn, h21nn, hb0nn, hvnn,
-      sq_nonneg (|v|)]
+    calc 5 * ℓ₁ ^ 3 * ℓ₂ * (3 * ℓ₂ - 2 * ℓ₁) * (|b₀| * (|v| ^ 2 * |v|))
+        = (ℓ₁ ^ 3 * ℓ₂ * |b₀| * |v| ^ 2) * (5 * (3 * ℓ₂ - 2 * ℓ₁) * |v|) := by ring
+      _ ≤ (ℓ₁ ^ 3 * ℓ₂ * |b₀| * |v| ^ 2) * (1 / 8 * ((ℓ₂ - ℓ₁) * d)) :=
+            mul_le_mul_of_nonneg_left hred hc
+      _ = 1 / 8 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v| ^ 2) * d := by ring
   -- term5 |t5| ≤ (1/8) T ;  need 40 |v|² ≤ |b₀| d
   have hsmall5 : 40 * |v| ^ 2 ≤ |b₀| * d := by
     -- |b₀| ≥ 16|v| (hbig_b0v) ;  d ≥ 120ℓ₂|v| ≥ 120|v| (ℓ₂≥1).
     have hdv : 120 * |v| ≤ d := by
-      have : 120 * |v| ≤ 120 * ℓ₂ * |v| := by nlinarith [hvnn, hℓ2pos, hℓ12, hℓ1]
+      have h1ℓ2 : (1:ℝ) ≤ ℓ₂ := le_of_lt (lt_of_le_of_lt hℓ1 hℓ12)
+      have : 120 * |v| ≤ 120 * ℓ₂ * |v| :=
+        calc 120 * |v| ≤ ℓ₂ * (120 * |v|) := le_mul_of_one_le_left (by positivity) h1ℓ2
+          _ = 120 * ℓ₂ * |v| := by ring
       linarith [this, hsmall4]
-    nlinarith [hbig_b0v, hdv, hvnn, sq_nonneg (|v|), mul_nonneg hb0nn hd_pos.le]
+    calc 40 * |v| ^ 2 ≤ 1920 * |v| ^ 2 := mul_le_mul_of_nonneg_right (by norm_num) (sq_nonneg _)
+      _ = (16 * |v|) * (120 * |v|) := by ring
+      _ ≤ |b₀| * d := mul_le_mul hbig_b0v hdv (by positivity) hb0nn
   have ht5 : |(-(5/2) * ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) * v ^ 4) / d| ≤ (1/8) * T := by
     rw [abs_div, abs_of_pos hd_pos]
     rw [show -(5/2) * ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) * v ^ 4
@@ -333,10 +383,16 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
         linarith [hsmall5]
       have h3 : 5 * ℓ₂ * ((|b₀| * d) / 40) ≤ (1/8) * (ℓ₂ * (ℓ₂ - ℓ₁) * (|b₀| * d)) := by
         rw [show (1/8) * (ℓ₂ * (ℓ₂ - ℓ₁) * (|b₀| * d)) = (ℓ₂ - ℓ₁) * (5 * ℓ₂ * ((|b₀| * d)/40)) by ring]
-        nlinarith [h21, mul_nonneg hℓ2nn (mul_nonneg hb0nn hd_pos.le)]
+        exact le_mul_of_one_le_left
+          (mul_nonneg (mul_nonneg (by norm_num) hℓ2nn)
+            (div_nonneg (mul_nonneg hb0nn hd_pos.le) (by norm_num))) h21
       linarith [h1, h2, h3]
-    -- multiply hred by ℓ₁³ (≥0)
-    nlinarith [mul_le_mul_of_nonneg_left hred hℓ13nn, hℓ13nn]
+    -- multiply hred by ℓ₁³|v|² (≥0)
+    calc 5 / 2 * ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) * |v| ^ 4
+        = (ℓ₁ ^ 3 * |v| ^ 2) * (5 / 2 * (2 * ℓ₂ - ℓ₁) * |v| ^ 2) := by ring
+      _ ≤ (ℓ₁ ^ 3 * |v| ^ 2) * (1 / 8 * (ℓ₂ * (ℓ₂ - ℓ₁) * (|b₀| * d))) :=
+            mul_le_mul_of_nonneg_left hred (by positivity)
+      _ = 1 / 8 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v| ^ 2) * d := by ring
   -- ===== assemble:  decompose Pone+Ptwo/d = M + (t1+t2+t3+t4+t5) =====
   -- name the five other monomials
   set t1 : ℝ := ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) * v ^ 3 with ht1def
@@ -357,7 +413,7 @@ theorem psum_resid_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
   rw [hdecomp]
   exact hRabs
 
-set_option maxHeartbeats 3200000 in
+set_option maxHeartbeats 400000 in
 /-- **§5 Step-4 magnitude foundation (v²-form, lower bound).**  With the local
 cancellation-avoidance bound `hvlo`, the leading `b₀v²` monomial of `P₁` dominates
 `|P₁+P₂/d|`.  Leading constant `1`. -/
@@ -398,7 +454,7 @@ theorem psum_abs_ge_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
   have hTnn : 0 ≤ T := by rw [hT]; positivity
   linarith [htri, hres, hTnn]
 
-set_option maxHeartbeats 3200000 in
+set_option maxHeartbeats 400000 in
 /-- **§5 Step-4 magnitude foundation (v²-form, upper bound).**  Companion of `psum_abs_ge_v2`:
 the same five-monomial residual control gives `|P₁+P₂/d| ≤ 4·ℓ₁³ℓ₂(ℓ₂−ℓ₁)|b₀|v²`. -/
 theorem psum_abs_le_v2 {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
@@ -444,7 +500,7 @@ noncomputable def V₂ (P : Globals) (S : Scale P) : ℝ :=
   (S.Δ ^ 3 / P.H) * (P.G ^ 2 * Real.sqrt P.G * (P.U ^ 22 * Real.sqrt P.U)) / S.Ω ^ 6
     + Real.sqrt S.Δ * (P.G ^ 2 * P.U ^ 10 * S.Ω)
 
-set_option maxHeartbeats 12800000 in
+set_option maxHeartbeats 2400000 in
 /-- **§5 Step-4 SHARP magnitude residual (v²-form, large-defect cutoff).**  Under the writeup
 cutoff `hVcut : V₂ ≤ |v|` (which forces `|v| ≫ floor`), *every* monomial of `P₁+P₂/d` other than
 the leading `3·ℓ₁³ℓ₂(ℓ₂−ℓ₁)b₀v²` contributes a **truly small** fraction `≤ (1/10⁵⁰)·T` in total,
@@ -465,6 +521,7 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     |Pone b₀ v ℓ₁ ℓ₂ + Ptwo b₀ v ℓ₁ ℓ₂ / d - 3 * ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * b₀ * v ^ 2|
       ≤ (1 / 10 ^ 50) * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2) := by
   -- positivity / basic facts
+  have _ha := a  -- `a` is a vestigial signature parameter (callers pass it by name)
   have hHpos : 0 < P.H := P.H_pos
   have hGpos : 0 < P.G := P.G_pos
   have hUpos : 0 < P.U := P.U_pos
@@ -490,7 +547,14 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
   have hDval : S.D = P.H * S.Δ := rfl
   have hΔ1 : (1:ℝ) ≤ S.Δ := by
     have : (10:ℝ) ^ 15 * (P.G ^ 4 * P.U ^ 20) ≥ 1 := by
-      nlinarith [one_le_pow₀ (n := 4) hG1, one_le_pow₀ (n := 20) hU1]
+      have hp : (1:ℝ) ≤ P.G ^ 4 * P.U ^ 20 :=
+        calc (1:ℝ) = 1 * 1 := (mul_one 1).symm
+          _ ≤ P.G ^ 4 * P.U ^ 20 :=
+            mul_le_mul (one_le_pow₀ hG1) (one_le_pow₀ hU1) zero_le_one (by positivity)
+      calc (1:ℝ) ≤ P.G ^ 4 * P.U ^ 20 := hp
+        _ = 1 * (P.G ^ 4 * P.U ^ 20) := (one_mul _).symm
+        _ ≤ 10 ^ 15 * (P.G ^ 4 * P.U ^ 20) :=
+            mul_le_mul_of_nonneg_right (by norm_num) (by positivity)
     linarith [hDeW]
   set T : ℝ := ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2 with hTdef
   have hTnn : 0 ≤ T := by rw [hTdef]; positivity
@@ -518,12 +582,15 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
         _ ≤ (10:ℝ) ^ 495 := pow_le_pow_right₀ (by norm_num) (by norm_num)
         _ = ((10:ℝ) ^ 33) ^ 15 := h2.symm
         _ ≤ P.U ^ 15 := h3
-    have hG3 : (1:ℝ) ≤ P.G ^ 3 := one_le_pow₀ hG1
     have step1 : 4 * 10 ^ 78 * (P.G * P.U ^ 5) ≤ P.U ^ 15 * (P.G * P.U ^ 5) :=
       mul_le_mul_of_nonneg_right hU15 (by positivity)
-    have hGG : P.G ≤ 10 ^ 15 * P.G ^ 4 := by nlinarith [hG3, hGpos, pow_pos hGpos 4]
+    have hGG : P.G ≤ 10 ^ 27 * P.G ^ 4 :=
+        le_trans (le_self_pow₀ hG1 (n := 4) (by norm_num))
+          (le_mul_of_one_le_left (by positivity) (by norm_num))
     have step2 : P.U ^ 15 * (P.G * P.U ^ 5) ≤ 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) := by
-      nlinarith [hGG, pow_pos hUpos 20, pow_pos hUpos 15, pow_pos hUpos 5]
+      calc P.U ^ 15 * (P.G * P.U ^ 5) = P.U ^ 20 * P.G := by ring
+        _ ≤ P.U ^ 20 * (10 ^ 27 * P.G ^ 4) := mul_le_mul_of_nonneg_left hGG (by positivity)
+        _ = 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) := by ring
     calc 4 * 10 ^ 78 * (P.G * P.U ^ 5) ≤ P.U ^ 15 * (P.G * P.U ^ 5) := step1
       _ ≤ 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) := step2
       _ ≤ S.Δ := hDeW
@@ -562,8 +629,11 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
         nlinarith [mul_nonneg hℓ2nn hb0nn, h21,
           mul_nonneg (mul_nonneg hℓ2nn hb0nn) h21nn]
       linarith [h1, h2, h3]
-    nlinarith [hkey, hℓ13pos, sq_nonneg (|v|), mul_nonneg hℓ13nn (sq_nonneg (|v|)),
-      mul_pos hℓ13pos (by positivity : (0:ℝ) < |v| ^ 2 + 1)]
+    calc ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) * (|v| ^ 2 * |v|)
+        = (ℓ₁ ^ 3 * |v| ^ 2) * ((2 * ℓ₂ - ℓ₁) * |v|) := by ring
+      _ ≤ (ℓ₁ ^ 3 * |v| ^ 2) * (1 / 10 ^ 51 * (ℓ₂ * (ℓ₂ - ℓ₁) * |b₀|)) :=
+            mul_le_mul_of_nonneg_left hkey (by positivity)
+      _ = 1 / 10 ^ 51 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v| ^ 2) := by ring
   -- ===== term 2:  −5ℓ₁³ℓ₂²(ℓ₂−ℓ₁)²b₀³v/d ;  |t2| ≤ (1/10⁵¹) T  via the LARGE-DEFECT CUTOFF =====
   -- ratio = (1/2)·floor/|v| with floor = 10ℓ₂(ℓ₂-ℓ₁)b₀²/d.  hVcut ⟹ floor/|v| ≪ 1.
   -- We need 5ℓ₂(ℓ₂-ℓ₁)|b₀|²/d ≤ (1/10⁵¹)|v|, i.e. 5·10⁵¹·ℓ₂(ℓ₂-ℓ₁)|b₀|² ≤ |v|·d.
@@ -581,12 +651,16 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
       -- floor ≤ 5·10⁵¹·ℓ₂(ℓ₂-ℓ₁)|b₀|² ≤ (writeup V₂-term1) · d ≤ |v| · d
       -- bound the LHS by polynomial scale facts, the RHS using d ≥ HΔ and |v| ≥ V₂.
       -- Step A: ℓ₂(ℓ₂-ℓ₁)|b₀|² ≤ (GU⁵)²·(3e12 Δ²/(GΩ³))² = 9e24 U¹⁰Δ⁴/Ω⁶
-      have hℓ2sq : ℓ₂ * (ℓ₂ - ℓ₁) ≤ (130 * (P.G * P.U ^ 5)) ^ 2 := by nlinarith [hℓ2W', h21, hℓ2pos, hℓ12]
+      have hℓ2sq : ℓ₂ * (ℓ₂ - ℓ₁) ≤ (130 * (P.G * P.U ^ 5)) ^ 2 := by
+        have hb : ℓ₂ - ℓ₁ ≤ 130 * (P.G * P.U ^ 5) := by linarith [hℓ2W', hℓ1pos]
+        calc ℓ₂ * (ℓ₂ - ℓ₁)
+            ≤ (130 * (P.G * P.U ^ 5)) * (130 * (P.G * P.U ^ 5)) :=
+              mul_le_mul hℓ2W' hb (by linarith [h21]) (by positivity)
+          _ = (130 * (P.G * P.U ^ 5)) ^ 2 := by ring
       have hb0sq : |b₀| ^ 2 ≤ (3000000000000 * (S.Δ ^ 2 / (P.G * S.Ω ^ 3))) ^ 2 := by
         have hb0' : |b₀| ≤ 3000000000000 * (S.Δ ^ 2 / (P.G * S.Ω ^ 3)) := by
           rw [hBval] at hb0; exact hb0
-        nlinarith [hb0', hb0nn,
-          (by positivity : (0:ℝ) ≤ 3000000000000 * (S.Δ ^ 2 / (P.G * S.Ω ^ 3)))]
+        exact pow_le_pow_left₀ hb0nn hb0' 2
       have hfl : ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| ^ 2
           ≤ 1521 * 10 ^ 26 * (P.U ^ 10 * S.Δ ^ 4 / S.Ω ^ 6) := by
         have hmul := mul_le_mul hℓ2sq hb0sq (by positivity) (by positivity)
@@ -609,9 +683,10 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
           have hfac : (1:ℝ) ≤ P.G ^ 2 * Real.sqrt P.G * Real.sqrt P.U := by
             have hG2 : (1:ℝ) ≤ P.G ^ 2 := one_le_pow₀ hG1
             have hp1 : (1:ℝ) ≤ P.G ^ 2 * Real.sqrt P.G := by
-              nlinarith [hG2, hsqG, (pow_pos hGpos 2).le, Real.sqrt_nonneg P.G]
-            nlinarith [hp1, hsqU, mul_nonneg (pow_pos hGpos 2).le (Real.sqrt_nonneg P.G),
-              Real.sqrt_nonneg P.U]
+              exact (le_of_eq (mul_one (1:ℝ)).symm).trans
+                (mul_le_mul hG2 hsqG zero_le_one (by positivity))
+            exact (le_of_eq (mul_one (1:ℝ)).symm).trans
+              (mul_le_mul hp1 hsqU zero_le_one (by positivity))
           have hRHSeq : (S.Δ ^ 3 / P.H) * (P.G ^ 2 * Real.sqrt P.G * (P.U ^ 22 * Real.sqrt P.U))
                 * (P.H * S.Ω ^ 6)
               = (S.Δ ^ 3 * P.U ^ 22 * S.Ω ^ 6) * (P.G ^ 2 * Real.sqrt P.G * Real.sqrt P.U) := by
@@ -646,11 +721,13 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
             have hx : (0:ℝ) ≤ P.U ^ 10 * (S.Δ ^ 4 / S.Ω ^ 6) := by positivity
             nlinarith [mul_nonneg (sub_nonneg.mpr hU12) hx]
         _ = S.Δ ^ 4 * P.U ^ 22 / S.Ω ^ 6 / 2 := by rw [← pow_add]; ring
-    -- multiply hfloor by (1/(2·10⁵¹))·ℓ₁³ℓ₂(ℓ₂-ℓ₁)|b₀||v| ≥0
-    have hcoef : (0:ℝ) ≤ ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v| := by positivity
-    nlinarith [mul_le_mul_of_nonneg_left hfloor (by positivity :
-      (0:ℝ) ≤ (1 / (2 * 10 ^ 51)) * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v|)),
-      hℓ13nn, hℓ2nn, h21nn, hb0nn, hvnn]
+    -- multiply hfloor by (1/10⁵¹)·ℓ₁³ℓ₂(ℓ₂-ℓ₁)|b₀||v| ≥0
+    calc 5 * ℓ₁ ^ 3 * ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) ^ 2 * (|b₀| ^ 3 * |v|)
+        = (1 / 10 ^ 51 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v|))
+            * (5 * 10 ^ 51 * (ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| ^ 2)) := by ring
+      _ ≤ (1 / 10 ^ 51 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v|)) * (|v| * d) :=
+            mul_le_mul_of_nonneg_left hfloor (by positivity)
+      _ = 1 / 10 ^ 51 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v| ^ 2) * d := by ring
   -- ===== term 3:  −15ℓ₁³ℓ₂²(ℓ₂−ℓ₁)b₀²v²/d ;  |t3| ≤ (1/10⁵¹) T  (15ℓ₂|b₀| ≤ d/10⁵¹) =====
   have hsmall3 : 15 * 10 ^ 51 * (ℓ₂ * |b₀|) ≤ d := by
     have hb0' : |b₀| ≤ 3000000000000 * (S.Δ ^ 2 / (P.G * S.Ω ^ 3)) := by
@@ -671,16 +748,28 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
           = (585 * 10 ^ 64) * (P.U ^ 5 * S.Δ ^ 2) / S.Ω ^ 3 by ring]
     rw [div_le_iff₀ (by positivity : (0:ℝ) < S.Ω ^ 3)]
     have hΔbd : (90000000000000000000000000000000000000000000000000000000000000000000:ℝ) ≤ S.Δ := by
-      -- Δ ≥ 10¹⁵ G⁴U²⁰ ≥ 10¹⁵·U²⁰ ≥ 10¹⁵·10^660 = 10^675 ≫ 4.5e64
+      -- Δ ≥ 10²⁷ G⁴U²⁰ ≥ 10²⁷·10^660 = 10^687 ≫ 9e67
       have hU20 : (10:ℝ) ^ 660 ≤ P.U ^ 20 := by
         have h3 : ((10:ℝ) ^ 33) ^ 20 ≤ P.U ^ 20 := pow_le_pow_left₀ (by positivity) hUbig 20
         have h2 : ((10:ℝ) ^ 33) ^ 20 = (10:ℝ) ^ 660 := by rw [← pow_mul]
         rw [h2] at h3; exact h3
       have hG4 : (1:ℝ) ≤ P.G ^ 4 := one_le_pow₀ hG1
-      nlinarith [hDeW, hU20, hG4, pow_pos hUpos 20]
-    nlinarith [hReg, hΔbd, hΔpos, pow_pos hUpos 5, hHpos, pow_pos hΩpos 3,
-      mul_pos hΔpos (pow_pos hUpos 5),
-      mul_le_mul_of_nonneg_right hΔbd (by positivity : (0:ℝ) ≤ P.U ^ 5 * S.Δ)]
+      have hGU20 : (10:ℝ) ^ 660 ≤ P.G ^ 4 * P.U ^ 20 :=
+        calc (10:ℝ) ^ 660 ≤ P.U ^ 20 := hU20
+          _ = 1 * P.U ^ 20 := (one_mul _).symm
+          _ ≤ P.G ^ 4 * P.U ^ 20 := mul_le_mul_of_nonneg_right hG4 (by positivity)
+      calc (90000000000000000000000000000000000000000000000000000000000000000000:ℝ)
+          ≤ (10:ℝ) ^ 68 := by norm_num
+        _ ≤ (10:ℝ) ^ 660 := pow_le_pow_right₀ (by norm_num) (by norm_num)
+        _ ≤ P.G ^ 4 * P.U ^ 20 := hGU20
+        _ ≤ 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) := le_mul_of_one_le_left (by positivity) (by norm_num)
+        _ ≤ S.Δ := hDeW
+    calc (585 * 10 ^ 64) * (P.U ^ 5 * S.Δ ^ 2)
+        = (585 * 10 ^ 64) * (S.Δ ^ 2 * P.U ^ 5) := by ring
+      _ ≤ (585 * 10 ^ 64) * (P.H * S.Ω ^ 3) := mul_le_mul_of_nonneg_left hReg (by positivity)
+      _ ≤ S.Δ / 2 * (P.H * S.Ω ^ 3) :=
+            mul_le_mul_of_nonneg_right (by linarith [hΔbd]) (by positivity)
+      _ = P.H * S.Δ / 2 * S.Ω ^ 3 := by ring
   have ht3 : |(-15 * ℓ₁ ^ 3 * ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) * b₀ ^ 2 * v ^ 2) / d| ≤ (1 / 10 ^ 51) * T := by
     rw [abs_div, abs_of_pos hd_pos]
     rw [show -15 * ℓ₁ ^ 3 * ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) * b₀ ^ 2 * v ^ 2
@@ -691,10 +780,12 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     rw [div_le_iff₀ hd_pos, hTdef]
     -- 15ℓ₁³ℓ₂²(ℓ₂-ℓ₁)|b₀|²v² ≤ (1/10⁵¹)ℓ₁³ℓ₂(ℓ₂-ℓ₁)|b₀|v²·d
     -- = use hsmall3 : 15·10⁵¹ ℓ₂|b₀| ≤ d, times ℓ₁³ℓ₂(ℓ₂-ℓ₁)|b₀|v²/10⁵¹
-    have hc : (0:ℝ) ≤ ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2 := by positivity
-    nlinarith [mul_le_mul_of_nonneg_right hsmall3 (by positivity :
-      (0:ℝ) ≤ (1 / 10 ^ 51) * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2)),
-      hℓ13nn, hℓ2nn, h21nn, hb0nn, sq_nonneg v]
+    calc 15 * ℓ₁ ^ 3 * ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) * (|b₀| ^ 2 * v ^ 2)
+        = (15 * 10 ^ 51 * (ℓ₂ * |b₀|))
+            * (1 / 10 ^ 51 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2)) := by ring
+      _ ≤ d * (1 / 10 ^ 51 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2)) :=
+            mul_le_mul_of_nonneg_right hsmall3 (by positivity)
+      _ = 1 / 10 ^ 51 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * v ^ 2) * d := by ring
   -- ===== term 4:  −5ℓ₁³ℓ₂(3ℓ₂−2ℓ₁)b₀v³/d ;  |t4| ≤ (1/10⁵¹) T  (120·10⁵¹ ℓ₂|v| ≤ d) =====
   have hsmall4 : 120 * 10 ^ 51 * (ℓ₂ * |v|) ≤ d := by
     have hℓ2v : ℓ₂ * |v| ≤ (130 * (P.G * P.U ^ 5)) * (10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3)) := by
@@ -709,8 +800,11 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
           = (156 * 10 ^ 73) * (P.G * P.U ^ 10) * S.Δ / S.Ω ^ 3 by field_simp; ring]
     rw [div_le_iff₀ (by positivity : (0:ℝ) < S.Ω ^ 3)]
     have hGU5Δ2 : (312 * 10 ^ 73 : ℝ) * (P.G * P.U ^ 5) ≤ S.Δ ^ 2 := by
-      have h1 : (4:ℝ) * 10 ^ 78 * (P.G * P.U ^ 5) ≤ S.Δ := hΔhuge
-      nlinarith [h1, hΔ1, mul_pos hGpos (pow_pos hUpos 5), hΔpos]
+      calc (312 * 10 ^ 73 : ℝ) * (P.G * P.U ^ 5)
+          ≤ 4 * 10 ^ 78 * (P.G * P.U ^ 5) :=
+            mul_le_mul_of_nonneg_right (by norm_num) (by positivity)
+        _ ≤ S.Δ := hΔhuge
+        _ ≤ S.Δ ^ 2 := by rw [pow_two]; exact le_mul_of_one_le_left hΔpos.le hΔ1
     have hkey : (312 * 10 ^ 73 : ℝ) * (P.G * P.U ^ 10) ≤ P.H * S.Ω ^ 3 := by
       have hm : (312 * 10 ^ 73 : ℝ) * (P.G * P.U ^ 5) * P.U ^ 5 ≤ S.Δ ^ 2 * P.U ^ 5 :=
         mul_le_mul_of_nonneg_right hGU5Δ2 (by positivity)
@@ -718,8 +812,10 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
           = (312 * 10 ^ 73) * (P.G * P.U ^ 10) := by ring
       rw [heq2] at hm
       exact le_trans hm hReg
-    nlinarith [hkey, hΔpos, mul_pos hGpos (pow_pos hUpos 10), hHpos, pow_pos hΩpos 3,
-      mul_le_mul_of_nonneg_right hkey hΔpos.le]
+    calc (156 * 10 ^ 73) * (P.G * P.U ^ 10) * S.Δ
+        = S.Δ / 2 * (312 * 10 ^ 73 * (P.G * P.U ^ 10)) := by ring
+      _ ≤ S.Δ / 2 * (P.H * S.Ω ^ 3) := mul_le_mul_of_nonneg_left hkey (by positivity)
+      _ = P.H * S.Δ / 2 * S.Ω ^ 3 := by ring
   have ht4 : |(-5 * ℓ₁ ^ 3 * ℓ₂ * (3 * ℓ₂ - 2 * ℓ₁) * b₀ * v ^ 3) / d| ≤ (1 / 10 ^ 51) * T := by
     rw [abs_div, abs_of_pos hd_pos]
     rw [show -5 * ℓ₁ ^ 3 * ℓ₂ * (3 * ℓ₂ - 2 * ℓ₁) * b₀ * v ^ 3
@@ -733,23 +829,33 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
       have h1 : 5 * (3 * ℓ₂ - 2 * ℓ₁) * |v| ≤ 15 * ℓ₂ * |v| :=
         mul_le_mul_of_nonneg_right (by linarith) hvnn
       have h2 : 15 * ℓ₂ * |v| ≤ (1 / 10 ^ 51) * d := by
-        rw [show (1 / 10 ^ 51) * d = (1 / 10 ^ 51) * d by rfl]
-        nlinarith [hsmall4, hvnn, hℓ2nn]
+        have hA : 15 * ℓ₂ * |v| = 15 / (120 * 10 ^ 51) * (120 * 10 ^ 51 * (ℓ₂ * |v|)) := by ring
+        rw [hA]
+        calc 15 / (120 * 10 ^ 51) * (120 * 10 ^ 51 * (ℓ₂ * |v|))
+            ≤ 15 / (120 * 10 ^ 51) * d := mul_le_mul_of_nonneg_left hsmall4 (by norm_num)
+          _ ≤ 1 / 10 ^ 51 * d := mul_le_mul_of_nonneg_right (by norm_num) hd_pos.le
       have h3 : (1 / 10 ^ 51) * d ≤ (1 / 10 ^ 51) * ((ℓ₂ - ℓ₁) * d) := by
-        have : d ≤ (ℓ₂ - ℓ₁) * d := by nlinarith [h21, hd_pos.le]
-        nlinarith [this]
+        have : d ≤ (ℓ₂ - ℓ₁) * d := le_mul_of_one_le_left hd_pos.le h21
+        exact mul_le_mul_of_nonneg_left this (by norm_num)
       linarith [h1, h2, h3]
     have hc : (0:ℝ) ≤ ℓ₁ ^ 3 * ℓ₂ * |b₀| * |v| ^ 2 := by positivity
-    nlinarith [mul_le_mul_of_nonneg_left hred hc, hℓ13nn, hℓ2nn, h21nn, hb0nn, hvnn,
-      sq_nonneg (|v|)]
+    calc 5 * ℓ₁ ^ 3 * ℓ₂ * (3 * ℓ₂ - 2 * ℓ₁) * (|b₀| * (|v| ^ 2 * |v|))
+        = (ℓ₁ ^ 3 * ℓ₂ * |b₀| * |v| ^ 2) * (5 * (3 * ℓ₂ - 2 * ℓ₁) * |v|) := by ring
+      _ ≤ (ℓ₁ ^ 3 * ℓ₂ * |b₀| * |v| ^ 2) * (1 / 10 ^ 51 * ((ℓ₂ - ℓ₁) * d)) :=
+            mul_le_mul_of_nonneg_left hred hc
+      _ = 1 / 10 ^ 51 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v| ^ 2) * d := by ring
   -- ===== term 5:  −(5/2)ℓ₁³(2ℓ₂−ℓ₁)v⁴/d ;  |t5| ≤ (1/10⁵¹) T  (40·10⁵¹|v|² ≤ |b₀|d) =====
   have hsmall5 : 40 * 10 ^ 51 * |v| ^ 2 ≤ |b₀| * d := by
     have hdv : 120 * 10 ^ 51 * |v| ≤ d := by
-      have : 120 * 10 ^ 51 * |v| ≤ 120 * 10 ^ 51 * (ℓ₂ * |v|) := by
-        apply mul_le_mul_of_nonneg_left _ (by positivity)
-        nlinarith [hvnn, hℓ2pos, hℓ12, hℓ1]
+      have : 120 * 10 ^ 51 * |v| ≤ 120 * 10 ^ 51 * (ℓ₂ * |v|) :=
+        mul_le_mul_of_nonneg_left
+          (le_mul_of_one_le_left hvnn (le_of_lt (lt_of_le_of_lt hℓ1 hℓ12))) (by positivity)
       linarith [this, hsmall4]
-    nlinarith [hbig_b0v, hdv, hvnn, sq_nonneg (|v|), mul_nonneg hb0nn hd_pos.le]
+    calc 40 * 10 ^ 51 * |v| ^ 2
+        ≤ 2 * 10 ^ 52 * (120 * 10 ^ 51) * |v| ^ 2 :=
+          mul_le_mul_of_nonneg_right (by norm_num) (sq_nonneg _)
+      _ = (2 * 10 ^ 52 * |v|) * (120 * 10 ^ 51 * |v|) := by ring
+      _ ≤ |b₀| * d := mul_le_mul hbig_b0v hdv (by positivity) hb0nn
   have ht5 : |(-(5/2) * ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) * v ^ 4) / d| ≤ (1 / 10 ^ 51) * T := by
     rw [abs_div, abs_of_pos hd_pos]
     rw [show -(5/2) * ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) * v ^ 4
@@ -763,7 +869,10 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
         mul_le_mul_of_nonneg_right (by linarith) (sq_nonneg _)
       have h2 : 5 * ℓ₂ * |v| ^ 2 ≤ 5 * ℓ₂ * ((|b₀| * d) / (8 * 10 ^ 51)) := by
         apply mul_le_mul_of_nonneg_left _ (by positivity)
-        rw [le_div_iff₀ (by positivity)]; nlinarith [hsmall5]
+        rw [le_div_iff₀ (by positivity)]
+        calc |v| ^ 2 * (8 * 10 ^ 51) = 8 * 10 ^ 51 * |v| ^ 2 := by ring
+          _ ≤ 40 * 10 ^ 51 * |v| ^ 2 := mul_le_mul_of_nonneg_right (by norm_num) (sq_nonneg _)
+          _ ≤ |b₀| * d := hsmall5
       have h3 : 5 * ℓ₂ * ((|b₀| * d) / (8 * 10 ^ 51))
           ≤ (1 / 10 ^ 51) * (ℓ₂ * (ℓ₂ - ℓ₁) * (|b₀| * d)) := by
         rw [show (1 / 10 ^ 51) * (ℓ₂ * (ℓ₂ - ℓ₁) * (|b₀| * d))
@@ -771,7 +880,11 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
         nlinarith [h21, mul_nonneg hℓ2nn (mul_nonneg hb0nn hd_pos.le),
           mul_nonneg (mul_nonneg hℓ2nn (mul_nonneg hb0nn hd_pos.le)) h21nn]
       linarith [h1, h2, h3]
-    nlinarith [mul_le_mul_of_nonneg_left hred hℓ13nn, hℓ13nn]
+    calc 5 / 2 * ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) * |v| ^ 4
+        = (ℓ₁ ^ 3 * |v| ^ 2) * (5 / 2 * (2 * ℓ₂ - ℓ₁) * |v| ^ 2) := by ring
+      _ ≤ (ℓ₁ ^ 3 * |v| ^ 2) * (1 / 10 ^ 51 * (ℓ₂ * (ℓ₂ - ℓ₁) * (|b₀| * d))) :=
+            mul_le_mul_of_nonneg_left hred (by positivity)
+      _ = 1 / 10 ^ 51 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| * |v| ^ 2) * d := by ring
   -- ===== assemble =====
   set t1 : ℝ := ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) * v ^ 3 with ht1def
   set t2 : ℝ := (-5 * ℓ₁ ^ 3 * ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) ^ 2 * b₀ ^ 3 * v) / d with ht2def
@@ -787,7 +900,7 @@ theorem psum_resid_le_sharp {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     have e3 : |t1 + t2 + t3| ≤ |t1 + t2| + |t3| := abs_add_le _ _
     have e4 : |t1 + t2| ≤ |t1| + |t2| := abs_add_le _ _
     -- 5·(1/10⁵¹) T = (1/(2·10⁵⁰)) T ≤ (1/10⁵⁰) T
-    nlinarith [e1, e2, e3, e4, ht1, ht2, ht3, ht4, ht5, hTnn]
+    linarith [e1, e2, e3, e4, ht1, ht2, ht3, ht4, ht5, hTnn]
   rw [hMmdef] at hdecomp
   rw [hdecomp]
   exact hRabs
@@ -819,12 +932,16 @@ theorem vlo_of_vcut {ℓ₁ ℓ₂ b₀ v d : ℝ}
   have hBval : S.B = S.Δ ^ 2 / (P.G * S.Ω ^ 3) := rfl
   have hDval : S.D = P.H * S.Δ := rfl
   -- Step A:  ℓ₂(ℓ₂−ℓ₁)|b₀|² ≤ 9·10²⁴·U¹⁰Δ⁴/Ω⁶
-  have hℓ2sq : ℓ₂ * (ℓ₂ - ℓ₁) ≤ (130 * (P.G * P.U ^ 5)) ^ 2 := by nlinarith [hℓ2W', h21, hℓ2pos, hℓ12]
+  have hℓ2sq : ℓ₂ * (ℓ₂ - ℓ₁) ≤ (130 * (P.G * P.U ^ 5)) ^ 2 := by
+    have hb : ℓ₂ - ℓ₁ ≤ 130 * (P.G * P.U ^ 5) := by linarith [hℓ2W', hℓ1pos]
+    calc ℓ₂ * (ℓ₂ - ℓ₁)
+        ≤ (130 * (P.G * P.U ^ 5)) * (130 * (P.G * P.U ^ 5)) :=
+          mul_le_mul hℓ2W' hb (by linarith [h21]) (by positivity)
+      _ = (130 * (P.G * P.U ^ 5)) ^ 2 := by ring
   have hb0sq : |b₀| ^ 2 ≤ (3000000000000 * (S.Δ ^ 2 / (P.G * S.Ω ^ 3))) ^ 2 := by
     have hb0' : |b₀| ≤ 3000000000000 * (S.Δ ^ 2 / (P.G * S.Ω ^ 3)) := by
       rw [hBval] at hb0; exact hb0
-    nlinarith [hb0', hb0nn,
-      (by positivity : (0:ℝ) ≤ 3000000000000 * (S.Δ ^ 2 / (P.G * S.Ω ^ 3)))]
+    exact pow_le_pow_left₀ hb0nn hb0' 2
   have hfl : ℓ₂ * (ℓ₂ - ℓ₁) * |b₀| ^ 2 ≤ 1521 * 10 ^ 26 * (P.U ^ 10 * S.Δ ^ 4 / S.Ω ^ 6) := by
     have hmul := mul_le_mul hℓ2sq hb0sq (by positivity) (by positivity)
     have heq : (130 * (P.G * P.U ^ 5)) ^ 2 * (3000000000000 * (S.Δ ^ 2 / (P.G * S.Ω ^ 3))) ^ 2
@@ -844,10 +961,10 @@ theorem vlo_of_vcut {ℓ₁ ℓ₂ b₀ v d : ℝ}
       rw [div_le_div_iff₀ (by positivity) (by positivity)]
       have hfac : (1:ℝ) ≤ P.G ^ 2 * Real.sqrt P.G * Real.sqrt P.U := by
         have hG2 : (1:ℝ) ≤ P.G ^ 2 := one_le_pow₀ hG1
-        have hp1 : (1:ℝ) ≤ P.G ^ 2 * Real.sqrt P.G := by
-          nlinarith [hG2, hsqG, (pow_pos hGpos 2).le, Real.sqrt_nonneg P.G]
-        nlinarith [hp1, hsqU, mul_nonneg (pow_pos hGpos 2).le (Real.sqrt_nonneg P.G),
-          Real.sqrt_nonneg P.U]
+        have hp1 : (1:ℝ) ≤ P.G ^ 2 * Real.sqrt P.G :=
+          (le_of_eq (mul_one (1:ℝ)).symm).trans (mul_le_mul hG2 hsqG zero_le_one (by positivity))
+        exact (le_of_eq (mul_one (1:ℝ)).symm).trans
+          (mul_le_mul hp1 hsqU zero_le_one (by positivity))
       have hRHSeq : (S.Δ ^ 3 / P.H) * (P.G ^ 2 * Real.sqrt P.G * (P.U ^ 22 * Real.sqrt P.U))
             * (P.H * S.Ω ^ 6)
           = (S.Δ ^ 3 * P.U ^ 22 * S.Ω ^ 6) * (P.G ^ 2 * Real.sqrt P.G * Real.sqrt P.U) := by
