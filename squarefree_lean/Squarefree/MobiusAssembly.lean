@@ -42,7 +42,7 @@ private lemma cast_div_bounds (m n : ℕ) (hn : 0 < n) :
     push_cast at this; linarith
   rw [this]
   have hmodR : ((m % n : ℕ) : ℝ) < n := by exact_mod_cast hmod
-  nlinarith [hmodR]
+  linarith [hmodR]
 
 /-- Per-`d` count error: for `1 ≤ a`, `1 ≤ q`, the count of multiples of `q` in `[a,b]` is within
 `O(1)` of `len/q` where `len = b − a + 1 ≥ 0` is the real interval length. -/
@@ -326,7 +326,7 @@ private lemma large_part_A (a b : ℕ) (X H B : ℝ) (D₁ : ℕ)
     have hJbound : ((J : ℝ) + 1) ≤ 1 + Real.log X / (2 * Real.log 2) := by
       have h2bb : (2 : ℝ) ^ (J + 1) ≤ 2 * bb := by
         have : 2 * bb / t ≤ 2 * bb := by
-          rw [div_le_iff₀ htpos]; nlinarith [hbbpos, ht1]
+          rw [div_le_iff₀ htpos]; nlinarith only [hbbpos, ht1]
         linarith [hJ3]
       have hlogJ : ((J : ℝ) + 1) * Real.log 2 ≤ Real.log (2 * bb) := by
         have e1 : Real.log ((2:ℝ) ^ (J + 1)) = ((J : ℝ) + 1) * Real.log 2 := by
@@ -361,7 +361,7 @@ private lemma large_part_A (a b : ℕ) (X H B : ℝ) (D₁ : ℕ)
         have hdR : t ≤ (d : ℝ) := by
           have h1 : t ≤ t * 2 ^ k := by
             have : (1:ℝ) ≤ 2 ^ k := one_le_pow₀ (by norm_num)
-            nlinarith [htpos]
+            nlinarith only [htpos, this]
           have h2 : (t * 2 ^ k : ℝ) ≤ (⌈t * 2 ^ k⌉ : ℝ) := Int.le_ceil _
           have h3 : ((⌈t * 2 ^ k⌉ : ℤ) : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd1
           linarith
@@ -406,7 +406,7 @@ private lemma large_part_A (a b : ℕ) (X H B : ℝ) (D₁ : ℕ)
           omega
       · intro m _; simp
       · intro d hd; simp only [Finset.mem_Icc] at hd; omega
-      · intro m _; simp only [hfdef, Int.toNat_natCast]; rfl
+      · intro m _; simp only [Int.toNat_natCast]; rfl
     rw [hbbdef] at hbridge ⊢
     rw [hbridge]; exact hcover
   · -- t > bb: empty range, take J = 0
@@ -440,6 +440,7 @@ private lemma large_part_B (a b : ℕ) (X H : ℝ) (lo hi : ℕ)
     (∑ d ∈ Finset.Icc lo hi, ((#{n ∈ Finset.Icc a b | d ^ 2 ∣ n} : ℕ) : ℝ))
       ≤ ((hi : ℝ) - (lo : ℝ) + 1) := by
   -- each term ≤ 1, and #(Icc lo hi) ≤ hi - lo + 1
+  have _ := H  -- `H` is part of the shared interface signature; unused in this branch
   have hterm : ∀ d ∈ Finset.Icc lo hi, ((#{n ∈ Finset.Icc a b | d ^ 2 ∣ n} : ℕ) : ℝ) ≤ 1 := by
     intro d hd
     rw [Finset.mem_Icc] at hd
@@ -491,6 +492,7 @@ private lemma small_part (a b : ℕ) (X H : ℝ) (D₁ : ℕ)
     |(∑ d ∈ Finset.Icc 1 D₁, (μ d : ℝ) * ((#{n ∈ Finset.Icc a b | d ^ 2 ∣ n} : ℕ) : ℝ))
         - 6 / Real.pi ^ 2 * H|
       ≤ 2 * (D₁ : ℝ) + H / (D₁ : ℝ) := by
+  have _ := X  -- `X` is part of the shared interface signature; unused here
   set len : ℝ := (b : ℝ) - (a : ℝ) + 1 with hlendef
   -- rewrite N_d via count_multiples to (b/d² - (a-1)/d² : ℕ)
   have hNeq : ∀ d ∈ Finset.Icc 1 D₁,
@@ -525,7 +527,7 @@ private lemma small_part (a b : ℕ) (X H : ℝ) (D₁ : ℕ)
           -- |N_d - H/d²| ≤ |N_d - len/d²| + |len/d² - H/d²| ≤ 1 + 1/d² ≤ 2
           have hclose := count_close a b (d ^ 2) ha hab hq
           have hdR : (1 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd1
-          have hd2R : (1 : ℝ) ≤ (d : ℝ) ^ 2 := by nlinarith [hdR]
+          have hd2R : (1 : ℝ) ≤ (d : ℝ) ^ 2 := by nlinarith only [hdR]
           have hlencast : ((d ^ 2 : ℕ) : ℝ) = (d : ℝ) ^ 2 := by push_cast; ring
           rw [hlencast] at hclose
           -- |len/d² - H/d²| = |len - H|/d² ≤ 1/d² ≤ 1
@@ -643,7 +645,7 @@ private lemma count_master (X H : ℝ) (D₁ : ℕ) (B : ℝ)
     have hcf : ⌈X⌉ ≤ ⌊X + H⌋ := by
       rw [Int.le_floor]
       have := Int.ceil_lt_add_one X
-      push_cast; linarith [hH1]
+      linarith [hH1]
     rw [hadef, hbdef]; omega
   -- the squarefree count over the ℕ interval, cast to ℝ
   rw [target_eq_natSum X H hX1 hHpos.le, ← hadef, ← hbdef]
@@ -807,9 +809,8 @@ private lemma sqrt_diff_le (X H : ℝ) (hX : 0 < X) (hH : 0 ≤ H) :
   have hnn : 0 ≤ (X + H) ^ (1/2 : ℝ) - X ^ (1/2 : ℝ) := by
     have := Real.rpow_le_rpow hX.le (by linarith : X ≤ X + H) (by norm_num : (0:ℝ) ≤ 1/2)
     linarith
-  nlinarith [hnn, hsXH, hsX, hfac]
+  nlinarith only [hnn, hsXH, hsX, hfac]
 
-set_option maxHeartbeats 1600000 in
 /-- **Final short-interval estimate.**  Assembles `count_master` with `H = X^{(1-g)/5}`,
 `D₁ = ⌊X^{(1-g)/10}⌋ ≈ √H`, and the per-block bound `B = (C_k+1)·H/X^{u_k}+1` (`C_k, u_k` from
 `key_dyadic_assembly`) into the headline bound `|S − (6/π²)H| ≤ C·H/X^u`. -/
@@ -822,17 +823,17 @@ theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
   classical
   obtain ⟨uk, huk, Ck, hCk, Xk, hkey⟩ := Squarefree.key_dyadic_assembly g hg hg'
   set e : ℝ := (1 - g) / 5 with hedef
-  have he0 : 0 < e := by rw [hedef]; nlinarith [hg']
-  have he12 : e < 1/2 := by rw [hedef]; nlinarith [hg]
+  have he0 : 0 < e := by rw [hedef]; linarith [hg']
+  have he12 : e < 1/2 := by rw [hedef]; linarith [hg]
   have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
   -- target shrink exponent
   set u : ℝ := min uk (e/2) / 2 with hudef
   have hu0 : 0 < u := by
     rw [hudef]; have := lt_min huk (by linarith : 0 < e/2); linarith
   have huuk : u < uk := by
-    rw [hudef]; have h := min_le_left uk (e/2); nlinarith [huk, h]
+    rw [hudef]; have h := min_le_left uk (e/2); linarith [huk, h]
   have hue2 : u < e/2 := by
-    rw [hudef]; have h := min_le_right uk (e/2); nlinarith [he0, h]
+    rw [hudef]; have h := min_le_right uk (e/2); linarith [he0, h]
   have hue : u < e := by linarith
   have hu12 : u < 1/2 := by linarith
   have hduk : 0 < uk - u := by linarith
@@ -906,7 +907,7 @@ theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
         rw [hBdef]
         have hHXuk : 0 ≤ H / X ^ uk := by positivity
         have : Ck * H / X ^ uk ≤ (Ck + 1) * H / X ^ uk := by
-          rw [div_le_div_iff_of_pos_right hXuk]; nlinarith [hHpos]
+          rw [div_le_div_iff_of_pos_right hXuk]; nlinarith only [hHpos]
         linarith
       linarith [hkk]
     · -- trivial bound dCard ≤ D + 1 < H/X^{uk} + 1 ≤ B
@@ -916,7 +917,7 @@ theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
       have : D + 1 ≤ B := by
         rw [hBdef]
         have hHle : H / X ^ uk ≤ (Ck + 1) * H / X ^ uk := by
-          rw [div_le_div_iff_of_pos_right hXuk]; nlinarith [hHpos, hCk]
+          rw [div_le_div_iff_of_pos_right hXuk]; nlinarith only [hHpos, hCk]
         linarith [le_of_lt hge, hHle]
       linarith [htriv]
   -- invoke count_master
@@ -934,7 +935,7 @@ theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
   have hsR : s ≤ R := by
     rw [hsdef, hRval]; exact Real.rpow_le_rpow_of_exponent_le hX1 (by linarith)
   -- 2·D₁ ≤ 2·R
-  have hT1 : 2 * (D₁ : ℝ) ≤ 2 * R := by nlinarith [hD1le, hsR]
+  have hT1 : 2 * (D₁ : ℝ) ≤ 2 * R := by linarith [hD1le, hsR]
   -- H/D₁ ≤ 2·R   (needs D₁ ≥ s/2, i.e. s ≥ 2)
   have hs_ge2 : (2 : ℝ) ≤ s := by
     rw [hsdef]
@@ -953,7 +954,7 @@ theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
     have hD1posR : 0 < (D₁ : ℝ) := by linarith [hD1geR]
     have hstep : s ^ 2 / (D₁ : ℝ) ≤ 2 * s := by
       rw [div_le_iff₀ hD1posR]
-      nlinarith [hD1ge_half, hspos]
+      nlinarith only [hD1ge_half, hspos]
     linarith [hstep, hsR]
   -- boundary: (X+H)^{1/2} - X^{1/2} + 2 ≤ 3·R
   have hbdry : (X + H) ^ (1/2 : ℝ) - X ^ (1/2 : ℝ) + 2 ≤ 3 * R := by
@@ -1031,7 +1032,7 @@ theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
             = ((e - u)⁻¹ * R) / (2 * Real.log 2) by ring]
       exact div_le_div_of_nonneg_right hc hlog2'.le
     -- term4: 1 ≤ R
-    nlinarith [ht1, ht2, ht3, hR1, hCk1, heuk_pos, hLnn]
+    nlinarith only [ht1, ht2, ht3, hR1, hCk1, heuk_pos, hLnn]
   -- (J+1)·B ≤ (1+L)·B
   have hJB : ((J : ℝ) + 1) * B ≤ Cblk * R := by
     have hstep : ((J : ℝ) + 1) * B ≤ (1 + L) * B := by

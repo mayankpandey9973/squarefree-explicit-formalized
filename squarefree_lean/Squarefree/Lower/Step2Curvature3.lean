@@ -20,7 +20,7 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 1600000
+set_option maxHeartbeats 400000
 
 /-- **`|φ''|` upper bound at the `L/R²`-scale**: `|φ''| ≤ 10⁵⁰·L/R²`, `L = ℓ₁ℓ₂(ℓ₂−ℓ₁)/(GΩ⁵)`.
 The §5 Step-2 second-derivative companion of `phi_deriv_ub`.  Each of the three product-rule
@@ -384,11 +384,11 @@ theorem phif_iteratedDeriv2_sign {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f 
       have : (0:ℝ) < d ^ 3 := by positivity
       have hd2' : 0 < d2 := by rw [hd2_def]; exact hd2_pos
       positivity
-    nlinarith [sq_nonneg d1, sq_nonneg d, this]
+    nlinarith only [sq_nonneg d1, sq_nonneg d, this]
   -- |φ| ≤ 10⁻⁹⁰·|f|·... ⇒ f·(f+φ) ≥ f²/2  (strong f-large)
   have hL_le90 : L ≤ (1 / 10 ^ 90) * |f| := by
     have hf90 : (10:ℝ) ^ 90 * L ≤ |f| := hflarge
-    nlinarith [hf90]
+    linarith only [hf90]
   have hφ_le : φ ≤ 10 ^ 20 * L := hphi_ub
   have hφ_small : φ ≤ (1 / 10 ^ 70) * |f| := by
     have : (10:ℝ) ^ 20 * L ≤ 10 ^ 20 * ((1 / 10 ^ 90) * |f|) :=
@@ -404,8 +404,8 @@ theorem phif_iteratedDeriv2_sign {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f 
         mul_le_mul_of_nonneg_left hφ_small hfabs_nn
       have h2 : |f| * ((1 / 10 ^ 70) * |f|) = (1 / 10 ^ 70) * |f| ^ 2 := by ring
       have h3 : |f| ^ 2 = f ^ 2 := sq_abs f
-      nlinarith [h1, h2.le, h2.ge, h3, sq_nonneg f]
-    rw [hfφ]; nlinarith [hfφ_lb, hφf2]
+      linarith only [h1, h2.le, h2.ge, h3, sq_nonneg f]
+    rw [hfφ]; linarith only [hfφ_lb, hφf2]
   -- MAIN: E1·f·(f+φ) ≥ (6/(66·10¹⁴))·W·f²
   -- TIGHTENED: lower-bound E1 through the `12 d̃²(d̃')²` term (no `10¹²` loss).
   -- `d̃ ≥ D/10` and `|d̃'| ≥ B/10⁶` give `12 d̃²(d̃')² ≥ 12·(D/10)²·(B/10⁶)² = 12 D²B²/10¹⁴`,
@@ -431,7 +431,7 @@ theorem phif_iteratedDeriv2_sign {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f 
         ≤ 12 * d ^ 2 * d1 ^ 2 + 4 * d ^ 3 * d2 := by
       have hp1 : (S.D / 10) ^ 2 ≤ d ^ 2 := pow_le_pow_left₀ (by positivity) hd_lo 2
       have h1 : 12 * (S.D / 10) ^ 2 * (S.B / 1000000) ^ 2 ≤ 12 * d ^ 2 * d1 ^ 2 := by
-        have hA : 12 * (S.D / 10) ^ 2 ≤ 12 * d ^ 2 := by nlinarith [hp1]
+        have hA : 12 * (S.D / 10) ^ 2 ≤ 12 * d ^ 2 := by linarith only [hp1]
         have hAnn : (0:ℝ) ≤ 12 * (S.D / 10) ^ 2 := by positivity
         have hBnn : (0:ℝ) ≤ (S.B / 1000000) ^ 2 := by positivity
         exact mul_le_mul hA hd1sq_lo hBnn (le_trans hAnn hA)
@@ -563,7 +563,7 @@ theorem phif_iteratedDeriv2_sign {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f 
       ≤ f * (E2 * φ1) := le_trans (by linarith [hNoiseA]) hNA
   have hB' : -((18 ^ 4 * 5 / 6) * 10 ^ 50 * (1 / 10 ^ 90) * (W * f ^ 2 / S.R))
       ≤ f * (E3 * φ2) := le_trans (by linarith [hNoiseB]) hNB
-  nlinarith [hMain, hA', hB', hcoef']
+  linarith only [hMain, hA', hB', hcoef']
 
 /-- **`deriv φ_f` is monotone or antitone on the band window** (`hmono` of `step2_subset_count`).
 `φ_f''` is sign-definite (sign of `f`, `phif_iteratedDeriv2_sign`): if `f > 0` it is `> 0` so
@@ -578,6 +578,7 @@ theorem phif_deriv_monotoneOrAntitoneOn {P : Globals} {S : Scale P} {a ℓ₁ �
     (hflarge : (10:ℝ) ^ 90 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁) / (P.G * S.Ω ^ 5)) ≤ |f|) :
     MonotoneOn (deriv (fun s => phif P.X a ℓ₁ ℓ₂ f s)) (Set.Icc r₀ r₁)
       ∨ AntitoneOn (deriv (fun s => phif P.X a ℓ₁ ℓ₂ f s)) (Set.Icc r₀ r₁) := by
+  have _ := hr_band_hi  -- faithful signature binder; the window uses `hwin` instead
   have hRpos : 0 < S.R := by
     unfold Scale.R; have := P.H_pos; have := P.G_pos; have := S.Ω_pos; have := S.Δ_pos; positivity
   have hXpos : 0 < P.X := P.X_pos
@@ -629,14 +630,14 @@ theorem phif_deriv_monotoneOrAntitoneOn {P : Globals} {S : Scale P} {a ℓ₁ �
     intro x hx
     have hx' : x ∈ Set.Icc r₀ r₁ := interior_subset hx
     have := hsign x hx'
-    nlinarith [this, hf_neg]
+    nlinarith only [this, hf_neg]
   · -- f > 0  ⇒  deriv (deriv φ_f) ≥ 0  ⇒ MonotoneOn
     left
     apply monotoneOn_of_deriv_nonneg (convex_Icc r₀ r₁) hcont hderivOn
     intro x hx
     have hx' : x ∈ Set.Icc r₀ r₁ := interior_subset hx
     have := hsign x hx'
-    nlinarith [this, hf_pos]
+    nlinarith only [this, hf_pos]
 
 /-- **`|φ_f''|` lower bound at the calibrated curvature scale** (the `T/(2N²) ≤ |φ''|` input of
 `bands_count_mono_low`, with `N = R`, `T ≍ |f|D⁴/(XA)`).  Concretely

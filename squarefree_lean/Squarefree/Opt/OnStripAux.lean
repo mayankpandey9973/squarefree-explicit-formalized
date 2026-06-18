@@ -23,8 +23,6 @@ namespace Squarefree.OnStripAux
 
 open Squarefree
 
-set_option maxHeartbeats 1600000
-
 /-- The §9 bottleneck envelope `Wnz := H^{1/84}x^{5/84}G^{1/7}Ω^{11/21}` (the `e14` monomial). -/
 noncomputable def Wnz (P : Globals) (S : Scale P) : ℝ :=
   P.H ^ (1/84 : ℝ) * S.x ^ (5/84 : ℝ) * P.G ^ (1/7 : ℝ) * S.Ω ^ (11/21 : ℝ)
@@ -44,7 +42,7 @@ theorem x_pos (P : Globals) (S : Scale P) : 0 < S.x := by
 
 /-- Lower bound a power `v^δ` of a positive `v` by its worst edge (`v ≥ vlo` for `δ ≥ 0`,
 `v ≤ vhi` for `δ ≤ 0`); the result is a power of `X` once the edge is an `X`-power. -/
-private theorem rpow_ge_edge_pos {v vlo : ℝ} (hv : 0 < v) (hvlo : 0 < vlo) {δ : ℝ}
+private theorem rpow_ge_edge_pos {v vlo : ℝ} (_hv : 0 < v) (hvlo : 0 < vlo) {δ : ℝ}
     (hδ : 0 ≤ δ) (hedge : vlo ≤ v) : vlo ^ δ ≤ v ^ δ :=
   Real.rpow_le_rpow hvlo.le hedge hδ
 
@@ -296,7 +294,7 @@ noncomputable def admissibleW_Wnz (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D
   have hbud' : 18977 * P.g + (16995 + 790 * Cu) * P.u ≤ 2 := by
     have h := hbud
     unfold Budget at h
-    nlinarith [mul_nonneg (by norm_num : (0:ℝ) ≤ 1680) hu]
+    linarith [mul_nonneg (by norm_num : (0:ℝ) ≤ 1680) hu]
   have huCu : (0:ℝ) ≤ P.u * Cu := mul_nonneg hu (by linarith)
   have huCu1 : (0:ℝ) ≤ P.u * (Cu - 1) := mul_nonneg hu (by linarith)
   -- master discharger for one comparison `Wnz ≤ H^a x^b G^c Ω^d`
@@ -320,42 +318,42 @@ noncomputable def admissibleW_Wnz (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D
   · rw [one_mul, show P.H ^ (1/16:ℝ) * S.x ^ (5/16:ℝ) * S.Ω ^ (1/4:ℝ)
           = P.H ^ (1/16:ℝ) * S.x ^ (5/16:ℝ) * P.G ^ (0:ℝ) * S.Ω ^ (1/4:ℝ) by
         rw [Real.rpow_zero]; ring]
-    exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+    exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
   -- e06: no G factor
   · rw [one_mul, show P.H ^ (1/30:ℝ) * S.x ^ (1/30:ℝ) * S.Ω ^ (-2/15:ℝ)
           = P.H ^ (1/30:ℝ) * S.x ^ (1/30:ℝ) * P.G ^ (0:ℝ) * S.Ω ^ (-2/15:ℝ) by
         rw [Real.rpow_zero]; ring]
-    exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+    exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
   -- e14: Wnz itself
   · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num)
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
   -- e18: no G, no Ω factor
   · rw [one_mul, show P.H ^ (1/16:ℝ) * S.x ^ (-1/16:ℝ)
           = P.H ^ (1/16:ℝ) * S.x ^ (-1/16:ℝ) * P.G ^ (0:ℝ) * S.Ω ^ (0:ℝ) by
         rw [Real.rpow_zero, Real.rpow_zero]; ring]
-    exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
-  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+    exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
+  · rw [one_mul]; exact wle _ _ _ _ (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
   -- R > 1
   · rw [R_mono]
-    exact ole (1/2) (1/2) 1 3 (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+    exact ole (1/2) (1/2) 1 3 (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
   -- T₁ > 1
   · rw [T1_mono]
-    exact ole (1/2) (-3/2) (-1) (-1) (by unfold ratioExp; norm_num; nlinarith [hbud', hg, hu, huCu, huCu1])
+    exact ole (1/2) (-3/2) (-1) (-1) (by unfold ratioExp; norm_num; linarith [hbud', hg, hu, huCu, huCu1])
 
 /-! ### Closing-LP upper bounds (Step D) -/
 
@@ -603,13 +601,13 @@ theorem closing_bound (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripData
     rw [hRWm, HA2_mono, RW_mul]; norm_num
   -- bound each X^{2u}·term ≤ H/U
   have bA := closing_term P S c₀ Cu D _ _ _ _ _ htA
-    (by unfold ratioExpU; norm_num; nlinarith [hbud, hg, hu, hCu, huCu, huCu1])
+    (by unfold ratioExpU; norm_num; linarith [hbud, hg, hu, hCu, huCu, huCu1])
   have bHA := closing_term P S c₀ Cu D _ _ _ _ _ htHA
-    (by unfold ratioExpU; norm_num; nlinarith [hbud, hg, hu, hCu, huCu, huCu1])
+    (by unfold ratioExpU; norm_num; linarith [hbud, hg, hu, hCu, huCu, huCu1])
   have b1 := closing_term P S c₀ Cu D _ _ _ _ _ ht1
-    (by unfold ratioExpU; norm_num; nlinarith [hbud, hg, hu, hCu, huCu, huCu1])
+    (by unfold ratioExpU; norm_num; linarith [hbud, hg, hu, hCu, huCu, huCu1])
   have bHA2 := closing_term P S c₀ Cu D _ _ _ _ _ htHA2
-    (by unfold ratioExpU; norm_num; nlinarith [hbud, hg, hu, hCu, huCu, huCu1])
+    (by unfold ratioExpU; norm_num; linarith [hbud, hg, hu, hCu, huCu, huCu1])
   -- assemble
   have hsum_nn : 0 ≤ (S.R / Wnz P S) * S.A + (S.R / Wnz P S) * (P.H / S.A)
       + (S.R / Wnz P S) * 1 + (S.R / Wnz P S) * (P.H / S.A ^ 2) := by

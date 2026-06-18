@@ -18,8 +18,6 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 1600000
-
 /-- **`|d̃ₐ'(r)| ≍ B`.**  In the §5 regime, the first `r`-derivative of `d̃ₐ` satisfies
 `B/1000000 ≤ |d̃ₐ'(r)| ≤ 1000000·B`, where `B = D/R`. -/
 theorem dtilde_d1_bounds {P : Globals} {S : Scale P} {a r : ℝ}
@@ -57,22 +55,22 @@ theorem dtilde_d1_bounds {P : Globals} {S : Scale P} {a r : ℝ}
   rw [habs]
   -- numerator bounds
   have hNum_lo : S.D ^ 2 / 100 ≤ Num := by
-    rw [hNum_def]; nlinarith [hd_lo, ha0, hd_pos, hDpos]
+    rw [hNum_def]; nlinarith only [hd_lo, ha0, hd_pos, hDpos]
   have hNum_hi : Num ≤ 360 * S.D ^ 2 := by
-    rw [hNum_def]; nlinarith [hd_hi, ha_hiD, hd_pos, ha0, hDpos]
+    rw [hNum_def]; nlinarith only [hd_hi, ha_hiD, hd_pos, ha0, hDpos]
   -- denominator bounds
   have hDen_lo : S.R * S.D / 180 ≤ Den := by
     rw [hDen_def]
     -- a + 2d ≥ 2(D/10) = D/5 ; r ≥ R/72
     have h1 : S.D / 5 ≤ a + 2 * d := by linarith
     have h2 : (1/72) * S.R ≤ r := hr_lo
-    nlinarith [h1, h2, hRpos, hDpos, ha0, hd_pos]
+    nlinarith only [h1, h2, hRpos, hDpos, ha0, hd_pos]
   have hDen_hi : Den ≤ 1300 * S.R * S.D := by
     rw [hDen_def]
     -- a + 2d ≤ 1.1D + 36D = 37.1D ≤ 38D ; r ≤ 16R
     have h1 : a + 2 * d ≤ 38 * S.D := by linarith
     have h2 : r ≤ 16 * S.R := hr_hi
-    nlinarith [h1, h2, hRpos, hDpos, ha0, hd_pos, hr0]
+    nlinarith only [h1, h2, hRpos, hDpos, ha0, hd_pos, hr0]
   -- combine: lower
   refine ⟨?_, ?_⟩
   · -- B/1000000 ≤ Num/Den
@@ -85,7 +83,7 @@ theorem dtilde_d1_bounds {P : Globals} {S : Scale P} {a r : ℝ}
     have heq : S.D / S.R / 1000000 * (1300 * S.R * S.D) = 1300 * S.D ^ 2 / 1000000 := by
       field_simp
     have hle : (1300 : ℝ) * S.D ^ 2 / 1000000 ≤ S.D ^ 2 / 100 := by
-      rw [div_le_div_iff₀ (by norm_num) (by norm_num)]; nlinarith [pow_pos hDpos 2]
+      rw [div_le_div_iff₀ (by norm_num) (by norm_num)]; linarith [pow_pos hDpos 2]
     calc S.D / S.R / 1000000 * Den
         ≤ 1300 * S.D ^ 2 / 1000000 := by rw [heq] at hstep; exact hstep
       _ ≤ S.D ^ 2 / 100 := hle
@@ -100,7 +98,7 @@ theorem dtilde_d1_bounds {P : Globals} {S : Scale P} {a r : ℝ}
     have heq : 1000000 * (S.D / S.R) * (S.R * S.D / 180) = 1000000 * S.D ^ 2 / 180 := by
       field_simp
     have hle : (360 : ℝ) * S.D ^ 2 ≤ 1000000 * S.D ^ 2 / 180 := by
-      rw [le_div_iff₀ (by norm_num)]; nlinarith [pow_pos hDpos 2]
+      rw [le_div_iff₀ (by norm_num)]; linarith [pow_pos hDpos 2]
     calc Num ≤ 360 * S.D ^ 2 := hNum_hi
       _ ≤ 1000000 * S.D ^ 2 / 180 := hle
       _ = 1000000 * (S.D / S.R) * (S.R * S.D / 180) := by rw [heq]
@@ -141,28 +139,28 @@ theorem dtilde_d2_bounds {P : Globals} {S : Scale P} {a r : ℝ}
   -- factor 1: d(d+a)
   have hf1_lo : S.D ^ 2 / 100 ≤ d * (d + a) := by nlinarith [hd_lo, ha0, hd_pos, hDpos]
   have hf1_hi : d * (d + a) ≤ 360 * S.D ^ 2 := by
-    nlinarith [hd_hi, ha_hiD, hd_pos, ha0, hDpos]
+    nlinarith only [hd_hi, ha_hiD, hd_pos, ha0, hDpos]
   -- factor 2: 3a² + 10ad + 10d²
   have hf2_lo : S.D ^ 2 / 10 ≤ 3 * a ^ 2 + 10 * a * d + 10 * d ^ 2 := by
-    nlinarith [hd_lo, ha0, hd_pos, hDpos]
+    nlinarith only [hd_lo, ha0, hd_pos, hDpos]
   have hf2_hi : 3 * a ^ 2 + 10 * a * d + 10 * d ^ 2 ≤ 3450 * S.D ^ 2 := by
-    nlinarith [hd_hi, ha_hiD, hd_pos, ha0, hDpos]
+    nlinarith only [hd_hi, ha_hiD, hd_pos, ha0, hDpos]
   -- numerator bounds via multiplication
   have hNum2_lo : S.D ^ 4 / 1000 ≤ Num2 := by
     rw [hNum2_def]
     have := mul_le_mul hf1_lo hf2_lo (by positivity) (by positivity)
-    calc S.D ^ 4 / 1000 ≤ (S.D ^ 2 / 100) * (S.D ^ 2 / 10) := by nlinarith [pow_pos hDpos 4]
+    calc S.D ^ 4 / 1000 ≤ (S.D ^ 2 / 100) * (S.D ^ 2 / 10) := by nlinarith only [pow_pos hDpos 4]
       _ ≤ d * (d + a) * (3 * a ^ 2 + 10 * a * d + 10 * d ^ 2) := this
   have hNum2_hi : Num2 ≤ 1242000 * S.D ^ 4 := by
     rw [hNum2_def]
     have := mul_le_mul hf1_hi hf2_hi (by positivity) (by positivity : (0:ℝ) ≤ 360 * S.D ^ 2)
     calc d * (d + a) * (3 * a ^ 2 + 10 * a * d + 10 * d ^ 2)
         ≤ (360 * S.D ^ 2) * (3450 * S.D ^ 2) := this
-      _ ≤ 1242000 * S.D ^ 4 := by nlinarith [pow_pos hDpos 4]
+      _ ≤ 1242000 * S.D ^ 4 := by nlinarith only [pow_pos hDpos 4]
   -- denominator factor bounds
   -- r² ∈ [R²/5184, 256R²]
-  have hr2_lo : S.R ^ 2 / 5184 ≤ r ^ 2 := by nlinarith [hr_lo, hr0, hRpos]
-  have hr2_hi : r ^ 2 ≤ 256 * S.R ^ 2 := by nlinarith [hr_hi, hr0, hRpos]
+  have hr2_lo : S.R ^ 2 / 5184 ≤ r ^ 2 := by nlinarith only [hr_lo, hr0, hRpos]
+  have hr2_hi : r ^ 2 ≤ 256 * S.R ^ 2 := by nlinarith only [hr_hi, hr0, hRpos]
   -- (a+2d)³ ∈ [D³/125, (38D)³]
   have hs_lo : S.D / 5 ≤ a + 2 * d := by linarith
   have hs_hi : a + 2 * d ≤ 38 * S.D := by linarith
@@ -180,17 +178,17 @@ theorem dtilde_d2_bounds {P : Globals} {S : Scale P} {a r : ℝ}
     have hmul := mul_le_mul hr2_lo hcube_lo (by positivity) (by positivity)
     calc S.R ^ 2 * S.D ^ 3 / 170000
         ≤ 4 * ((S.R ^ 2 / 5184) * (S.D ^ 3 / 125)) := by
-          rw [div_le_iff₀ (by norm_num)]; nlinarith [mul_pos (pow_pos hRpos 2) (pow_pos hDpos 3)]
-      _ ≤ 4 * (r ^ 2 * (a + 2 * d) ^ 3) := by nlinarith [hmul]
+          rw [div_le_iff₀ (by norm_num)]; nlinarith only [mul_pos (pow_pos hRpos 2) (pow_pos hDpos 3)]
+      _ ≤ 4 * (r ^ 2 * (a + 2 * d) ^ 3) := by nlinarith only [hmul]
       _ = 4 * r ^ 2 * (a + 2 * d) ^ 3 := by ring
   have hDen2_hi : Den2 ≤ 56200000 * S.R ^ 2 * S.D ^ 3 := by
     rw [hDen2_def]
     have hmul := mul_le_mul hr2_hi hcube_hi (by positivity)
       (by positivity : (0:ℝ) ≤ 256 * S.R ^ 2)
     calc 4 * r ^ 2 * (a + 2 * d) ^ 3 = 4 * (r ^ 2 * (a + 2 * d) ^ 3) := by ring
-      _ ≤ 4 * ((256 * S.R ^ 2) * (54872 * S.D ^ 3)) := by nlinarith [hmul]
+      _ ≤ 4 * ((256 * S.R ^ 2) * (54872 * S.D ^ 3)) := by nlinarith only [hmul]
       _ ≤ 56200000 * S.R ^ 2 * S.D ^ 3 := by
-          nlinarith [mul_pos (pow_pos hRpos 2) (pow_pos hDpos 3)]
+          nlinarith only [mul_pos (pow_pos hRpos 2) (pow_pos hDpos 3)]
   -- convert B/R to D/R²
   have hRne : S.R ≠ 0 := ne_of_gt hRpos
   have hBR : S.B / S.R = S.D / S.R ^ 2 := by
@@ -208,7 +206,7 @@ theorem dtilde_d2_bounds {P : Globals} {S : Scale P} {a r : ℝ}
     have heq : S.D / (S.R ^ 2 * 1000000000000) * (56200000 * S.R ^ 2 * S.D ^ 3)
         = 56200000 * S.D ^ 4 / 1000000000000 := by field_simp
     have hle : (56200000 : ℝ) * S.D ^ 4 / 1000000000000 ≤ S.D ^ 4 / 1000 := by
-      rw [div_le_div_iff₀ (by norm_num) (by norm_num)]; nlinarith [pow_pos hDpos 4]
+      rw [div_le_div_iff₀ (by norm_num) (by norm_num)]; linarith [pow_pos hDpos 4]
     calc S.D / (S.R ^ 2 * 1000000000000) * Den2
         ≤ 56200000 * S.D ^ 4 / 1000000000000 := by rw [heq] at hstep; exact hstep
       _ ≤ S.D ^ 4 / 1000 := hle
@@ -222,7 +220,7 @@ theorem dtilde_d2_bounds {P : Globals} {S : Scale P} {a r : ℝ}
     have heq : 10000000000000 * (S.D / S.R ^ 2) * (S.R ^ 2 * S.D ^ 3 / 170000)
         = 10000000000000 * S.D ^ 4 / 170000 := by field_simp
     have hle : (1242000 : ℝ) * S.D ^ 4 ≤ 10000000000000 * S.D ^ 4 / 170000 := by
-      rw [le_div_iff₀ (by norm_num)]; nlinarith [pow_pos hDpos 4]
+      rw [le_div_iff₀ (by norm_num)]; linarith [pow_pos hDpos 4]
     calc Num2 ≤ 1242000 * S.D ^ 4 := hNum2_hi
       _ ≤ 10000000000000 * S.D ^ 4 / 170000 := hle
       _ = 10000000000000 * (S.D / S.R ^ 2) * (S.R ^ 2 * S.D ^ 3 / 170000) := by rw [heq]
