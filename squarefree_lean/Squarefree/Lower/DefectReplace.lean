@@ -16,8 +16,6 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 6400000
-
 /-- Arithmetic core of the δ-comparison: `G²U¹⁰·(11/(GΩ⁵Δ)) ≤ 11·δ` where `δ = G³U¹⁰/(ΔΩ⁵)`.
 Pulled out to keep the heavy main proof's `nlinarith` out of the giant context. -/
 private theorem delta_compare_aux {G U Ω Δ δ : ℝ}
@@ -53,7 +51,7 @@ raising to the 4th power so the band/`h1` integer-power bounds apply.
 private theorem absorb_UH_aux {G U Ω Δ H : ℝ}
     (hG : 0 < G) (hU : 0 < U) (hΩ : 0 < Ω) (hΔ : 0 < Δ) (hH : 0 < H)
     (h1 : G * U ^ 10 ≤ H / Δ ^ 2) (hband : 1 ≤ G * U ^ 3 * Ω ^ 4)
-    (_hG1 : 1 ≤ G) (_hU1 : 1 ≤ U) (hH1 : 1 ≤ H) (hUH : U ^ 9 ≤ G ^ 7 * H ^ 2) :
+    (_hG1 : 1 ≤ G) (_hU1 : 1 ≤ U) (_hH1 : 1 ≤ H) (hUH : U ^ 9 ≤ G ^ 7 * H ^ 2) :
     U ^ 5 * Δ ≤ G ^ 2 * Ω ^ 3 * H := by
   -- It suffices to compare 4th powers (both sides nonneg).
   have hLnn : 0 ≤ U ^ 5 * Δ := by positivity
@@ -100,7 +98,7 @@ private theorem absorb_UH_aux {G U Ω Δ H : ℝ}
   -- H²/G² ≤ G⁵H⁴/U⁹  ⟺  U⁹ ≤ G⁷H²
   have hmid : H ^ 2 / G ^ 2 ≤ G ^ 5 * H ^ 4 / U ^ 9 := by
     rw [div_le_div_iff₀ (by positivity) (by positivity)]
-    nlinarith [hUH, sq_nonneg H, hH1, pow_pos hH 2, pow_pos hG 5, mul_pos (pow_pos hG 5) (pow_pos hH 2)]
+    nlinarith [hUH, sq_nonneg H, _hH1, pow_pos hH 2, pow_pos hG 5, mul_pos (pow_pos hG 5) (pow_pos hH 2)]
   -- chain the 4th-power comparison and take 4th roots
   have h4 : (U ^ 5 * Δ) ^ 4 ≤ (G ^ 2 * Ω ^ 3 * H) ^ 4 :=
     le_trans hL4 (le_trans hmid hR4)
@@ -391,7 +389,7 @@ theorem phi_d_replace {P : Globals} {S : Scale P} {a : ℤ} {r ℓ₁ ℓ₂ d d
         ≤ (11 / (P.G * S.Ω ^ 5)) / S.Δ ^ 2 := by gcongr
     have hΔ2 : (11 / (P.G * S.Ω ^ 5)) / S.Δ ^ 2 ≤ (11 / (P.G * S.Ω ^ 5)) / S.Δ := by
       apply div_le_div_of_nonneg_left (by positivity) hΔpos
-      nlinarith [hΔ1, hΔpos]
+      nlinarith only [hΔ1, hΔpos]
     rw [heq, show 11 / (P.G * S.Ω ^ 5 * S.Δ) = (11 / (P.G * S.Ω ^ 5)) / S.Δ by rw [div_div]]
     exact le_trans hstep hΔ2
   -- key δ-comparison:  ℓ₂(ℓ₂−ℓ₁)·11/(G·Ω⁵·Δ) ≤ 11·δ
@@ -455,7 +453,10 @@ theorem phi_d_replace {P : Globals} {S : Scale P} {a : ℤ} {r ℓ₁ ℓ₂ d d
           ≤ 96000000000000000000000000 * (16900 * (11 * δ)) :=
         mul_le_mul_of_nonneg_left hkey (by norm_num)
       have hc2 : (96000000000000000000000000 : ℝ) * (16900 * (11 * δ))
-          ≤ (10:ℝ) ^ 45 / 2 * δ := by nlinarith [hδpos.le]
+          ≤ (10:ℝ) ^ 45 / 2 * δ := by
+        have h10 : (10:ℝ) ^ 45 / 2 = 500000000000000000000000000000000000000000000 := by
+          norm_num
+        rw [h10]; nlinarith only [hδpos.le]
       exact le_trans hc1 hc2
     calc 12 * (ℓ₂ * (ℓ₂ - ℓ₁)) *
             (4000000000000000000 * (P.X * (a:ℝ) * δ' * S.B / S.D ^ 5)
@@ -541,7 +542,10 @@ theorem phi_d_replace {P : Globals} {S : Scale P} {a : ℤ} {r ℓ₁ ℓ₂ d d
       _ ≤ (12 * (5 * 18 ^ 4 * 100000 * 1000000000000) * 1000000000000)
             * (2197000 * (11 * δ)) :=
           mul_le_mul_of_nonneg_left hkey2 hc
-      _ ≤ (10:ℝ) ^ 45 / 2 * δ := by nlinarith [hδpos.le]
+      _ ≤ (10:ℝ) ^ 45 / 2 * δ := by
+          have h10 : (10:ℝ) ^ 45 / 2 = 500000000000000000000000000000000000000000000 := by
+            norm_num
+          rw [h10]; nlinarith only [hδpos.le]
   exact add_le_add hTerm1 hTerm2
 
 end Squarefree

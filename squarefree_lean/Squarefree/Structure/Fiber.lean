@@ -21,7 +21,7 @@ open Classical Finset
 
 namespace Squarefree
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 400000 in
 /-- **Prop 3.2** (writeup 346–393).  Fiber bound is the STATED WEAK (non-sharp) form.
 
 Threaded faithful regime hypotheses (beyond `lemma_3_1`'s): the dyadic window `D = S.D`
@@ -77,13 +77,13 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
     have haX : (262144 : ℝ) * S.Δ ^ (3:ℕ) * P.H ^ 4 ≤ (a:ℝ) ^ 3 * P.X := by
       have e : (262144 : ℝ) * S.Δ ^ (3:ℕ) * (P.H ^ 4 / P.X) * P.X
           = 262144 * S.Δ ^ (3:ℕ) * P.H ^ 4 := by field_simp
-      nlinarith [mul_le_mul_of_nonneg_right ha3 hXpos.le, e]
+      nlinarith only [mul_le_mul_of_nonneg_right ha3 hXpos.le, e]
     have hPXA : P.X * ((a:ℝ)/2) ^ 3 ≤ P.X * S.A ^ 3 :=
       mul_le_mul_of_nonneg_left hAcube hXpos.le
     have hΔ4 : S.Δ ^ (4:ℕ) = S.Δ ^ (3:ℕ) * S.Δ := by ring
     rw [hΔ4]
-    nlinarith [haX, hPXA, hXpos.le, mul_le_mul_of_nonneg_right haX hΔpos.le,
-      mul_pos hΔpos (pow_pos hΔpos 3)]
+    nlinarith only [haX, hPXA, hXpos.le, mul_le_mul_of_nonneg_right haX hΔpos.le,
+      mul_pos hΔpos (pow_pos hΔpos 3), hΔpos.le]
   -- chosen near-integer for a 𝒟-element
   have hd2pos : ∀ d : ℤ, (0:ℝ) < S.D → S.D ≤ (d:ℝ) → (0:ℝ) < (d:ℝ) ^ 2 := by
     intro d hD hle; have : (0:ℝ) < (d:ℝ) := lt_of_lt_of_le hD hle; positivity
@@ -139,10 +139,10 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
       Rfun_factor P.X (a:ℝ) (d:ℝ) hdne hdane
     have haD' : (a:ℝ) ≤ S.D := by rw [← hDeq]; exact haD
     have hden : (0:ℝ) < (d:ℝ) ^ 2 * ((d:ℝ) + a) ^ 2 := by positivity
-    have hd2ub : (d:ℝ) ^ 2 ≤ 4 * S.D ^ 2 := by nlinarith [hdlo, hdhi, hdpos.le]
-    have hdaub : ((d:ℝ) + a) ^ 2 ≤ 9 * S.D ^ 2 := by nlinarith [hdhi, haD', haRpos.le, hdpos.le]
-    have hd2lb : S.D ^ 2 ≤ (d:ℝ) ^ 2 := by nlinarith [hdlo, hdpos.le, hDSpos.le]
-    have hdalb : S.D ^ 2 ≤ ((d:ℝ) + a) ^ 2 := by nlinarith [hdlo, haRpos.le, hdpos.le, hDSpos.le]
+    have hd2ub : (d:ℝ) ^ 2 ≤ 4 * S.D ^ 2 := by nlinarith only [hdlo, hdhi, hdpos.le]
+    have hdaub : ((d:ℝ) + a) ^ 2 ≤ 9 * S.D ^ 2 := by nlinarith only [hdhi, haD', haRpos.le, hdpos.le]
+    have hd2lb : S.D ^ 2 ≤ (d:ℝ) ^ 2 := by nlinarith only [hdlo, hdpos.le, hDSpos.le]
+    have hdalb : S.D ^ 2 ≤ ((d:ℝ) + a) ^ 2 := by nlinarith only [hdlo, haRpos.le, hdpos.le, hDSpos.le]
     have hprodub : (d:ℝ) ^ 2 * ((d:ℝ) + a) ^ 2 ≤ 36 * S.D ^ 4 := by
       calc (d:ℝ) ^ 2 * ((d:ℝ) + a) ^ 2 ≤ (4 * S.D ^ 2) * (9 * S.D ^ 2) :=
             mul_le_mul hd2ub hdaub (by positivity) (by positivity)
@@ -153,7 +153,7 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
             mul_le_mul hd2lb hdalb (by positivity) (by positivity)
     have hAcube : S.A ^ 3 ≤ (a:ℝ) ^ 3 := pow_le_pow_left₀ hApos.le hAa 3
     have hacube : (a:ℝ) ^ 3 ≤ 8 * S.A ^ 3 := by
-      nlinarith [pow_le_pow_left₀ haRpos.le haA 3, hApos.le]
+      nlinarith only [pow_le_pow_left₀ haRpos.le haA 3, hApos.le]
     have hD4pos : (0:ℝ) < S.D ^ 4 := by positivity
     have hSRprod : S.R * ((d:ℝ) ^ 2 * ((d:ℝ) + a) ^ 2) = P.X * S.A ^ 3 * ((d:ℝ) ^ 2 * ((d:ℝ) + a) ^ 2) / S.D ^ 4 := by
       rw [hRval]; ring
@@ -196,7 +196,7 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
     rw [hHD]
     -- 14/Δ ≤ (32768/Δ)/72 ≤ R/72  (uses the degraded `hRlb : 32768/Δ ≤ R`)
     have h1 : (14:ℝ) / S.Δ ≤ (32768 / S.Δ) / 72 := by
-      rw [div_div, div_le_div_iff₀ hΔpos (by positivity)]; nlinarith [hΔpos]
+      rw [div_div, div_le_div_iff₀ hΔpos (by positivity)]; linarith [hΔpos]
     have h2 : (32768 / S.Δ) / 72 ≤ S.R / 72 := by gcongr
     linarith
   -- for d ∈ S₀:  R_a(d) ∈ [R/36, 8R], and rStar d ∈ [R/72, 9R] as a real
@@ -263,14 +263,14 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
     have hXa3 : (262144 : ℝ) * S.Δ ^ (3:ℕ) * P.H ^ 4 ≤ (a:ℝ) ^ 3 * P.X := by
       have e : (262144 : ℝ) * S.Δ ^ (3:ℕ) * (P.H ^ 4 / P.X) * P.X
           = 262144 * S.Δ ^ (3:ℕ) * P.H ^ 4 := by field_simp
-      nlinarith [mul_le_mul_of_nonneg_right ha3 hXpos.le, e]
+      nlinarith only [mul_le_mul_of_nonneg_right ha3 hXpos.le, e]
     have hD4 : S.D ^ 4 = S.Δ ^ (4:ℕ) * P.H ^ 4 := by rw [hDeqv]; ring
     rw [hD5, hD4, hDeqv]
     have hcoef : (0:ℝ) ≤ P.H * S.Δ ^ 2 / 2 := by positivity
     have hmul : (P.H * S.Δ ^ 2 / 2) * ((262144:ℝ) * S.Δ ^ (3:ℕ) * P.H ^ 4)
         ≤ (P.H * S.Δ ^ 2 / 2) * ((a:ℝ) ^ 3 * P.X) :=
       mul_le_mul_of_nonneg_left hXa3 hcoef
-    nlinarith [hmul, hΔ, pow_pos hHpos 5, pow_pos hΔpos 5, mul_pos hHpos hΔpos,
+    nlinarith only [hmul, hΔ, pow_pos hHpos 5, pow_pos hΔpos 5, mul_pos hHpos hΔpos,
       mul_nonneg (pow_pos hHpos 5).le (pow_pos hΔpos 5).le]
   -- the cube comparison:  2 Wbud / spc ≤ (18144/c) tgt
   have hWspc : 2 * Wbud / spc ≤ (18144 / c) * tgt := by
@@ -319,9 +319,9 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
       -- reduces to  A⁸ ≤ Δ a⁸  times a positive monomial
       have hDa8 : S.A ^ (8:ℕ) ≤ S.Δ * (a:ℝ) ^ (8:ℕ) := by
         calc S.A ^ (8:ℕ) ≤ (a:ℝ) ^ (8:ℕ) := hAcube8
-          _ ≤ S.Δ * (a:ℝ) ^ (8:ℕ) := by nlinarith [hΔ, pow_pos haRpos 8]
+          _ ≤ S.Δ * (a:ℝ) ^ (8:ℕ) := by nlinarith only [hΔ, pow_pos haRpos 8]
       have hfac : (0:ℝ) ≤ 5973090729984 * S.Δ ^ 15 * P.G ^ 3 * P.H ^ 15 * (a:ℝ) := by positivity
-      nlinarith [mul_le_mul_of_nonneg_left hDa8 hfac]
+      nlinarith only [mul_le_mul_of_nonneg_left hDa8 hfac]
     rw [div_le_iff₀ hspc_pos]; exact hmain
   refine ⟨Ra, dStar, ?_, ?_, ?_, ?_⟩
   · -- (1) dStar r ∈ 𝒟_a
@@ -400,7 +400,7 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
             rw [hDSeq]; field_simp
           have hstep : (1/324 : ℝ) * P.X * (a:ℝ) ^ 3 * |(d:ℝ) - (d'':ℝ)| ≤ 28 * P.H * S.D ^ 4 := by
             rw [← hHDS]; exact hcomb
-          nlinarith [hstep, abs_nonneg ((d:ℝ) - (d'':ℝ))]
+          nlinarith only [hstep, abs_nonneg ((d:ℝ) - (d'':ℝ))]
         have : (d'':ℝ) - (d:ℝ) ≤ |(d:ℝ) - (d'':ℝ)| := by
           rw [abs_sub_comm]; exact le_abs_self _
         linarith [this, hdd_abs]
@@ -432,7 +432,7 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
       have h2W : 2 + 2 * Wbud / spc ≤ C₂ * (1 + tgt) := by
         rw [hC₂def]
         have htnn : 0 ≤ tgt := htgt_pos.le
-        nlinarith [hWspc, htnn, hc_pos, div_nonneg (by norm_num : (0:ℝ) ≤ 18144) hc_pos.le]
+        nlinarith only [hWspc, htnn, hc_pos, div_nonneg (by norm_num : (0:ℝ) ≤ 18144) hc_pos.le]
       calc (((S₀.filter (fun d => rN d = r)).card : ℕ) : ℝ)
           = ((Fr.card : ℕ) : ℝ) := by rw [hFrdef]
         _ ≤ 2 + 2 * Wbud / spc := hgcb
@@ -483,7 +483,7 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
         rw [hDSeq]; field_simp
       have hstep : (1/324 : ℝ) * P.X * (a:ℝ) ^ 3 * |((dStar r):ℝ) - dtil (r:ℝ)| ≤ 14 * P.H * S.D ^ 4 := by
         rw [← hHDS]; exact hcomb
-      nlinarith [hstep, abs_nonneg (((dStar r):ℝ) - dtil (r:ℝ))]
+      nlinarith only [hstep, abs_nonneg (((dStar r):ℝ) - dtil (r:ℝ))]
     -- finally bound by 4536 (Δ/G)(Δ³/A³)
     refine le_trans habs ?_
     -- 4536 D⁴ H/(X a³) ≤ 4536 (Δ/G)(Δ³/A³)  ⟺  D⁴ H A³/(X a³) ≤ Δ⁴/G  (uses A ≤ a, D=HΔ, X=GH⁵)
@@ -496,10 +496,10 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
     rw [hD4, hXGH]
     -- goal: 4536 * (H⁴Δ⁴) * H * (G * A³) ≤ 4536 * Δ⁴ * ((G H⁵) * a³)
     have hGH5 : (0:ℝ) < P.G * P.H ^ 5 := by positivity
-    nlinarith [mul_le_mul_of_nonneg_left hAcube (by positivity : (0:ℝ) ≤ 4536 * (P.H ^ 4 * S.Δ ^ 4) * P.H * P.G),
+    nlinarith only [mul_le_mul_of_nonneg_left hAcube (by positivity : (0:ℝ) ≤ 4536 * (P.H ^ 4 * S.Δ ^ 4) * P.H * P.G),
       hApos.le, hGpos.le, hHpos.le, hΔpos.le]
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 400000 in
 /-- **Prop 3.2 fiber bound only** (the `dtil`-free part of `prop_3_2`).
 
 The fiber/spacing construction never uses the right-inverse `dtil`; this variant exposes just
@@ -543,14 +543,14 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
     have haX : (262144 : ℝ) * S.Δ ^ (3:ℕ) * P.H ^ 4 ≤ (a:ℝ) ^ 3 * P.X := by
       have e : (262144 : ℝ) * S.Δ ^ (3:ℕ) * (P.H ^ 4 / P.X) * P.X
           = 262144 * S.Δ ^ (3:ℕ) * P.H ^ 4 := by field_simp
-      nlinarith [mul_le_mul_of_nonneg_right ha3 hXpos.le, e]
+      nlinarith only [mul_le_mul_of_nonneg_right ha3 hXpos.le, e]
     have hPXA : P.X * ((a:ℝ)/2) ^ 3 ≤ P.X * S.A ^ 3 :=
       mul_le_mul_of_nonneg_left hAcube hXpos.le
     -- goal: 32768 * (S.Δ⁴ H⁴) ≤ (X A³) * S.Δ;  use X a³ ≥ 262144 Δ³ H⁴, A³ ≥ (a/2)³
     have hΔ4 : S.Δ ^ (4:ℕ) = S.Δ ^ (3:ℕ) * S.Δ := by ring
     rw [hΔ4]
-    nlinarith [haX, hPXA, hXpos.le, mul_le_mul_of_nonneg_right haX hΔpos.le,
-      mul_pos hΔpos (pow_pos hΔpos 3)]
+    nlinarith only [haX, hPXA, hXpos.le, mul_le_mul_of_nonneg_right haX hΔpos.le,
+      mul_pos hΔpos (pow_pos hΔpos 3), hΔpos.le]
   classical
   set getm : ℤ → ℤ := fun d =>
     if h : (∃ m : ℤ, P.X ≤ (m : ℝ) * (d : ℝ) ^ 2 ∧ (m : ℝ) * (d : ℝ) ^ 2 ≤ P.X + P.H)
@@ -599,10 +599,10 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
       Rfun_factor P.X (a:ℝ) (d:ℝ) hdne hdane
     have haD' : (a:ℝ) ≤ S.D := by rw [← hDeq]; exact haD
     have hden : (0:ℝ) < (d:ℝ) ^ 2 * ((d:ℝ) + a) ^ 2 := by positivity
-    have hd2ub : (d:ℝ) ^ 2 ≤ 4 * S.D ^ 2 := by nlinarith [hdlo, hdhi, hdpos.le]
-    have hdaub : ((d:ℝ) + a) ^ 2 ≤ 9 * S.D ^ 2 := by nlinarith [hdhi, haD', haRpos.le, hdpos.le]
-    have hd2lb : S.D ^ 2 ≤ (d:ℝ) ^ 2 := by nlinarith [hdlo, hdpos.le, hDSpos.le]
-    have hdalb : S.D ^ 2 ≤ ((d:ℝ) + a) ^ 2 := by nlinarith [hdlo, haRpos.le, hdpos.le, hDSpos.le]
+    have hd2ub : (d:ℝ) ^ 2 ≤ 4 * S.D ^ 2 := by nlinarith only [hdlo, hdhi, hdpos.le]
+    have hdaub : ((d:ℝ) + a) ^ 2 ≤ 9 * S.D ^ 2 := by nlinarith only [hdhi, haD', haRpos.le, hdpos.le]
+    have hd2lb : S.D ^ 2 ≤ (d:ℝ) ^ 2 := by nlinarith only [hdlo, hdpos.le, hDSpos.le]
+    have hdalb : S.D ^ 2 ≤ ((d:ℝ) + a) ^ 2 := by nlinarith only [hdlo, haRpos.le, hdpos.le, hDSpos.le]
     have hprodub : (d:ℝ) ^ 2 * ((d:ℝ) + a) ^ 2 ≤ 36 * S.D ^ 4 := by
       calc (d:ℝ) ^ 2 * ((d:ℝ) + a) ^ 2 ≤ (4 * S.D ^ 2) * (9 * S.D ^ 2) :=
             mul_le_mul hd2ub hdaub (by positivity) (by positivity)
@@ -613,7 +613,7 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
             mul_le_mul hd2lb hdalb (by positivity) (by positivity)
     have hAcube : S.A ^ 3 ≤ (a:ℝ) ^ 3 := pow_le_pow_left₀ hApos.le hAa 3
     have hacube : (a:ℝ) ^ 3 ≤ 8 * S.A ^ 3 := by
-      nlinarith [pow_le_pow_left₀ haRpos.le haA 3, hApos.le]
+      nlinarith only [pow_le_pow_left₀ haRpos.le haA 3, hApos.le]
     have hD4pos : (0:ℝ) < S.D ^ 4 := by positivity
     constructor
     · rw [hfac, div_le_div_iff₀ (by positivity) hden]
@@ -648,7 +648,7 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
     rw [hHD]
     -- 14/Δ ≤ (32768/Δ)/72 ≤ R/72  (uses the degraded `hRlb : 32768/Δ ≤ R`)
     have h1 : (14:ℝ) / S.Δ ≤ (32768 / S.Δ) / 72 := by
-      rw [div_div, div_le_div_iff₀ hΔpos (by positivity)]; nlinarith [hΔpos]
+      rw [div_div, div_le_div_iff₀ hΔpos (by positivity)]; linarith [hΔpos]
     have h2 : (32768 / S.Δ) / 72 ≤ S.R / 72 := by gcongr
     linarith
   have hrStar_band : ∀ d ∈ S₀, S.R / 72 ≤ (rStar d : ℝ) ∧ (rStar d : ℝ) ≤ 16 * S.R := by
@@ -694,7 +694,7 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
     have hXa3 : (262144 : ℝ) * S.Δ ^ (3:ℕ) * P.H ^ 4 ≤ (a:ℝ) ^ 3 * P.X := by
       have e : (262144 : ℝ) * S.Δ ^ (3:ℕ) * (P.H ^ 4 / P.X) * P.X
           = 262144 * S.Δ ^ (3:ℕ) * P.H ^ 4 := by field_simp
-      nlinarith [mul_le_mul_of_nonneg_right ha3 hXpos.le, e]
+      nlinarith only [mul_le_mul_of_nonneg_right ha3 hXpos.le, e]
     have hD4 : S.D ^ 4 = S.Δ ^ (4:ℕ) * P.H ^ 4 := by rw [hDeqv]; ring
     rw [hD5, hD4, hDeqv]
     have hcoef : (0:ℝ) ≤ P.H * S.Δ ^ 2 / 2 := by positivity
@@ -702,7 +702,7 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
         ≤ (P.H * S.Δ ^ 2 / 2) * ((a:ℝ) ^ 3 * P.X) :=
       mul_le_mul_of_nonneg_left hXa3 hcoef
     -- LHS goal 9072 H⁵Δ⁵ ≤ (HΔ²/2)·X·a³ ≥ (HΔ²/2)·262144 Δ³ H⁴ = 131072 H⁵ Δ⁵
-    nlinarith [hmul, hΔ, pow_pos hHpos 5, pow_pos hΔpos 5, mul_pos hHpos hΔpos,
+    nlinarith only [hmul, hΔ, pow_pos hHpos 5, pow_pos hΔpos 5, mul_pos hHpos hΔpos,
       mul_nonneg (pow_pos hHpos 5).le (pow_pos hΔpos 5).le]
   have hWspc : 2 * Wbud / spc ≤ (18144 / c) * tgt := by
     obtain ⟨-, hspc3⟩ := spc_pos_cube P.X P.H S.Δ (a:ℝ) hXpos hHpos hΔpos haRpos
@@ -744,9 +744,9 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
       rw [hLHS, hRHS, div_le_div_iff₀ (by positivity) (by positivity)]
       have hDa8 : S.A ^ (8:ℕ) ≤ S.Δ * (a:ℝ) ^ (8:ℕ) := by
         calc S.A ^ (8:ℕ) ≤ (a:ℝ) ^ (8:ℕ) := hAcube8
-          _ ≤ S.Δ * (a:ℝ) ^ (8:ℕ) := by nlinarith [hΔ, pow_pos haRpos 8]
+          _ ≤ S.Δ * (a:ℝ) ^ (8:ℕ) := by nlinarith only [hΔ, pow_pos haRpos 8]
       have hfac : (0:ℝ) ≤ 5973090729984 * S.Δ ^ 15 * P.G ^ 3 * P.H ^ 15 * (a:ℝ) := by positivity
-      nlinarith [mul_le_mul_of_nonneg_left hDa8 hfac]
+      nlinarith only [mul_le_mul_of_nonneg_left hDa8 hfac]
     rw [div_le_iff₀ hspc_pos]; exact hmain
   refine ⟨Ra, ?_, ?_⟩
   · -- band  (c₁ = 1/72, C₁ = 16)
@@ -809,7 +809,7 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
           have hHDS : 28 * P.H / S.D * S.D ^ 5 = 28 * P.H * S.D ^ 4 := by rw [hDSeq]; field_simp
           have hstep : (1/324 : ℝ) * P.X * (a:ℝ) ^ 3 * |(d:ℝ) - (d'':ℝ)| ≤ 28 * P.H * S.D ^ 4 := by
             rw [← hHDS]; exact hcomb
-          nlinarith [hstep, abs_nonneg ((d:ℝ) - (d'':ℝ))]
+          nlinarith only [hstep, abs_nonneg ((d:ℝ) - (d'':ℝ))]
         have : (d'':ℝ) - (d:ℝ) ≤ |(d:ℝ) - (d'':ℝ)| := by rw [abs_sub_comm]; exact le_abs_self _
         linarith [this, hdd_abs]
       have hgap : ∀ d d'' : ℤ, d ∈ Fr → d'' ∈ Fr → d < d'' →
@@ -837,7 +837,7 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
       have h2W : 2 + 2 * Wbud / spc ≤ C₂ * (1 + tgt) := by
         rw [hC₂def]
         have htnn : 0 ≤ tgt := htgt_pos.le
-        nlinarith [hWspc, htnn, hc_pos, div_nonneg (by norm_num : (0:ℝ) ≤ 18144) hc_pos.le]
+        nlinarith only [hWspc, htnn, hc_pos, div_nonneg (by norm_num : (0:ℝ) ≤ 18144) hc_pos.le]
       calc (((S₀.filter (fun d => rN d = r)).card : ℕ) : ℝ)
           = ((Fr.card : ℕ) : ℝ) := by rw [hFrdef]
         _ ≤ 2 + 2 * Wbud / spc := hgcb
@@ -852,7 +852,7 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
       _ = (Ra.card : ℝ) * (C₂ * (1 + tgt)) := by rw [Finset.sum_const, nsmul_eq_mul]
       _ = C₂ * (Ra.card : ℝ) * (1 + tgt) := by ring
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 400000 in
 /-- **Prop 3.2 fiber bound + `dStar` localization** (the `dtil`-free part of `prop_3_2`, but also
 returning the `dStar : ℕ → ℤ` with `dStar r ∈ 𝒟_a`).  Same construction as `prop_3_2_fiber`, but
 additionally exposes the localization map `dStar`, which §7's `prop_7_3` needs (and which is built
@@ -899,14 +899,14 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
     have haX : (262144 : ℝ) * S.Δ ^ (3:ℕ) * P.H ^ 4 ≤ (a:ℝ) ^ 3 * P.X := by
       have e : (262144 : ℝ) * S.Δ ^ (3:ℕ) * (P.H ^ 4 / P.X) * P.X
           = 262144 * S.Δ ^ (3:ℕ) * P.H ^ 4 := by field_simp
-      nlinarith [mul_le_mul_of_nonneg_right ha3 hXpos.le, e]
+      nlinarith only [mul_le_mul_of_nonneg_right ha3 hXpos.le, e]
     have hPXA : P.X * ((a:ℝ)/2) ^ 3 ≤ P.X * S.A ^ 3 :=
       mul_le_mul_of_nonneg_left hAcube hXpos.le
     -- goal: 32768 * (S.Δ⁴ H⁴) ≤ (X A³) * S.Δ;  use X a³ ≥ 262144 Δ³ H⁴, A³ ≥ (a/2)³
     have hΔ4 : S.Δ ^ (4:ℕ) = S.Δ ^ (3:ℕ) * S.Δ := by ring
     rw [hΔ4]
-    nlinarith [haX, hPXA, hXpos.le, mul_le_mul_of_nonneg_right haX hΔpos.le,
-      mul_pos hΔpos (pow_pos hΔpos 3)]
+    nlinarith only [haX, hPXA, hXpos.le, mul_le_mul_of_nonneg_right haX hΔpos.le,
+      mul_pos hΔpos (pow_pos hΔpos 3), hΔpos.le]
   classical
   set getm : ℤ → ℤ := fun d =>
     if h : (∃ m : ℤ, P.X ≤ (m : ℝ) * (d : ℝ) ^ 2 ∧ (m : ℝ) * (d : ℝ) ^ 2 ≤ P.X + P.H)
@@ -955,10 +955,10 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
       Rfun_factor P.X (a:ℝ) (d:ℝ) hdne hdane
     have haD' : (a:ℝ) ≤ S.D := by rw [← hDeq]; exact haD
     have hden : (0:ℝ) < (d:ℝ) ^ 2 * ((d:ℝ) + a) ^ 2 := by positivity
-    have hd2ub : (d:ℝ) ^ 2 ≤ 4 * S.D ^ 2 := by nlinarith [hdlo, hdhi, hdpos.le]
-    have hdaub : ((d:ℝ) + a) ^ 2 ≤ 9 * S.D ^ 2 := by nlinarith [hdhi, haD', haRpos.le, hdpos.le]
-    have hd2lb : S.D ^ 2 ≤ (d:ℝ) ^ 2 := by nlinarith [hdlo, hdpos.le, hDSpos.le]
-    have hdalb : S.D ^ 2 ≤ ((d:ℝ) + a) ^ 2 := by nlinarith [hdlo, haRpos.le, hdpos.le, hDSpos.le]
+    have hd2ub : (d:ℝ) ^ 2 ≤ 4 * S.D ^ 2 := by nlinarith only [hdlo, hdhi, hdpos.le]
+    have hdaub : ((d:ℝ) + a) ^ 2 ≤ 9 * S.D ^ 2 := by nlinarith only [hdhi, haD', haRpos.le, hdpos.le]
+    have hd2lb : S.D ^ 2 ≤ (d:ℝ) ^ 2 := by nlinarith only [hdlo, hdpos.le, hDSpos.le]
+    have hdalb : S.D ^ 2 ≤ ((d:ℝ) + a) ^ 2 := by nlinarith only [hdlo, haRpos.le, hdpos.le, hDSpos.le]
     have hprodub : (d:ℝ) ^ 2 * ((d:ℝ) + a) ^ 2 ≤ 36 * S.D ^ 4 := by
       calc (d:ℝ) ^ 2 * ((d:ℝ) + a) ^ 2 ≤ (4 * S.D ^ 2) * (9 * S.D ^ 2) :=
             mul_le_mul hd2ub hdaub (by positivity) (by positivity)
@@ -969,7 +969,7 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
             mul_le_mul hd2lb hdalb (by positivity) (by positivity)
     have hAcube : S.A ^ 3 ≤ (a:ℝ) ^ 3 := pow_le_pow_left₀ hApos.le hAa 3
     have hacube : (a:ℝ) ^ 3 ≤ 8 * S.A ^ 3 := by
-      nlinarith [pow_le_pow_left₀ haRpos.le haA 3, hApos.le]
+      nlinarith only [pow_le_pow_left₀ haRpos.le haA 3, hApos.le]
     have hD4pos : (0:ℝ) < S.D ^ 4 := by positivity
     constructor
     · rw [hfac, div_le_div_iff₀ (by positivity) hden]
@@ -1004,7 +1004,7 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
     rw [hHD]
     -- 14/Δ ≤ (32768/Δ)/72 ≤ R/72  (uses the degraded `hRlb : 32768/Δ ≤ R`)
     have h1 : (14:ℝ) / S.Δ ≤ (32768 / S.Δ) / 72 := by
-      rw [div_div, div_le_div_iff₀ hΔpos (by positivity)]; nlinarith [hΔpos]
+      rw [div_div, div_le_div_iff₀ hΔpos (by positivity)]; linarith [hΔpos]
     have h2 : (32768 / S.Δ) / 72 ≤ S.R / 72 := by gcongr
     linarith
   have hrStar_band : ∀ d ∈ S₀, S.R / 72 ≤ (rStar d : ℝ) ∧ (rStar d : ℝ) ≤ 16 * S.R := by
@@ -1060,7 +1060,7 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
     have hXa3 : (262144 : ℝ) * S.Δ ^ (3:ℕ) * P.H ^ 4 ≤ (a:ℝ) ^ 3 * P.X := by
       have e : (262144 : ℝ) * S.Δ ^ (3:ℕ) * (P.H ^ 4 / P.X) * P.X
           = 262144 * S.Δ ^ (3:ℕ) * P.H ^ 4 := by field_simp
-      nlinarith [mul_le_mul_of_nonneg_right ha3 hXpos.le, e]
+      nlinarith only [mul_le_mul_of_nonneg_right ha3 hXpos.le, e]
     have hD4 : S.D ^ 4 = S.Δ ^ (4:ℕ) * P.H ^ 4 := by rw [hDeqv]; ring
     rw [hD5, hD4, hDeqv]
     have hcoef : (0:ℝ) ≤ P.H * S.Δ ^ 2 / 2 := by positivity
@@ -1068,7 +1068,7 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
         ≤ (P.H * S.Δ ^ 2 / 2) * ((a:ℝ) ^ 3 * P.X) :=
       mul_le_mul_of_nonneg_left hXa3 hcoef
     -- LHS goal 9072 H⁵Δ⁵ ≤ (HΔ²/2)·X·a³ ≥ (HΔ²/2)·262144 Δ³ H⁴ = 131072 H⁵ Δ⁵
-    nlinarith [hmul, hΔ, pow_pos hHpos 5, pow_pos hΔpos 5, mul_pos hHpos hΔpos,
+    nlinarith only [hmul, hΔ, pow_pos hHpos 5, pow_pos hΔpos 5, mul_pos hHpos hΔpos,
       mul_nonneg (pow_pos hHpos 5).le (pow_pos hΔpos 5).le]
   have hWspc : 2 * Wbud / spc ≤ (18144 / c) * tgt := by
     obtain ⟨-, hspc3⟩ := spc_pos_cube P.X P.H S.Δ (a:ℝ) hXpos hHpos hΔpos haRpos
@@ -1110,9 +1110,9 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
       rw [hLHS, hRHS, div_le_div_iff₀ (by positivity) (by positivity)]
       have hDa8 : S.A ^ (8:ℕ) ≤ S.Δ * (a:ℝ) ^ (8:ℕ) := by
         calc S.A ^ (8:ℕ) ≤ (a:ℝ) ^ (8:ℕ) := hAcube8
-          _ ≤ S.Δ * (a:ℝ) ^ (8:ℕ) := by nlinarith [hΔ, pow_pos haRpos 8]
+          _ ≤ S.Δ * (a:ℝ) ^ (8:ℕ) := by nlinarith only [hΔ, pow_pos haRpos 8]
       have hfac : (0:ℝ) ≤ 5973090729984 * S.Δ ^ 15 * P.G ^ 3 * P.H ^ 15 * (a:ℝ) := by positivity
-      nlinarith [mul_le_mul_of_nonneg_left hDa8 hfac]
+      nlinarith only [mul_le_mul_of_nonneg_left hDa8 hfac]
     rw [div_le_iff₀ hspc_pos]; exact hmain
   refine ⟨Ra, dStar, ?_, ?_, ?_, ?_, ?_⟩
   · -- (1) dStar r ∈ 𝒟_a
@@ -1197,7 +1197,7 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
           have hHDS : 28 * P.H / S.D * S.D ^ 5 = 28 * P.H * S.D ^ 4 := by rw [hDSeq]; field_simp
           have hstep : (1/324 : ℝ) * P.X * (a:ℝ) ^ 3 * |(d:ℝ) - (d'':ℝ)| ≤ 28 * P.H * S.D ^ 4 := by
             rw [← hHDS]; exact hcomb
-          nlinarith [hstep, abs_nonneg ((d:ℝ) - (d'':ℝ))]
+          nlinarith only [hstep, abs_nonneg ((d:ℝ) - (d'':ℝ))]
         have : (d'':ℝ) - (d:ℝ) ≤ |(d:ℝ) - (d'':ℝ)| := by rw [abs_sub_comm]; exact le_abs_self _
         linarith [this, hdd_abs]
       have hgap : ∀ d d'' : ℤ, d ∈ Fr → d'' ∈ Fr → d < d'' →
@@ -1225,7 +1225,7 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
       have h2W : 2 + 2 * Wbud / spc ≤ C₂ * (1 + tgt) := by
         rw [hC₂def]
         have htnn : 0 ≤ tgt := htgt_pos.le
-        nlinarith [hWspc, htnn, hc_pos, div_nonneg (by norm_num : (0:ℝ) ≤ 18144) hc_pos.le]
+        nlinarith only [hWspc, htnn, hc_pos, div_nonneg (by norm_num : (0:ℝ) ≤ 18144) hc_pos.le]
       calc (((S₀.filter (fun d => rN d = r)).card : ℕ) : ℝ)
           = ((Fr.card : ℕ) : ℝ) := by rw [hFrdef]
         _ ≤ 2 + 2 * Wbud / spc := hgcb

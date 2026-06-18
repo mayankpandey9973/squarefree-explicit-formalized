@@ -8,7 +8,7 @@ Upstream grade 3/4 inverse-derivative scale bounds for the §7 residual layer.
 
 namespace Squarefree
 
-set_option maxHeartbeats 4000000
+set_option maxHeartbeats 800000
 
 private theorem sec7_phase_inv3_scale_base {P : Globals} (S : Scale P) :
     S.F ^ 3 * (S.D ^ 10 / (P.X ^ 3 * S.A ^ 3)) = S.D := by
@@ -44,25 +44,25 @@ private theorem dBreve_deriv3_abs_base_wide {P : Globals} {S : Scale P} {a d : �
   have hDpos : 0 < S.D := S.D_pos
   have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
   have hd0 : 0 < d := lt_of_lt_of_le (by positivity : 0 < S.D / 16) hd_lo
-  have hAleD : S.A ≤ S.D / 10 := by nlinarith
-  have hAle_d : S.A ≤ 2 * d := by nlinarith
-  have ha_le_18d : a ≤ 18 * d := by nlinarith
-  have ha_le_2D : a ≤ 2 * S.D := by nlinarith
+  have hAleD : S.A ≤ S.D / 10 := by linarith
+  have hAle_d : S.A ≤ 2 * d := by linarith
+  have ha_le_18d : a ≤ 18 * d := by linarith
+  have ha_le_2D : a ≤ 2 * S.D := by linarith
   have hda_lo : d ≤ d + a := by linarith
-  have hda_hi : d + a ≤ 32 * S.D := by nlinarith
+  have hda_hi : d + a ≤ 32 * S.D := by linarith
   set Q : ℝ := a ^ 2 + 3 * a * d + 3 * d ^ 2 with hQ
   set Poly : ℝ := 5 * a ^ 6 + 40 * a ^ 5 * d + 140 * a ^ 4 * d ^ 2
       + 284 * a ^ 3 * d ^ 3 + 352 * a ^ 2 * d ^ 4
       + 252 * a * d ^ 5 + 84 * d ^ 6 with hPoly
   have hQ_le : Q ≤ 381 * d ^ 2 := by
     rw [hQ]
-    nlinarith [sq_nonneg (a - 18 * d), hd0.le]
+    nlinarith only [ha_le_18d, ha0.le, hd0.le, sq_nonneg (a - 18 * d)]
   have hQ_nonneg : 0 ≤ Q := by
     rw [hQ]
     positivity
   have hQ_ge : 3 * d ^ 2 ≤ Q := by
     rw [hQ]
-    nlinarith [sq_nonneg a, mul_nonneg ha0.le hd0.le]
+    nlinarith only [sq_nonneg a, mul_nonneg ha0.le hd0.le]
   have hpoly_lo : 84 * d ^ 6 ≤ Poly := by
     rw [hPoly]
     have h1 : 0 ≤ 5 * a ^ 6 := by positivity
@@ -71,7 +71,7 @@ private theorem dBreve_deriv3_abs_base_wide {P : Globals} {S : Scale P} {a d : �
     have h4 : 0 ≤ 284 * a ^ 3 * d ^ 3 := by positivity
     have h5 : 0 ≤ 352 * a ^ 2 * d ^ 4 := by positivity
     have h6 : 0 ≤ 252 * a * d ^ 5 := by positivity
-    nlinarith
+    nlinarith only [h1, h2, h3, h4, h5, h6]
   have hterm1 : 5 * a ^ 6 ≤ 5 * (2 * S.D) ^ 6 := by gcongr
   have hterm2 : 40 * a ^ 5 * d ≤ 40 * (2 * S.D) ^ 5 * (30 * S.D) := by gcongr
   have hterm3 : 140 * a ^ 4 * d ^ 2 ≤ 140 * (2 * S.D) ^ 4 * (30 * S.D) ^ 2 := by gcongr
@@ -81,13 +81,13 @@ private theorem dBreve_deriv3_abs_base_wide {P : Globals} {S : Scale P} {a d : �
   have hterm7 : 84 * d ^ 6 ≤ 84 * (30 * S.D) ^ 6 := by gcongr
   have hpoly_hi : Poly ≤ 74687078720 * S.D ^ 6 := by
     rw [hPoly]
-    nlinarith [hterm1, hterm2, hterm3, hterm4, hterm5, hterm6, hterm7]
+    nlinarith only [hterm1, hterm2, hterm3, hterm4, hterm5, hterm6, hterm7]
   have hda7 : d ^ 7 ≤ (d + a) ^ 7 := pow_le_pow_left₀ hd0.le hda_lo 7
   have hnum_lo : 3 * 84 * d ^ 20 ≤ 3 * d ^ 7 * (d + a) ^ 7 * Poly := by
     have hprod : d ^ 7 * d ^ 7 * (84 * d ^ 6) ≤ d ^ 7 * (d + a) ^ 7 * Poly := by
       exact mul_le_mul (mul_le_mul_of_nonneg_left hda7 (by positivity)) hpoly_lo
         (by positivity) (by positivity)
-    nlinarith [hprod, hd0]
+    nlinarith only [hprod, hd0]
   have hQ5_hi : Q ^ 5 ≤ (381 * d ^ 2) ^ 5 := pow_le_pow_left₀ hQ_nonneg hQ_le 5
   have hden_hi : 8 * P.X ^ 3 * a ^ 3 * Q ^ 5 ≤
       8 * P.X ^ 3 * (11 * S.A) ^ 3 * (381 * d ^ 2) ^ 5 := by
@@ -104,18 +104,19 @@ private theorem dBreve_deriv3_abs_base_wide {P : Globals} {S : Scale P} {a d : �
     have hmul := mul_le_mul hnum_lo hden_hi
       (by positivity : 0 ≤ 8 * P.X ^ 3 * a ^ 3 * Q ^ 5)
       (by positivity : 0 ≤ 3 * d ^ 7 * (d + a) ^ 7 * Poly)
-    nlinarith [hmul]
+    nlinarith only [hmul]
   have hD10 : S.D ^ 10 ≤ 16 ^ 10 * d ^ 10 := by
     have hpow : (S.D / 16) ^ 10 ≤ d ^ 10 :=
       pow_le_pow_left₀ (by positivity) hd_lo 10
-    nlinarith [hpow, hDpos]
+    nlinarith only [hpow, hDpos]
   have hbase_d_lo :
       (3 * 84 : ℝ) / (8 * 11 ^ 3 * 381 ^ 5 * 16 ^ 10) *
           (S.D ^ 10 / (P.X ^ 3 * S.A ^ 3)) ≤
         (3 * 84 : ℝ) / (8 * 11 ^ 3 * 381 ^ 5) *
           (d ^ 10 / (P.X ^ 3 * S.A ^ 3)) := by
     field_simp [ne_of_gt hXpos, ne_of_gt hApos]
-    nlinarith [hD10]
+    nlinarith only [hD10,
+      mul_le_mul_of_nonneg_left hD10 (show (0:ℝ) ≤ P.X ^ 3 * S.A ^ 3 by positivity)]
   have hbase_eq_lo :
       (3 * 84 : ℝ) / (8 * 11 ^ 3 * 381 ^ 5) *
           (d ^ 10 / (P.X ^ 3 * S.A ^ 3)) =
@@ -139,7 +140,7 @@ private theorem dBreve_deriv3_abs_base_wide {P : Globals} {S : Scale P} {a d : �
       mul_le_mul hd7_hi hda7_hi (by positivity) (by positivity)
     have hprod2 := mul_le_mul hprod1 hpoly_hi (by positivity)
       (by positivity : 0 ≤ (30 * S.D) ^ 7 * (32 * S.D) ^ 7)
-    nlinarith [hprod2]
+    nlinarith only [hprod2]
   have hQ5_lo : (3 * d ^ 2) ^ 5 ≤ Q ^ 5 := pow_le_pow_left₀ (by positivity) hQ_ge 5
   have hden_lo : 8 * P.X ^ 3 * (S.A / 5) ^ 3 * (3 * d ^ 2) ^ 5 ≤
       8 * P.X ^ 3 * a ^ 3 * Q ^ 5 := by
@@ -155,7 +156,7 @@ private theorem dBreve_deriv3_abs_base_wide {P : Globals} {S : Scale P} {a d : �
       (by positivity : 0 ≤ 8 * P.X ^ 3 * (S.A / 5) ^ 3 * (3 * d ^ 2) ^ 5)
       (by positivity : 0 ≤ 3 * (30 * S.D) ^ 7 * (32 * S.D) ^ 7 *
         (74687078720 * S.D ^ 6))
-    nlinarith [hmul]
+    nlinarith only [hmul]
   have hbase_hi :
       3 * (30 * S.D) ^ 7 * (32 * S.D) ^ 7 * (74687078720 * S.D ^ 6) /
           (8 * P.X ^ 3 * (S.A / 5) ^ 3 * (3 * d ^ 2) ^ 5) ≤
@@ -196,7 +197,7 @@ theorem dBreve_deriv3_scale_wide_image_construct {P : Globals} {S : Scale P} {a 
     positivity
   obtain ⟨hlo, hhi⟩ :=
     dBreve_deriv3_abs_base_wide (P := P) (S := S) (a := a) (d := d)
-      hAD ha_lo ha_hi (by nlinarith [hd_lo]) (by nlinarith [hd_hi])
+      hAD ha_lo ha_hi (by linarith) (by linarith)
   constructor
   · calc (1 / 10 ^ 80 : ℝ) * (P.H * S.Δ)
         = (1 / 10 ^ 80 : ℝ) * S.D := rfl
@@ -277,14 +278,14 @@ private theorem dBreve_deriv4_abs_base_wide {P : Globals} {S : Scale P} {a d : �
   have hDpos : 0 < S.D := S.D_pos
   have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
   have hd0 : 0 < d := lt_of_lt_of_le (by positivity : 0 < S.D / 16) hd_lo
-  have hAleD : S.A ≤ S.D / 10 := by nlinarith
-  have hAle_d : S.A ≤ 2 * d := by nlinarith
-  have ha_le_18d : a ≤ 18 * d := by nlinarith
-  have ha_le_2D : a ≤ 2 * S.D := by nlinarith
+  have hAleD : S.A ≤ S.D / 10 := by linarith
+  have hAle_d : S.A ≤ 2 * d := by linarith
+  have ha_le_18d : a ≤ 18 * d := by linarith
+  have ha_le_2D : a ≤ 2 * S.D := by linarith
   have hda_lo : d ≤ d + a := by linarith
-  have hda_hi : d + a ≤ 32 * S.D := by nlinarith
+  have hda_hi : d + a ≤ 32 * S.D := by linarith
   have had2_lo : 2 * d ≤ a + 2 * d := by linarith
-  have had2_hi : a + 2 * d ≤ 62 * S.D := by nlinarith
+  have had2_hi : a + 2 * d ≤ 62 * S.D := by linarith
   set Q : ℝ := a ^ 2 + 3 * a * d + 3 * d ^ 2 with hQ
   set Poly : ℝ := 7 * a ^ 8 + 70 * a ^ 7 * d + 322 * a ^ 6 * d ^ 2
       + 912 * a ^ 5 * d ^ 3 + 1728 * a ^ 4 * d ^ 4
@@ -292,13 +293,13 @@ private theorem dBreve_deriv4_abs_base_wide {P : Globals} {S : Scale P} {a d : �
       + 1008 * a * d ^ 7 + 252 * d ^ 8 with hPoly
   have hQ_le : Q ≤ 381 * d ^ 2 := by
     rw [hQ]
-    nlinarith [sq_nonneg (a - 18 * d), hd0.le]
+    nlinarith only [ha_le_18d, ha0.le, hd0.le, sq_nonneg (a - 18 * d)]
   have hQ_nonneg : 0 ≤ Q := by
     rw [hQ]
     positivity
   have hQ_ge : 3 * d ^ 2 ≤ Q := by
     rw [hQ]
-    nlinarith [sq_nonneg a, mul_nonneg ha0.le hd0.le]
+    nlinarith only [sq_nonneg a, mul_nonneg ha0.le hd0.le]
   have hpoly_lo : 252 * d ^ 8 ≤ Poly := by
     rw [hPoly]
     have h1 : 0 ≤ 7 * a ^ 8 := by positivity
@@ -309,7 +310,7 @@ private theorem dBreve_deriv4_abs_base_wide {P : Globals} {S : Scale P} {a d : �
     have h6 : 0 ≤ 2232 * a ^ 3 * d ^ 5 := by positivity
     have h7 : 0 ≤ 1920 * a ^ 2 * d ^ 6 := by positivity
     have h8 : 0 ≤ 1008 * a * d ^ 7 := by positivity
-    nlinarith
+    nlinarith only [h1, h2, h3, h4, h5, h6, h7, h8]
   have hterm1 : 7 * a ^ 8 ≤ 7 * (2 * S.D) ^ 8 := by gcongr
   have hterm2 : 70 * a ^ 7 * d ≤ 70 * (2 * S.D) ^ 7 * (30 * S.D) := by gcongr
   have hterm3 : 322 * a ^ 6 * d ^ 2 ≤ 322 * (2 * S.D) ^ 6 * (30 * S.D) ^ 2 := by gcongr
@@ -321,7 +322,7 @@ private theorem dBreve_deriv4_abs_base_wide {P : Globals} {S : Scale P} {a d : �
   have hterm9 : 252 * d ^ 8 ≤ 252 * (30 * S.D) ^ 8 := by gcongr
   have hpoly_hi : Poly ≤ 215482942465792 * S.D ^ 8 := by
     rw [hPoly]
-    nlinarith [hterm1, hterm2, hterm3, hterm4, hterm5, hterm6, hterm7, hterm8, hterm9]
+    nlinarith only [hterm1, hterm2, hterm3, hterm4, hterm5, hterm6, hterm7, hterm8, hterm9]
   have hda9 : d ^ 9 ≤ (d + a) ^ 9 := pow_le_pow_left₀ hd0.le hda_lo 9
   have hnum_lo : 15 * 2 * 252 * d ^ 27 ≤
       15 * d ^ 9 * (d + a) ^ 9 * (a + 2 * d) * Poly := by
@@ -333,7 +334,7 @@ private theorem dBreve_deriv4_abs_base_wide {P : Globals} {S : Scale P} {a d : �
     have hprod3 : d ^ 9 * d ^ 9 * (2 * d) * (252 * d ^ 8) ≤
         d ^ 9 * (d + a) ^ 9 * (a + 2 * d) * Poly :=
       mul_le_mul hprod2 hpoly_lo (by positivity) (by positivity)
-    nlinarith [hprod3, hd0]
+    nlinarith only [hprod3, hd0]
   have hQ7_hi : Q ^ 7 ≤ (381 * d ^ 2) ^ 7 := pow_le_pow_left₀ hQ_nonneg hQ_le 7
   have hden_hi : 16 * P.X ^ 4 * a ^ 4 * Q ^ 7 ≤
       16 * P.X ^ 4 * (11 * S.A) ^ 4 * (381 * d ^ 2) ^ 7 := by
@@ -352,18 +353,19 @@ private theorem dBreve_deriv4_abs_base_wide {P : Globals} {S : Scale P} {a d : �
     have hmul := mul_le_mul hnum_lo hden_hi
       (by positivity : 0 ≤ 16 * P.X ^ 4 * a ^ 4 * Q ^ 7)
       (by positivity : 0 ≤ 15 * d ^ 9 * (d + a) ^ 9 * (a + 2 * d) * Poly)
-    nlinarith [hmul]
+    nlinarith only [hmul]
   have hD13 : S.D ^ 13 ≤ 16 ^ 13 * d ^ 13 := by
     have hpow : (S.D / 16) ^ 13 ≤ d ^ 13 :=
       pow_le_pow_left₀ (by positivity) hd_lo 13
-    nlinarith [hpow, hDpos]
+    nlinarith only [hpow, hDpos]
   have hbase_d_lo :
       (15 * 2 * 252 : ℝ) / (16 * 11 ^ 4 * 381 ^ 7 * 16 ^ 13) *
           (S.D ^ 13 / (P.X ^ 4 * S.A ^ 4)) ≤
         (15 * 2 * 252 : ℝ) / (16 * 11 ^ 4 * 381 ^ 7) *
           (d ^ 13 / (P.X ^ 4 * S.A ^ 4)) := by
     field_simp [ne_of_gt hXpos, ne_of_gt hApos]
-    nlinarith [hD13]
+    nlinarith only [hD13,
+      mul_le_mul_of_nonneg_left hD13 (show (0:ℝ) ≤ P.X ^ 4 * S.A ^ 4 by positivity)]
   have hbase_eq_lo :
       (15 * 2 * 252 : ℝ) / (16 * 11 ^ 4 * 381 ^ 7) *
           (d ^ 13 / (P.X ^ 4 * S.A ^ 4)) =
@@ -393,7 +395,7 @@ private theorem dBreve_deriv4_abs_base_wide {P : Globals} {S : Scale P} {a d : �
       mul_le_mul hprod1 had2_hi (by positivity) (by positivity)
     have hprod3 := mul_le_mul hprod2 hpoly_hi (by positivity)
       (by positivity : 0 ≤ (30 * S.D) ^ 9 * (32 * S.D) ^ 9 * (62 * S.D))
-    nlinarith [hprod3]
+    nlinarith only [hprod3]
   have hQ7_lo : (3 * d ^ 2) ^ 7 ≤ Q ^ 7 := pow_le_pow_left₀ (by positivity) hQ_ge 7
   have hden_lo : 16 * P.X ^ 4 * (S.A / 5) ^ 4 * (3 * d ^ 2) ^ 7 ≤
       16 * P.X ^ 4 * a ^ 4 * Q ^ 7 := by
@@ -411,11 +413,11 @@ private theorem dBreve_deriv4_abs_base_wide {P : Globals} {S : Scale P} {a d : �
       (by positivity : 0 ≤ 16 * P.X ^ 4 * (S.A / 5) ^ 4 * (3 * d ^ 2) ^ 7)
       (by positivity : 0 ≤ 15 * (30 * S.D) ^ 9 * (32 * S.D) ^ 9 * (62 * S.D) *
         (215482942465792 * S.D ^ 8))
-    nlinarith [hmul]
+    nlinarith only [hmul]
   have hD14 : S.D ^ 14 ≤ 16 ^ 14 * d ^ 14 := by
     have hpow : (S.D / 16) ^ 14 ≤ d ^ 14 :=
       pow_le_pow_left₀ (by positivity) hd_lo 14
-    nlinarith [hpow, hDpos]
+    nlinarith only [hpow, hDpos]
   have hbase_hi :
       15 * (30 * S.D) ^ 9 * (32 * S.D) ^ 9 * (62 * S.D) *
           (215482942465792 * S.D ^ 8) /
@@ -458,7 +460,7 @@ theorem dBreve_deriv4_scale_wide_image_construct {P : Globals} {S : Scale P} {a 
     positivity
   obtain ⟨hlo, hhi⟩ :=
     dBreve_deriv4_abs_base_wide (P := P) (S := S) (a := a) (d := d)
-      hAD ha_lo ha_hi (by nlinarith [hd_lo]) (by nlinarith [hd_hi])
+      hAD ha_lo ha_hi (by linarith) (by linarith)
   constructor
   · calc (1 / 10 ^ 100 : ℝ) * (P.H * S.Δ)
         = (1 / 10 ^ 100 : ℝ) * S.D := rfl

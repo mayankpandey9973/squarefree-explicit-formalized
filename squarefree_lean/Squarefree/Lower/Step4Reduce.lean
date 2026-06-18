@@ -15,7 +15,6 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 3200000 in
 /-- **Step-4 delta: the pref-free `Q_gen` error piece.** Raw `Q_gen_expand` remainder
 `E_Q ≤ 10⁶⁶·δ`, `δ = (1/Δ)G⁴U¹⁵/Ω⁵`. -/
 theorem qgen_pieceV_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
@@ -30,6 +29,8 @@ theorem qgen_pieceV_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
         + 400 * P.X * (a : ℝ) * ℓ₁ * |ℓ₂ * b₀ + v| * ((a : ℝ) + |ℓ₂ * b₀ + v|) ^ 2 / d ^ 6
         + 400 * P.X * (a : ℝ) * ℓ₂ * ℓ₁ * |b₀| * ((a : ℝ) + ℓ₁ * |b₀|) ^ 2 / d ^ 6
       ≤ (10:ℝ) ^ 68 * ((1 / S.Δ) * P.G ^ 4 * P.U ^ 15 / S.Ω ^ 5) := by
+  have _ := r
+  have _ := ha_lo
   have hHpos : 0 < P.H := P.H_pos
   have hGpos : 0 < P.G := P.G_pos
   have hUpos : 0 < P.U := P.U_pos
@@ -74,20 +75,20 @@ theorem qgen_pieceV_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     have hΩ4 : S.Ω ^ 4 ≤ P.U ^ 4 := pow_le_pow_left₀ hΩpos.le hΩU 4
     have hUΔ : (11 : ℝ) ≤ P.U * S.Δ := by
       have : (11 : ℝ) ≤ P.U := le_trans (by norm_num) hUbig
-      nlinarith [hΔ1, this, hUpos]
+      nlinarith only [hΔ1, this, hUpos]
     have c1 : (a : ℝ) * S.Ω ^ 3 ≤ 11 * S.Δ * S.Ω ^ 4 := by
-      have := mul_le_mul_of_nonneg_right ha_A (pow_nonneg hΩpos.le 3); nlinarith [this]
+      have := mul_le_mul_of_nonneg_right ha_A (pow_nonneg hΩpos.le 3); nlinarith only [this]
     have c2 : (11 : ℝ) * S.Δ * S.Ω ^ 4 ≤ 11 * S.Δ * P.U ^ 4 :=
       mul_le_mul_of_nonneg_left hΩ4 (by positivity)
     have c3 : (11 : ℝ) * S.Δ * P.U ^ 4 ≤ P.U ^ 5 * S.Δ ^ 2 := by
-      nlinarith [mul_le_mul_of_nonneg_right hUΔ (by positivity : (0:ℝ) ≤ S.Δ * P.U ^ 4),
+      nlinarith only [mul_le_mul_of_nonneg_right hUΔ (by positivity : (0:ℝ) ≤ S.Δ * P.U ^ 4),
         hΔpos, hUpos]
     linarith [c1, c2, c3]
   have hv_M : |v| ≤ 10 ^ 20 * M := by
     rw [hM_def]
     refine le_trans hv ?_
-    have hΔsq : S.Δ ≤ S.Δ ^ 2 := by nlinarith [hΔ1, hΔpos]
-    have hnum : S.Δ * P.U ^ 5 ≤ P.U ^ 5 * S.Δ ^ 2 := by nlinarith [hΔsq, pow_nonneg hUpos.le 5]
+    have hΔsq : S.Δ ≤ S.Δ ^ 2 := by nlinarith only [hΔ1, hΔpos]
+    have hnum : S.Δ * P.U ^ 5 ≤ P.U ^ 5 * S.Δ ^ 2 := by nlinarith only [hΔsq, pow_nonneg hUpos.le 5]
     exact mul_le_mul_of_nonneg_left (div_le_div_of_nonneg_right hnum (by positivity)) (by norm_num)
   have hℓ2b0v_M : |ℓ₂ * b₀ + v| ≤ 2 * 10 ^ 20 * M := by
     calc |ℓ₂ * b₀ + v| ≤ |ℓ₂ * b₀| + |v| := abs_add_le _ _
@@ -109,20 +110,20 @@ theorem qgen_pieceV_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     have hUΩ : P.U ^ 3 * S.Ω ^ 4 ≤ P.U ^ 4 * S.Ω ^ 3 := by
       have hfac : P.U ^ 4 * S.Ω ^ 3 - P.U ^ 3 * S.Ω ^ 4
           = P.U ^ 3 * S.Ω ^ 3 * (P.U - S.Ω) := by ring
-      nlinarith [hfac, pow_nonneg hUpos.le 3, pow_nonneg hΩpos.le 3, sub_nonneg.mpr hΩU,
+      nlinarith only [hfac,
         mul_nonneg (mul_nonneg (pow_nonneg hUpos.le 3) (pow_nonneg hΩpos.le 3))
           (sub_nonneg.mpr hΩU)]
     have hband4 : (1 : ℝ) ≤ P.G * P.U ^ 4 * S.Ω ^ 3 := by
       have hb' : P.G * P.U ^ 3 * S.Ω ^ 4 ≤ P.G * P.U ^ 4 * S.Ω ^ 3 := by
-        nlinarith [hUΩ, hGpos.le, mul_le_mul_of_nonneg_left hUΩ hGpos.le]
+        nlinarith only [mul_le_mul_of_nonneg_left hUΩ hGpos.le]
       linarith [hband, hb']
     have hmid : S.Δ ^ 2 * P.U ^ 6 ≤ P.G * P.U ^ 10 * S.Δ ^ 2 * S.Ω ^ 3 := by
       have hd6nn : (0:ℝ) ≤ S.Δ ^ 2 * P.U ^ 6 := by positivity
       have := mul_le_mul_of_nonneg_left hband4 hd6nn
       rw [mul_one] at this
-      nlinarith [this]
+      nlinarith only [this]
     calc S.Δ ^ 2 * P.U ^ 6 ≤ P.G * P.U ^ 10 * S.Δ ^ 2 * S.Ω ^ 3 := hmid
-      _ ≤ P.H * S.Ω ^ 3 := by nlinarith [hH1', pow_nonneg hΩpos.le 3]
+      _ ≤ P.H * S.Ω ^ 3 := by nlinarith only [hH1', pow_nonneg hΩpos.le 3]
   -- scale identities for X·a / D^k  with a ≤ 11A
   -- X·A/D⁵ = X·A·B²/D⁵ / B² = (1/(GΩ⁵))/B²; B² = Δ⁴/(G²Ω⁶); so X·A/D⁵ = G/(Δ⁴)·... compute directly
   have hSDeq : S.D = P.H * S.Δ := rfl
@@ -177,15 +178,14 @@ theorem qgen_pieceV_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     -- reduces to 2.64e42·G²·3 ≤ 10⁴⁹·G⁴; use G²≤G⁴ and 2.64e42·3 ≤ 10⁴⁹
     have hG24 : P.G ^ 2 ≤ P.G ^ 4 := by
       have : P.G ^ 2 * 1 ≤ P.G ^ 2 * P.G ^ 2 :=
-        mul_le_mul_of_nonneg_left (by nlinarith [hG1] : (1:ℝ) ≤ P.G ^ 2) (by positivity)
-      nlinarith [this]
+        mul_le_mul_of_nonneg_left (by nlinarith only [hG1] : (1:ℝ) ≤ P.G ^ 2) (by positivity)
+      nlinarith only [this]
     have hfin : (343200000000000000000000000000000000000000000 : ℝ) * P.G ^ 2 * 3 ≤ 10 ^ 68 * P.G ^ 4 := by
       calc (343200000000000000000000000000000000000000000 : ℝ) * P.G ^ 2 * 3
-          ≤ 10 ^ 68 * P.G ^ 2 := by nlinarith [hG24, pow_nonneg hGpos.le 2]
-        _ ≤ 10 ^ 68 * P.G ^ 4 := by nlinarith [hG24]
-    nlinarith [mul_le_mul_of_nonneg_right hfin
-        (by positivity : (0:ℝ) ≤ P.U ^ 15 * (S.Δ * S.Ω ^ 5)),
-      hGpos, hUpos, hΔpos, hΩpos]
+          ≤ 10 ^ 68 * P.G ^ 2 := by nlinarith only [pow_nonneg hGpos.le 2]
+        _ ≤ 10 ^ 68 * P.G ^ 4 := by nlinarith only [hG24]
+    nlinarith only [mul_le_mul_of_nonneg_right hfin
+        (by positivity : (0:ℝ) ≤ P.U ^ 15 * (S.Δ * S.Ω ^ 5))]
   -- ===== TERM 2 =====
   have hT2 : E2 ≤ 10 ^ 68 * δ4 / 3 := by
     rw [hE2_def]
@@ -222,7 +222,7 @@ theorem qgen_pieceV_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
           = 10 ^ 68 * P.G ^ 4 * P.U ^ 15 / (3 * (S.Δ * S.Ω ^ 5)) by field_simp]
     rw [div_le_div_iff₀ (by positivity) (by positivity)]
     -- reduce using hkey: Δ²U⁶ ≤ HΩ³
-    have hG24 : P.G ^ 2 ≤ P.G ^ 4 := by nlinarith [hG1, sq_nonneg (P.G ^ 2 - 1), pow_nonneg hGpos.le 2]
+    have hG24 : P.G ^ 2 ≤ P.G ^ 4 := by nlinarith only [hG1, sq_nonneg (P.G ^ 2 - 1), pow_nonneg hGpos.le 2]
     have hΩ3U3 : S.Ω ^ 3 ≤ P.U ^ 3 := pow_le_pow_left₀ hΩpos.le hΩU 3
     -- const·Δ·G²·U²⁰·(3ΔΩ⁵) ≤ 10⁶⁶·G⁴·U¹⁵·(HΩ⁸)
     -- i.e. 3·const·Δ²·U⁵·G² ≤ 10⁶⁶·G⁴·(HΩ³)  (after cancelling U¹⁵Ω⁵)
@@ -291,7 +291,7 @@ theorem qgen_pieceV_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     rw [hδ4_def, show (10:ℝ) ^ 68 * ((1 / S.Δ) * P.G ^ 4 * P.U ^ 15 / S.Ω ^ 5) / 3
           = 10 ^ 68 * P.G ^ 4 * P.U ^ 15 / (3 * (S.Δ * S.Ω ^ 5)) by field_simp]
     rw [div_le_div_iff₀ (by positivity) (by positivity)]
-    have hG24 : P.G ^ 2 ≤ P.G ^ 4 := by nlinarith [hG1, sq_nonneg (P.G ^ 2 - 1), pow_nonneg hGpos.le 2]
+    have hG24 : P.G ^ 2 ≤ P.G ^ 4 := by nlinarith only [hG1, sq_nonneg (P.G ^ 2 - 1), pow_nonneg hGpos.le 2]
     have hcore : (35692800000000000000000000000000000000000000000000 : ℝ) * 3
           * (S.Δ ^ 2 * P.U ^ 6) * P.G ^ 2 ≤ 10 ^ 68 * P.G ^ 4 * (P.H * S.Ω ^ 3) := by
       have hc1 : (35692800000000000000000000000000000000000000000000 : ℝ) * 3 ≤ 10 ^ 68 := by norm_num

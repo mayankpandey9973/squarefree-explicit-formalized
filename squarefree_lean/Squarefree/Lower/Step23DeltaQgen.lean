@@ -12,7 +12,6 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 3200000 in
 /-- **Steps 2/3 delta: the `Q_gen` error piece** `(d̃⁴/6Xa)·E_Q ≤ δ₂₃`, where `E_Q` is the
 three-term `Q_gen_expand` remainder. All inner factors are `≤ const·M` with the master scale
 `M = U⁵Δ²/Ω³` (`a ≤ M`, `ℓ₂|b₀| ≤ 3·10¹²M`, `|v| ≤ M`), and `Δ²/(HΩ³) ≤ 1/U⁶` (from `h1`+band)
@@ -85,17 +84,16 @@ theorem qgen_piece_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     have hΩ4 : S.Ω ^ 4 ≤ P.U ^ 4 := pow_le_pow_left₀ hΩpos.le hΩU 4
     have hUΔ : (11 : ℝ) ≤ P.U * S.Δ := by
       have : (11 : ℝ) ≤ P.U := le_trans (by norm_num) hUbig
-      nlinarith [hΔ1, this, hUpos]
+      nlinarith only [hΔ1, this, hUpos]
     -- a*Ω³ ≤ 11ΔΩ⁴ ≤ 11ΔU⁴ ≤ U⁵Δ²
     have c1 : (a : ℝ) * S.Ω ^ 3 ≤ 11 * S.Δ * S.Ω ^ 4 := by
       have := mul_le_mul_of_nonneg_right ha11 (pow_nonneg hΩpos.le 3)
-      nlinarith [this]
+      linarith [this]
     have c2 : (11 : ℝ) * S.Δ * S.Ω ^ 4 ≤ 11 * S.Δ * P.U ^ 4 :=
       mul_le_mul_of_nonneg_left hΩ4 (by positivity)
     have c3 : (11 : ℝ) * S.Δ * P.U ^ 4 ≤ P.U ^ 5 * S.Δ ^ 2 := by
       have hP4nn : (0:ℝ) ≤ P.U ^ 4 := by positivity
-      nlinarith [mul_le_mul_of_nonneg_right hUΔ (by positivity : (0:ℝ) ≤ S.Δ * P.U ^ 4),
-        hΔpos, hUpos]
+      linarith [mul_le_mul_of_nonneg_right hUΔ (by positivity : (0:ℝ) ≤ S.Δ * P.U ^ 4)]
     linarith [c1, c2, c3]
   -- ℓ₂*|b₀| ≤ 3e12*M
   have hℓ2b0_M : ℓ₂ * |b₀| ≤ 390000000000000 * M := by
@@ -112,9 +110,9 @@ theorem qgen_piece_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
   have hv_M : |v| ≤ 10 ^ 20 * M := by
     rw [hM_def]
     refine le_trans hv ?_
-    have hΔsq : S.Δ ≤ S.Δ ^ 2 := by nlinarith [hΔ1, hΔpos]
+    have hΔsq : S.Δ ≤ S.Δ ^ 2 := by nlinarith only [hΔ1, hΔpos]
     have hnum : S.Δ * P.U ^ 5 ≤ P.U ^ 5 * S.Δ ^ 2 := by
-      nlinarith [hΔsq, pow_nonneg hUpos.le 5]
+      nlinarith only [hΔsq, pow_nonneg hUpos.le 5]
     have hbase : S.Δ * P.U ^ 5 / S.Ω ^ 3 ≤ P.U ^ 5 * S.Δ ^ 2 / S.Ω ^ 3 :=
       div_le_div_of_nonneg_right hnum (by positivity)
     exact mul_le_mul_of_nonneg_left hbase (by norm_num)
@@ -146,12 +144,11 @@ theorem qgen_piece_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     have hUΩ : P.U ^ 3 * S.Ω ^ 4 ≤ P.U ^ 4 * S.Ω ^ 3 := by
       have hfac : P.U ^ 4 * S.Ω ^ 3 - P.U ^ 3 * S.Ω ^ 4
           = P.U ^ 3 * S.Ω ^ 3 * (P.U - S.Ω) := by ring
-      nlinarith [hfac, pow_nonneg hUpos.le 3, pow_nonneg hΩpos.le 3, sub_nonneg.mpr hΩU,
-        mul_nonneg (mul_nonneg (pow_nonneg hUpos.le 3) (pow_nonneg hΩpos.le 3))
+      linarith [hfac, mul_nonneg (mul_nonneg (pow_nonneg hUpos.le 3) (pow_nonneg hΩpos.le 3))
           (sub_nonneg.mpr hΩU)]
     have hband4 : (1 : ℝ) ≤ P.G * P.U ^ 4 * S.Ω ^ 3 := by
       have hb' : P.G * P.U ^ 3 * S.Ω ^ 4 ≤ P.G * P.U ^ 4 * S.Ω ^ 3 := by
-        nlinarith [hUΩ, hGpos.le, mul_le_mul_of_nonneg_left hUΩ hGpos.le]
+        linarith [mul_le_mul_of_nonneg_left hUΩ hGpos.le]
       linarith [hband, hb']
     -- Δ² U^6 ≤ G U^10 Δ² Ω³ ≤ H Ω³
     have hmid : S.Δ ^ 2 * P.U ^ 6 ≤ P.G * P.U ^ 10 * S.Δ ^ 2 * S.Ω ^ 3 := by
@@ -163,7 +160,8 @@ theorem qgen_piece_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
       rw [mul_one] at this
       linarith [this, heq.le, heq.ge]
     calc S.Δ ^ 2 * P.U ^ 6 ≤ P.G * P.U ^ 10 * S.Δ ^ 2 * S.Ω ^ 3 := hmid
-      _ ≤ P.H * S.Ω ^ 3 := by nlinarith [hH1', pow_nonneg hΩpos.le 3]
+      _ ≤ P.H * S.Ω ^ 3 := by
+            linarith [mul_le_mul_of_nonneg_right hH1' (pow_nonneg hΩpos.le 3)]
   -- common positivity / abbreviation
   have hSDeq : S.D = P.H * S.Δ := rfl
   have hδ_pos : (0:ℝ) < S.Δ ^ 2 * P.G * P.U ^ 20 / (P.H * S.Ω ^ 6) := by positivity
@@ -237,10 +235,9 @@ theorem qgen_piece_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
       have hUsplit : P.U ^ 20 = P.U ^ 5 * P.U ^ 15 := by ring
       rw [hUsplit]
       have := mul_le_mul_of_nonneg_right hU5 (pow_nonneg hUpos.le 15)
-      nlinarith [this, pow_pos hUpos 15]
-    nlinarith [mul_le_mul_of_nonneg_right hkkey
-        (by positivity : (0:ℝ) ≤ P.G * S.Δ ^ 2 * (P.H * S.Ω ^ 6)),
-      hΔpos, hGpos, hHpos, hUpos, hΩpos]
+      linarith [this]
+    linarith [mul_le_mul_of_nonneg_right hkkey
+        (by positivity : (0:ℝ) ≤ P.G * S.Δ ^ 2 * (P.H * S.Ω ^ 6))]
   -- ====================================================================
   -- TERM 2 : (dt^4/(6Xa)) * E2 ≤ δ₂₃/3
   -- ====================================================================
@@ -263,8 +260,7 @@ theorem qgen_piece_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
             * ((130 * (P.G * P.U ^ 5)) * (2 * 10 ^ 20 * M) * (3 * 10 ^ 20 * M) ^ 2) / S.D ^ 6 := by
       apply div_le_div₀ (by positivity)
       · have a1 : (400 / 6 : ℝ) * dt ^ 4 ≤ (400 / 6) * (18 ^ 4 * S.D ^ 4) := by
-          have : (0:ℝ) ≤ 400 / 6 := by norm_num
-          nlinarith [hdt4, this]
+          exact mul_le_mul_of_nonneg_left hdt4 (by norm_num)
         have a2 : 0 ≤ (400 / 6 : ℝ) * (18 ^ 4 * S.D ^ 4) := by positivity
         calc (400 / 6 : ℝ) * dt ^ 4 * (ℓ₁ * |ℓ₂ * b₀ + v| * ((a : ℝ) + |ℓ₂ * b₀ + v|) ^ 2)
             ≤ (400 / 6) * (18 ^ 4 * S.D ^ 4)
@@ -297,9 +293,8 @@ theorem qgen_piece_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
           ≤ P.U ^ 6 * S.Δ ^ 2 := h1
         _ = S.Δ ^ 2 * P.U ^ 6 := by ring
         _ ≤ P.H * S.Ω ^ 3 := hkey
-    nlinarith [mul_le_mul_of_nonneg_right hstep2
-        (by positivity : (0:ℝ) ≤ P.G * P.U ^ 20 * S.Δ ^ 2 * (P.H * S.Ω ^ 6)),
-      hΔpos, hGpos, hHpos, hUpos, hΩpos]
+    linarith [mul_le_mul_of_nonneg_right hstep2
+        (by positivity : (0:ℝ) ≤ P.G * P.U ^ 20 * S.Δ ^ 2 * (P.H * S.Ω ^ 6))]
   -- ====================================================================
   -- TERM 3 : (dt^4/(6Xa)) * E3 ≤ δ₂₃/3
   -- ====================================================================
@@ -332,7 +327,7 @@ theorem qgen_piece_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
                 * (400000000000000 * M) ^ 2) / S.D ^ 6 := by
       apply div_le_div₀ (by positivity)
       · have a1 : (400 / 6 : ℝ) * dt ^ 4 ≤ (400 / 6) * (18 ^ 4 * S.D ^ 4) := by
-          nlinarith [hdt4]
+          exact mul_le_mul_of_nonneg_left hdt4 (by norm_num)
         have a2 : 0 ≤ (400 / 6 : ℝ) * (18 ^ 4 * S.D ^ 4) := by positivity
         calc (400 / 6 : ℝ) * dt ^ 4 * (ℓ₂ * ℓ₁ * |b₀| * ((a : ℝ) + ℓ₁ * |b₀|) ^ 2)
             ≤ (400 / 6) * (18 ^ 4 * S.D ^ 4)
@@ -366,9 +361,8 @@ theorem qgen_piece_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
           ≤ P.U ^ 6 * S.Δ ^ 2 := h1
         _ = S.Δ ^ 2 * P.U ^ 6 := by ring
         _ ≤ P.H * S.Ω ^ 3 := hkey
-    nlinarith [mul_le_mul_of_nonneg_right hstep2
-        (by positivity : (0:ℝ) ≤ P.G * P.U ^ 20 * S.Δ ^ 2 * (P.H * S.Ω ^ 6)),
-      hΔpos, hGpos, hHpos, hUpos, hΩpos]
+    linarith [mul_le_mul_of_nonneg_right hstep2
+        (by positivity : (0:ℝ) ≤ P.G * P.U ^ 20 * S.Δ ^ 2 * (P.H * S.Ω ^ 6))]
   -- ====================================================================
   -- ASSEMBLE
   -- ====================================================================

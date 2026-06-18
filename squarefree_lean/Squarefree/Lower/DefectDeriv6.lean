@@ -19,7 +19,7 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 4000000
+set_option maxHeartbeats 400000
 
 /-- The fifth-derivative function `d̃ₐ⁽⁵⁾(s)` as a closed-form expression (matches the RHS of
 `dtilde_r_iteratedDeriv5` with `s` in place of `r`). -/
@@ -278,63 +278,63 @@ theorem dtilde_d6_upper {P : Globals} {S : Scale P} {a r : ℝ}
   rw [hmatch, habs]
   -- numerator upper bound
   have hf1 : 45 * d * (d + a) ≤ 16000 * S.D ^ 2 := by
-    nlinarith [hd_hi, ha_hiD, hd_pos, ha0, hDpos]
+    nlinarith only [hd_hi, ha_hiD, hd_pos, ha0, hDpos]
   have hf2 : Poly ≤ 800000000000000000 * S.D ^ 10 := by
     rw [hPoly_def]
     have hp1 : 231 * a ^ 10 ≤ 231 * ((11/10) * S.D) ^ 10 := by
-      have := pow_le_pow_left₀ (le_of_lt ha0) ha_hiD 10; nlinarith [this]
+      have := pow_le_pow_left₀ (le_of_lt ha0) ha_hiD 10; nlinarith only [this]
     have hp2 : 4058 * a ^ 9 * d ≤ 4058 * ((11/10) * S.D) ^ 9 * (18 * S.D) := by
       have h9 := pow_le_pow_left₀ (le_of_lt ha0) ha_hiD 9
       have := mul_le_mul h9 hd_hi (by positivity) (by positivity)
-      nlinarith [this]
+      nlinarith only [this]
     have hp3 : 33274 * a ^ 8 * d ^ 2 ≤ 33274 * ((11/10) * S.D) ^ 8 * (18 * S.D) ^ 2 := by
       have h8 := pow_le_pow_left₀ (le_of_lt ha0) ha_hiD 8
       have hd2 := pow_le_pow_left₀ (le_of_lt hd_pos) hd_hi 2
       have := mul_le_mul h8 hd2 (by positivity) (by positivity)
-      nlinarith [this]
+      nlinarith only [this]
     have hp4 : 165416 * a ^ 7 * d ^ 3 ≤ 165416 * ((11/10) * S.D) ^ 7 * (18 * S.D) ^ 3 := by
       have h7 := pow_le_pow_left₀ (le_of_lt ha0) ha_hiD 7
       have hd3 := pow_le_pow_left₀ (le_of_lt hd_pos) hd_hi 3
       have := mul_le_mul h7 hd3 (by positivity) (by positivity)
-      nlinarith [this]
+      nlinarith only [this]
     have hp5 : 548520 * a ^ 6 * d ^ 4 ≤ 548520 * ((11/10) * S.D) ^ 6 * (18 * S.D) ^ 4 := by
       have h6 := pow_le_pow_left₀ (le_of_lt ha0) ha_hiD 6
       have hd4 := pow_le_pow_left₀ (le_of_lt hd_pos) hd_hi 4
       have := mul_le_mul h6 hd4 (by positivity) (by positivity)
-      nlinarith [this]
+      nlinarith only [this]
     have hp6 : 1262872 * a ^ 5 * d ^ 5 ≤ 1262872 * ((11/10) * S.D) ^ 5 * (18 * S.D) ^ 5 := by
       have h5 := pow_le_pow_left₀ (le_of_lt ha0) ha_hiD 5
       have hd5 := pow_le_pow_left₀ (le_of_lt hd_pos) hd_hi 5
       have := mul_le_mul h5 hd5 (by positivity) (by positivity)
-      nlinarith [this]
+      nlinarith only [this]
     have hp7 : 2039656 * a ^ 4 * d ^ 6 ≤ 2039656 * ((11/10) * S.D) ^ 4 * (18 * S.D) ^ 6 := by
       have h4 := pow_le_pow_left₀ (le_of_lt ha0) ha_hiD 4
       have hd6 := pow_le_pow_left₀ (le_of_lt hd_pos) hd_hi 6
       have := mul_le_mul h4 hd6 (by positivity) (by positivity)
-      nlinarith [this]
+      nlinarith only [this]
     have hp8 : 2278528 * a ^ 3 * d ^ 7 ≤ 2278528 * ((11/10) * S.D) ^ 3 * (18 * S.D) ^ 7 := by
       have h3 := pow_le_pow_left₀ (le_of_lt ha0) ha_hiD 3
       have hd7 := pow_le_pow_left₀ (le_of_lt hd_pos) hd_hi 7
       have := mul_le_mul h3 hd7 (by positivity) (by positivity)
-      nlinarith [this]
+      nlinarith only [this]
     have hp9 : 1683472 * a ^ 2 * d ^ 8 ≤ 1683472 * ((11/10) * S.D) ^ 2 * (18 * S.D) ^ 8 := by
       have h2 := pow_le_pow_left₀ (le_of_lt ha0) ha_hiD 2
       have hd8 := pow_le_pow_left₀ (le_of_lt hd_pos) hd_hi 8
       have := mul_le_mul h2 hd8 (by positivity) (by positivity)
-      nlinarith [this]
+      nlinarith only [this]
     have hp10 : 742560 * a * d ^ 9 ≤ 742560 * ((11/10) * S.D) * (18 * S.D) ^ 9 := by
       have hd9 := pow_le_pow_left₀ (le_of_lt hd_pos) hd_hi 9
       have := mul_le_mul ha_hiD hd9 (by positivity) (by positivity)
-      nlinarith [this]
+      nlinarith only [this]
     have hp11 : 148512 * d ^ 10 ≤ 148512 * (18 * S.D) ^ 10 := by
-      have := pow_le_pow_left₀ (le_of_lt hd_pos) hd_hi 10; nlinarith [this]
-    nlinarith [hp1, hp2, hp3, hp4, hp5, hp6, hp7, hp8, hp9, hp10, hp11, pow_pos hDpos 10]
+      have := pow_le_pow_left₀ (le_of_lt hd_pos) hd_hi 10; nlinarith only [this]
+    nlinarith only [hp1, hp2, hp3, hp4, hp5, hp6, hp7, hp8, hp9, hp10, hp11, pow_pos hDpos 10]
   have hNum6_hi : Num6 ≤ 13000000000000000000000 * S.D ^ 12 := by
     rw [hNum6_def]
     have hmul := mul_le_mul hf1 hf2 (le_of_lt hPoly_pos) (by positivity)
     calc 45 * d * (d + a) * Poly
         ≤ (16000 * S.D ^ 2) * (800000000000000000 * S.D ^ 10) := hmul
-      _ ≤ 13000000000000000000000 * S.D ^ 12 := by nlinarith [pow_pos hDpos 12]
+      _ ≤ 13000000000000000000000 * S.D ^ 12 := by nlinarith only [pow_pos hDpos 12]
   -- denominator lower bound: `Den6 ≥ R⁶ D¹¹ / 1.062882·10¹⁷`
   have hr6_lo : S.R ^ 6 / 139314069504 ≤ r ^ 6 := by
     have := pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ (1/72) * S.R) hr_lo 6
@@ -351,8 +351,8 @@ theorem dtilde_d6_upper {P : Globals} {S : Scale P} {a r : ℝ}
     calc S.R ^ 6 * S.D ^ 11 / 106288200000000000
         ≤ 64 * ((S.R ^ 6 / 139314069504) * (S.D ^ 11 / 48828125)) := by
           rw [div_le_iff₀ (by norm_num)]
-          nlinarith [mul_pos (pow_pos hRpos 6) (pow_pos hDpos 11)]
-      _ ≤ 64 * (r ^ 6 * (a + 2 * d) ^ 11) := by nlinarith [hmul]
+          nlinarith only [mul_pos (pow_pos hRpos 6) (pow_pos hDpos 11)]
+      _ ≤ 64 * (r ^ 6 * (a + 2 * d) ^ 11) := by nlinarith only [hmul]
       _ = 64 * r ^ 6 * (a + 2 * d) ^ 11 := by ring
   -- combine
   rw [div_le_iff₀ hDen6_pos]
