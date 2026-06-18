@@ -17,7 +17,7 @@ open Real
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 3200000
+set_option maxHeartbeats 800000
 
 theorem upsilon_err_le_sharp {a : ℝ} {b₀ v d ℓ₁ ℓ₂ : ℝ}
     (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
@@ -26,7 +26,7 @@ theorem upsilon_err_le_sharp {a : ℝ} {b₀ v d ℓ₁ ℓ₂ : ℝ}
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hv : |v| ≤ 390000000000000 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
     (hshift : d / 2 ≤ d + ℓ₁ * b₀)
     -- regime
-    (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2) (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4)
+    (_h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2) (_hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H)
     (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U) :
     ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) ^ 2
@@ -77,16 +77,15 @@ theorem upsilon_err_le_sharp {a : ℝ} {b₀ v d ℓ₁ ℓ₂ : ℝ}
     have hΩ4 : S.Ω ^ 4 ≤ P.U ^ 4 := pow_le_pow_left₀ hΩpos.le hΩU 4
     have hUΔ : (11 : ℝ) ≤ P.U * S.Δ := by
       have : (11 : ℝ) ≤ P.U := le_trans (by norm_num) hUbig
-      nlinarith [hΔ1, this, hUpos]
-    have c1 : a * S.Ω ^ 3 ≤ 11 * S.Δ * S.Ω ^ 4 := by nlinarith [ha11, pow_nonneg hΩpos.le 3]
+      nlinarith only [hΔ1, this, hUpos]
+    have c1 : a * S.Ω ^ 3 ≤ 11 * S.Δ * S.Ω ^ 4 := by nlinarith only [ha11, pow_nonneg hΩpos.le 3]
     have c2 : (11 : ℝ) * S.Δ * S.Ω ^ 4 ≤ 11 * S.Δ * P.U ^ 4 :=
       mul_le_mul_of_nonneg_left hΩ4 (by positivity)
     have c3 : (11 : ℝ) * S.Δ * P.U ^ 4 ≤ P.U ^ 5 * S.Δ ^ 2 := by
-      nlinarith [mul_le_mul_of_nonneg_right hUΔ (by positivity : (0:ℝ) ≤ S.Δ * P.U ^ 4),
-        hΔpos, hUpos]
-    nlinarith [c2, c3, mul_le_mul_of_nonneg_right hΩ4 (by positivity : (0:ℝ) ≤ S.Δ)]
-  have hΔΩM : S.Δ * S.Ω ≤ M := by nlinarith [h11ΔΩM, hM_nn]
-  have haM : a ≤ M := by nlinarith [ha11, h11ΔΩM]
+      linarith [mul_le_mul_of_nonneg_right hUΔ (by positivity : (0:ℝ) ≤ S.Δ * P.U ^ 4)]
+    linarith [c2, c3]
+  have hΔΩM : S.Δ * S.Ω ≤ M := by nlinarith only [h11ΔΩM, hM_nn]
+  have haM : a ≤ M := by linarith [ha11, h11ΔΩM]
   -- the three β-magnitudes against `M`
   have hb0M : ℓ₂ * |b₀| ≤ 390000000000000 * M := by
     have hb0' : |b₀| ≤ 3000000000000 * (S.Δ ^ 2 / (P.G * S.Ω ^ 3)) := by
@@ -102,8 +101,9 @@ theorem upsilon_err_le_sharp {a : ℝ} {b₀ v d ℓ₁ ℓ₂ : ℝ}
   have hvM : |v| ≤ 390000000000000 * M := by
     rw [hM_def]
     refine le_trans hv ?_
-    have hΔsq : S.Δ ≤ S.Δ ^ 2 := by nlinarith [hΔ1, hΔpos]
-    have hnum : S.Δ * P.U ^ 5 ≤ P.U ^ 5 * S.Δ ^ 2 := by nlinarith [hΔsq, pow_nonneg hUpos.le 5]
+    have hΔsq : S.Δ ≤ S.Δ ^ 2 := by nlinarith only [hΔ1, hΔpos]
+    have hnum : S.Δ * P.U ^ 5 ≤ P.U ^ 5 * S.Δ ^ 2 := by
+      nlinarith only [hΔsq, pow_nonneg hUpos.le 5]
     exact mul_le_mul_of_nonneg_left (div_le_div_of_nonneg_right hnum (by positivity))
       (by norm_num)
   -- |ℓ₁b₀| ≤ 3e12 M
@@ -123,8 +123,8 @@ theorem upsilon_err_le_sharp {a : ℝ} {b₀ v d ℓ₁ ℓ₂ : ℝ}
       _ ≤ 780000000000000 * M := by linarith [hM_nn]
   -- `a ≤ 11ΔΩ` as nonneg, and `11ΔΩ ≤ 2e20 M` (so it can be the `Amag` with `hAb`)
   have ha0' : 0 ≤ a := ha0.le
-  have hAmag_le_b : 11 * (S.Δ * S.Ω) ≤ 780000000000000 * M := by nlinarith [h11ΔΩM, hM_nn]
-  have hAmag_le_b' : 11 * (S.Δ * S.Ω) ≤ 390000000000000 * M := by nlinarith [h11ΔΩM, hM_nn]
+  have hAmag_le_b : 11 * (S.Δ * S.Ω) ≤ 780000000000000 * M := by nlinarith only [h11ΔΩM, hM_nn]
+  have hAmag_le_b' : 11 * (S.Δ * S.Ω) ≤ 390000000000000 * M := by nlinarith only [h11ΔΩM, hM_nn]
   -- prefactor bounds (each ≤ W⁴)
   have hpre1 : ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) ^ 2 ≤ 285610000 * (P.G * P.U ^ 5) ^ 4 := by
     calc ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) ^ 2 ≤ (130 * (P.G * P.U ^ 5)) ^ 2 * (130 * (P.G * P.U ^ 5)) ^ 2 := by
@@ -314,7 +314,7 @@ theorem upsilon_err_le_sharp {a : ℝ} {b₀ v d ℓ₁ ℓ₂ : ℝ}
     have hB : 10 * a ^ 2 * |(ℓ₂ - ℓ₁) * b₀ + v| ^ 3 * |ℓ₁ * b₀|
         ≤ (10 * 121 * (780000000000000) ^ 3 * 390000000000000) * (S.Δ * S.Ω) * M ^ 5 := by
       have hΔΩsq : (S.Δ * S.Ω) ^ 2 ≤ (S.Δ * S.Ω) * M :=
-        by nlinarith [hΔΩM, mul_pos hΔpos hΩpos]
+        by nlinarith only [hΔΩM, mul_pos hΔpos hΩpos]
       calc 10 * a ^ 2 * |(ℓ₂ - ℓ₁) * b₀ + v| ^ 3 * |ℓ₁ * b₀|
           ≤ 10 * (11 * (S.Δ * S.Ω)) ^ 2 * (780000000000000 * M) ^ 3 * (390000000000000 * M) := by
             gcongr
@@ -397,7 +397,7 @@ theorem upsilon_err_le_sharp {a : ℝ} {b₀ v d ℓ₁ ℓ₂ : ℝ}
       + 12 * (390000000000000 ^ 2 * (2 * 10 ^ 20) ^ 2)
       + 10 * (390000000000000 * (2 * 10 ^ 20) ^ 3)
       + 3 * ((2 * 10 ^ 20) ^ 4) with hCsumdef
-  have hvM2 : |v| ≤ 2 * 10 ^ 20 * M := by nlinarith [hvM, hM_nn]
+  have hvM2 : |v| ≤ 2 * 10 ^ 20 * M := by linarith [hvM, hM_nn]
   have hP5 : |Rres P.X a b₀ v d ℓ₁ ℓ₂| ≤ 25 * 121 * 285610000 * Csum * UpsT P S :=
     rres_le ha0 ha11 hℓ1R hℓ12 hℓ2W' hd_pos hb0M hvM2 hΔΩM hd7HΔ hM_def
   -- ===========================================================

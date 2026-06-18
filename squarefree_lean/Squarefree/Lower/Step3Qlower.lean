@@ -61,7 +61,7 @@ private theorem reg_U5Δ_le (S : Scale P)
 `ℓ₂(ℓ₂−ℓ₁) ≤ (G·U⁵)²`, the target `10⁵⁵·L + 1/2` is below `(3/80·10⁶⁵)·L₀`. -/
 private theorem vterm_numeric (S : Scale P) {l1 l2 : ℝ}
     (hℓ1R : (1:ℝ) ≤ l1) (hℓ12R : l1 < l2) (hℓ2W' : l2 ≤ 130 * (P.G * P.U ^ 5))
-    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U) :
+    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΩU : S.Ω ≤ P.U) (_hUbig : (10:ℝ) ^ 33 ≤ P.U) :
     10 ^ 55 * (l1 * l2 * (l2 - l1) / (P.G * S.Ω ^ 5)) + 1 / 2
       ≤ (3 / 80 * 10 ^ 65) * (l1 * (P.G * P.U ^ 10 / S.Ω ^ 5)) := by
   have hGpos := P.G_pos; have hUpos := P.U_pos; have hΩpos := S.Ω_pos
@@ -93,13 +93,13 @@ private theorem vterm_numeric (S : Scale P) {l1 l2 : ℝ}
           mul_le_mul_of_nonneg_right hℓ1R (by positivity)
   nlinarith [hLle, hbase_big, mul_le_mul_of_nonneg_left hLle (by norm_num : (0:ℝ) ≤ (10:ℝ) ^ 55)]
 
-set_option maxHeartbeats 6400000 in
+set_option maxHeartbeats 800000 in
 /-- **§5 Step-3 per-`r` lower bound on `|𝒬|`** in the monotone range `V₁ < |v|`. -/
 theorem Qval_abs_ge {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ v : ℝ}
-    (hAD : 10 * S.A ≤ S.D) (ha0 : 0 < a)
+    (_hAD : 10 * S.A ≤ S.D) (ha0 : 0 < a)
     (ha_lo : S.A / 5 ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 11 * S.A)
     (hℓ1 : 0 < ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ2W : (ℓ₂ : ℝ) ≤ 130 * P.Wval)
-    (hr_lo : (1/72) * S.R ≤ r) (hr_hi : r ≤ 16 * S.R)
+    (hr_lo : (1/72) * S.R ≤ r) (_hr_hi : r ≤ 16 * S.R)
     (hdwin : S.D ≤ (d : ℝ) ∧ (d : ℝ) ≤ 2 * S.D)
     (hb0def : (ℓ₁ : ℝ) * b₀ = (d₁ : ℝ) - (d : ℝ))
     (hvdef : (ℓ₂ : ℝ) * b₀ + v = (d₂ : ℝ) - (d : ℝ))
@@ -114,7 +114,7 @@ theorem Qval_abs_ge {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ 
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2) (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H)
     (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
-    (hΔreg : P.G ^ 2 * P.U ^ 5 ≤ S.Δ) :
+    (_hΔreg : P.G ^ 2 * P.U ^ 5 ≤ S.Δ) :
     10 ^ 55 * ((ℓ₁ : ℝ) * (ℓ₂ : ℝ) * ((ℓ₂ : ℝ) - (ℓ₁ : ℝ)) / (P.G * S.Ω ^ 5)) + 1 / 2 ≤ |𝒬| := by
   -- ===== positivity =====
   have hHpos : 0 < P.H := P.H_pos
@@ -181,13 +181,13 @@ theorem Qval_abs_ge {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ 
     have hΩ4 : S.Ω ^ 4 ≤ P.U ^ 4 := pow_le_pow_left₀ hΩpos.le hΩU 4
     have hUΔ : (11 : ℝ) ≤ P.U * S.Δ := by
       have : (11 : ℝ) ≤ P.U := le_trans (by norm_num) hUbig
-      nlinarith [hΔ1, this, hUpos]
+      nlinarith only [hΔ1, this, hUpos]
     have c1 : (a : ℝ) * S.Ω ^ 3 ≤ 11 * S.Δ * S.Ω ^ 4 := by
-      have := mul_le_mul_of_nonneg_right ha11 (pow_nonneg hΩpos.le 3); nlinarith [this]
+      have := mul_le_mul_of_nonneg_right ha11 (pow_nonneg hΩpos.le 3); nlinarith only [this]
     have c2 : (11 : ℝ) * S.Δ * S.Ω ^ 4 ≤ 11 * S.Δ * P.U ^ 4 :=
       mul_le_mul_of_nonneg_left hΩ4 (by positivity)
     have c3 : (11 : ℝ) * S.Δ * P.U ^ 4 ≤ P.U ^ 5 * S.Δ ^ 2 := by
-      nlinarith [mul_le_mul_of_nonneg_right hUΔ (by positivity : (0:ℝ) ≤ S.Δ * P.U ^ 4),
+      nlinarith only [mul_le_mul_of_nonneg_right hUΔ (by positivity : (0:ℝ) ≤ S.Δ * P.U ^ 4),
         hΔpos, hUpos]
     linarith [c1, c2, c3]
   have hb0' : |b₀| ≤ 3000000000000 * (S.Δ ^ 2 / (P.G * S.Ω ^ 3)) := by
@@ -203,8 +203,9 @@ theorem Qval_abs_ge {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ 
   have hv_M : |v| ≤ 10 ^ 20 * M := by
     rw [hM_def]
     refine le_trans hv ?_
-    have hΔsq : S.Δ ≤ S.Δ ^ 2 := by nlinarith [hΔ1, hΔpos]
-    have hnum : S.Δ * P.U ^ 5 ≤ P.U ^ 5 * S.Δ ^ 2 := by nlinarith [hΔsq, pow_nonneg hUpos.le 5]
+    have hΔsq : S.Δ ≤ S.Δ ^ 2 := by nlinarith only [hΔ1, hΔpos]
+    have hnum : S.Δ * P.U ^ 5 ≤ P.U ^ 5 * S.Δ ^ 2 := by
+      nlinarith only [hΔsq, pow_nonneg hUpos.le 5]
     have hbase : S.Δ * P.U ^ 5 / S.Ω ^ 3 ≤ P.U ^ 5 * S.Δ ^ 2 / S.Ω ^ 3 :=
       div_le_div_of_nonneg_right hnum (by positivity)
     exact mul_le_mul_of_nonneg_left hbase (by norm_num)
@@ -250,7 +251,7 @@ theorem Qval_abs_ge {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ 
       abs_mul, abs_mul,
       abs_of_pos (show (0:ℝ) < 12 * (ℓ₂ : ℝ) * ((ℓ₂ : ℝ) - (ℓ₁ : ℝ)) by
         have : (0:ℝ) < 12 * (ℓ₂ : ℝ) := by positivity
-        nlinarith [this, hℓ21pos]),
+        exact mul_pos this hℓ21pos),
       abs_of_pos (by positivity : (0:ℝ) < (ℓ₁ : ℝ) * P.X * (a : ℝ)), abs_of_nonneg (sq_nonneg b₀)]
     field_simp
   have hERR_K : ERR = K * (bE1 + bE2 + bE3) := by

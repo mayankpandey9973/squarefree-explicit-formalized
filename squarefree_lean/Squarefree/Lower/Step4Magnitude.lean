@@ -43,8 +43,6 @@ open Real Squarefree.Counting
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 1600000
-
 /-- The large-defect leading bracket is genuinely `≍ −4`: under the §5 regime `a/d` is tiny
 (`H ≫ Ω`), so `10·a/d ≤ 1/8`, hence `2 ≤ |−4 + 10a/d| ≤ 7`. -/
 theorem bracket_ad_small {a d : ℝ} (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
@@ -66,8 +64,8 @@ theorem bracket_ad_small {a d : ℝ} (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
   -- H ≥ 1000·Ω :  H ≥ U¹⁰ ≥ U⁹·Ω  (Ω ≤ U), and U⁹ ≥ 1000.
   have hHΩ : 1000 * S.Ω ≤ P.H := by
     have hU10 : P.U ^ 10 ≤ P.H := by
-      have h1' : (1:ℝ) ≤ P.G * S.Δ ^ 2 := by nlinarith [one_le_pow₀ (n := 2) hΔ1, hG1]
-      nlinarith [hHbig, pow_pos hUpos 10, mul_le_mul_of_nonneg_left h1'
+      have h1' : (1:ℝ) ≤ P.G * S.Δ ^ 2 := by nlinarith only [one_le_pow₀ (n := 2) hΔ1, hG1]
+      nlinarith only [hHbig, pow_pos hUpos 10, mul_le_mul_of_nonneg_left h1'
         (by positivity : (0:ℝ) ≤ P.U ^ 10)]
     have hU9 : (1000:ℝ) ≤ P.U ^ 9 := by
       calc (1000:ℝ) ≤ (10:ℝ) ^ 33 := by norm_num
@@ -75,7 +73,7 @@ theorem bracket_ad_small {a d : ℝ} (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
         _ = P.U ^ 1 := by ring
         _ ≤ P.U ^ 9 := pow_le_pow_right₀ (le_trans (by norm_num) hUbig) (by norm_num)
     have hΩU9 : P.U ^ 10 = P.U ^ 9 * P.U := by ring
-    calc 1000 * S.Ω ≤ P.U ^ 9 * P.U := by nlinarith [hU9, hΩU, pow_pos hUpos 9, hΩpos]
+    calc 1000 * S.Ω ≤ P.U ^ 9 * P.U := by nlinarith only [hU9, hΩU, pow_pos hUpos 9, hΩpos]
       _ = P.U ^ 10 := hΩU9.symm
       _ ≤ P.H := hU10
   -- a/d ≤ 11A/D = 11Ω/H ≤ 11/1000.  So 10a/d ≤ 0.11.
@@ -84,11 +82,11 @@ theorem bracket_ad_small {a d : ℝ} (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
   have had : 10 * a / d ≤ 1 / 8 := by
     rw [div_le_iff₀ hd_pos]
     -- 10 a ≤ (1/8) d ;  10 a ≤ 110 ΔΩ ;  (1/8) d ≥ (1/8)(1−ε) HΔ ≥ 124.9 ΩΔ
-    have hlo : (10:ℝ) * a ≤ 110 * (S.Δ * S.Ω) := by nlinarith [haA]
+    have hlo : (10:ℝ) * a ≤ 110 * (S.Δ * S.Ω) := by linarith [haA]
     have hhi : 110 * (S.Δ * S.Ω) ≤ 1 / 8 * d := by
       have hstep : 110 * (S.Δ * S.Ω) ≤ 1 / 8 * (P.H * S.Δ * (1 - 1/10 ^ 9)) := by
-        nlinarith [mul_le_mul_of_nonneg_right hHΩ hΔpos.le, hΔpos, hΩpos, hHpos]
-      nlinarith [hstep, mul_le_mul_of_nonneg_left hd_ge (by norm_num : (0:ℝ) ≤ 1/8)]
+        nlinarith only [mul_le_mul_of_nonneg_right hHΩ hΔpos.le, hΔpos, hΩpos, hHpos]
+      linarith [hstep, mul_le_mul_of_nonneg_left hd_ge (by norm_num : (0:ℝ) ≤ 1/8)]
     linarith [hlo, hhi]
   have had0 : 0 ≤ 10 * a / d := by positivity
   exact ⟨had0, had⟩
@@ -169,7 +167,7 @@ theorem sigma_s_magnitude_lower
         have hb3 : S.Δ ^ 2 * S.Ω ^ 2 * |(s:ℝ)| / 1000000 ≤ L * v ^ 2 := by
           rw [div_le_iff₀ (by norm_num)]; linarith [hvpin_lo]
         exact mul_le_mul hb2 hb3 (by positivity) (by positivity)
-      nlinarith [e1, mul_pos hXpos (mul_pos hApos hBpos)]
+      linarith [e1]
     have hd5le : d ^ 5 ≤ (2 * S.D) ^ 5 := pow_le_pow_left₀ hd_pos.le hd2D 5
     have hLHS : |(s:ℝ)| * d ^ 5 ≤ 2 * 10 ^ 8 * (P.X * S.A * S.B * (S.Δ ^ 2 * S.Ω ^ 2 * |(s : ℝ)|)) := by
       have h32 : |(s:ℝ)| * d ^ 5 ≤ |(s:ℝ)| * (32 * S.D ^ 5) := by
@@ -180,7 +178,7 @@ theorem sigma_s_magnitude_lower
           = 32 * (S.Δ ^ 2 * S.Ω ^ 2 * (P.X * S.A * S.B)) * |(s:ℝ)| := by
         rw [hABID]; ring
       rw [h32'] at h32
-      nlinarith [h32, mul_nonneg (mul_nonneg (mul_pos hXpos hApos).le hBpos.le)
+      linarith [h32, mul_nonneg (mul_nonneg (mul_pos hXpos hApos).le hBpos.le)
         (mul_nonneg (mul_nonneg (by positivity : (0:ℝ) ≤ S.Δ^2) (by positivity : (0:ℝ) ≤ S.Ω^2)) hsnn)]
     linarith [hLHS, hn]
   have hQform : (1 / (10 ^ 21 : ℝ)) * |(s : ℝ)| ≤ Q * (2 * (L * |b₀| * v ^ 2)) := by
@@ -189,7 +187,7 @@ theorem sigma_s_magnitude_lower
     rw [hQexp, le_div_iff₀ hd5pos]
     have : (1 / (10 ^ 21 : ℝ)) * |(s:ℝ)| * d ^ 5 = (|(s:ℝ)| * d ^ 5) / 10 ^ 21 := by ring
     rw [this, div_le_iff₀ (by norm_num : (0:ℝ) < 10 ^ 21)]
-    nlinarith [hkey]
+    linarith [hkey]
   linarith [hQform, hstep1]
 
 /-- **§5 Step-4 large-defect per-`s` magnitude + extraction** (writeup 1025–1052).
@@ -309,7 +307,7 @@ theorem sigma_s_magnitude_extract
           have hb3 : S.Δ ^ 2 * S.Ω ^ 2 * |(s:ℝ)| / 1000000 ≤ L * v ^ 2 := by
             rw [div_le_iff₀ (by norm_num)]; linarith [hvpin_lo]
           exact mul_le_mul hb2 hb3 (by positivity) (by positivity)
-        nlinarith [e1, mul_pos hXpos (mul_pos hApos hBpos)]
+        linarith [e1]
       -- LHS |s|·d⁵ ≤ |s|·(2D)⁵ = 32·|s|·D⁵ = 32·|s|·(Δ²Ω²XAB) ≤ 2·10⁸·(…)
       have hd5le : d ^ 5 ≤ (2 * S.D) ^ 5 := by
         apply pow_le_pow_left₀ hd_pos.le hd2D
@@ -322,7 +320,7 @@ theorem sigma_s_magnitude_extract
             = 32 * (S.Δ ^ 2 * S.Ω ^ 2 * (P.X * S.A * S.B)) * |(s:ℝ)| := by
           rw [hABID]; ring
         rw [h32'] at h32
-        nlinarith [h32, mul_nonneg (mul_nonneg (mul_pos hXpos hApos).le hBpos.le)
+        linarith [h32, mul_nonneg (mul_nonneg (mul_pos hXpos hApos).le hBpos.le)
           (mul_nonneg (mul_nonneg (by positivity : (0:ℝ) ≤ S.Δ^2) (by positivity : (0:ℝ) ≤ S.Ω^2)) hsnn)]
       linarith [hLHS, hn]
     -- convert |s|·d⁵ ≤ … into the Q-form and finish
@@ -332,7 +330,7 @@ theorem sigma_s_magnitude_extract
       rw [hQexp, le_div_iff₀ hd5pos]
       have : (1 / (10 ^ 21 : ℝ)) * |(s:ℝ)| * d ^ 5 = (|(s:ℝ)| * d ^ 5) / 10 ^ 21 := by ring
       rw [this, div_le_iff₀ (by norm_num : (0:ℝ) < 10 ^ 21)]
-      nlinarith [hkey]
+      linarith [hkey]
     linarith [hQform, hstep1]
   -- ===================== (2) UPPER BOUND :  |Σ_closed| ≤ 10²¹·|s| =====================
   have hupper : |Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂| ≤ (10 ^ 21 : ℝ) * |(s : ℝ)| := by
@@ -360,7 +358,7 @@ theorem sigma_s_magnitude_extract
         have hb2 : P.X * a * |b₀| ≤ P.X * (11 * S.A) * (3000000000000 * S.B) :=
           mul_le_mul hb1 hb0 hb0nn (by positivity)
         exact mul_le_mul hb2 hvpin_hi hLv2nn (by positivity)
-      nlinarith [e1, mul_pos hXpos (mul_pos hApos hBpos)]
+      linarith [e1]
     -- D⁵ = Δ²Ω²·X·A·B, so the RHS/D⁵ = 924·10¹⁸·|s|
     have hcollapse : 924 * 10 ^ 18 * (P.X * S.A * S.B * (S.Δ ^ 2 * S.Ω ^ 2 * |(s : ℝ)|)) / S.D ^ 5
         = 924 * 10 ^ 18 * |(s : ℝ)| := by

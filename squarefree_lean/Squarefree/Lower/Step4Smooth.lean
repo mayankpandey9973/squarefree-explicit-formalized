@@ -30,8 +30,6 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 3200000
-
 variable {P : Globals} {S : Scale P}
 
 /-- The `d`-derivative of `Σ_closed` as a one-variable function of `d` (local copy of the
@@ -72,7 +70,7 @@ derivative of `Σ_closed` obeys `|dΣ/dd| ≤ 7·|Σ|/d`.  Same `Dval = −5Σ/d
 `|correction| ≤ 2|Σ|/d` split as the lower bound, but assembled by the (forward) triangle
 inequality `|Dval| ≤ 5|Σ|/d + 2|Σ|/d`. -/
 private theorem sigma_d_deriv_ub {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
-    (ha0 : 0 < a) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (ha0 : 0 < a) (_ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ12' : ℓ₁ + 1 ≤ ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hdwin : S.D * (1 - 1/10 ^ 9) ≤ d ∧ d ≤ 2 * S.D * (1 + 1/10 ^ 9))
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hb0lo : S.B / 2000000 ≤ |b₀|)
@@ -97,7 +95,7 @@ private theorem sigma_d_deriv_ub {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
   -- regime: Δ²U⁵ ≤ HΩ³
   have hGU5Ω3 : (1 : ℝ) ≤ P.G * P.U ^ 5 * S.Ω ^ 3 := by
     have hU2Ω : P.U ≤ P.U ^ 2 / S.Ω := by
-      rw [le_div_iff₀ hΩpos]; nlinarith [hΩU, hUpos.le, hU1]
+      rw [le_div_iff₀ hΩpos]; nlinarith only [hΩU, hUpos.le, hU1]
     have hfactor : P.G * P.U ^ 3 * S.Ω ^ 4 * (P.U ^ 2 / S.Ω) = P.G * P.U ^ 5 * S.Ω ^ 3 := by
       field_simp
     have hchain : (1 : ℝ) ≤ P.G * P.U ^ 3 * S.Ω ^ 4 * (P.U ^ 2 / S.Ω) := by
@@ -115,7 +113,7 @@ private theorem sigma_d_deriv_ub {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
           = (P.G * P.U ^ 10 * S.Δ ^ 2) * S.Ω ^ 3 := by ring
       rw [heq]; exact mul_le_mul_of_nonneg_right hHbig (by positivity)
     have hle : S.Δ ^ 2 * P.U ^ 5 ≤ S.Δ ^ 2 * P.U ^ 5 * (P.G * P.U ^ 5 * S.Ω ^ 3) := by
-      nlinarith [hGU5Ω3, mul_pos (by positivity : (0:ℝ) < S.Δ ^ 2) (by positivity : (0:ℝ) < P.U ^ 5)]
+      nlinarith only [hGU5Ω3, mul_pos (by positivity : (0:ℝ) < S.Δ ^ 2) (by positivity : (0:ℝ) < P.U ^ 5)]
     linarith [hle, hstep]
   -- scale identities (same as `Sigma_closed_deriv_lb`)
   have ha_hi' : a ≤ 11 * (S.Δ * S.Ω) := by have : S.A = S.Δ * S.Ω := rfl; rwa [this] at ha_hi
@@ -125,14 +123,14 @@ private theorem sigma_d_deriv_ub {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
   have had : a / d ≤ 23 / 120 := by
     rw [div_le_div_iff₀ hd_pos (by norm_num)]
     have h60 : 60 * (S.Δ * S.Ω) ≤ P.H * S.Δ := by
-      have := mul_le_mul_of_nonneg_right hΩH hΔpos.le; nlinarith [this]
-    nlinarith [ha_hi', hdD', h60]
+      have := mul_le_mul_of_nonneg_right hΩH hΔpos.le; linarith [this]
+    linarith [ha_hi', hdD', h60, hd_pos]
   have had0 : 0 ≤ a / d := by positivity
   -- bracket
   have hbracket : 2 ≤ |(-4 + 10 * a / d)| := by
     have h10ad : 10 * a / d = 10 * (a / d) := by ring
-    rw [h10ad, abs_of_nonpos (by nlinarith [had, had0])]
-    nlinarith [had, had0]
+    rw [h10ad, abs_of_nonpos (by linarith [had])]
+    linarith [had]
   -- ===== sharp V₂-dominance:  |P₂|/d ≤ 2T ≤ |P₁+P₂/d| =====
   have hℓ2pos : 0 < ℓ₂ := lt_trans hℓ1pos hℓ12
   have h21nn : (0:ℝ) ≤ ℓ₂ - ℓ₁ := by linarith
@@ -186,8 +184,8 @@ private theorem sigma_d_deriv_ub {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     rw [hSsig_def, hSm_val, abs_mul, abs_of_pos hK_pos, abs_mul]
   have h10adu : 10 * a / d ≤ 23 / 24 * |u| := by
     have h1' : 10 * a / d ≤ 23 / 12 := by
-      rw [show 10 * a / d = 10 * (a/d) by ring]; nlinarith [had]
-    nlinarith [hbracket, h1']
+      rw [show 10 * a / d = 10 * (a/d) by ring]; linarith [had]
+    linarith [hbracket, h1']
   have hP2w : |Ptwo b₀ v ℓ₁ ℓ₂| / d ≤ |w| := le_trans hP2d hPsum_ge
   clear hres hMabs
   have hup_abs : |up| = 10 * a / d ^ 2 := by
@@ -197,7 +195,7 @@ private theorem sigma_d_deriv_ub {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     rw [hwp_def, abs_neg, abs_div, abs_of_pos hd2_pos]
   have hcmp1 : (10 * a / d ^ 2) * |w| ≤ 23 / 24 * (|u| * |w| / d) := by
     have hstep : (10 * a / d) * |w| ≤ 23 / 24 * |u| * |w| := by
-      nlinarith [mul_le_mul_of_nonneg_right h10adu hw_nn]
+      linarith [mul_le_mul_of_nonneg_right h10adu hw_nn]
     have hL : (10 * a / d ^ 2) * |w| = ((10 * a / d) * |w|) / d := by
       rw [eq_div_iff (ne_of_gt hd_pos)]; field_simp
     rw [hL, show 23 / 24 * (|u| * |w| / d) = (23 / 24 * |u| * |w|) / d by ring]
@@ -301,7 +299,7 @@ theorem Sigma_closed_d_smoothing {a : ℝ} {ℓ₁ ℓ₂ b₀ v d₁ d₂ : ℝ
       mul_le_mul_of_nonneg_right (by linarith [hMbd]) hDpos.le
     have h2' : M * (S.D * (1 - 1/10 ^ 9)) ≤ M * t :=
       mul_le_mul_of_nonneg_left htlo hM_nn
-    nlinarith [h1', h2', mul_nonneg hM_nn hDpos.le]
+    linarith [h1', h2', mul_nonneg hM_nn hDpos.le]
   -- differentiability of `Φ` on `I` (pure-`d` HasDerivAt at every window point, `d > 0`)
   have hdiff : ∀ t ∈ I, HasDerivAt Φ (deriv Φ t) t := by
     intro t ht
