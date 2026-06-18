@@ -47,6 +47,12 @@ Build/verify from the Lean project root (`squarefree_lean/`): `lake build <Modul
   took 3:25 — longer than Sec7RaResidual (8.1k lines, 2:32) — because of its `maxHeartbeats`
   `nlinarith` lemmas. A `set_option maxHeartbeats ≥ 1000000` is a red flag: isolate the numeric
   fact (esp. astronomical numerals like 10^143) into a tiny dedicated lemma proved on a clean goal.
+- **`nlinarith`-on-LINEAR-goals is the #1 cost anti-pattern (project-wide).** Many slow `nlinarith`
+  calls are actually *linear* goals sitting in a huge rpow-laden context; `nlinarith` still runs its
+  O(n²) Positivstellensatz product search over every atom. Fix: `linarith [explicit hints]`, or
+  pull the numeric step into `have … := by norm_num`/`positivity`/`gcongr` on a clean goal, then
+  `linarith`. Reserve bare `nlinarith` for genuinely nonlinear goals in SMALL contexts. (This one
+  change took Sec7ZeroScale 3:25 → 1:14 and dropped two `maxHeartbeats 4000000` bumps; 2026-06-17.)
 - **Minimal imports save little MEMORY here** (the analysis closure dominates), but still help
   elaboration time + rebuild fan-out. Worth doing on pure `import Mathlib` files; not a memory fix.
 - **Splitting a monster only speeds the FULL build if the pieces are independent siblings.** A
