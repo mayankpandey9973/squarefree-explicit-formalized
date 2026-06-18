@@ -35,7 +35,7 @@ noncomputable def Lval (X a d b₀ v ℓ₁ ℓ₂ : ℝ) : ℝ :=
 /-- **§5 Step-4 leading-term upper bound** (writeup 1035). -/
 theorem leading_abs_le {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     (hAD : 10 * S.A ≤ S.D) (ha0 : 0 < a)
-    (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (_ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1pos : 0 < ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hdwin : S.D * (1 - 1/10 ^ 9) ≤ d ∧ d ≤ 2 * S.D * (1 + 1/10 ^ 9))
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
@@ -70,7 +70,7 @@ theorem leading_abs_le {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
   -- KEY regime fact: Δ²·U⁵ ≤ H·Ω³  (from h1 + band + Ω ≤ U)
   have hGU5Ω3 : (1 : ℝ) ≤ P.G * P.U ^ 5 * S.Ω ^ 3 := by
     have hU2Ω : P.U ≤ P.U ^ 2 / S.Ω := by
-      rw [le_div_iff₀ hΩpos]; nlinarith [hΩU, hUpos.le, hU1]
+      rw [le_div_iff₀ hΩpos, pow_two]; exact mul_le_mul_of_nonneg_left hΩU hUpos.le
     have hfactor : P.G * P.U ^ 3 * S.Ω ^ 4 * (P.U ^ 2 / S.Ω) = P.G * P.U ^ 5 * S.Ω ^ 3 := by
       field_simp
     have hU2Ωpos : (0 : ℝ) ≤ P.U ^ 2 / S.Ω := by positivity
@@ -93,8 +93,8 @@ theorem leading_abs_le {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
       rw [heq]
       exact mul_le_mul_of_nonneg_right hHbig (by positivity)
     -- Δ²U⁵ ≤ Δ²U⁵·(GU⁵Ω³)  since GU⁵Ω³ ≥ 1
-    have hle : S.Δ ^ 2 * P.U ^ 5 ≤ S.Δ ^ 2 * P.U ^ 5 * (P.G * P.U ^ 5 * S.Ω ^ 3) := by
-      nlinarith [hGU5Ω3, mul_pos (by positivity : (0:ℝ) < S.Δ ^ 2) (by positivity : (0:ℝ) < P.U ^ 5)]
+    have hle : S.Δ ^ 2 * P.U ^ 5 ≤ S.Δ ^ 2 * P.U ^ 5 * (P.G * P.U ^ 5 * S.Ω ^ 3) :=
+      le_mul_of_one_le_right (by positivity) hGU5Ω3
     linarith [hle, hstep]
   -- B and A in terms of Δ,Ω,G
   have hBval : S.B = S.Δ ^ 2 / (P.G * S.Ω ^ 3) := rfl
@@ -286,9 +286,12 @@ theorem leading_abs_le {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
             (by positivity)
       _ = 11 * P.G * S.Ω * (P.H * S.Δ) ^ 5 := by rw [hXval]; ring
       _ ≤ 12 * P.G * S.Ω * ((P.H * S.Δ) ^ 5 * (1 - 1/10 ^ 9) ^ 5) := by
-          nlinarith [h1112, mul_nonneg (mul_nonneg hGpos.le hΩpos.le)
-            (pow_nonneg (mul_pos hHpos hΔpos).le 5),
-            mul_pos (mul_pos hGpos hΩpos) (pow_pos (mul_pos hHpos hΔpos) 5)]
+          have hKnn : (0:ℝ) ≤ P.G * S.Ω * (P.H * S.Δ) ^ 5 := by positivity
+          calc 11 * P.G * S.Ω * (P.H * S.Δ) ^ 5
+              = 11 * (P.G * S.Ω * (P.H * S.Δ) ^ 5) := by ring
+            _ ≤ (12 * (1 - 1/10 ^ 9) ^ 5) * (P.G * S.Ω * (P.H * S.Δ) ^ 5) :=
+                mul_le_mul_of_nonneg_right h1112 hKnn
+            _ = 12 * P.G * S.Ω * ((P.H * S.Δ) ^ 5 * (1 - 1/10 ^ 9) ^ 5) := by ring
       _ ≤ 12 * P.G * S.Ω * d ^ 5 := by
           apply mul_le_mul_of_nonneg_left hd5 (by positivity)
   have hpre_ub_nn : (0:ℝ) ≤ 12 * P.G * S.Ω / S.Δ ^ 4 := by positivity
@@ -297,27 +300,32 @@ theorem leading_abs_le {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     have hHbig2 : P.G * P.U ^ 10 * S.Δ ^ 2 ≤ P.H :=
       (le_div_iff₀ (by positivity : (0:ℝ) < S.Δ ^ 2)).mp h1
     have hU10H : P.U ^ 10 ≤ P.H := by
-      have h1' : (1:ℝ) ≤ P.G * S.Δ ^ 2 := by nlinarith [one_le_pow₀ (n := 2) hΔ1, hG1]
-      nlinarith [hHbig2, pow_pos hUpos 10, mul_le_mul_of_nonneg_left h1'
-        (by positivity : (0:ℝ) ≤ P.U ^ 10)]
+      have h1' : (1:ℝ) ≤ P.G * S.Δ ^ 2 := by
+        have hΔ2 : (1:ℝ) ≤ S.Δ ^ 2 := one_le_pow₀ hΔ1
+        calc (1:ℝ) = 1 * 1 := (one_mul 1).symm
+          _ ≤ P.G * S.Δ ^ 2 := mul_le_mul hG1 hΔ2 zero_le_one hGpos.le
+      calc P.U ^ 10 = P.U ^ 10 * 1 := (mul_one _).symm
+        _ ≤ P.U ^ 10 * (P.G * S.Δ ^ 2) := mul_le_mul_of_nonneg_left h1' (by positivity)
+        _ = P.G * P.U ^ 10 * S.Δ ^ 2 := by ring
+        _ ≤ P.H := hHbig2
     have hHΩ : 1000 * S.Ω ≤ P.H := by
       have hU9 : (1000:ℝ) ≤ P.U ^ 9 := by
         calc (1000:ℝ) ≤ (10:ℝ) ^ 33 := by norm_num
           _ ≤ P.U := hUbig
           _ = P.U ^ 1 := by ring
           _ ≤ P.U ^ 9 := pow_le_pow_right₀ (le_trans (by norm_num) hUbig) (by norm_num)
-      calc 1000 * S.Ω ≤ P.U ^ 9 * P.U := by nlinarith [hU9, hΩU, pow_pos hUpos 9, hΩpos]
+      calc 1000 * S.Ω ≤ P.U ^ 9 * P.U := mul_le_mul hU9 hΩU hΩpos.le (by positivity)
         _ = P.U ^ 10 := by ring
         _ ≤ P.H := hU10H
     have hd_ge : P.H * S.Δ * (1 - 1/10 ^ 9) ≤ d := by
       rw [show P.H * S.Δ * (1 - 1/10 ^ 9) = S.D * (1 - 1/10 ^ 9) by rfl]; exact hdD
     have had2 : 10 * a / d ≤ 11 := by
       rw [div_le_iff₀ hd_pos]
-      nlinarith [ha', hΩpos, hΔpos, hHpos, hd_ge,
-        mul_le_mul_of_nonneg_right hHΩ hΔpos.le]
+      linarith [ha', hd_ge, mul_le_mul_of_nonneg_right hHΩ hΔpos.le,
+        mul_nonneg hHpos.le hΔpos.le]
     have had0 : 0 ≤ 10 * a / d := by positivity
     rw [abs_le]
-    constructor <;> [nlinarith [had0]; nlinarith [had2]]
+    constructor <;> [linarith [had0]; linarith [had2]]
   -- Z1, Z2 abbreviations
   set Z1 : ℝ := 3 * Wu ^ 3 * Wu * Wu * Bu * Vu ^ 2 + Wu ^ 3 * (2 * Wu) * Vu ^ 3 with hZ1
   set Z2 : ℝ := 5 * Wu ^ 7 * Bu ^ 3 * Vu + 15 * Wu ^ 6 * Bu ^ 2 * Vu ^ 2
@@ -362,7 +370,7 @@ theorem leading_abs_le {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     -- LHS = G⁵U³⁵·(c₁Δ+c₀) ≤ (10⁸⁵/2)·G⁵U³⁵·Δ  ⟸ (c₁Δ+c₀) ≤ (10⁸⁵/2)·Δ
     have hkey : (280697508000000000000000000000000000000000000000000000000000000000 * S.Δ
           + 47982480000000000000000000000000000000000000000000000000000000000000000)
-        ≤ (10:ℝ) ^ 94 / 2 * S.Δ := by nlinarith [hΔ1, hΔpos]
+        ≤ (10:ℝ) ^ 94 / 2 * S.Δ := by linarith [hΔ1]
     have := mul_le_mul_of_nonneg_left hkey (by positivity : (0:ℝ) ≤ P.G ^ 5 * P.U ^ 35)
     calc (P.G ^ 5 * P.U ^ 35)
           * (280697508000000000000000000000000000000000000000000000000000000000 * S.Δ
@@ -374,14 +382,14 @@ theorem leading_abs_le {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
       ≤ (10:ℝ) ^ 94 / 2 * (P.G ^ 5 * P.U ^ 35 / S.Ω ^ 8) := by
     -- step through d ≥ D(1−ε) : Z2/d ≤ (9/8)·Z2/D
     have hZ2d : Z2 / d ≤ 9 / 8 * (Z2 / S.D) := by
-      have hD'pos : (0:ℝ) < S.D * (1 - 1/10 ^ 9) := by nlinarith [hDpos]
+      have hD'pos : (0:ℝ) < S.D * (1 - 1/10 ^ 9) := mul_pos hDpos (by norm_num)
       have h1' : Z2 / d ≤ Z2 / (S.D * (1 - 1/10 ^ 9)) := by gcongr
       refine h1'.trans ?_
       rw [div_le_iff₀ hD'pos]
       have heq9 : 9 / 8 * (Z2 / S.D) * (S.D * (1 - 1/10 ^ 9))
           = 9 / 8 * (1 - 1/10 ^ 9) * Z2 := by field_simp
       rw [heq9]
-      nlinarith [hZ2_nn]
+      linarith [hZ2_nn]
     have hmul : (12 * P.G * S.Ω / S.Δ ^ 4) * (7 * (Z2 / d))
         ≤ (12 * P.G * S.Ω / S.Δ ^ 4) * (7 * (9 / 8 * (Z2 / S.D))) := by
       apply mul_le_mul_of_nonneg_left _ hpre_ub_nn
@@ -507,11 +515,19 @@ private theorem leading_scale_chain {v : ℝ}
     rw [mul_div_assoc', mul_div_assoc',
       div_le_div_iff₀ (by positivity) (by positivity)]
     have hH2 : S.Δ ^ 4 * P.U ^ 10 ≤ P.H ^ 2 * S.Ω ^ 6 := by
-      have := pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ S.Δ ^ 2 * P.U ^ 5) hHsq 2
-      nlinarith [this]
+      have h := pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ S.Δ ^ 2 * P.U ^ 5) hHsq 2
+      calc S.Δ ^ 4 * P.U ^ 10 = (S.Δ ^ 2 * P.U ^ 5) ^ 2 := by ring
+        _ ≤ (P.H * S.Ω ^ 3) ^ 2 := h
+        _ = P.H ^ 2 * S.Ω ^ 6 := by ring
     have hΔ2 : (10:ℝ) ^ 30 * (P.G ^ 8 * P.U ^ 40) ≤ S.Δ ^ 2 := by
-      have := pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ 10 ^ 27 * (P.G ^ 4 * P.U ^ 20)) hDeW 2
-      nlinarith [this]
+      have h := pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ 10 ^ 27 * (P.G ^ 4 * P.U ^ 20)) hDeW 2
+      have hge : (10:ℝ) ^ 30 * (P.G ^ 8 * P.U ^ 40)
+          ≤ (10 ^ 27 * (P.G ^ 4 * P.U ^ 20)) ^ 2 := by
+        have he : ((10:ℝ) ^ 27 * (P.G ^ 4 * P.U ^ 20)) ^ 2 = 10 ^ 54 * (P.G ^ 8 * P.U ^ 40) := by
+          ring
+        rw [he]
+        exact mul_le_mul_of_nonneg_right (by norm_num) (by positivity)
+      linarith [hge, h]
     -- literal-safe:  10¹¹⁰ ≤ U²⁰  (from U ≥ 10³³, keeping 10⁶⁶⁰ as a symbolic power)
     have hU110 : (10:ℝ) ^ 119 ≤ P.U ^ 20 := by
       have h1 : (10:ℝ) ^ 119 ≤ (10:ℝ) ^ 660 := pow_le_pow_right₀ (by norm_num) (by norm_num)
@@ -570,8 +586,11 @@ private theorem leading_scale_chain {v : ℝ}
     have hΩ8 : S.Ω ^ 8 ≤ P.U ^ 8 := pow_le_pow_left₀ hΩpos.le hΩU 8
     have hU815 : P.U ^ 8 ≤ P.U ^ 15 := pow_le_pow_right₀ hU1 (by norm_num)
     have hGΔ : P.U ^ 15 ≤ P.G * S.Δ ^ 2 * P.U ^ 15 := by
-      have h1 : (1:ℝ) ≤ P.G * S.Δ ^ 2 := by nlinarith [hG1, hΔ1, one_le_pow₀ (n := 2) hΔ1]
-      nlinarith [h1, pow_pos hUpos 15]
+      have h1 : (1:ℝ) ≤ P.G * S.Δ ^ 2 := by
+        have hΔ2 : (1:ℝ) ≤ S.Δ ^ 2 := one_le_pow₀ hΔ1
+        calc (1:ℝ) = 1 * 1 := (one_mul 1).symm
+          _ ≤ P.G * S.Δ ^ 2 := mul_le_mul hG1 hΔ2 zero_le_one hGpos.le
+      exact le_mul_of_one_le_left (by positivity) h1
     have hchain : S.Ω ^ 8 ≤ P.G * S.Δ ^ 2 * P.U ^ 15 := le_trans hΩ8 (le_trans hU815 hGΔ)
     have hc2 : (1:ℝ) ≤ (40040325 * 10 ^ 36 / 2) := by norm_num
     calc (1:ℝ) * S.Ω ^ 8 = S.Ω ^ 8 := by ring
@@ -593,7 +612,7 @@ private theorem leading_scale_chain {v : ℝ}
 range.  Factored out of `leading_abs_ge` so the term-by-term scale arithmetic gets its own
 heartbeat budget.  The threshold `hv2`, the upper window `hv`, and the X-large fact `hDeW`
 calibrate the four `P₂`-monomials against `(HΔ/16)|v|³`. -/
-theorem ptwo_div_quarter {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
+theorem ptwo_div_quarter {_a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hb0 : |b₀| ≤ 3000000000000 * S.B)
     (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
@@ -735,7 +754,10 @@ theorem ptwo_div_quarter {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
   -- HΔ ≥ Δ³U⁵/Ω³   (from hReg : Δ²U⁵ ≤ HΩ³)
   have hHΔlow : S.Δ ^ 3 * P.U ^ 5 / S.Ω ^ 3 ≤ P.H * S.Δ := by
     rw [div_le_iff₀ (by positivity)]
-    nlinarith [mul_le_mul_of_nonneg_left hReg (by positivity : (0:ℝ) ≤ S.Δ), hΔpos]
+    have h := mul_le_mul_of_nonneg_left hReg (by positivity : (0:ℝ) ≤ S.Δ)
+    calc S.Δ ^ 3 * P.U ^ 5 = S.Δ * (S.Δ ^ 2 * P.U ^ 5) := by ring
+      _ ≤ S.Δ * (P.H * S.Ω ^ 3) := h
+      _ = P.H * S.Δ * S.Ω ^ 3 := by ring
   -- bound |Ptwo| ≤ HΔ·|v|³/4.  Work term by term against (HΔ/16)|v|³, using Wu=GU⁵, Bu=3e12Δ²/(GΩ³).
   have hPtwo_le : |Ptwo b₀ v ℓ₁ ℓ₂| ≤ (P.H * S.Δ) * |v| ^ 3 / 4 := by
     refine le_trans hP2abs ?_
@@ -759,9 +781,11 @@ theorem ptwo_div_quarter {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
               = 1000000000000000000000000000 * (P.G ^ 4 * P.U ^ 25 * S.Δ ^ 2) := by ring
           have hR : S.Δ * (P.U ^ 5 * S.Δ ^ 2) = S.Δ ^ 3 * P.U ^ 5 := by ring
           rw [hL, hR] at h
-          nlinarith [h, mul_nonneg (mul_nonneg (pow_nonneg hGpos.le 4) (pow_nonneg hUpos.le 25))
-            (pow_nonneg hΔpos.le 2)]
-        nlinarith [hprod, hHΔΩ]
+          have hc : (26733096000000000000000000 : ℝ) * (P.G ^ 4 * P.U ^ 25 * S.Δ ^ 2)
+              ≤ 1000000000000000000000000000 * (P.G ^ 4 * P.U ^ 25 * S.Δ ^ 2) :=
+            mul_le_mul_of_nonneg_right (by norm_num) (by positivity)
+          linarith [hc, h]
+        linarith [hprod, hHΔΩ]
       calc 15 * Wu ^ 5 * Bu * |v| ^ 3 ≤ (P.H * S.Δ) / 16 * |v| ^ 3 :=
             mul_le_mul_of_nonneg_right hcoef hv3nn
         _ = (P.H * S.Δ) * |v| ^ 3 / 16 := by ring
@@ -783,10 +807,15 @@ theorem ptwo_div_quarter {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
         -- 5e20·G⁴U²⁵Δ·16 ≤ HΔ·Ω³ ;  HΔΩ³≥Δ³U⁵ ; need 8e21 G⁴U²⁰≤Δ², from Δ²≥10³⁰G⁸U⁴⁰
         -- Δ ≥ 10¹⁵ G⁴U²⁰ and Δ³U⁵ ≥ (10¹⁵ G⁴U²⁰)·Δ²U⁵ ≥ 10¹⁵ G⁴U²⁰·(8e21 G⁴U⁵... ) — chain via two ·
         have hGU1 : (1:ℝ) ≤ P.G ^ 4 * P.U ^ 20 := by
-          have h1 := one_le_pow₀ (n := 4) hG1; have h2 := one_le_pow₀ (n := 20) hU1; nlinarith [h1, h2]
+          have h1 : (1:ℝ) ≤ P.G ^ 4 := one_le_pow₀ hG1
+          have h2 : (1:ℝ) ≤ P.U ^ 20 := one_le_pow₀ hU1
+          calc (1:ℝ) = 1 * 1 := (one_mul 1).symm
+            _ ≤ P.G ^ 4 * P.U ^ 20 := mul_le_mul h1 h2 zero_le_one (by positivity)
         -- step A: Δ² ≥ 10¹⁵ G⁴U²⁰ · Δ  (from Δ ≥ 10¹⁵ G⁴U²⁰)
         have hA : 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) * S.Δ ≤ S.Δ ^ 2 := by
-          have := mul_le_mul_of_nonneg_right hDeW hΔpos.le; nlinarith [this]
+          have h := mul_le_mul_of_nonneg_right hDeW hΔpos.le
+          calc 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) * S.Δ ≤ S.Δ * S.Δ := h
+            _ = S.Δ ^ 2 := by ring
         -- step B: Δ³U⁵ = Δ·Δ²·U⁵ ≥ Δ·(10¹⁵ G⁴U²⁰·Δ)·U⁵ = 10¹⁵ G⁴U²⁵·Δ²  (one factor Δ extra)
         have hkey : 2284880000000000000000000000000 * (P.G ^ 4 * P.U ^ 25 * S.Δ)
             ≤ S.Δ ^ 3 * P.U ^ 5 := by
@@ -800,11 +829,24 @@ theorem ptwo_div_quarter {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
           -- 1e15 G⁴U²⁵Δ² ≤ Δ³U⁵ ; and 8e21 G⁴U²⁵Δ ≤ 1e15 G⁴U²⁵Δ²  (Δ ≥ 1e15 G⁴U²⁰ ≥ 8e6)
           have hΔge : 2284880000000000000000000000000 * (P.G ^ 4 * P.U ^ 25 * S.Δ)
               ≤ 1000000000000000000000000000 * (P.G ^ 4 * P.U ^ 25 * S.Δ ^ 2) := by
-            have hΔbig : (8000000 : ℝ) ≤ S.Δ := by nlinarith [hDeW, hGU1]
-            nlinarith [hΔbig, mul_nonneg (mul_nonneg (pow_nonneg hGpos.le 4)
-              (pow_nonneg hUpos.le 25)) hΔpos.le, hΔpos]
+            have hΔbig : (8000000 : ℝ) ≤ S.Δ := by
+              have hge : (10:ℝ) ^ 27 ≤ 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) := by
+                calc (10:ℝ) ^ 27 = 10 ^ 27 * 1 := (mul_one _).symm
+                  _ ≤ 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) :=
+                      mul_le_mul_of_nonneg_left hGU1 (by norm_num)
+              calc (8000000:ℝ) ≤ (10:ℝ) ^ 27 := by norm_num
+                _ ≤ 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) := hge
+                _ ≤ S.Δ := hDeW
+            have hMnn : (0:ℝ) ≤ P.G ^ 4 * P.U ^ 25 * S.Δ := by positivity
+            have hcoef : (2284880000000000000000000000000:ℝ)
+                ≤ 1000000000000000000000000000 * S.Δ := by linarith [hΔbig]
+            calc 2284880000000000000000000000000 * (P.G ^ 4 * P.U ^ 25 * S.Δ)
+                = (P.G ^ 4 * P.U ^ 25 * S.Δ) * 2284880000000000000000000000000 := by ring
+              _ ≤ (P.G ^ 4 * P.U ^ 25 * S.Δ) * (1000000000000000000000000000 * S.Δ) :=
+                  mul_le_mul_of_nonneg_left hcoef hMnn
+              _ = 1000000000000000000000000000 * (P.G ^ 4 * P.U ^ 25 * S.Δ ^ 2) := by ring
           linarith [hB, hΔge]
-        nlinarith [hHΔΩ, hkey]
+        linarith [hHΔΩ, hkey]
       calc 5 * Wu ^ 4 * (|v| ^ 3 * (10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3)))
           = (5 * Wu ^ 4 * (10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))) * |v| ^ 3 := by ring
         _ ≤ (P.H * S.Δ) / 16 * |v| ^ 3 := mul_le_mul_of_nonneg_right hcoef hv3nn
@@ -945,7 +987,7 @@ theorem psum_abs_ge {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
               mul_le_mul_of_nonneg_left hWB hℓ2nn
           _ ≤ (2*ℓ₂-ℓ₁) * |v| := by
               apply mul_le_mul_of_nonneg_right _ hvnn; linarith
-      nlinarith [hkey]
+      linarith [hkey]
     linarith [hlow, hhalf]
   -- |P₁| ≥ |v|³/2
   have hP1ge : |v| ^ 3 / 2 ≤ |Pone b₀ v ℓ₁ ℓ₂| := by
@@ -963,13 +1005,16 @@ theorem psum_abs_ge {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
       have hstep : ℓ₁ ^ 3 * |v| ^ 2 * ((2 * ℓ₂ - ℓ₁) * |v| / 2)
           = (ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁)) * (|v| ^ 3 / 2) := by rw [← hv3]; ring
       rw [hstep]
-      have hcoef : (1:ℝ) ≤ ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) := by nlinarith [hℓ13, h2ℓ1ge]
+      have hcoef : (1:ℝ) ≤ ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) := by
+        calc (1:ℝ) = 1 * 1 := (one_mul 1).symm
+          _ ≤ ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁) :=
+              mul_le_mul hℓ13 h2ℓ1ge zero_le_one (pow_nonneg hℓ1nn 3)
       have hvq : (0:ℝ) ≤ |v| ^ 3 / 2 := by positivity
-      nlinarith [hcoef, hvq]
+      exact le_mul_of_one_le_left hvq hcoef
     linarith [hb, hc]
   -- |P₂|/d ≤ |v|³/4
   have hP2d : |Ptwo b₀ v ℓ₁ ℓ₂| / d ≤ |v| ^ 3 / 4 :=
-    ptwo_div_quarter (a := a) hℓ1 hℓ12 hℓ2W hb0 hv hdD hd_pos hReg hG1 hU1 hDeW hv2
+    ptwo_div_quarter (_a := a) hℓ1 hℓ12 hℓ2W hb0 hv hdD hd_pos hReg hG1 hU1 hDeW hv2
   -- assemble
   have htri : |Pone b₀ v ℓ₁ ℓ₂| - |Ptwo b₀ v ℓ₁ ℓ₂ / d|
       ≤ |Pone b₀ v ℓ₁ ℓ₂ + Ptwo b₀ v ℓ₁ ℓ₂ / d| := by
@@ -992,7 +1037,7 @@ the large-defect threshold `hv2 : V₂ ≤ |v|` with `V₂ = 1.8·10¹³·Δ²U�
 the `P₁`-bracket) forces the cubic `v³`-monomial of `P₁` to dominate, giving `|P₁| ≥ |v|³/2`; the
 upper bound `|v| ≤ 10²⁰ΔU⁵/Ω³` together with `hDeW` controls `|P₂|/d ≤ |P₁|/2`. -/
 theorem leading_abs_ge {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
-    (hAD : 10 * S.A ≤ S.D) (ha0 : 0 < a)
+    (_hAD : 10 * S.A ≤ S.D) (ha0 : 0 < a)
     (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hdwin : S.D ≤ d ∧ d ≤ 2 * S.D)
@@ -1040,7 +1085,7 @@ theorem leading_abs_ge {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
   -- ===== regime: Δ²U⁵ ≤ HΩ³ (same as in leading_abs_le) =====
   have hGU5Ω3 : (1 : ℝ) ≤ P.G * P.U ^ 5 * S.Ω ^ 3 := by
     have hU2Ω : P.U ≤ P.U ^ 2 / S.Ω := by
-      rw [le_div_iff₀ hΩpos]; nlinarith [hΩU, hUpos.le, hU1]
+      rw [le_div_iff₀ hΩpos, pow_two]; exact mul_le_mul_of_nonneg_left hΩU hUpos.le
     have hfactor : P.G * P.U ^ 3 * S.Ω ^ 4 * (P.U ^ 2 / S.Ω) = P.G * P.U ^ 5 * S.Ω ^ 3 := by
       field_simp
     have hU2Ωpos : (0 : ℝ) ≤ P.U ^ 2 / S.Ω := by positivity
@@ -1058,8 +1103,8 @@ theorem leading_abs_ge {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
       have heq : S.Δ ^ 2 * P.U ^ 5 * (P.G * P.U ^ 5 * S.Ω ^ 3)
           = (P.G * P.U ^ 10 * S.Δ ^ 2) * S.Ω ^ 3 := by ring
       rw [heq]; exact mul_le_mul_of_nonneg_right hHbig (by positivity)
-    have hle : S.Δ ^ 2 * P.U ^ 5 ≤ S.Δ ^ 2 * P.U ^ 5 * (P.G * P.U ^ 5 * S.Ω ^ 3) := by
-      nlinarith [hGU5Ω3, mul_pos (by positivity : (0:ℝ) < S.Δ ^ 2) (by positivity : (0:ℝ) < P.U ^ 5)]
+    have hle : S.Δ ^ 2 * P.U ^ 5 ≤ S.Δ ^ 2 * P.U ^ 5 * (P.G * P.U ^ 5 * S.Ω ^ 3) :=
+      le_mul_of_one_le_right (by positivity) hGU5Ω3
     linarith [hle, hstep]
   -- ============= |P₁ + P₂/d| ≥ |v|³/4  (factored: psum_abs_ge) =============
   have hPsum_ge : |v| ^ 3 / 4 ≤ |Pone b₀ v ℓ₁ ℓ₂ + Ptwo b₀ v ℓ₁ ℓ₂ / d| :=
@@ -1073,11 +1118,13 @@ theorem leading_abs_ge {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
       -- 5a ≤ d, with a ≤ 11A = 11ΔΩ and d ≥ D = HΔ ; 55ΔΩ ≤ HΔ from 55Ω ≤ H
       have hdD' : P.H * S.Δ ≤ d := by have : S.D = P.H * S.Δ := rfl; rw [← this]; exact hdD
       have h55 : 55 * (S.Δ * S.Ω) ≤ P.H * S.Δ := by
-        have := mul_le_mul_of_nonneg_right hΩH hΔpos.le; nlinarith [this]
-      nlinarith [ha_hi', hdD', h55]
+        have h := mul_le_mul_of_nonneg_right hΩH hΔpos.le
+        calc 55 * (S.Δ * S.Ω) = 55 * S.Ω * S.Δ := by ring
+          _ ≤ P.H * S.Δ := h
+      linarith [ha_hi', hdD', h55]
     have had0 : 0 ≤ a / d := by positivity
-    rw [abs_of_nonpos (by nlinarith [had, had0])]
-    nlinarith [had, had0]
+    rw [abs_of_nonpos (by linarith [had])]
+    linarith [had]
   -- prefactor lower:  Xa/d⁵ ≥ GΩ/(160Δ⁴)   (a ≥ A/5 = ΔΩ/5, d ≤ 2D = 2HΔ, X = GH⁵)
   have hpre_pos : 0 < P.X * a / d ^ 5 := by positivity
   have hpre : P.G * S.Ω / (160 * S.Δ ^ 4) ≤ P.X * a / d ^ 5 := by
