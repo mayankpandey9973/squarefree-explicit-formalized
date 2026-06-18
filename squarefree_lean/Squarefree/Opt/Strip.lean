@@ -40,7 +40,7 @@ private theorem five_U_le_H (P : Globals) (hX : (16777216 : ℝ) ≤ P.X ^ (1/10
       Real.rpow_le_one hX0.le h.le (by norm_num : (0:ℝ) ≤ 1/100)
     linarith
   -- exponent gap ≥ 1/100
-  have hexp : (1/100 : ℝ) ≤ (1 - P.g) / 5 - P.u := by nlinarith [hg, hu, hg0]
+  have hexp : (1/100 : ℝ) ≤ (1 - P.g) / 5 - P.u := by linarith [hg, hu, hg0]
   -- X^{(1-g)/5 - u} ≥ X^{1/100} ≥ 16777216 ≥ 5
   have hmono : P.X ^ (1/100 : ℝ) ≤ P.X ^ ((1 - P.g) / 5 - P.u) :=
     Real.rpow_le_rpow_of_exponent_le hX1 hexp
@@ -102,13 +102,13 @@ private theorem ghΩ3_ge_500 (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 1
     _ ≤ c₀ ^ 3 * P.X ^ (1/5 + P.g/20 - 9*P.u/4) := by
         have hxp : (0:ℝ) < P.X ^ (1/5 + P.g/20 - 9*P.u/4) := Real.rpow_pos_of_pos hX0 _
         have hc3 : (1:ℝ) ≤ c₀ ^ 3 := one_le_pow₀ hc₀
-        nlinarith [hxp, hc3]
+        linarith [mul_le_mul_of_nonneg_right hc3 hxp.le]
     _ = P.G * P.H * e0 ^ 3 := hghe.symm
     _ ≤ P.G * P.H * S.Ω ^ 3 := by
         apply mul_le_mul_of_nonneg_left hΩ3
         positivity
 
-set_option maxHeartbeats 6400000 in
+set_option maxHeartbeats 1000000 in
 /-- **Off-strip case** of `dblock_bound` (Prop 8.1, writeup 2020–2079). `u, c₀, Cu` are shared
 parameters (the merger `dblock_bound` picks them). Small-x edge `x ≤ G^{-2}Ω^{-11/2}X^{-Cu·u}` via
 `prop_6_1` (binding term `x^{2/3}G^{4/3}Ω^{11/3}`); large-x edge `x ≥ G^{17}Ω^{-26}X^{Cu·u}` via
@@ -172,7 +172,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
           refine le_trans ?_ hlo
           have hthr : (0:ℝ) ≤ S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) :=
             mul_nonneg (Real.rpow_nonneg hΔ.le _) (Real.rpow_nonneg (by positivity) _)
-          nlinarith [hthr]
+          linarith [hthr]
         obtain ⟨Ra, _dStar, _hinDa, _hband, _hnear, hRaWit, hcard⟩ :=
           hfiber' P S a ha0 hΔlong hX0big hloq hAa ha2A h2AD Dd hDdpos hDdeq
         exact ⟨Ra, hRaWit, hcard⟩)
@@ -195,9 +195,9 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   have hAD5 : 10 * S.A ≤ S.D := by
     have h5UH : 10 * P.U ≤ P.H :=
       five_U_le_H P hX0big (by rw [hg]; exact hg1) (by rw [hu]; exact hu2) hg0'
-    have h5ΩH : 10 * S.Ω ≤ P.H := le_trans (by nlinarith [hΩU, hU.le]) h5UH
+    have h5ΩH : 10 * S.Ω ≤ P.H := le_trans (by linarith [hΩU]) h5UH
     unfold Scale.A Scale.D
-    nlinarith [h5ΩH, hΔ.le, hΔ]
+    linarith [mul_le_mul_of_nonneg_left h5ΩH hΔ.le]
   have hΩfloor : (16777216 : ℝ) ≤ P.G * P.H * S.Ω ^ 3 :=
     ghΩ3_ge_500 P S c₀ hc₀ hX hg0' (by rw [hu]; exact hu2) hbandlo hX0big
   have hg1' : P.g ≤ 1 := by rw [hg]; linarith [hg1]
@@ -206,7 +206,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
     have hbpos : (0:ℝ) < P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) := by
       have := Real.rpow_pos_of_pos hG (-1/4 : ℝ)
       have := Real.rpow_pos_of_pos hU (-3/4 : ℝ); positivity
-    nlinarith [hbpos, hc₀]
+    linarith [mul_le_mul_of_nonneg_right hc₀ hbpos.le]
   have hprop6 := StripAux.prop_6_1_spec P S hX hPu hg1' hAD5 hband6 hΩfloor hlog RaOf hwit'
   rw [← hC6def] at hprop6
   -- rewrite the target  C * P.H / P.U = C * (P.H / P.U)
@@ -244,7 +244,10 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
             = C6 * P.H * (P.X ^ (C6 * P.u) * T2) by ring]
       apply mul_le_mul_of_nonneg_left _ (by positivity)
       exact mul_le_mul_of_nonneg_left hT2 hxbud
-    have he2 : C6 * P.u + -(2/3) * (Cu * P.u) ≤ -3 * P.u := by nlinarith [hCuP, hu0, hC6]
+    have he2 : C6 * P.u + -(2/3) * (Cu * P.u) ≤ -3 * P.u := by
+      have hp : ((3/2) * C6 + 232) * P.u ≤ Cu * P.u :=
+        mul_le_mul_of_nonneg_right hCuP hPu.le
+      linarith [hp, hPu]
     have hq1 : C6 * (P.H * P.X ^ (C6 * P.u)) * T1
         ≤ C6 * c₀ ^ (-7/2 : ℝ) * P.H * P.X ^ (C6 * P.u + (-P.g/8 + 21*P.u/8 - Cu * P.u)) := by
       rw [show C6 * c₀ ^ (-7/2 : ℝ) * P.H * P.X ^ (C6 * P.u + (-P.g/8 + 21*P.u/8 - Cu * P.u))
@@ -257,7 +260,9 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       apply mul_le_mul_of_nonneg_left _ (by positivity)
       exact mul_le_mul_of_nonneg_left hT1 hxbud
     have he1 : C6 * P.u + (-P.g/8 + 21*P.u/8 - Cu * P.u) ≤ -3 * P.u := by
-      nlinarith [hCuP, hu0, hC6, hg0']
+      have hp : ((3/2) * C6 + 232) * P.u ≤ Cu * P.u :=
+        mul_le_mul_of_nonneg_right hCuP hPu.le
+      linarith [hp, hPu, hg0', mul_nonneg hC6.le hPu.le]
     have hq3 : C6 * (P.H * P.X ^ (C6 * P.u)) * T3
         ≤ C6 * P.H * P.X ^ (C6 * P.u + (-(1 - P.g)/10 + P.g/2 + 5*P.u/2)) := by
       rw [show C6 * P.H * P.X ^ (C6 * P.u + (-(1 - P.g)/10 + P.g/2 + 5*P.u/2))
@@ -267,7 +272,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       apply mul_le_mul_of_nonneg_left _ (by positivity)
       exact mul_le_mul_of_nonneg_left hT3 hxbud
     have he3 : C6 * P.u + (-(1 - P.g)/10 + P.g/2 + 5*P.u/2) ≤ -3 * P.u := by
-      nlinarith [hbu, hu0, hg0', hC6]
+      linarith [hbu, hPu, hg0']
     -- apply fiber_prop_term to each
     have hF2 := StripAux.fiber_prop_term P S c₀ hc₀0 hX hPu hbandlo
       (c := C6) (e := C6 * P.u + -(2/3) * (Cu * P.u)) hC6.le (mul_nonneg hqnn_base hT2nn) hq2 he2
@@ -391,7 +396,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
     have hU1 : 1 ≤ P.U := Real.one_le_rpow hX hPu.le
     have hH1 : 1 ≤ P.H := Real.one_le_rpow hX (by rw [hg]; linarith [hg1])
     have hu2P : P.u ≤ 1/100 := by rw [hu]; exact hu2
-    have hbu100 : 100 * P.u + 20 * P.g ≤ 1/200 := by nlinarith [hbu, mul_pos hC6 hPu]
+    have hbu100 : 100 * P.u + 20 * P.g ≤ 1/200 := by linarith [hbu, mul_pos hC6 hPu]
     have hgq : P.g ≤ 1/4000 := by linarith [hbu100, hPu.le]
     have hCu232 : (232:ℝ) ≤ Cu := by linarith [hCuP, hC6.le]
     have hband1 : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4 := StripAux.regime_band_one P S hband6
@@ -609,7 +614,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
                     + Bf * (c₀ ^ (-1 : ℝ) + c₀ ^ (-13 : ℝ) + c₀ ^ (-14 : ℝ))) * (P.H / P.U)) by ring]
           linarith [hslackL]
 
-set_option maxHeartbeats 1000000 in
+set_option maxHeartbeats 400000 in
 /-- Small-Ω block bound (below the band): the trivial Prop 3.2 bound (writeup 400–406), no §5/§6/§7.
 Uniform (absolute) `C`, valid for any band constant `c₀` (with `C` depending on `c₀`). The regime
 hypotheses match `dblock_bound`'s, so the two compose over `a_decomposition`'s sum.
@@ -671,7 +676,7 @@ theorem dblock_small_omega (c₀ : ℝ) (hc₀ : 0 < c₀) :
       refine le_trans ?_ (le_trans hNR hAa)
       have hthr : (0:ℝ) ≤ S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) :=
         mul_nonneg (Real.rpow_nonneg hΔ.le _) (Real.rpow_nonneg (by positivity) _)
-      nlinarith [hthr]
+      linarith [hthr]
     obtain ⟨Ra, hRaBand, hRaCard⟩ :=
       hfiber P S a ha0 hΔlong hX0big hloq hAa ha2A h2AD D hDpos hDeq
     -- #Ra ≤ C₁·R + 1

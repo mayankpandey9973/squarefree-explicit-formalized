@@ -107,7 +107,7 @@ private theorem sec7_phase_shift_margin {P : Globals} {S : Scale P} {W : ℝ}
     gcongr
     norm_num [sec7_envC]
   have h2000 : 2000 * (W + W ^ 2 + W ^ 4) ≤ S.R := le_trans (le_trans h6000 hC) henv
-  nlinarith
+  linarith
 
 private theorem sec7_phase_shift_margin_strong {P : Globals} {S : Scale P} {W : ℝ}
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W) (c₀ Cu : ℝ)
@@ -145,7 +145,7 @@ private theorem sec7_phase_shift_margin_strong {P : Globals} {S : Scale P} {W : 
     gcongr
     norm_num [sec7_envC]
   have h6000R : 6000 * (W + W ^ 2 + W ^ 4) ≤ S.R := le_trans (le_trans h6000 hC) henv
-  nlinarith
+  linarith
 
 private theorem sec7_phase_rWin_pos {P : Globals} {S : Scale P} {W : ℝ}
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W) (c₀ Cu : ℝ)
@@ -155,7 +155,7 @@ private theorem sec7_phase_rWin_pos {P : Globals} {S : Scale P} {W : ℝ}
   have hR : 0 < S.R := sec7_R_pos S
   have hs := sec7_phase_shift_margin Env hW c₀ Cu hsd
   simp only [sec7_rWin, Set.mem_Icc] at hr
-  nlinarith
+  linarith
 
 private theorem sec7_phase_rWinWide_pos {P : Globals} {S : Scale P} {W : ℝ}
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W) (c₀ Cu : ℝ)
@@ -165,7 +165,7 @@ private theorem sec7_phase_rWinWide_pos {P : Globals} {S : Scale P} {W : ℝ}
   have hR : 0 < S.R := sec7_R_pos S
   have hs := sec7_phase_shift_margin Env hW c₀ Cu hsd
   simp only [sec7_rWinWide, Set.mem_Ioo] at hr
-  nlinarith
+  linarith
 
 private theorem sec7_hasDerivAt_iteratedDeriv_of_contDiffAt {g : ℝ → ℝ} {r : ℝ} {m : ℕ}
     (hg : ContDiffAt ℝ 4 g r) (hm : m < 4) :
@@ -381,7 +381,7 @@ private theorem sec7_phase_rWin_core {P : Globals} {S : Scale P} {W r : ℝ}
   have hR : 0 < S.R := sec7_R_pos S
   have hs := sec7_phase_shift_margin Env hW c₀ Cu hsd
   simp only [sec7_rWin, Set.mem_Icc] at hr
-  constructor <;> nlinarith
+  constructor <;> linarith
 
 private theorem sec7_phase_rWinWide_core {P : Globals} {S : Scale P} {W r : ℝ}
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W) (c₀ Cu : ℝ)
@@ -390,7 +390,7 @@ private theorem sec7_phase_rWinWide_core {P : Globals} {S : Scale P} {W r : ℝ}
   have hR : 0 < S.R := sec7_R_pos S
   have hs := sec7_phase_shift_margin_strong Env hW c₀ Cu hsd
   simp only [sec7_rWinWide, Set.mem_Ioo] at hr
-  constructor <;> nlinarith
+  constructor <;> linarith
 
 private theorem sec7_phase_AD_omega_le {P : Globals} {S : Scale P}
     (hAD : 10 * S.A ≤ S.D) : 10 * S.Ω ≤ P.H := by
@@ -566,7 +566,7 @@ private theorem sec7_phase_shift_error_bound {P : Globals} {S : Scale P} {W θ :
     _ ≤ S.F / (10:ℝ) ^ 100 + S.F / (10:ℝ) ^ 100 := by
       exact add_le_add hsmall0 hsmallHA
     _ ≤ S.F / 1000 := by
-      nlinarith
+      linarith
 
 private theorem sec7_phase_ftil_scale {P : Globals} {S : Scale P} {r : ℝ} {a : ℤ}
     (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
@@ -619,7 +619,7 @@ private theorem sec7_phase_ftil_scale {P : Globals} {S : Scale P} {r : ℝ} {a :
             have hrad_ge :
                 4 * Real.sqrt (P.X * (a : ℝ) ^ 3 / r) ≤
                   (a : ℝ) ^ 2 + 4 * Real.sqrt (P.X * (a : ℝ) ^ 3 / r) := by
-              nlinarith [sq_nonneg (a : ℝ)]
+              linarith [sq_nonneg (a : ℝ)]
             have hsq :=
               pow_le_pow_left₀ hterm_nonneg hrad_ge 2
             gcongr
@@ -672,7 +672,7 @@ private theorem sec7_phase_ftil_scale {P : Globals} {S : Scale P} {r : ℝ} {a :
       S.F / 500 ≤ sec7_phase_ftil P S a r :=
     sec7_phase_le_of_fourth (by positivity) hftil_nonneg hlow4
   have hΩH : 10 * S.Ω ≤ P.H := sec7_phase_AD_omega_le hAD
-  have hΩle : S.Ω ≤ P.H / 10 := by nlinarith
+  have hΩle : S.Ω ≤ P.H / 10 := by linarith
   have hΩ4 : S.Ω ^ 4 ≤ (P.H / 10) ^ 4 :=
     pow_le_pow_left₀ S.Ω_pos.le hΩle 4
   have harX : (a : ℝ) * r ≤ P.X := by
@@ -714,7 +714,7 @@ private theorem sec7_phase_ftil_scale {P : Globals} {S : Scale P} {r : ℝ} {a :
   have hrad_le :
       (a : ℝ) ^ 2 + 4 * Real.sqrt (P.X * (a : ℝ) ^ 3 / r) ≤
         5 * Real.sqrt (P.X * (a : ℝ) ^ 3 / r) := by
-    nlinarith
+    linarith
   have hclosed_hi :
       (sec7_phase_ftil P S a r) ^ 4 ≤
         25 * P.X * r ^ 3 / (a : ℝ) ^ 5 := by
@@ -914,18 +914,18 @@ private theorem sec7_phase_shift_mem (P : Globals) (S : Scale P) (W : ℝ) (a : 
   have hshift_lo : -(S.F / 1000) ≤ (j : ℝ) - θ := by
     have hjlo : -|(j : ℝ)| ≤ (j : ℝ) := neg_abs_le (j : ℝ)
     have hθlo : 0 ≤ θ := hθ.1
-    nlinarith
+    linarith
   have hshift_hi : (j : ℝ) - θ ≤ S.F / 1000 := by
     have hjhi : (j : ℝ) ≤ |(j : ℝ)| := le_abs_self (j : ℝ)
     have hθlo : 0 ≤ θ := hθ.1
-    nlinarith
+    linarith
   have hcWin : sec7_cWin = (1000:ℝ) := by norm_num [sec7_cWin]
   simp only [sec7_tWin, Set.mem_Icc]
   constructor
   · rw [hcWin]
-    nlinarith
+    linarith
   · rw [hcWin]
-    nlinarith [hftil_hi, hshift_hi, sec7_phase_F_pos S]
+    linarith [hftil_hi, hshift_hi, sec7_phase_F_pos S]
 
 private theorem sec7_phase_f3_base_contDiffAt4 {P : Globals} {S : Scale P} {W : ℝ}
     {a j : ℤ} {r : ℝ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
@@ -1008,7 +1008,7 @@ private theorem sec7_phase_a_lo_wide {P : Globals} {S : Scale P} {a : ℤ}
     have hΩ : 0 < S.Ω := S.Ω_pos
     unfold Scale.A
     positivity
-  nlinarith
+  linarith
 
 private theorem sec7_phase_a_hi_wide {P : Globals} {S : Scale P} {a : ℤ}
     (ha_hi : (a : ℝ) ≤ 2 * S.A) :
@@ -1018,7 +1018,7 @@ private theorem sec7_phase_a_hi_wide {P : Globals} {S : Scale P} {a : ℤ}
     have hΩ : 0 < S.Ω := S.Ω_pos
     unfold Scale.A
     positivity
-  nlinarith
+  linarith
 
 private theorem sec7_phase_ra_c₁_window_lo {P : Globals} {S : Scale P} {a j : ℤ}
     (ha_lo : S.A ≤ (a : ℝ)) :
@@ -1036,7 +1036,7 @@ private theorem sec7_phase_ra_c₁_window_lo {P : Globals} {S : Scale P} {a j : 
     simpa using h
   rw [sec7_phase_ra_c₁, abs_of_nonneg (by positivity :
     0 ≤ (1 / 6 : ℝ) * ((a : ℝ) / S.A) ^ 2)]
-  nlinarith
+  linarith
 
 private theorem sec7_phase_ra_c₁_window_hi {P : Globals} {S : Scale P} {a j : ℤ}
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A) :
@@ -1057,7 +1057,7 @@ private theorem sec7_phase_ra_c₁_window_hi {P : Globals} {S : Scale P} {a j : 
     pow_le_pow_left₀ hs_nonneg hs_hi 2
   rw [sec7_phase_ra_c₁, abs_of_nonneg (by positivity :
     0 ≤ (1 / 6 : ℝ) * ((a : ℝ) / S.A) ^ 2)]
-  nlinarith
+  linarith
 
 private theorem sec7_phase_ra_c₂_window_lo {P : Globals} {S : Scale P} {a j : ℤ}
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A) :
@@ -1070,7 +1070,7 @@ private theorem sec7_phase_ra_c₂_window_lo {P : Globals} {S : Scale P} {a j : 
   have ha_pos : 0 < (a : ℝ) := lt_of_lt_of_le hApos ha_lo
   have hu_lo : (1 / 2 : ℝ) ≤ S.A / (a : ℝ) := by
     rw [le_div_iff₀ ha_pos]
-    nlinarith
+    linarith
   have hpow_mono :
       (1 / 2 : ℝ) ^ ((5 : ℝ) / 4) ≤
         (S.A / (a : ℝ)) ^ ((5 : ℝ) / 4) := by
@@ -1084,7 +1084,7 @@ private theorem sec7_phase_ra_c₂_window_lo {P : Globals} {S : Scale P} {a j : 
     exact h
   rw [sec7_phase_ra_c₂, abs_of_nonneg (by positivity :
     0 ≤ 2 * (S.A / (a : ℝ)) ^ ((5 : ℝ) / 4))]
-  nlinarith
+  linarith
 
 private theorem sec7_phase_ra_c₂_window_hi {P : Globals} {S : Scale P} {a j : ℤ}
     (ha_lo : S.A ≤ (a : ℝ)) :
@@ -1104,7 +1104,7 @@ private theorem sec7_phase_ra_c₂_window_hi {P : Globals} {S : Scale P} {a j : 
     simpa using h
   rw [sec7_phase_ra_c₂, abs_of_nonneg (by positivity :
     0 ≤ 2 * (S.A / (a : ℝ)) ^ ((5 : ℝ) / 4))]
-  nlinarith
+  linarith
 
 private theorem sec7_phase_shift_mem_wide_zero (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
     (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (_hG1 : 1 ≤ P.G)
@@ -1123,17 +1123,17 @@ private theorem sec7_phase_shift_mem_wide_zero (P : Globals) (S : Scale P) (W : 
       Env hW c₀ Cu hsd hj (by norm_num)
   have hshift_lo : -(S.F / 1000) ≤ (j : ℝ) := by
     have hjlo : -|(j : ℝ)| ≤ (j : ℝ) := neg_abs_le (j : ℝ)
-    nlinarith
+    linarith
   have hshift_hi : (j : ℝ) ≤ S.F / 1000 := by
     have hjhi : (j : ℝ) ≤ |(j : ℝ)| := le_abs_self (j : ℝ)
-    nlinarith
+    linarith
   have hcWin : sec7_cWin = (1000:ℝ) := by norm_num [sec7_cWin]
   simp only [sec7_tWin, Set.mem_Icc]
   constructor
   · rw [hcWin]
-    nlinarith
+    linarith
   · rw [hcWin]
-    nlinarith [hftil_hi, hshift_hi, sec7_phase_F_pos S]
+    linarith [hftil_hi, hshift_hi, sec7_phase_F_pos S]
 
 private theorem sec7_phase_f3_base_contDiffAt5 {P : Globals} {S : Scale P} {W : ℝ}
     {a j : ℤ} {r : ℝ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
@@ -1436,10 +1436,10 @@ private theorem sec7_phase_f2D_rpow_factor_bounds {P : Globals} {S : Scale P}
   have hy0 : 0 ≤ y := hypos.le
   have hylo : (1 / 200 : ℝ) ≤ y := by
     rw [hydef, le_div_iff₀ hR]
-    nlinarith [hcore.1]
+    linarith [hcore.1]
   have hyhi : y ≤ (41 : ℝ) := by
     rw [hydef, div_le_iff₀ hR]
-    nlinarith [hcore.2]
+    linarith [hcore.2]
   interval_cases m
   · have hpowlo : (1 / (10 : ℝ) ^ 5) ^ 4 ≤ y ^ 3 := by
       have hbase : (1 / 200 : ℝ) ^ 3 ≤ y ^ 3 :=
@@ -1558,12 +1558,12 @@ private theorem sec7_phase_f2D_monomial_scale {P : Globals} {S : Scale P}
   have hcoef_lo :
       1 / (10 : ℝ) ^ 3 ≤
         |sec7_phase_ra_c₂ P S a 0| * |sec7_aprod ((3 : ℝ) / 4) m| := by
-    nlinarith [hc_lo, haprod_lo, abs_nonneg (sec7_phase_ra_c₂ P S a 0),
-      abs_nonneg (sec7_aprod ((3 : ℝ) / 4) m)]
+    exact le_trans (by norm_num)
+      (mul_le_mul hc_lo haprod_lo (by norm_num) (abs_nonneg _))
   have hcoef_hi :
       |sec7_phase_ra_c₂ P S a 0| * |sec7_aprod ((3 : ℝ) / 4) m| ≤ 4 := by
-    nlinarith [hc_hi, haprod_hi, abs_nonneg (sec7_phase_ra_c₂ P S a 0),
-      abs_nonneg (sec7_aprod ((3 : ℝ) / 4) m)]
+    exact le_trans (mul_le_mul hc_hi haprod_hi (abs_nonneg _) (by norm_num))
+      (by norm_num)
   constructor
   · have hcoefB :
         (1 / (10 : ℝ) ^ 3) * (S.T₂ / S.R ^ m) ≤
@@ -1607,7 +1607,7 @@ private theorem sec7_phase_f2D_monomial_scale {P : Globals} {S : Scale P}
             rw [habs]
       _ ≤ (4 * (S.T₂ / S.R ^ m)) * (10 : ℝ) ^ 6 := hstep
       _ ≤ (10 : ℝ) ^ 8 * (S.T₂ / S.R ^ m) := by
-            nlinarith [hB0]
+            linarith [hB0]
 
 private theorem sec7_phase_f1D_monomial_scale {P : Globals} {S : Scale P}
     {W : ℝ} {a j : ℤ} {m : ℕ} {r : ℝ}
@@ -1647,7 +1647,7 @@ private theorem sec7_phase_f1D_monomial_scale {P : Globals} {S : Scale P}
       pow_le_pow_left₀ hs_nonneg hs_hi 2
     rw [sec7_phase_ra_c₁, abs_of_nonneg (by positivity :
       0 ≤ (1 / 6 : ℝ) * ((a : ℝ) / S.A) ^ 2)]
-    nlinarith
+    linarith
   have haprod_lo : 1 ≤ |sec7_aprod (-(1 : ℝ)) m| := by
     interval_cases m <;> norm_num [sec7_aprod]
   have haprod_hi : |sec7_aprod (-(1 : ℝ)) m| ≤ 6 := by
@@ -1665,12 +1665,12 @@ private theorem sec7_phase_f1D_monomial_scale {P : Globals} {S : Scale P}
     ring
   have hcoef_lo :
       1 / 16 ≤ |sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m| := by
-    nlinarith [hc_lo, haprod_lo, abs_nonneg (sec7_phase_ra_c₁ P S a j),
-      abs_nonneg (sec7_aprod (-(1 : ℝ)) m)]
+    exact le_trans (by norm_num)
+      (mul_le_mul hc_lo haprod_lo (by norm_num) (abs_nonneg _))
   have hcoef_hi :
       |sec7_phase_ra_c₁ P S a j| * |sec7_aprod (-(1 : ℝ)) m| ≤ 6 := by
-    nlinarith [hc_hi, haprod_hi, abs_nonneg (sec7_phase_ra_c₁ P S a j),
-      abs_nonneg (sec7_aprod (-(1 : ℝ)) m)]
+    exact le_trans (mul_le_mul hc_hi haprod_hi (abs_nonneg _) (by norm_num))
+      (by norm_num)
   constructor
   · have hcoefB :
         (1 / 16) * (S.T₁ / S.R ^ m) ≤
@@ -1733,10 +1733,10 @@ private theorem sec7_phase_f3D_rpow_factor_bounds {P : Globals} {S : Scale P}
   have hy0 : 0 ≤ y := hypos.le
   have hylo : (1 / 200 : ℝ) ≤ y := by
     rw [hydef, le_div_iff₀ hR]
-    nlinarith [hcore.1]
+    linarith [hcore.1]
   have hyhi : y ≤ (41 : ℝ) := by
     rw [hydef, div_le_iff₀ hR]
-    nlinarith [hcore.2]
+    linarith [hcore.2]
   interval_cases m
   · have hpowhi : y ^ 1 ≤ ((10 : ℝ) ^ 6) ^ 4 := by
       have : y ≤ (41 : ℝ) := hyhi
@@ -1873,16 +1873,15 @@ private theorem sec7_phase_f3D_monomial_scale {P : Globals} {S : Scale P}
     have h3 : |(3 : ℝ)| = 3 := by norm_num
     have hc12_lo :
         1 / 256 ≤ |sec7_phase_ra_c₁ P S a j| * |sec7_phase_ra_c₂ P S a j| := by
-      nlinarith [hc₁_lo, hc₂_lo, abs_nonneg (sec7_phase_ra_c₁ P S a j),
-        abs_nonneg (sec7_phase_ra_c₂ P S a j)]
+      exact le_trans (by norm_num)
+        (mul_le_mul hc₁_lo hc₂_lo (by norm_num) (abs_nonneg _))
     have hcap_lo :
         1 / 1024 ≤
           (|sec7_phase_ra_c₁ P S a j| * |sec7_phase_ra_c₂ P S a j|) *
             |sec7_aprod (-(1 : ℝ) / 4) m| := by
-      nlinarith [hc12_lo, haprod_lo,
-        mul_nonneg (abs_nonneg (sec7_phase_ra_c₁ P S a j))
-          (abs_nonneg (sec7_phase_ra_c₂ P S a j)),
-        abs_nonneg (sec7_aprod (-(1 : ℝ) / 4) m)]
+      exact le_trans (by norm_num)
+        (mul_le_mul hc12_lo haprod_lo (by norm_num)
+          (mul_nonneg (abs_nonneg _) (abs_nonneg _)))
     rw [h3]
     calc
       1 / 1000 ≤ 3 * (1 / 1024 : ℝ) := by norm_num
@@ -1897,8 +1896,8 @@ private theorem sec7_phase_f3D_monomial_scale {P : Globals} {S : Scale P}
     have h3 : |(3 : ℝ)| = 3 := by norm_num
     have hc12_hi :
         |sec7_phase_ra_c₁ P S a j| * |sec7_phase_ra_c₂ P S a j| ≤ 16 := by
-      nlinarith [hc₁_hi, hc₂_hi, abs_nonneg (sec7_phase_ra_c₁ P S a j),
-        abs_nonneg (sec7_phase_ra_c₂ P S a j)]
+      exact le_trans (mul_le_mul hc₁_hi hc₂_hi (abs_nonneg _) (by norm_num))
+        (by norm_num)
     have hcap_hi :
         (|sec7_phase_ra_c₁ P S a j| * |sec7_phase_ra_c₂ P S a j|) *
             |sec7_aprod (-(1 : ℝ) / 4) m| ≤ 16 := by
@@ -1966,7 +1965,7 @@ private theorem sec7_phase_f3D_monomial_scale {P : Globals} {S : Scale P}
             rw [habs]
       _ ≤ (48 * (S.T₃ / S.R ^ m)) * (10 : ℝ) ^ 8 := hstep
       _ ≤ (5 * (10 : ℝ) ^ 9) * (S.T₃ / S.R ^ m) := by
-            nlinarith [hB0]
+            linarith [hB0]
 
 private theorem sec7_phase_ra_e₁_base_contDiffAt5 {P : Globals} {S : Scale P} {W : ℝ}
     {a j : ℤ} {r : ℝ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
@@ -2276,7 +2275,7 @@ private theorem sec7_ra_e₂D_principal_bridge {P : Globals} {S : Scale P}
   have hscale' : S.T₂ ^ 4 * S.A ^ 5 = P.X * S.R ^ 3 := by
     have hscale := sec7_phase_T₂_four_A_five_div_R_three S
     rw [div_eq_iff (by positivity : S.R ^ 3 ≠ 0)] at hscale
-    nlinarith
+    linarith
   have hfour :
       (sec7_phase_ra_c₂ P S a j * S.T₂ * (r / S.R) ^ ((3 : ℝ) / 4)) ^ 4 =
       (2 * P.X * (a : ℝ) /
@@ -2284,7 +2283,7 @@ private theorem sec7_ra_e₂D_principal_bridge {P : Globals} {S : Scale P}
     rw [hL4, hM4, ← hspec]
     field_simp [ne_of_gt hX, ne_of_gt haR, ne_of_gt hd, ne_of_gt hda,
       ne_of_gt hA, ne_of_gt hR]
-    nlinarith
+    linarith
   apply le_antisymm
   · exact sec7_phase_le_of_fourth hLnonneg hMnonneg (by rw [hfour])
   · exact sec7_phase_le_of_fourth hMnonneg hLnonneg (by rw [hfour])
@@ -2395,7 +2394,7 @@ private theorem sec7_ra_e₃D_principal_bridge {P : Globals} {S : Scale P}
     rw [← hspec]
     field_simp [ne_of_gt hX, ne_of_gt haR, ne_of_gt hd, ne_of_gt hda,
       ne_of_gt hA, ne_of_gt hR]
-    nlinarith [hscale]
+    linarith [hscale]
   apply le_antisymm
   · exact sec7_phase_le_of_fourth hLnonneg hMnonneg (by rw [hfour])
   · exact sec7_phase_le_of_fourth hMnonneg hLnonneg (by rw [hfour])
@@ -2443,16 +2442,16 @@ private theorem sec7_raC_rho3Target_uniqueDiffOn {P : Globals} {S : Scale P} {a 
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   have ht_lo : S.F / 500 ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   obtain ⟨himg_hi, _hhi_lo, _hhi_hi⟩ :=
     dBreve_sec7_tWin_image (P := P) (S := S) (a := a) (t := 300 * S.F)
       hAD ha_lo ha_hi ht_hi
@@ -2475,11 +2474,11 @@ private theorem sec7_raC_rho3Target_uniqueDiffOn {P : Globals} {S : Scale P} {a 
       have hval := hanti (by simpa using hqlo_pos) (by simpa using hqhi_pos) hlt
       change Ffun P.X a q_hi < Ffun P.X a q_lo at hval
       rw [himg_hi, himg_lo] at hval
-      nlinarith
+      linarith
     · have heqF : 300 * S.F = S.F / 500 := by
         rw [← himg_hi, ← himg_lo]
         rw [heq]
-      nlinarith [hFpos, heqF]
+      linarith [hFpos, heqF]
   have hDpos : 0 < S.D := S.D_pos
   have htarget_order :
       dBreve P.X a (300 * S.F) / S.D < dBreve P.X a (S.F / 500) / S.D := by
@@ -2499,16 +2498,16 @@ private theorem sec7_ra_rho3DTarget_uniqueDiffOn {P : Globals} {S : Scale P} {a 
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   have ht_lo : S.F / 500 ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   obtain ⟨himg_hi, _hhi_lo, _hhi_hi⟩ :=
     dBreve_sec7_tWin_image (P := P) (S := S) (a := a) (t := 300 * S.F)
       hAD ha_lo ha_hi ht_hi
@@ -2531,11 +2530,11 @@ private theorem sec7_ra_rho3DTarget_uniqueDiffOn {P : Globals} {S : Scale P} {a 
       have hval := hanti (by simpa using hqlo_pos) (by simpa using hqhi_pos) hlt
       change Ffun P.X a q_hi < Ffun P.X a q_lo at hval
       rw [himg_hi, himg_lo] at hval
-      nlinarith
+      linarith
     · have heqF : 300 * S.F = S.F / 500 := by
         rw [← himg_hi, ← himg_lo]
         rw [heq]
-      nlinarith [hFpos, heqF]
+      linarith [hFpos, heqF]
   simpa [sec7_ra_rho3DTarget, q_hi, q_lo] using uniqueDiffOn_Icc hq_order
 
 private theorem sec7_ra_rho3Target_mulD_mapsTo {P : Globals} {S : Scale P} {a : ℝ} :
@@ -2571,16 +2570,16 @@ private theorem sec7_ra_rho3_contDiffOn_DTarget {P : Globals} {S : Scale P} {W :
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   have ht_lo : S.F / 500 ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   obtain ⟨himg_hi, _hhi_lo, _hhi_hi⟩ :=
     dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := 300 * S.F)
       hAD ha_lo_w ha_hi_w ht_hi
@@ -2620,17 +2619,17 @@ private theorem sec7_ra_rho3_contDiffOn_DTarget {P : Globals} {S : Scale P} {W :
       Env hW c₀ Cu hsd hj (by norm_num)
   have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
     have hjlo' : -|(j : ℝ)| ≤ (j : ℝ) := neg_abs_le (j : ℝ)
-    nlinarith
+    linarith
   have hjhi : (j : ℝ) ≤ S.F / 1000 := by
     have hjhi' : (j : ℝ) ≤ |(j : ℝ)| := le_abs_self (j : ℝ)
-    nlinarith
+    linarith
   have htWin : Ffun P.X (a : ℝ) d + (j : ℝ) ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   set t : ℝ := Ffun P.X (a : ℝ) d + (j : ℝ)
   obtain ⟨himg, _hlo, _hhi⟩ :=
     dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := t)
@@ -2672,16 +2671,16 @@ private theorem sec7_ra_rho1_contDiffOn_DTarget {P : Globals} {S : Scale P} {W :
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   have ht_lo : S.F / 500 ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   obtain ⟨himg_hi, _hhi_lo, _hhi_hi⟩ :=
     dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := 300 * S.F)
       hAD ha_lo_w ha_hi_w ht_hi
@@ -2721,17 +2720,17 @@ private theorem sec7_ra_rho1_contDiffOn_DTarget {P : Globals} {S : Scale P} {W :
       Env hW c₀ Cu hsd hj (by norm_num)
   have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
     have hjlo' : -|(j : ℝ)| ≤ (j : ℝ) := neg_abs_le (j : ℝ)
-    nlinarith
+    linarith
   have hjhi : (j : ℝ) ≤ S.F / 1000 := by
     have hjhi' : (j : ℝ) ≤ |(j : ℝ)| := le_abs_self (j : ℝ)
-    nlinarith
+    linarith
   have htWin : Ffun P.X (a : ℝ) d + (j : ℝ) ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   set t : ℝ := Ffun P.X (a : ℝ) d + (j : ℝ)
   obtain ⟨himg, _hlo, _hhi⟩ :=
     dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := t)
@@ -2776,16 +2775,16 @@ private theorem sec7_raC_ftilde_mapsTo_rho3Target {P : Globals} {S : Scale P} {W
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   have ht_lo : S.F / 500 ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   obtain ⟨himg_hi, _hhi_lo, _hhi_hi⟩ :=
     dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := 300 * S.F)
       hAD ha_lo_w ha_hi_w ht_hi
@@ -2813,14 +2812,14 @@ private theorem sec7_raC_ftilde_mapsTo_rho3Target {P : Globals} {S : Scale P} {W
     have hval := hanti (by simpa using hdpos) (by simpa using hqhi_pos) hlt
     change Ffun P.X (a : ℝ) q_hi < Ffun P.X (a : ℝ) d at hval
     rw [himg_hi, hFd] at hval
-    nlinarith
+    linarith
   have hright_d : d ≤ q_lo := by
     by_contra hnot
     have hlt : q_lo < d := lt_of_not_ge hnot
     have hval := hanti (by simpa using hqlo_pos) (by simpa using hdpos) hlt
     change Ffun P.X (a : ℝ) d < Ffun P.X (a : ℝ) q_lo at hval
     rw [hFd, himg_lo] at hval
-    nlinarith
+    linarith
   constructor
   · simpa [sec7_ra_rho3Target, d, q_hi] using div_le_div_of_nonneg_right hleft_d hDpos.le
   · simpa [sec7_ra_rho3Target, d, q_lo] using div_le_div_of_nonneg_right hright_d hDpos.le
@@ -2844,16 +2843,16 @@ private theorem sec7_raC_gtilde3_contDiffOn_target {P : Globals} {S : Scale P} {
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   have ht_lo : S.F / 500 ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   obtain ⟨himg_hi, _hhi_lo, _hhi_hi⟩ :=
     dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := 300 * S.F)
       hAD ha_lo_w ha_hi_w ht_hi
@@ -2906,17 +2905,17 @@ private theorem sec7_raC_gtilde3_contDiffOn_target {P : Globals} {S : Scale P} {
       Env hW c₀ Cu hsd hj (by norm_num)
   have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
     have hjlo' : -|(j : ℝ)| ≤ (j : ℝ) := neg_abs_le (j : ℝ)
-    nlinarith
+    linarith
   have hjhi : (j : ℝ) ≤ S.F / 1000 := by
     have hjhi' : (j : ℝ) ≤ |(j : ℝ)| := le_abs_self (j : ℝ)
-    nlinarith
+    linarith
   have htWin : Ffun P.X (a : ℝ) (S.D * u) + (j : ℝ) ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   set t : ℝ := Ffun P.X (a : ℝ) (S.D * u) + (j : ℝ)
   obtain ⟨himg, _hlo, _hhi⟩ :=
     dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := t)
@@ -2990,20 +2989,20 @@ private theorem sec7_ra_rho3_contDiffAt_dtilde {P : Globals} {S : Scale P} {W : 
   have hpert :=
     sec7_phase_shift_error_bound (P := P) (S := S) (W := W) (θ := 0) (j := j)
       Env hW c₀ Cu hsd hj (by norm_num)
-  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by nlinarith
+  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by linarith
   have hshift : Ffun P.X (a : ℝ) d + (j : ℝ) ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin, hFd]
       have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
         have h := neg_abs_le (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
     · rw [sec7_cWin, hFd]
       have hjhi : (j : ℝ) ≤ S.F / 1000 := by
         have h := le_abs_self (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
   set t : ℝ := Ffun P.X (a : ℝ) d + (j : ℝ)
   obtain ⟨himg, _hlo, _hhi⟩ :=
     dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := t)
@@ -3052,20 +3051,20 @@ private theorem sec7_ra_rho1_contDiffAt_dtilde {P : Globals} {S : Scale P} {W : 
   have hpert :=
     sec7_phase_shift_error_bound (P := P) (S := S) (W := W) (θ := 0) (j := j)
       Env hW c₀ Cu hsd hj (by norm_num)
-  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by nlinarith
+  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by linarith
   have hshift : Ffun P.X (a : ℝ) d + (j : ℝ) ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin, hFd]
       have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
         have h := neg_abs_le (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
     · rw [sec7_cWin, hFd]
       have hjhi : (j : ℝ) ≤ S.F / 1000 := by
         have h := le_abs_self (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
   set t : ℝ := Ffun P.X (a : ℝ) d + (j : ℝ)
   obtain ⟨himg, _hlo, _hhi⟩ :=
     dBreve_sec7_tWin_image (P := P) (S := S) (a := (a : ℝ)) (t := t)
@@ -3600,8 +3599,8 @@ private theorem sec7_relErr_le_relErrF {P : Globals} {S : Scale P}
   have hb : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have hCu1 : (1 : ℝ) ≤ Cu := hsd.hCu
   have hCuu_nn : (0 : ℝ) ≤ Cu * P.u := mul_nonneg (le_trans zero_le_one hCu1) hu0.le
-  have hu_le : P.u ≤ 2 / 18675 := by nlinarith [hb, hg0, hCuu_nn]
-  have hg_le : P.g ≤ 2 / 18977 := by nlinarith [hb, hu0.le, hCuu_nn]
+  have hu_le : P.u ≤ 2 / 18675 := by linarith [hb, hg0, hCuu_nn]
+  have hg_le : P.g ≤ 2 / 18977 := by linarith [hb, hu0.le, hCuu_nn]
   have key : sec7_relErr P S ≤ P.U / P.H * P.U ^ 3 := by
     unfold sec7_relErr
     gcongr
@@ -3613,7 +3612,7 @@ private theorem sec7_relErr_le_relErrF {P : Globals} {S : Scale P}
   have hgoal : sec7_relErrF P S = P.X ^ (-(19 : ℝ) / 100) := rfl
   rw [hgoal]
   refine le_trans key (le_trans (le_of_eq heq) ?_)
-  exact Real.rpow_le_rpow_of_exponent_le hsd.hX (by nlinarith [hu_le, hg_le])
+  exact Real.rpow_le_rpow_of_exponent_le hsd.hX (by linarith [hu_le, hg_le])
 
 /-- On-strip bridge: `A = ΔΩ ≤ HΔ·X^{-19/100} = T₃·relErrF` (since `Ω ≤ U` and `u ≤ 1/100`). -/
 private theorem sec7_A_le_T₃_relErrF {P : Globals} {S : Scale P}
@@ -3625,8 +3624,8 @@ private theorem sec7_A_le_T₃_relErrF {P : Globals} {S : Scale P}
   have hb : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have hCu1 : (1 : ℝ) ≤ Cu := hsd.hCu
   have hCuu_nn : (0 : ℝ) ≤ Cu * P.u := mul_nonneg (le_trans zero_le_one hCu1) hu0.le
-  have hu_le : P.u ≤ 2 / 18675 := by nlinarith [hb, hg0, hCuu_nn]
-  have hg_le : P.g ≤ 2 / 18977 := by nlinarith [hb, hu0.le, hCuu_nn]
+  have hu_le : P.u ≤ 2 / 18675 := by linarith [hb, hg0, hCuu_nn]
+  have hg_le : P.g ≤ 2 / 18977 := by linarith [hb, hu0.le, hCuu_nn]
   have hHrelF : P.H * sec7_relErrF P S = P.X ^ ((1 - P.g) / 5 - 19 / 100 : ℝ) := by
     rw [Globals.H, show sec7_relErrF P S = P.X ^ (-(19 : ℝ) / 100) from rfl,
       ← Real.rpow_add P.X_pos]
@@ -3636,7 +3635,7 @@ private theorem sec7_A_le_T₃_relErrF {P : Globals} {S : Scale P}
     calc S.Ω ≤ P.U := hsd.hΩhi
       _ = P.X ^ P.u := by rw [Globals.U]
       _ ≤ P.X ^ ((1 - P.g) / 5 - 19 / 100 : ℝ) :=
-          Real.rpow_le_rpow_of_exponent_le hsd.hX (by nlinarith [hu_le, hg_le])
+          Real.rpow_le_rpow_of_exponent_le hsd.hX (by linarith [hu_le, hg_le])
   calc S.A ≤ S.Δ * (P.H * sec7_relErrF P S) := by
         rw [show S.A = S.Δ * S.Ω from rfl]
         exact mul_le_mul_of_nonneg_left hΩH hΔpos.le
@@ -3765,9 +3764,9 @@ private theorem sec7_ra_jF_powersaving {P : Globals} {S : Scale P} {c₀ Cu : �
   have hb : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have hCu1 : (1 : ℝ) ≤ Cu := hsd.hCu
   have hCuu_nn : (0 : ℝ) ≤ Cu * P.u := mul_nonneg (le_trans zero_le_one hCu1) hu_pos.le
-  have hu_le : P.u ≤ 2 / 18675 := by nlinarith [hb, hg0, hCuu_nn]
-  have hg_le : P.g ≤ 2 / 18977 := by nlinarith [hb, hu_pos.le, hCuu_nn]
-  have hCuu_le : Cu * P.u ≤ 2 / 790 := by nlinarith [hb, hg0, hu_pos.le]
+  have hu_le : P.u ≤ 2 / 18675 := by linarith [hb, hg0, hCuu_nn]
+  have hg_le : P.g ≤ 2 / 18977 := by linarith [hb, hu_pos.le, hCuu_nn]
+  have hCuu_le : Cu * P.u ≤ 2 / 790 := by linarith [hb, hg0, hu_pos.le]
   -- the strip lower bound on Ω and x as clean X-powers
   have hΩpow : P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) = P.X ^ (-P.g/4 - 3*P.u/4 : ℝ) := by
     rw [Globals.G, Globals.U, ← Real.rpow_mul P.X_pos.le, ← Real.rpow_mul P.X_pos.le,
@@ -3802,7 +3801,7 @@ private theorem sec7_ra_jF_powersaving {P : Globals} {S : Scale P} {c₀ Cu : �
         * P.X ^ (-P.g/4 - 3*P.u/4 : ℝ) ≤ S.F := by
     rw [S.F_eq_H_x_G_Ω]; gcongr
   have hexpF : (39/200 : ℝ) ≤ 1/5 - 29*P.g/20 - 25*P.u/4 - Cu*P.u := by
-    nlinarith [hg_le, hu_le, hCuu_le, hg0, hu_pos.le]
+    linarith [hg_le, hu_le, hCuu_le, hg0, hu_pos.le]
   have hFlo : P.X ^ (39/200 : ℝ) ≤ S.F := by
     calc P.X ^ (39/200 : ℝ)
         ≤ P.X ^ (1/5 - 29*P.g/20 - 25*P.u/4 - Cu*P.u : ℝ) :=
@@ -3814,7 +3813,7 @@ private theorem sec7_ra_jF_powersaving {P : Globals} {S : Scale P} {c₀ Cu : �
   have hbound2 : P.H * P.G * (P.X ^ (-P.g/4 - 3*P.u/4 : ℝ)) ^ 3 ≤ P.H * P.G * S.Ω ^ 3 := by
     gcongr
   have hexpH2 : (39/200 : ℝ) ≤ 1/5 + P.g/20 - 9*P.u/4 := by
-    nlinarith [hg0, hu_le]
+    linarith [hg0, hu_le]
   have hH2lo : P.X ^ (39/200 : ℝ) ≤ P.H * P.G * S.Ω ^ 3 := by
     calc P.X ^ (39/200 : ℝ)
         ≤ P.X ^ (1/5 + P.g/20 - 9*P.u/4 : ℝ) :=
@@ -3841,7 +3840,7 @@ private theorem sec7_ra_jF_powersaving {P : Globals} {S : Scale P} {c₀ Cu : �
   have hX1 : 2 * sec7_cJ * (10 : ℝ) ^ 9 ≤ P.X ^ (1/200 : ℝ) := by
     have hU1 : (1 : ℝ) ≤ P.U := le_trans (by norm_num) hUbig
     have hExp : (6000/33 : ℝ) ≤ 1 / P.u := by
-      rw [le_div_iff₀ hu_pos]; nlinarith [hu_le, hu_pos]
+      rw [le_div_iff₀ hu_pos]; linarith [hu_le, hu_pos]
     have hXeq : (P.U) ^ (1 / P.u) = P.X := by
       rw [Globals.U, ← Real.rpow_mul P.X_pos.le, mul_one_div, div_self hu_pos.ne', Real.rpow_one]
     have hXbig : (10 : ℝ) ^ (6000 : ℕ) ≤ P.X := by
@@ -4061,9 +4060,9 @@ private theorem sec7_ra_rho3_A_rescaled_bound_sharp {P : Globals} {S : Scale P} 
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   set d : ℝ := dtilde P.X r (a : ℝ) with hd_def
   have hr0 : 0 < r := sec7_phase_rWinWide_pos Env hW c₀ Cu hsd r hr
   have hdpos : 0 < d := by
@@ -4142,9 +4141,9 @@ private theorem sec7_ra_rho3_A_rescaled_bound_sharp6 {P : Globals} {S : Scale P}
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   set d : ℝ := dtilde P.X r (a : ℝ) with hd_def
   have hr0 : 0 < r := sec7_phase_rWinWide_pos Env hW c₀ Cu hsd r hr
   have hdpos : 0 < d := by
@@ -4314,9 +4313,9 @@ private theorem sec7_ra_B3_dtilde_close {P : Globals} {S : Scale P} {W : ℝ}
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin]
-      nlinarith
+      linarith
     · rw [sec7_cWin]
-      nlinarith
+      linarith
   have hdb_eq : dBreve P.X (a : ℝ) (sec7_phase_ftil P S a r) = d := by
     simpa [d, hd_def, sec7_phase_ftil] using dBreve_spec P.X_pos haR hdpos
   obtain ⟨_himg, hdlo16_raw, hdhi30_raw⟩ :=
@@ -4330,7 +4329,7 @@ private theorem sec7_ra_B3_dtilde_close {P : Globals} {S : Scale P} {W : ℝ}
   have hpert0 :=
     sec7_phase_shift_error_bound (P := P) (S := S) (W := W) (θ := 0) (j := j)
       Env hW c₀ Cu hsd hj (by norm_num)
-  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by nlinarith
+  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by linarith
   have hseg : ∀ s ∈ Set.uIcc (0 : ℝ) (j : ℝ),
       Ffun P.X (a : ℝ) d + s ∈ sec7_tWin S := by
     intro s hs
@@ -4340,16 +4339,16 @@ private theorem sec7_ra_B3_dtilde_close {P : Globals} {S : Scale P} {W : ℝ}
     have hsF : |s| ≤ S.F / 1000 := le_trans hsabs hjF
     have hslo : -(S.F / 1000) ≤ s := by
       have h := neg_abs_le s
-      nlinarith
+      linarith
     have hshi : s ≤ S.F / 1000 := by
       have h := le_abs_self s
-      nlinarith
+      linarith
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin, hFd]
-      nlinarith
+      linarith
     · rw [sec7_cWin, hFd]
-      nlinarith
+      linarith
   have hb0 :=
     sec7_ra_B3_bound_k0_public (P := P) (S := S) (a := (a : ℝ)) (d := d)
       (j := (j : ℝ)) hAD (sec7_phase_a_lo_wide ha_lo)
@@ -4400,20 +4399,20 @@ private theorem sec7_ra_rho3_B_rescaled_prebound {P : Globals} {S : Scale P} {W 
   have hpert0 :=
     sec7_phase_shift_error_bound (P := P) (S := S) (W := W) (θ := 0) (j := j)
       Env hW c₀ Cu hsd hj (by norm_num)
-  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by nlinarith
+  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by linarith
   have hshift : Ffun P.X (a : ℝ) d + (j : ℝ) ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin, hFd]
       have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
         have h := neg_abs_le (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
     · rw [sec7_cWin, hFd]
       have hjhi : (j : ℝ) ≤ S.F / 1000 := by
         have h := le_abs_self (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
   have hclose :
       |dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) d + (j : ℝ)) - d| ≤ d / 100 := by
     simpa [d, hd_def] using
@@ -4587,7 +4586,7 @@ private theorem sec7_ra_rho3_B_rescaled_prebound {P : Globals} {S : Scale P} {W 
           (fun t : ℝ => dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) t + (j : ℝ)) - t)
           d| ≤ 30084656000 * |(j : ℝ)| / (d * (P.X * (a : ℝ))) := by
       simpa using hb
-    have hDle : S.D ≤ 20 * d := by nlinarith [hdlo20]
+    have hDle : S.D ≤ 20 * d := by linarith [hdlo20]
     have hD5le : S.D ^ 5 ≤ (20 * S.D ^ 4) * d := by
       calc
         S.D ^ 5 = S.D ^ 4 * S.D := by ring
@@ -4666,20 +4665,20 @@ private theorem sec7_ra_rho3_B_rescaled_prebound6 {P : Globals} {S : Scale P} {W
     have hpert0 :=
       sec7_phase_shift_error_bound (P := P) (S := S) (W := W) (θ := 0) (j := j)
         Env hW c₀ Cu hsd hj (by norm_num)
-    have hjF : |(j : ℝ)| ≤ S.F / 1000 := by nlinarith
+    have hjF : |(j : ℝ)| ≤ S.F / 1000 := by linarith
     have hshift : Ffun P.X (a : ℝ) d + (j : ℝ) ∈ sec7_tWin S := by
       simp only [sec7_tWin, Set.mem_Icc]
       constructor
       · rw [sec7_cWin, hFd]
         have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
           have h := neg_abs_le (j : ℝ)
-          nlinarith
-        nlinarith
+          linarith
+        linarith
       · rw [sec7_cWin, hFd]
         have hjhi : (j : ℝ) ≤ S.F / 1000 := by
           have h := le_abs_self (j : ℝ)
-          nlinarith
-        nlinarith
+          linarith
+        linarith
     have hclose :
         |dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) d + (j : ℝ)) - d| ≤ d / 100 := by
       simpa [d, hd_def] using
@@ -4697,12 +4696,12 @@ private theorem sec7_ra_rho3_B_rescaled_prebound6 {P : Globals} {S : Scale P} {W
           (fun t : ℝ => dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) t + (j : ℝ)) - t)
           d| ≤ 60985797208000 * |(j : ℝ)| / (d ^ 2 * (P.X * (a : ℝ))) := by
       simpa using hb
-    have hDle : S.D ≤ 20 * d := by nlinarith [hdlo20]
+    have hDle : S.D ≤ 20 * d := by linarith [hdlo20]
     have hD6le : S.D ^ 6 ≤ (400 * S.D ^ 4) * d ^ 2 := by
       calc
         S.D ^ 6 = S.D ^ 4 * S.D ^ 2 := by ring
         _ ≤ S.D ^ 4 * (20 * d) ^ 2 := by
-              exact mul_le_mul_of_nonneg_left (by nlinarith [hDle, hDpos.le, hdpos.le])
+              exact mul_le_mul_of_nonneg_left (pow_le_pow_left₀ hDpos.le hDle 2)
                 (pow_nonneg hDpos.le 4)
         _ = (400 * S.D ^ 4) * d ^ 2 := by ring
     have hD6div : S.D ^ 6 / d ^ 2 ≤ 400 * S.D ^ 4 := by
@@ -4769,20 +4768,20 @@ private theorem sec7_ra_rho1_B_rescaled_prebound {P : Globals} {S : Scale P} {W 
   have hpert0 :=
     sec7_phase_shift_error_bound (P := P) (S := S) (W := W) (θ := 0) (j := j)
       Env hW c₀ Cu hsd hj (by norm_num)
-  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by nlinarith
+  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by linarith
   have hshift : Ffun P.X (a : ℝ) d + (j : ℝ) ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin, hFd]
       have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
         have h := neg_abs_le (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
     · rw [sec7_cWin, hFd]
       have hjhi : (j : ℝ) ≤ S.F / 1000 := by
         have h := le_abs_self (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
   have hclose :
       |dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) d + (j : ℝ)) - d| ≤ d / 100 := by
     simpa [d, hd_def] using
@@ -4970,20 +4969,20 @@ private theorem sec7_ra_rho3_rescaled_FDeriv_prebound {P : Globals} {S : Scale P
   have hpert :=
     sec7_phase_shift_error_bound (P := P) (S := S) (W := W) (θ := 0) (j := j)
       Env hW c₀ Cu hsd hj (by norm_num)
-  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by nlinarith
+  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by linarith
   have hshift : Ffun P.X (a : ℝ) d + (j : ℝ) ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin, hFd]
       have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
         have h := neg_abs_le (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
     · rw [sec7_cWin, hFd]
       have hjhi : (j : ℝ) ≤ S.F / 1000 := by
         have h := le_abs_self (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
   set Bfun : ℝ → ℝ :=
     fun t => dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) t + (j : ℝ)) - t
   set Afun : ℝ → ℝ := fun t => t - Real.sqrt (t * (t + (a : ℝ)))
@@ -5130,20 +5129,20 @@ private theorem sec7_ra_rho3_rescaled_FDeriv_prebound6 {P : Globals} {S : Scale 
   have hpert :=
     sec7_phase_shift_error_bound (P := P) (S := S) (W := W) (θ := 0) (j := j)
       Env hW c₀ Cu hsd hj (by norm_num)
-  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by nlinarith
+  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by linarith
   have hshift : Ffun P.X (a : ℝ) d + (j : ℝ) ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin, hFd]
       have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
         have h := neg_abs_le (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
     · rw [sec7_cWin, hFd]
       have hjhi : (j : ℝ) ≤ S.F / 1000 := by
         have h := le_abs_self (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
   set Bfun : ℝ → ℝ :=
     fun t => dBreve P.X (a : ℝ) (Ffun P.X (a : ℝ) t + (j : ℝ)) - t
   set Afun : ℝ → ℝ := fun t => t - Real.sqrt (t * (t + (a : ℝ)))
@@ -5291,20 +5290,20 @@ private theorem sec7_ra_rho1_rescaled_FDeriv_prebound {P : Globals} {S : Scale P
   have hpert :=
     sec7_phase_shift_error_bound (P := P) (S := S) (W := W) (θ := 0) (j := j)
       Env hW c₀ Cu hsd hj (by norm_num)
-  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by nlinarith
+  have hjF : |(j : ℝ)| ≤ S.F / 1000 := by linarith
   have hshift : Ffun P.X (a : ℝ) d + (j : ℝ) ∈ sec7_tWin S := by
     simp only [sec7_tWin, Set.mem_Icc]
     constructor
     · rw [sec7_cWin, hFd]
       have hjlo : -(S.F / 1000) ≤ (j : ℝ) := by
         have h := neg_abs_le (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
     · rw [sec7_cWin, hFd]
       have hjhi : (j : ℝ) ≤ S.F / 1000 := by
         have h := le_abs_self (j : ℝ)
-        nlinarith
-      nlinarith
+        linarith
+      linarith
   have hFbase : ContDiffAt ℝ 5 (fun y : ℝ => Ffun P.X (a : ℝ) y) d :=
     sec7_Ffun_contDiffAt (n := 5) (X := P.X) (a := (a : ℝ)) (d := d)
       (ne_of_gt hdpos) (by positivity)
@@ -6639,7 +6638,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
         simpa [M] using hmono
       have hres' : |E| ≤ (1 / (10 : ℝ) ^ 100) * (S.T₁ / S.R ^ m) := by
         simpa [E] using hres
-      nlinarith [hmono', hres', htri, hpre]
+      linarith [hmono', hres', htri, hpre]
     calc
       S.T₁ / S.R ^ m =
           (10 : ℝ) ^ 10 * ((1 / (10 : ℝ) ^ 10) * (S.T₁ / S.R ^ m)) := by ring
@@ -6727,7 +6726,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
         simpa [M] using hmono
       have hres' : |E| ≤ (1 / (10 : ℝ) ^ 100) * (S.T₂ / S.R ^ m) := by
         simpa [E] using hres
-      nlinarith [hmono', hres', htri, hpre]
+      linarith [hmono', hres', htri, hpre]
     calc
       S.T₂ / S.R ^ m =
           (10 : ℝ) ^ 9 * ((1 / (10 : ℝ) ^ 9) * (S.T₂ / S.R ^ m)) := by ring
@@ -6817,7 +6816,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
         simpa [M] using hmono
       have hres' : |E| ≤ (1 / (10 : ℝ) ^ 100) * (S.T₃ / S.R ^ m) := by
         simpa [E] using hres
-      nlinarith [hmono', hres', htri, hpre]
+      linarith [hmono', hres', htri, hpre]
     calc
       S.T₃ / S.R ^ m =
           (10 : ℝ) ^ 10 * ((1 / (10 : ℝ) ^ 10) * (S.T₃ / S.R ^ m)) := by ring
@@ -6979,8 +6978,8 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
     intro x hx
     obtain ⟨hx1, hx2⟩ := Set.mem_Ioo.mp hx
     obtain ⟨⟨⟨hh1lo, hh1hi⟩, ⟨hh2lo, hh2hi⟩, ⟨hh3lo, hh3hi⟩⟩, hξ1, hξ2, hξ3⟩ := hbound
-    have hW2 : (1 : ℝ) ≤ W ^ 2 := by nlinarith [hW, sq_nonneg (W - 1)]
-    have hW4 : (1 : ℝ) ≤ W ^ 4 := by nlinarith [hW2, sq_nonneg (W ^ 2 - 1)]
+    have hW2 : (1 : ℝ) ≤ W ^ 2 := by linarith [hW, sq_nonneg (W - 1)]
+    have hW4 : (1 : ℝ) ≤ W ^ 4 := by linarith [hW2, sq_nonneg (W ^ 2 - 1)]
     have hWsum3 : (3 : ℝ) ≤ W + W ^ 2 + W ^ 4 := by linarith
     have hmar : W + W ^ 2 + W ^ 4 ≤ S.R / 2000 :=
       sec7_phase_shift_margin Env hW c₀ Cu hsd
@@ -7066,10 +7065,10 @@ private theorem sec7_Ffun_clean {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (had : a
   rw [Ffun_factor' X a d (ne_of_gt hd) hda]
   refine ⟨?_, ?_⟩
   · rw [div_le_div_iff₀ (by positivity) (by positivity)]
-    nlinarith [mul_nonneg (mul_nonneg (mul_nonneg hX.le ha.le) (sq_nonneg d))
+    linarith [mul_nonneg (mul_nonneg (mul_nonneg hX.le ha.le) (sq_nonneg d))
       (by nlinarith [had, hd] : (0 : ℝ) ≤ 3 * d ^ 2 - a ^ 2)]
   · rw [div_le_div_iff₀ (by positivity) (by positivity)]
-    nlinarith [mul_nonneg (mul_nonneg (mul_nonneg hX.le ha.le) (sq_nonneg d))
+    linarith [mul_nonneg (mul_nonneg (mul_nonneg hX.le ha.le) (sq_nonneg d))
       (by positivity : (0 : ℝ) ≤ d ^ 2 + 5 * a * d + 3 * a ^ 2)]
 
 /-- Lower bound on `m · |u − v|` by the `F_a`-gap, via the mean value theorem with a uniform
@@ -7142,11 +7141,11 @@ private theorem sec7_phase_round_inverse_margin (P : Globals) (S : Scale P) (a :
   have hFpos : 0 < S.F := sec7_ra_F_pos S
   have hAle' : S.Δ * S.Ω ≤ (a : ℝ) := ha_lo
   -- `a` is small relative to every reference point `D/2, D, 2D, 4D`.
-  have haD5 : (a : ℝ) ≤ S.D / 5 := by nlinarith [ha_hi, hAD]
-  have hadR : (a : ℝ) ≤ (d : ℝ) := by nlinarith [haD5, hdD, hD]
-  have haD2 : (a : ℝ) ≤ S.D / 2 := by nlinarith [haD5, hD]
-  have ha2D : (a : ℝ) ≤ 2 * S.D := by nlinarith [haD5, hD]
-  have ha4D : (a : ℝ) ≤ 4 * S.D := by nlinarith [haD5, hD]
+  have haD5 : (a : ℝ) ≤ S.D / 5 := by linarith [ha_hi, hAD]
+  have hadR : (a : ℝ) ≤ (d : ℝ) := by linarith [haD5, hdD, hD]
+  have haD2 : (a : ℝ) ≤ S.D / 2 := by linarith [haD5, hD]
+  have ha2D : (a : ℝ) ≤ 2 * S.D := by linarith [haD5, hD]
+  have ha4D : (a : ℝ) ≤ 4 * S.D := by linarith [haD5, hD]
   -- The closeness `|F_a(d) − f| ≤ 2H/D²` and the perturbation budget `≤ F/1000`.
   have hdist : Counting.distInt (Ffun P.X (a : ℝ) (d : ℝ))
       = |Ffun P.X (a : ℝ) (d : ℝ) - (f : ℝ)| := by
@@ -7168,7 +7167,7 @@ private theorem sec7_phase_round_inverse_margin (P : Globals) (S : Scale P) (a :
   have hXaF : S.F ≤ t := by
     rw [ht_def, Scale.F, Scale.D, P.X_eq_G_mul_H_pow_five,
       div_le_div_iff₀ (by positivity) (by positivity)]
-    nlinarith [mul_le_mul_of_nonneg_left hAle'
+    linarith [mul_le_mul_of_nonneg_left hAle'
       (show (0 : ℝ) ≤ P.G * P.H ^ 5 * S.Δ ^ 2 by positivity)]
   -- Reference-point envelope facts, all in the atom `t`.
   have hUpdR : Ffun P.X (a : ℝ) (d : ℝ) ≤ 3 * t := by
@@ -7186,7 +7185,7 @@ private theorem sec7_phase_round_inverse_margin (P : Globals) (S : Scale P) (a :
     rw [ht_def, show (1 / 16 : ℝ) * (P.X * (a : ℝ) / S.D ^ 3)
         = P.X * (a : ℝ) / (16 * S.D ^ 3) by ring]
     apply div_le_div_of_nonneg_left (by positivity) (by positivity)
-    nlinarith [pow_le_pow_left₀ hdpos.le hd2D 3, hD.le]
+    linarith [pow_le_pow_left₀ hdpos.le hd2D 3, hD.le]
   have hUp4D : Ffun P.X (a : ℝ) (4 * S.D) ≤ (3 / 64 : ℝ) * t := by
     have heq : (3 / 64 : ℝ) * t = 3 * P.X * (a : ℝ) / (4 * S.D) ^ 3 := by
       rw [ht_def]; field_simp; ring
@@ -7232,11 +7231,11 @@ private theorem sec7_phase_round_inverse_margin (P : Globals) (S : Scale P) (a :
       m ≤ |deriv (fun x => Ffun P.X (a : ℝ) x) c| := by
     intro c hcl hch
     have hcpos : 0 < c := lt_of_lt_of_le (by positivity) hcl
-    have hac : (a : ℝ) ≤ 11 * c := by nlinarith [haD5, hcl, hD.le]
+    have hac : (a : ℝ) ≤ 11 * c := by linarith [haD5, hcl, hD.le]
     refine le_trans ?_ (Ffun_deriv1_abs_bounds hX haR hcpos hac).1
     rw [hm_def]
     apply div_le_div_of_nonneg_left (by positivity) (by positivity)
-    nlinarith [pow_le_pow_left₀ hcpos.le hch 4]
+    linarith [pow_le_pow_left₀ hcpos.le hch 4]
   have hmd : m * |(d : ℝ) - d'|
       ≤ |Ffun P.X (a : ℝ) (d : ℝ) - Ffun P.X (a : ℝ) d'| :=
     sec7_Ffun_dist_le hX haR (by positivity) hdmemIcc hd'mem hbd
@@ -7252,7 +7251,7 @@ private theorem sec7_phase_round_inverse_margin (P : Globals) (S : Scale P) (a :
       rw [hm_def]; ring
     rw [hRHS, div_le_div_iff₀ (by positivity) (by positivity), sec7_cdMar,
       Scale.D, Scale.A, P.X_eq_G_mul_H_pow_five]
-    nlinarith [mul_le_mul_of_nonneg_left hAle'
+    linarith [mul_le_mul_of_nonneg_left hAle'
       (show (0 : ℝ) ≤ 10 ^ 7 * P.G * P.H ^ 7 * S.Δ ^ 4 by positivity),
       mul_pos (mul_pos (mul_pos hG (pow_pos hH 7)) (pow_pos hΔ 5)) hΩ]
   have hfinal : m * |(d : ℝ) - d'|
@@ -7292,7 +7291,7 @@ theorem sec7_phase_construct (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ) (ha
         calc (10 : ℝ) ^ 120 * P.H = 10 ^ 100 * sec7_cJ * P.H := by norm_num [sec7_cJ]
           _ ≤ S.F * S.A ^ 2 := h2
       rw [div_le_div_iff₀ (pow_pos hD 2) (by norm_num)]
-      nlinarith [hHA2, hH.le, mul_le_mul_of_nonneg_left
+      linarith [hHA2, hH.le, mul_le_mul_of_nonneg_left
         (show (100 : ℝ) * S.A ^ 2 ≤ S.D ^ 2 by nlinarith [hAD, hA.le]) (sec7_ra_F_pos S).le]
     exact sec7_phase_round_inverse_margin P S a ha hAD hG1 ha_lo ha_hi hdD hd2D hf hnear hpert
 
