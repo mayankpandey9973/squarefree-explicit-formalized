@@ -25,7 +25,7 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 3200000
+set_option maxHeartbeats 400000
 
 /-- The TRUE-ℓ Step-4 s-sum integrand, **FAITHFUL form** (writeup 1090–1126): the BARE smooth count
 `b = Rδ = (H/Δ²)G⁵U¹⁵/Ω²` (n-free) times the SHARP near-integer band v-count `(1 + ev/√n)` plus the
@@ -112,7 +112,8 @@ theorem ra_step4_ssum_collapse'
   -- `√Scap = ℓ₁·sL·U⁵/Ω⁴`
   have hsqrtScap : Real.sqrt Scap = ℓ₁ * sL * P.U ^ 5 / S.Ω ^ 4 := by
     have heq : Scap = (ℓ₁ * sL * P.U ^ 5 / S.Ω ^ 4) ^ 2 := by
-      rw [hScap]; field_simp; nlinarith [hsLmul]
+      have hsL2 : sL ^ 2 = L := by rw [pow_two]; exact hsLmul
+      rw [hScap, div_pow, mul_pow, mul_pow, hsL2]; ring
     rw [heq, Real.sqrt_sq (by positivity)]
   -- `√N ≤ C·√Scap`
   have hsqrtNC : Real.sqrt (N : ℝ) ≤ C * Real.sqrt Scap := by
@@ -128,13 +129,17 @@ theorem ra_step4_ssum_collapse'
   have hkey : b * (N : ℝ) + (dc + ev * b) * (2 * Real.sqrt (N : ℝ)) + ev * dc * (N : ℝ)
       ≤ C * (b * Scap) + C * ((dc + ev * b) * (2 * Real.sqrt Scap)) + C * (ev * dc * Scap) := by
     have t1 : b * (N : ℝ) ≤ C * (b * Scap) := by
-      have := mul_le_mul_of_nonneg_left hNC hbnn; nlinarith [this]
+      calc b * (N : ℝ) ≤ b * (C * Scap) := mul_le_mul_of_nonneg_left hNC hbnn
+        _ = C * (b * Scap) := by ring
     have t2 : (dc + ev * b) * (2 * Real.sqrt (N : ℝ))
         ≤ C * ((dc + ev * b) * (2 * Real.sqrt Scap)) := by
       have h2N : 2 * Real.sqrt (N : ℝ) ≤ 2 * (C * Real.sqrt Scap) := by linarith [hsqrtNC]
-      have := mul_le_mul_of_nonneg_left h2N hcmnn; nlinarith [this]
+      calc (dc + ev * b) * (2 * Real.sqrt (N : ℝ))
+          ≤ (dc + ev * b) * (2 * (C * Real.sqrt Scap)) := mul_le_mul_of_nonneg_left h2N hcmnn
+        _ = C * ((dc + ev * b) * (2 * Real.sqrt Scap)) := by ring
     have t3 : ev * dc * (N : ℝ) ≤ C * (ev * dc * Scap) := by
-      have := mul_le_mul_of_nonneg_left hNC hcpnn; nlinarith [this]
+      calc ev * dc * (N : ℝ) ≤ ev * dc * (C * Scap) := mul_le_mul_of_nonneg_left hNC hcpnn
+        _ = C * (ev * dc * Scap) := by ring
     linarith [t1, t2, t3]
   refine le_trans hkey ?_
   set HDt6 : ℝ := P.H * P.G ^ 15 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) with hHDt6
@@ -163,7 +168,9 @@ theorem ra_step4_ssum_collapse'
       rw [hrearr, hevsL]
     -- the regime fact `Δ²·G·U¹⁰ ≤ H`
     have hHbig : S.Δ ^ 2 * P.G * P.U ^ 10 ≤ P.H := by
-      have := (le_div_iff₀ (by positivity : (0:ℝ) < S.Δ ^ 2)).mp h1; nlinarith [this]
+      have h := (le_div_iff₀ (by positivity : (0:ℝ) < S.Δ ^ 2)).mp h1
+      calc S.Δ ^ 2 * P.G * P.U ^ 10 = P.G * P.U ^ 10 * S.Δ ^ 2 := by ring
+        _ ≤ P.H := h
     have hℓ1nn : 0 ≤ ℓ₁ := hℓ1pos.le
     have hLnn : 0 ≤ L := hLpos.le
     have hU2 : (2 : ℝ) ≤ P.U := le_trans (by norm_num) hUbig
@@ -208,15 +215,15 @@ theorem ra_step4_ssum_collapse'
     -- the regime power facts
     have hU17k : (130 : ℝ) ^ 5 ≤ P.U := le_trans (by norm_num) hUbig
     have R1 : 130 ^ 5 * S.Ω ^ 3 ≤ P.G ^ 5 * P.U ^ 25 := by
-      calc (130:ℝ) ^ 5 * S.Ω ^ 3 ≤ 130 ^ 5 * P.U ^ 3 := by
-            have := hΩ_le 3; nlinarith [this]
+      calc (130:ℝ) ^ 5 * S.Ω ^ 3 ≤ 130 ^ 5 * P.U ^ 3 :=
+            mul_le_mul_of_nonneg_left (hΩ_le 3) (by positivity)
         _ ≤ P.U * P.U ^ 3 := mul_le_mul_of_nonneg_right hU17k (by positivity)
         _ = P.U ^ 4 := by ring
         _ ≤ P.U ^ 25 := pow_le_pow_right₀ hU1 (by norm_num)
         _ ≤ P.G ^ 5 * P.U ^ 25 := le_mul_of_one_le_left (by positivity) (one_le_pow₀ hG1)
     have R2 : 2 * 130 ^ 4 * S.Ω ^ 19 ≤ S.Δ * P.G ^ 7 * P.U ^ 50 := by
-      calc (2:ℝ) * 130 ^ 4 * S.Ω ^ 19 ≤ 2 * 130 ^ 4 * P.U ^ 19 := by
-            have := hΩ_le 19; nlinarith [this]
+      calc (2:ℝ) * 130 ^ 4 * S.Ω ^ 19 ≤ 2 * 130 ^ 4 * P.U ^ 19 :=
+            mul_le_mul_of_nonneg_left (hΩ_le 19) (by positivity)
         _ ≤ P.U * P.U ^ 19 := mul_le_mul_of_nonneg_right (le_trans (by norm_num) hU17k) (by positivity)
         _ = P.U ^ 20 := by ring
         _ ≤ P.U ^ 50 := pow_le_pow_right₀ hU1 (by norm_num)
@@ -228,8 +235,8 @@ theorem ra_step4_ssum_collapse'
               _ ≤ (S.Δ * P.G ^ 7) * P.U ^ 50 := mul_le_mul_of_nonneg_right h17 (by positivity)
               _ = S.Δ * P.G ^ 7 * P.U ^ 50 := by ring
     have R3 : 260 * S.Ω ^ 8 ≤ P.G ^ 5 * P.U ^ 30 := by
-      calc 260 * S.Ω ^ 8 ≤ 260 * P.U ^ 8 := by
-            have := hΩ_le 8; nlinarith [this]
+      calc 260 * S.Ω ^ 8 ≤ 260 * P.U ^ 8 :=
+            mul_le_mul_of_nonneg_left (hΩ_le 8) (by positivity)
         _ ≤ P.U * P.U ^ 8 := mul_le_mul_of_nonneg_right (le_trans (by norm_num) hU17k) (by positivity)
         _ = P.U ^ 9 := by ring
         _ ≤ P.U ^ 30 := pow_le_pow_right₀ hU1 (by norm_num)
@@ -243,8 +250,8 @@ theorem ra_step4_ssum_collapse'
         _ ≤ P.H * (P.G ^ 4 * P.U ^ 20) := hf2
         _ = P.H * P.G ^ 4 * P.U ^ 20 := by ring
     have R5 : 130 ^ 5 * S.Ω ^ 16 ≤ S.Δ * P.G ^ 2 * P.U ^ 20 := by
-      calc (130:ℝ) ^ 5 * S.Ω ^ 16 ≤ 130 ^ 5 * P.U ^ 16 := by
-            have := hΩ_le 16; nlinarith [this]
+      calc (130:ℝ) ^ 5 * S.Ω ^ 16 ≤ 130 ^ 5 * P.U ^ 16 :=
+            mul_le_mul_of_nonneg_left (hΩ_le 16) (by positivity)
         _ ≤ P.U * P.U ^ 16 := mul_le_mul_of_nonneg_right hU17k (by positivity)
         _ = P.U ^ 17 := by ring
         _ ≤ P.U ^ 20 := pow_le_pow_right₀ hU1 (by norm_num)
@@ -266,9 +273,10 @@ theorem ra_step4_ssum_collapse'
           _ ≤ P.G ^ 3 * P.U ^ 20 :=
               le_mul_of_one_le_left (by positivity) (one_le_pow₀ hG1)
       calc (130:ℝ) ^ 5 * (S.Δ ^ 4 * P.U ^ 5 * S.Ω ^ 2)
-            ≤ 130 ^ 5 * (S.Δ ^ 4 * P.U ^ 5 * P.U ^ 2) := by
-            have := mul_le_mul_of_nonneg_left (hΩ_le 2) (by positivity : (0:ℝ) ≤ S.Δ ^ 4 * P.U ^ 5)
-            nlinarith [this]
+            ≤ 130 ^ 5 * (S.Δ ^ 4 * P.U ^ 5 * P.U ^ 2) :=
+            mul_le_mul_of_nonneg_left
+              (mul_le_mul_of_nonneg_left (hΩ_le 2) (by positivity : (0:ℝ) ≤ S.Δ ^ 4 * P.U ^ 5))
+              (by positivity)
         _ = S.Δ ^ 4 * (130 ^ 5 * P.U ^ 7) := by ring
         _ ≤ S.Δ ^ 4 * (P.G ^ 3 * P.U ^ 20) := mul_le_mul_of_nonneg_left hu (by positivity)
         _ = P.G * (S.Δ ^ 2 * P.G * P.U ^ 10) ^ 2 := by ring

@@ -20,7 +20,7 @@ open Classical Finset Squarefree.FiniteDiff Set
 
 namespace Squarefree.Counting
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 1200000 in
 /-- **Lemma 2.1** (writeup 84–194): 4th-derivative counting via 3-fold differencing.
 Generalized from `|f⁗| ≤ 2Λ` to `|f⁗| ≤ K·Λ`; the constant `C` may depend on `K` (the
 cross-term genuinely carries `K`, so a single absolute constant is impossible). -/
@@ -75,7 +75,7 @@ theorem fourthDeriv_count : ∀ (K : ℝ), 1 ≤ K → ∃ C : ℝ, 0 < C ∧
       _ ≤ max C₀ 1 * (N ^ (7/8 : ℝ) + N * δ ^ (1/8 : ℝ)
             + N ^ (7/8 : ℝ) * (δ / Λ) ^ (1/8 : ℝ) + Λ ^ (1/15 : ℝ) * N) := by
           have hm1 : (1:ℝ) ≤ max C₀ 1 := le_max_right _ _
-          nlinarith [hsum_ge1, hm1, le_max_left C₀ 1, hC₀pos]
+          nlinarith only [hsum_ge1, hm1]
   · -- M ≥ 2: the main argument.
     have hM2 : 2 ≤ M := hMbig
     have hMbig : 1 < M := by omega
@@ -134,7 +134,7 @@ theorem fourthDeriv_count : ∀ (K : ℝ), 1 ≤ K → ∃ C : ℝ, 0 < C ∧
           _ ≤ Kfc * N ^ 7 := by
               apply mul_le_mul hKge hNle (by positivity) (le_trans (by positivity) hKge)
       have : (M:ℝ) ^ 8 ≤ Kfc * N ^ 7 := le_trans h2 h3
-      nlinarith [this, hbudget0, mul_nonneg (le_of_lt (by linarith : (0:ℝ) < Kfc))
+      nlinarith only [this, hbudget0, mul_nonneg (le_of_lt (by linarith : (0:ℝ) < Kfc))
         (by positivity : (0:ℝ) ≤ Λ * N ^ 15 / (M:ℝ) ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ)]
     have collapse2 : (M:ℝ) ^ 4 ≤ (16 * Ñ) ^ 3 →
         (M:ℝ) ^ 8 ≤ Kfc * (N ^ 7 + Λ * N ^ 15 / (M:ℝ) ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) := by
@@ -153,7 +153,7 @@ theorem fourthDeriv_count : ∀ (K : ℝ), 1 ≤ K → ∃ C : ℝ, 0 < C ∧
           _ ≤ Kfc * N ^ 7 := by
               apply mul_le_mul hKge hNle (by positivity) (le_trans (by positivity) hKge)
       have : (M:ℝ) ^ 8 ≤ Kfc * N ^ 7 := le_trans h2 h3
-      nlinarith [this, hbudget0, mul_nonneg (le_of_lt (by linarith : (0:ℝ) < Kfc))
+      nlinarith only [this, hbudget0, mul_nonneg (le_of_lt (by linarith : (0:ℝ) < Kfc))
         (by positivity : (0:ℝ) ≤ Λ * N ^ 15 / (M:ℝ) ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ)]
     -- ===== First popular difference =====
     obtain ⟨h₁, hh₁lo, hh₁hi, hrc₁⟩ := popular_diff Ñ S lo (hmemAux S (subset_refl S))
@@ -290,8 +290,8 @@ theorem fourthDeriv_count : ∀ (K : ℝ), 1 ≤ K → ∃ C : ℝ, 0 < C ∧
     have hPpos : (0:ℝ) < P := by rw [hPdef]; positivity
     have hP1 : (1:ℝ) ≤ P := by
       rw [hPdef]
-      have h12 : (1:ℝ) ≤ (h₁:ℝ) * (h₂:ℝ) := by nlinarith [hh1r, hh2r]
-      nlinarith [h12, hh3r]
+      have h12 : (1:ℝ) ≤ (h₁:ℝ) * (h₂:ℝ) := by nlinarith only [hh1r, hh2r]
+      nlinarith only [h12, hh3r]
     have hFpos : (0:ℝ) < P * Λ := by positivity
     obtain ⟨hexp, hvar⟩ := expanding_and_variation (N := N) (Λ := Λ) (K := K)
       (h₁ := (h₁:ℝ)) (h₂ := (h₂:ℝ)) (h₃ := (h₃:ℝ)) (f := f)

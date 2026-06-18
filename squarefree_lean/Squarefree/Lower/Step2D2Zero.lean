@@ -18,8 +18,6 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 6400000
-
 /-- The closed-form second derivative `φ_f''` as a function of `s` (the `phif_iteratedDeriv2_eq`
 right-hand side), used to transfer differentiability to `iteratedDeriv 2 φ_f`. -/
 private noncomputable def F2 (P : Globals) (a ℓ₁ ℓ₂ f s : ℝ) : ℝ :=
@@ -373,7 +371,7 @@ private theorem W2_act_neg {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ r : ℝ}
   have hNact_neg : Nact < 0 := by
     have hle := (abs_le.mp hcorr_bd).2
     have hpos : 0 < S.B ^ 7 / (2 * 10 ^ 42) := by positivity
-    nlinarith [hNs_ub, hle, hpos]
+    nlinarith only [hNs_ub, hle, hpos]
   -- conclude
   rw [hNumVal]
   have hKpos : 0 < K := by rw [hK_def]; positivity

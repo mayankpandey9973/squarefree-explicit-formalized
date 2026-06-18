@@ -39,7 +39,6 @@ private theorem qb_XA_div_D4 (S : Scale P) :
   rw [P.X_eq_G_mul_H_pow_five]
   field_simp
 
-set_option maxHeartbeats 6400000 in
 /-- **§5 Step-3 per-`r` two-term `|𝒬|` bound.** Faithful to writeup line 874. -/
 theorem Qval_abs_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ v Vplus : ℝ}
     (hAD : 10 * S.A ≤ S.D) (ha0 : 0 < a)
@@ -148,7 +147,7 @@ theorem Qval_abs_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ 
     rw [hkey]
     have hcoef : (66 : ℝ) ≤ 10 ^ 34 := by norm_num
     have hpos : 0 ≤ (ℓ₁ : ℝ) * (P.H * P.G * S.Ω / S.Δ ^ 3) * Vplus := by positivity
-    nlinarith [mul_le_mul_of_nonneg_right hcoef hpos]
+    linarith only [mul_le_mul_of_nonneg_right hcoef hpos]
   -- ===========================================================
   -- BOUND 2 : |BTERM| ≤ const·G²U¹⁵/Ω⁵
   -- ===========================================================
@@ -206,11 +205,11 @@ theorem Qval_abs_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ 
     -- const·G³U¹⁵·(1/(GΩ⁵)) = const·G²U¹⁵/Ω⁵
     have heq2 : (12 * 2197000 * 11 * 3000000000000 ^ 2 : ℝ) * (P.G ^ 3 * P.U ^ 15) * (1 / (P.G * S.Ω ^ 5))
         = (12 * 2197000 * 11 * 3000000000000 ^ 2) * (P.G ^ 2 * P.U ^ 15 / S.Ω ^ 5) := by
-      field_simp <;> ring
+      field_simp
     rw [heq2]
     have hcoef : (12 * 2197000 * 11 * 3000000000000 ^ 2 : ℝ) ≤ 3 * 10 ^ 33 := by norm_num
     have hpos : 0 ≤ P.G ^ 2 * P.U ^ 15 / S.Ω ^ 5 := by positivity
-    nlinarith [mul_le_mul_of_nonneg_right hcoef hpos]
+    linarith only [mul_le_mul_of_nonneg_right hcoef hpos]
   -- ===========================================================
   -- BOUND 3 : ERR ≤ const·G²U¹⁵/Ω⁵   (divide qgen_piece_le by PREF ≥ D⁴/(660000 XA))
   -- ===========================================================
@@ -231,7 +230,7 @@ theorem Qval_abs_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ 
     have hPREF_lo : S.D ^ 4 / (660000 * (P.X * S.A)) ≤ PREF := by
       rw [hPREF_def]
       -- 6·X·a ≤ 6·X·11A = 66·X·A;  dt⁴ ≥ D⁴/10⁴ ⟹ PREF ≥ (D⁴/10⁴)/(66XA) = D⁴/(660000 XA)
-      have hden : 6 * P.X * (a : ℝ) ≤ 66 * (P.X * S.A) := by nlinarith [ha_hi, hXpos.le]
+      have hden : 6 * P.X * (a : ℝ) ≤ 66 * (P.X * S.A) := by nlinarith only [ha_hi, hXpos.le]
       have hden_pos : 0 < 6 * P.X * (a : ℝ) := by positivity
       calc S.D ^ 4 / (660000 * (P.X * S.A))
           = (S.D ^ 4 / 10 ^ 4) / (66 * (P.X * S.A)) := by
@@ -274,12 +273,12 @@ theorem Qval_abs_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ 
     have hcollapse : (660000 : ℝ) * (S.Δ ^ 2 * P.G * P.U ^ 20 / (P.H * S.Ω ^ 6))
           * (P.H * P.G * S.Ω / S.Δ ^ 3)
         = 660000 * (P.G ^ 2 * P.U ^ 20 / (S.Δ * S.Ω ^ 5)) := by
-      field_simp <;> ring
+      field_simp
     rw [hcollapse]
     -- 660000·G²U²⁰/(Δ·Ω⁵) ≤ 660000·G²U¹⁵/Ω⁵  via Δ ≥ U⁵
     have hΔU5 : P.U ^ 5 ≤ S.Δ := by
-      have hG2 : (1:ℝ) ≤ P.G ^ 2 := by nlinarith [hG1]
-      have : P.U ^ 5 ≤ P.G ^ 2 * P.U ^ 5 := by nlinarith [hG2, pow_pos hUpos 5]
+      have hG2 : (1:ℝ) ≤ P.G ^ 2 := by nlinarith only [hG1]
+      have : P.U ^ 5 ≤ P.G ^ 2 * P.U ^ 5 := by nlinarith only [hG2, pow_pos hUpos 5]
       linarith [hΔreg, this]
     have hkey : P.U ^ 20 / S.Δ ≤ P.U ^ 15 := by
       rw [div_le_iff₀ hΔpos]
@@ -288,7 +287,7 @@ theorem Qval_abs_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ 
         _ ≤ P.U ^ 15 * S.Δ := this
     have hrw1 : (P.G ^ 2 * P.U ^ 20 / (S.Δ * S.Ω ^ 5))
         = (P.G ^ 2 / S.Ω ^ 5) * (P.U ^ 20 / S.Δ) := by
-      field_simp <;> ring
+      field_simp
     have hrw2 : (P.G ^ 2 * P.U ^ 15 / S.Ω ^ 5) = (P.G ^ 2 / S.Ω ^ 5) * P.U ^ 15 := by
       rw [div_mul_eq_mul_div]
     rw [hrw1, hrw2]
@@ -305,7 +304,7 @@ theorem Qval_abs_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ 
   have hsum : (3 * 10 ^ 33 : ℝ) + 660000 ≤ 10 ^ 34 := by norm_num
   have hBE : |BTERM| + ERR ≤ 10 ^ 34 * (P.G ^ 2 * P.U ^ 15 / S.Ω ^ 5) := by
     have := mul_le_mul_of_nonneg_right hsum henv_nn
-    nlinarith [hBbound, hERRbound, this]
+    linarith only [hBbound, hERRbound, this]
   linarith [hVbound, hBE]
 
 end Squarefree

@@ -26,8 +26,6 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 3200000
-
 variable {P : Globals} {S : Scale P}
 
 /-- `Σ_closed` and `Lval` are the same expression (argument order differs). -/
@@ -143,7 +141,7 @@ theorem Sigma_closed_deriv_lb {a : ℝ} {ℓ₁ ℓ₂ b₀ v r : ℝ}
   -- regime: Δ²U⁵ ≤ HΩ³ (same chain as in `leading_abs_ge`)
   have hGU5Ω3 : (1 : ℝ) ≤ P.G * P.U ^ 5 * S.Ω ^ 3 := by
     have hU2Ω : P.U ≤ P.U ^ 2 / S.Ω := by
-      rw [le_div_iff₀ hΩpos]; nlinarith [hΩU, hUpos.le, hU1]
+      rw [le_div_iff₀ hΩpos]; nlinarith only [hΩU, hUpos.le, hU1]
     have hfactor : P.G * P.U ^ 3 * S.Ω ^ 4 * (P.U ^ 2 / S.Ω) = P.G * P.U ^ 5 * S.Ω ^ 3 := by
       field_simp
     have hchain : (1 : ℝ) ≤ P.G * P.U ^ 3 * S.Ω ^ 4 * (P.U ^ 2 / S.Ω) := by
@@ -161,7 +159,7 @@ theorem Sigma_closed_deriv_lb {a : ℝ} {ℓ₁ ℓ₂ b₀ v r : ℝ}
           = (P.G * P.U ^ 10 * S.Δ ^ 2) * S.Ω ^ 3 := by ring
       rw [heq]; exact mul_le_mul_of_nonneg_right hHbig (by positivity)
     have hle : S.Δ ^ 2 * P.U ^ 5 ≤ S.Δ ^ 2 * P.U ^ 5 * (P.G * P.U ^ 5 * S.Ω ^ 3) := by
-      nlinarith [hGU5Ω3, mul_pos (by positivity : (0:ℝ) < S.Δ ^ 2) (by positivity : (0:ℝ) < P.U ^ 5)]
+      nlinarith only [hGU5Ω3, mul_pos (by positivity : (0:ℝ) < S.Δ ^ 2) (by positivity : (0:ℝ) < P.U ^ 5)]
     linarith [hle, hstep]
   have hd2D : d ≤ 2 * S.D := hd_hi
   have hdD : S.D ≤ d := hd_lo
@@ -174,14 +172,14 @@ theorem Sigma_closed_deriv_lb {a : ℝ} {ℓ₁ ℓ₂ b₀ v r : ℝ}
   have had : a / d ≤ 1 / 5 := by
     rw [div_le_div_iff₀ hd_pos (by norm_num)]
     have h55 : 55 * (S.Δ * S.Ω) ≤ P.H * S.Δ := by
-      have := mul_le_mul_of_nonneg_right hΩH hΔpos.le; nlinarith [this]
-    nlinarith [ha_hi', hdD', h55]
+      have := mul_le_mul_of_nonneg_right hΩH hΔpos.le; linarith [this]
+    linarith [ha_hi', hdD', h55]
   have had0 : 0 ≤ a / d := by positivity
   -- bracket `u = −4 + 10a/d ∈ [−4,−2]`, so `|u| ≥ 2`
   have hbracket : 2 ≤ |(-4 + 10 * a / d)| := by
     have h10ad : 10 * a / d = 10 * (a / d) := by ring
-    rw [h10ad, abs_of_nonpos (by nlinarith [had, had0])]
-    nlinarith [had, had0]
+    rw [h10ad, abs_of_nonpos (by linarith [had])]
+    linarith [had]
   -- ===== sharp V₂-dominance:  |P₂|/d ≤ 2T ≤ |P₁+P₂/d| =====
   have hℓ1pos' : 0 < ℓ₁ := lt_of_lt_of_le one_pos hℓ1
   have hℓ2pos : 0 < ℓ₂ := lt_trans hℓ1pos' hℓ12
@@ -242,7 +240,7 @@ theorem Sigma_closed_deriv_lb {a : ℝ} {ℓ₁ ℓ₂ b₀ v r : ℝ}
     rw [hSsig_def, hSm_val, abs_mul, abs_of_pos hK_pos, abs_mul]
   -- the two pointwise comparisons
   have h10adu : 10 * a / d ≤ |u| := by
-    have : 10 * a / d ≤ 2 := by rw [show 10 * a / d = 10 * (a/d) by ring]; nlinarith [had]
+    have : 10 * a / d ≤ 2 := by rw [show 10 * a / d = 10 * (a/d) by ring]; linarith [had]
     linarith [hbracket]
   have hP2w : |Ptwo b₀ v ℓ₁ ℓ₂| / d ≤ |w| := le_trans hP2d hPsum_ge
   clear hres hMabs
@@ -318,8 +316,7 @@ theorem Sigma_closed_deriv_lb {a : ℝ} {ℓ₁ ℓ₂ b₀ v r : ℝ}
     have hkey : Sm * d ≤ 3 * Sm * (S.B * S.R) := by
       rw [show 3 * Sm * (S.B * S.R) = Sm * (3 * (S.B * S.R)) by ring]
       exact mul_le_mul_of_nonneg_left hd3BR hSm_nn
-    nlinarith [hkey, hSm_nn, mul_pos hd_pos (by positivity : (0:ℝ) < 1000000),
-      mul_pos hBpos hRpos]
+    linarith [hkey]
   refine le_trans hgoal ?_
   exact mul_le_mul hDlb hd1_abs_lo (by positivity) (abs_nonneg _)
 

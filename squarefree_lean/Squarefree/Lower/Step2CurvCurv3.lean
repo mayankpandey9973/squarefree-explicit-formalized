@@ -17,8 +17,6 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 6400000
-
 /-- **The smooth numerator lower bound.**  `Ñ_s = −d̃'·(5d̃'⁴ − 10d̃'²d̃''d̃ + 2d̃'d̃'''d̃²)` equals the
 positive closed form `d⁵(a+d)³(5a⁴+44a³d+169a²d²+280ad³+180d⁴)/(32r⁵(a+2d)⁷)` (`Step2CurvCurv`),
 which on the §5 window is `≥ D⁵/(10²⁹R⁵)`. -/
@@ -37,7 +35,7 @@ private lemma Ns_lower {P : Globals} {S : Scale P} {a r : ℝ}
   have hApos : 0 < S.A := by unfold Scale.A; have := S.Δ_pos; have := S.Ω_pos; positivity
   have hRpos : 0 < S.R := by
     unfold Scale.R; have := P.H_pos; have := P.G_pos; have := S.Ω_pos; have := S.Δ_pos; positivity
-  have hr0 : 0 < r := by nlinarith [hr_lo, hRpos]
+  have hr0 : 0 < r := by linarith [hr_lo, hRpos]
   obtain ⟨hd_lo, hd_hi⟩ := dtilde_asymp_D hAD ha0 hr0 ha_lo ha_hi hr_lo hr_hi
   have hd_pos : 0 < dtilde P.X r a := dtilde_pos P.X_pos ha0 hr0
   have hd1cf := (dtilde_r_hasDerivAt P.X_pos ha0 hr0).deriv
@@ -74,7 +72,7 @@ private lemma Ns_lower {P : Globals} {S : Scale P} {a r : ℝ}
   have hden_hi : 32 * r ^ 5 * (a + 2 * d) ^ 7 ≤ 32 * (16 * S.R) ^ 5 * (38 * S.D) ^ 7 := by
     have hr5 : r ^ 5 ≤ (16 * S.R) ^ 5 := pow_le_pow_left₀ hr0.le hr_hi 5
     have ha2d7 : (a + 2 * d) ^ 7 ≤ (38 * S.D) ^ 7 := pow_le_pow_left₀ ha2d.le ha2d_hi 7
-    have s1 : 32 * r ^ 5 ≤ 32 * (16 * S.R) ^ 5 := by nlinarith [hr5]
+    have s1 : 32 * r ^ 5 ≤ 32 * (16 * S.R) ^ 5 := by linarith [hr5]
     exact mul_le_mul s1 ha2d7 (by positivity) (by positivity)
   calc S.D ^ 5 / (10 ^ 29 * S.R ^ 5)
       ≤ (180 * (S.D / 10) ^ 12) / (32 * (16 * S.R) ^ 5 * (38 * S.D) ^ 7) := by
@@ -84,7 +82,7 @@ private lemma Ns_lower {P : Globals} {S : Scale P} {a r : ℝ}
         have eR : 180 * (S.D / 10) ^ 12 * (10 ^ 29 * S.R ^ 5)
             = 180 * 10 ^ 17 * (S.D ^ 12 * S.R ^ 5) := by ring
         rw [eL, eR]
-        nlinarith [mul_nonneg (pow_nonneg hDpos.le 12) (pow_nonneg hRpos.le 5)]
+        nlinarith only [mul_nonneg (pow_nonneg hDpos.le 12) (pow_nonneg hRpos.le 5)]
     _ ≤ (d ^ 5 * (a + d) ^ 3 * Poly) / (32 * r ^ 5 * (a + 2 * d) ^ 7) := by gcongr
 
 /-- **§5 Step-2 curvature lower bound** (`f`-free Wronskian branch, writeup line 917, 2nd branch).
@@ -114,13 +112,13 @@ theorem phif_curvature_lower_curv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f
   have h6Xa : (6 : ℝ) * P.X * a ≠ 0 := by positivity
   have hBR : S.B = S.D / S.R := Scale.B_eq_D_div_R S
   -- window facts
-  have hr0 : 0 < r := by nlinarith [hr_lo, hRpos]
+  have hr0 : 0 < r := by linarith [hr_lo, hRpos]
   have hrl : 0 < r + ℓ₁ := by linarith
   have hr_hi : r ≤ 16 * S.R := by linarith [hℓ1.le]
   have hℓne : ℓ₁ ≠ 0 := ne_of_gt hℓ1
   have hℓ21 : 0 < ℓ₂ - ℓ₁ := by linarith
   have hℓ2 : 0 < ℓ₂ := by linarith
-  have hl1R : ℓ₁ ≤ S.R := by nlinarith [hsmall, hℓ1]
+  have hl1R : ℓ₁ ≤ S.R := by linarith [hsmall, hℓ1]
   -- d̃ positivity / bounds
   have hd_pos : 0 < dtilde P.X r a := dtilde_pos hXpos ha0 hr0
   obtain ⟨hd_lo, hd_hi⟩ := dtilde_asymp_D hAD ha0 hr0 ha_lo ha_hi hr_lo hr_hi
@@ -129,8 +127,8 @@ theorem phif_curvature_lower_curv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f
     intro x hx; obtain ⟨hxl, hxr⟩ := hx
     exact ⟨by linarith, by linarith, by linarith⟩
   have hD_BR : S.D = S.B * S.R := by rw [hBR]; field_simp
-  have hconv3 : S.D / S.R ^ 3 = S.B / S.R ^ 2 := by rw [hBR]; field_simp <;> ring
-  have hconv4 : S.D / S.R ^ 4 = S.B / S.R ^ 3 := by rw [hBR]; field_simp <;> ring
+  have hconv3 : S.D / S.R ^ 3 = S.B / S.R ^ 2 := by rw [hBR]; ring
+  have hconv4 : S.D / S.R ^ 4 = S.B / S.R ^ 3 := by rw [hBR]; ring
   -- closed-form derivative values
   have hD1eq := (phif_hasDerivAt (P := P) (a := a) (ℓ₁ := ℓ₁) (ℓ₂ := ℓ₂) (f := f)
     ha0 hr0 hrl hℓne).deriv
@@ -228,7 +226,7 @@ theorem phif_curvature_lower_curv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f
     rw [hE1_def]; apply div_pos _ (by positivity)
     have hd2pos : (0:ℝ) < d2 := hd2_pos
     have : (0:ℝ) < 4 * d ^ 3 * d2 := by positivity
-    nlinarith [sq_nonneg d1, pow_pos hd_pos 2, this]
+    nlinarith only [sq_nonneg d1, pow_pos hd_pos 2, this]
   -- |Ñ_act| ≥ B⁵/(2·10²⁹)
   have hcorr_eq : Nact - Ns = (-5 * d1 ^ 3 * e1 ^ 2
       + 2 * d * (d * d2 + 5 * d1 ^ 2) * e1 * e2 - 2 * d ^ 2 * d1 * e1 * e3
@@ -253,7 +251,7 @@ theorem phif_curvature_lower_curv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f
     · rw [he2_def]; exact he2
     · rw [he3_def]; exact he3
   have hLn_eq : S.D ^ 5 / (10 ^ 29 * S.R ^ 5) = S.B ^ 5 / 10 ^ 29 := by
-    rw [hBR]; field_simp <;> ring
+    rw [hBR]; ring
   have hNact_lb : S.B ^ 5 / (2 * 10 ^ 29) ≤ |Nact| := by
     have h1 : |Ns| ≤ |Nact| + |Nact - Ns| := by
       have heq : Nact - (Nact - Ns) = Ns := by ring
@@ -281,7 +279,7 @@ theorem phif_curvature_lower_curv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f
         have := mul_le_mul hdcube hd2_hi hd2_pos.le (by positivity); linarith
       have heq : 12 * ((18 * S.D) ^ 2 * (1000000 * S.B) ^ 2)
           + 4 * ((18 * S.D) ^ 3 * (10000000000000 * (S.B / S.R)))
-          = 237168000000000000 * (S.D ^ 4 / S.R ^ 2) := by rw [hBR]; field_simp <;> ring
+          = 237168000000000000 * (S.D ^ 4 / S.R ^ 2) := by rw [hBR]; field_simp; ring
       have hcoef : 237168000000000000 * (S.D ^ 4 / S.R ^ 2) ≤ 10 ^ 18 * (S.D ^ 4 / S.R ^ 2) :=
         mul_le_mul_of_nonneg_right (by norm_num) (by positivity)
       linarith [h12, h4, heq.le, heq.ge, hcoef]
@@ -291,13 +289,13 @@ theorem phif_curvature_lower_curv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f
     have hd_le : d ≤ 3 * 10 ^ 24 * S.R * |d1| := by
       have h1 : 18 * S.D ≤ 3 * 10 ^ 24 * S.R * (S.B / 1000000) := by
         rw [show 3 * 10 ^ 24 * S.R * (S.B / 1000000) = 3 * 10 ^ 18 * (S.R * S.B) by ring, hRSB]
-        nlinarith [hDpos]
+        linarith [hDpos]
       have h2 : 3 * 10 ^ 24 * S.R * (S.B / 1000000) ≤ 3 * 10 ^ 24 * S.R * |d1| := by gcongr
       linarith [hd_hi, h1, h2]
     have hprod : 4 * d ^ 2 * |d1| * d ≤ 4 * d ^ 2 * |d1| * (3 * 10 ^ 24 * S.R * |d1|) :=
       mul_le_mul_of_nonneg_left hd_le (by positivity)
     have hstep : 4 * d ^ 3 * |d1| ≤ 12 * 10 ^ 24 * S.R * d ^ 2 * |d1| ^ 2 := by
-      nlinarith [hprod]
+      nlinarith only [hprod]
     rw [sq_abs d1] at hstep
     have h0 : (0:ℝ) ≤ 10 ^ 24 * S.R * (4 * d ^ 3 * d2) := by positivity
     have hexp : 10 ^ 24 * S.R * (12 * d ^ 2 * d1 ^ 2 + 4 * d ^ 3 * d2)
@@ -335,7 +333,7 @@ theorem phif_curvature_lower_curv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f
       positivity
     have heq : Wlo / (10 ^ 24 * Uc)
         = 40 * ((1 / 10 ^ 72) * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁) * S.B ^ 2 / S.D) / S.R) := by
-      rw [hWlo_def, hUc_def, hK_def, hBR]; field_simp <;> ring
+      rw [hWlo_def, hUc_def, hK_def, hBR]; field_simp; ring
     rw [heq]; linarith [hgoal_nn]
   linarith [hscale, step3, step2, step1]
 
