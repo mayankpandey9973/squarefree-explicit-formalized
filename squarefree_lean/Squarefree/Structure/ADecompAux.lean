@@ -21,7 +21,7 @@ open Classical Finset Squarefree.Counting
 
 namespace Squarefree
 
-set_option maxHeartbeats 1000000
+set_option maxHeartbeats 400000
 
 /-- `F_a(d) = X/d² − X/(d+a)²`, the first difference of `X/d²`. -/
 noncomputable def Ffun (X a d : ℝ) : ℝ := X / d ^ 2 - X / (d + a) ^ 2
@@ -46,7 +46,7 @@ private theorem err_bound (X H : ℝ) (m : ℤ) (r : ℝ) (hr : 0 < r ^ 2)
 /-- **B1 step** of the §3→§6 near-curve bridge: a popular `d` (one belonging to a `𝒟_a`-gap,
 so both `d` and `d+a` lie in `𝒟`) makes `F_a(d) = X/d² − X/(d+a)²` lie within `2H/d²` of an
 integer.  The witnessing integer is `m − m'`, where `m·d²` and `m'·(d+a)²` lie in `[X,X+H]`. -/
-theorem inDa_distInt_Ffun {X H : ℝ} {a d : ℤ} (hX : 0 < X) (hd : 0 < (d : ℝ)) (ha : 0 < a)
+theorem inDa_distInt_Ffun {X H : ℝ} {a d : ℤ} (_hX : 0 < X) (hd : 0 < (d : ℝ)) (ha : 0 < a)
     (hin : inDa X H a d) :
     distInt (Ffun X (a : ℝ) (d : ℝ)) ≤ 2 * H / (d : ℝ) ^ 2 := by
   obtain ⟨-, hD, hDa, -⟩ := hin
@@ -118,10 +118,11 @@ theorem tiny_gap_impossible (X H D : ℝ) (a d : ℤ)
   have haltd3 : (a : ℝ) < (d : ℝ) ^ 3 / (6 * X) := by
     refine lt_of_lt_of_le hcon ?_
     apply div_le_div_of_nonneg_right hd3 (by positivity)
-  have hd2X : (d : ℝ) ^ 2 ≤ 6 * X := by nlinarith [hd2D, hDX, hdR, hDpos]
+  have hd2X : (d : ℝ) ^ 2 ≤ 6 * X := by
+    linarith [mul_le_mul hd2D hd2D hdR.le (by linarith : (0:ℝ) ≤ 2 * D), hDX, sq_nonneg D]
   have hale : (a : ℝ) ≤ (d : ℝ) := by
     have : (d : ℝ) ^ 3 / (6 * X) ≤ (d : ℝ) := by
-      rw [div_le_iff₀ (by positivity)]; nlinarith [hd2X, hdR]
+      rw [div_le_iff₀ (by positivity)]; linarith [mul_le_mul_of_nonneg_left hd2X hdR.le]
     linarith [haltd3, this]
   -- points and squares
   set p : ℝ := (d : ℝ) with hp
@@ -161,26 +162,26 @@ theorem tiny_gap_impossible (X H D : ℝ) (a d : ℤ)
     have e1 : X * (a:ℝ) * ((a:ℝ) + 2 * p) * p ^ 3 ≤ X * (a:ℝ) * (3 * p) * p ^ 3 := by
       have : X * (a:ℝ) * ((a:ℝ) + 2 * p) ≤ X * (a:ℝ) * (3 * p) := by
         apply mul_le_mul_of_nonneg_left _ hcoef; linarith [hale]
-      nlinarith [this, pow_pos hppos 3]
+      linarith [mul_le_mul_of_nonneg_right this (pow_pos hppos 3).le]
     have e2 : X * (a:ℝ) * (3 * p) * p ^ 3 ≤ 3 * X * (a:ℝ) * (p ^ 2 * q ^ 2) := by
       have : X * (a:ℝ) * (p ^ 2 * p ^ 2) ≤ X * (a:ℝ) * (p ^ 2 * q ^ 2) := by
-        apply mul_le_mul_of_nonneg_left _ hcoef; nlinarith [hq2, hpsq]
-      nlinarith [this, hppos]
+        apply mul_le_mul_of_nonneg_left _ hcoef; exact mul_le_mul_of_nonneg_left hq2 hpsq.le
+      linarith [this]
     linarith [e1, e2]
   have hFlb : X * (a:ℝ) / (2 * p ^ 3) ≤ Ffun X (a:ℝ) p := by
     rw [hFfac, div_le_div_iff₀ (by positivity) (by positivity)]
     have hq2 : q ^ 2 ≤ 4 * p ^ 2 := by
       have : q ≤ 2 * p := by rw [hq]; linarith
-      nlinarith [hqpos, hppos]
+      linarith [mul_le_mul this this hqpos.le (by linarith : (0:ℝ) ≤ 2 * p)]
     -- goal: X·a·(p²·q²) ≤ X·a·(a+2p)·(2·p³)
     have e1 : X * (a:ℝ) * (p ^ 2 * q ^ 2) ≤ X * (a:ℝ) * (p ^ 2 * (4 * p ^ 2)) := by
-      apply mul_le_mul_of_nonneg_left _ hcoef; nlinarith [hq2, hpsq]
+      apply mul_le_mul_of_nonneg_left _ hcoef; exact mul_le_mul_of_nonneg_left hq2 hpsq.le
     have e2 : X * (a:ℝ) * (p ^ 2 * (4 * p ^ 2)) ≤ X * (a:ℝ) * ((a:ℝ) + 2 * p) * (2 * p ^ 3) := by
       have hb : X * (a:ℝ) * (2 * p) * (2 * p ^ 3) ≤ X * (a:ℝ) * ((a:ℝ) + 2 * p) * (2 * p ^ 3) := by
         have : X * (a:ℝ) * (2 * p) ≤ X * (a:ℝ) * ((a:ℝ) + 2 * p) := by
           apply mul_le_mul_of_nonneg_left _ hcoef; linarith [haRpos]
-        nlinarith [this, pow_pos hppos 3]
-      nlinarith [hb, hppos]
+        linarith [mul_le_mul_of_nonneg_right this (by positivity : (0:ℝ) ≤ 2 * p ^ 3)]
+      linarith [hb]
     linarith [e1, e2]
   -- F < 1/2
   have hFhalf : Ffun X (a:ℝ) p < 1 / 2 := by
@@ -188,13 +189,13 @@ theorem tiny_gap_impossible (X H D : ℝ) (a d : ℤ)
       rw [div_lt_iff₀ (by positivity)]
       have hh : (a:ℝ) < p ^ 3 / (6 * X) := by rw [hp]; exact haltd3
       rw [lt_div_iff₀ (by positivity)] at hh
-      nlinarith [hh, hX, pow_pos hppos 3]
+      linarith [hh]
     linarith [hFub]
   -- δ = H/p²;  e0 - e1 ∈ [-δ, δ];  δ < 1/2
   have hδlt : H / p ^ 2 < 1 / 2 := by
     rw [div_lt_iff₀ hpsq]
     have hpD : D ^ 2 ≤ p ^ 2 := by apply pow_le_pow_left₀ hDpos.le hDd
-    nlinarith [hH, hHD2, hpD]
+    linarith [hH, hHD2, hpD]
   have he1' : e1 ≤ H / p ^ 2 := by
     refine le_trans he1hi ?_
     apply div_le_div_of_nonneg_left (by linarith) hpsq
@@ -219,12 +220,14 @@ theorem tiny_gap_impossible (X H D : ℝ) (a d : ℤ)
   have hchain : X * (a:ℝ) / (2 * p ^ 3) ≤ H / p ^ 2 := le_trans hFlb hFle
   have haub : X * (a:ℝ) ≤ 2 * H * p := by
     rw [div_le_div_iff₀ (by positivity) hpsq] at hchain
-    nlinarith [hchain, pow_pos hppos 3, hppos, hpsq]
+    exact le_of_mul_le_mul_right
+      (by linarith [hchain] : X * (a:ℝ) * p ^ 2 ≤ 2 * H * p * p ^ 2) hpsq
   -- contradiction: X·a ≤ 2Hp = 2Hd ≤ 4HD ≤ X/2 < X ≤ X·a
   have : X * (a:ℝ) ≤ X / 2 := by
-    have h2Hp : 2 * H * p ≤ 4 * H * D := by rw [hp]; nlinarith [hd2D, hH]
-    nlinarith [haub, h2Hp, hHD]
-  nlinarith [this, haR, hX]
+    have h2Hp : 2 * H * p ≤ 4 * H * D := by
+      rw [hp]; linarith [mul_le_mul_of_nonneg_left hd2D (by linarith : (0:ℝ) ≤ 2 * H)]
+    linarith [haub, h2Hp, hHD]
+  linarith [this, mul_le_mul_of_nonneg_left haR hX.le]
 
 /-! ## Determinant isolation -/
 
@@ -240,9 +243,8 @@ private theorem Dfun_factor (X a b d : ℝ)
         / (d ^ 2 * (d + a) ^ 2 * (d + a + b) ^ 2) := by
   unfold Dfun; field_simp; ring
 
-set_option maxHeartbeats 2000000 in
 /-- Two-sided bound on `Δ₀` for `D ≤ d ≤ 2D`, `a+b ≤ d`, `a,b>0`. -/
-private theorem Dfun_bounds (X H D a b d : ℝ)
+private theorem Dfun_bounds (X _H D a b d : ℝ)
     (hX : 0 < X) (hD : 0 < D) (ha : 0 < a) (hb : 0 < b)
     (hDd : D ≤ d) (hd2D : d ≤ 2 * D) (hab : a + b ≤ d) :
     (3 / 256 : ℝ) * X * (a * b * (a + b)) / D ^ 4 ≤ Dfun X a b d ∧
@@ -263,20 +265,25 @@ private theorem Dfun_bounds (X H D a b d : ℝ)
   have hval : Dfun X a b d = Num / Den := by rw [Dfun_factor X a b d hane hbne hcne, hN, hDen]
   -- polynomial G bounds:  3d² ≤ G ≤ 11d²
   have hG_lb : 3 * d ^ 2 ≤ a ^ 2 + a * b + 4 * a * d + 2 * b * d + 3 * d ^ 2 := by
-    nlinarith [ha, hb, hdpos]
+    linarith [sq_nonneg a, mul_pos ha hb, mul_pos ha hdpos, mul_pos hb hdpos]
   have hG_ub : a ^ 2 + a * b + 4 * a * d + 2 * b * d + 3 * d ^ 2 ≤ 11 * d ^ 2 := by
-    nlinarith [hale, hble, ha.le, hb.le, hdpos]
+    linarith [mul_le_mul hale hale ha.le hdpos.le, mul_le_mul hale hble hb.le hdpos.le,
+      mul_le_mul_of_nonneg_right hale hdpos.le, mul_le_mul_of_nonneg_right hble hdpos.le]
   -- Den bounds:  d⁶ ≤ Den ≤ 16 d⁶ ;  and d⁶ ≥ D⁶, d⁶ ≤ 16 D⁶
   have hDen_lb : d ^ 6 ≤ Den := by
     rw [hDen]
-    have h1 : d ^ 2 ≤ (d + a) ^ 2 := by nlinarith [ha, hdpos]
-    have h2 : d ^ 2 ≤ (d + a + b) ^ 2 := by nlinarith [ha, hb, hdpos]
+    have h1 : d ^ 2 ≤ (d + a) ^ 2 := by linarith [mul_pos ha hdpos, sq_nonneg a]
+    have h2 : d ^ 2 ≤ (d + a + b) ^ 2 := by
+      linarith [sq_nonneg a, sq_nonneg b, mul_pos ha hb, mul_pos ha hdpos, mul_pos hb hdpos]
     calc d ^ 6 = d ^ 2 * d ^ 2 * d ^ 2 := by ring
       _ ≤ d ^ 2 * (d + a) ^ 2 * (d + a + b) ^ 2 := by gcongr
   have hDen_ub : Den ≤ 16 * d ^ 6 := by
     rw [hDen]
-    have h1 : (d + a) ^ 2 ≤ 4 * d ^ 2 := by nlinarith [hale, hdpos]
-    have h2 : (d + a + b) ^ 2 ≤ 4 * d ^ 2 := by nlinarith [hab, hdpos]
+    have h1 : (d + a) ^ 2 ≤ 4 * d ^ 2 := by
+      linarith [mul_le_mul_of_nonneg_right hale hdpos.le, mul_le_mul hale hale ha.le hdpos.le]
+    have h2 : (d + a + b) ^ 2 ≤ 4 * d ^ 2 := by
+      linarith [mul_le_mul hab hab (by linarith : (0:ℝ) ≤ a + b) hdpos.le,
+        mul_le_mul_of_nonneg_left hab hdpos.le]
     calc d ^ 2 * (d + a) ^ 2 * (d + a + b) ^ 2 ≤ d ^ 2 * (4 * d ^ 2) * (4 * d ^ 2) := by
           gcongr
       _ = 16 * d ^ 6 := by ring
@@ -284,28 +291,36 @@ private theorem Dfun_bounds (X H D a b d : ℝ)
   · -- lower:  (3/256) X ab(a+b)/D⁴ ≤ Num/Den
     rw [hval, le_div_iff₀ hDenpos]
     -- Num ≥ X ab(a+b)·3d², Den ≤ 16 d⁶ ≤ 16·(2D)⁴·d²... use Den ≤ 16 d⁶ and d ≤ 2D
-    have hd6 : d ^ 6 ≤ (2 * D) ^ 4 * d ^ 2 := by
-      have : d ^ 4 ≤ (2 * D) ^ 4 := by apply pow_le_pow_left₀ hdpos.le hd2D
+    have hd6 : d ^ 6 ≤ 16 * D ^ 4 * d ^ 2 := by
+      have h4 : d ^ 4 ≤ (2 * D) ^ 4 := pow_le_pow_left₀ hdpos.le hd2D 4
       calc d ^ 6 = d ^ 4 * d ^ 2 := by ring
         _ ≤ (2 * D) ^ 4 * d ^ 2 := by gcongr
+        _ = 16 * D ^ 4 * d ^ 2 := by ring
     have hNum_lb : X * (a * b * (a + b)) * (3 * d ^ 2) ≤ Num := by
       rw [hN]
-      have : (0:ℝ) ≤ X * (a * b * (a + b)) := by positivity
-      nlinarith [hG_lb, this]
+      have hC : (0:ℝ) ≤ X * (a * b * (a + b)) := by positivity
+      linarith [mul_le_mul_of_nonneg_left hG_lb hC]
     have hkey : (3 / 256 : ℝ) * X * (a * b * (a + b)) / D ^ 4 * Den
         ≤ (3 / 256 : ℝ) * X * (a * b * (a + b)) / D ^ 4 * (16 * d ^ 6) := by
       apply mul_le_mul_of_nonneg_left hDen_ub
       apply div_nonneg (by positivity) (by positivity)
     refine le_trans hkey ?_
     rw [div_mul_eq_mul_div, div_le_iff₀ (by positivity)]
-    nlinarith [hNum_lb, hd6, pow_pos hdpos 2, hD, mul_pos (mul_pos ha hb) (by linarith : (0:ℝ) < a + b), hX]
+    have hC : (0:ℝ) ≤ X * (a * b * (a + b)) := by positivity
+    have HA : X * (a * b * (a + b)) * (3 * d ^ 2) * D ^ 4 ≤ Num * D ^ 4 :=
+      mul_le_mul_of_nonneg_right hNum_lb (by positivity)
+    have HB : X * (a * b * (a + b)) * d ^ 6 ≤ X * (a * b * (a + b)) * (16 * D ^ 4 * d ^ 2) :=
+      mul_le_mul_of_nonneg_left hd6 hC
+    linarith [HA, HB]
   · -- upper:  Num/Den ≤ 11 X ab(a+b)/D⁴
     rw [hval, div_le_iff₀ hDenpos]
     have hNum_ub : Num ≤ X * (a * b * (a + b)) * (11 * d ^ 2) := by
       rw [hN]
-      have : (0:ℝ) ≤ X * (a * b * (a + b)) := by positivity
-      nlinarith [hG_ub, this]
-    have hD4d6 : D ^ 4 * d ^ 2 ≤ d ^ 6 := by nlinarith [pow_le_pow_left₀ hD.le hDd 4, pow_pos hdpos 2, hDd, hdpos, hD]
+      have hC : (0:ℝ) ≤ X * (a * b * (a + b)) := by positivity
+      linarith [mul_le_mul_of_nonneg_left hG_ub hC]
+    have hD4d6 : D ^ 4 * d ^ 2 ≤ d ^ 6 := by
+      linarith [mul_le_mul_of_nonneg_right (pow_le_pow_left₀ hD.le hDd 4)
+        (by positivity : (0:ℝ) ≤ d ^ 2)]
     -- 11 X ab(a+b)/D⁴ · Den ≥ 11 X ab(a+b)/D⁴ · d⁶ ≥ 11 X ab(a+b)·d²  ≥ Num
     have hk1 : 11 * X * (a * b * (a + b)) / D ^ 4 * d ^ 6
         ≤ 11 * X * (a * b * (a + b)) / D ^ 4 * Den := by
@@ -313,9 +328,14 @@ private theorem Dfun_bounds (X H D a b d : ℝ)
       apply div_nonneg (by positivity) (by positivity)
     refine le_trans ?_ hk1
     rw [div_mul_eq_mul_div, le_div_iff₀ (by positivity)]
-    nlinarith [hNum_ub, hD4d6, mul_pos (mul_pos ha hb) (by linarith : (0:ℝ) < a + b), hX, pow_pos hdpos 2]
+    have hC : (0:ℝ) ≤ X * (a * b * (a + b)) := by positivity
+    have HA : Num * D ^ 4 ≤ X * (a * b * (a + b)) * (11 * d ^ 2) * D ^ 4 :=
+      mul_le_mul_of_nonneg_right hNum_ub (by positivity)
+    have HB : 11 * (X * (a * b * (a + b))) * (D ^ 4 * d ^ 2)
+        ≤ 11 * (X * (a * b * (a + b))) * d ^ 6 :=
+      mul_le_mul_of_nonneg_left hD4d6 (by positivity)
+    linarith [HA, HB]
 
-set_option maxHeartbeats 2000000 in
 /-- **No two consecutive sub-threshold gaps.** For three consecutive `𝒟`-elements
 `d, d+a, d+a+b` (window `[X,X+H]`, `0<a`, `0<b`) in `[D,2D]` with `a+b ≤ d`, the algebraic
 threshold conditions below (both gaps `≤ T₀ = thr/2`, the determinant `Δ₀` dominating its
@@ -405,25 +425,26 @@ theorem no_two_small_gaps (X H D : ℝ) (a b d : ℤ) (T0 : ℝ)
     refine le_trans hD0_ub ?_
     -- 11 X ab(a+b)/D⁴ ≤ 11 X (2T0³)... ≤ 11/32, using ab(a+b) ≤ 2T0³ and 64 X T0³ ≤ D⁴
     have habp : (a:ℝ) * (b:ℝ) * ((a:ℝ) + b) ≤ 2 * T0 ^ 3 := by
-      have h1 : (a:ℝ) * (b:ℝ) ≤ T0 ^ 2 := by nlinarith [haT, hbT, haR, hbR, hT0]
+      have h1 : (a:ℝ) * (b:ℝ) ≤ T0 ^ 2 := by linarith [mul_le_mul haT hbT hbR.le hT0.le]
       have h2 : (a:ℝ) + b ≤ 2 * T0 := hab2T
-      nlinarith [h1, h2, haR, hbR, hT0, mul_pos haR hbR]
-    have hXT : 64 * X * T0 ^ 3 ≤ D ^ 4 := by nlinarith [hcube]
+      linarith [mul_le_mul h1 h2 (by linarith : (0:ℝ) ≤ (a:ℝ) + b)
+        (by positivity : (0:ℝ) ≤ T0 ^ 2)]
+    have hXT : 64 * X * T0 ^ 3 ≤ D ^ 4 := by linarith [hcube]
     rw [div_le_iff₀ (by positivity)]
     have hstep : 11 * X * ((a:ℝ) * (b:ℝ) * ((a:ℝ) + b)) ≤ 11 * X * (2 * T0 ^ 3) := by
       apply mul_le_mul_of_nonneg_left habp (by positivity)
-    nlinarith [hstep, hXT, hX, pow_pos hT0 3]
+    linarith [hstep, hXT]
   -- |errsum| ≤ 1/4
   have herr_quarter : |errsum| ≤ 1 / 4 := by
     refine le_trans herr_bd ?_
     -- 2(a+b) H/D² ≤ 4 T0 H/D² ≤ 1/4, using a+b ≤ 2T0 and 16 H T0 ≤ D²
-    have h16 : 16 * H * T0 ≤ D ^ 2 := by nlinarith [heps]
+    have h16 : 16 * H * T0 ≤ D ^ 2 := by linarith [heps]
     have hle : 2 * ((a:ℝ) + b) * (H / D ^ 2) ≤ 4 * T0 * (H / D ^ 2) := by
       have : 2 * ((a:ℝ) + b) ≤ 4 * T0 := by linarith [hab2T]
       apply mul_le_mul_of_nonneg_right this hHDnn
     refine le_trans hle ?_
     rw [show (4:ℝ) * T0 * (H / D ^ 2) = 4 * T0 * H / D ^ 2 by ring, div_le_iff₀ (by positivity)]
-    nlinarith [h16, hT0, hH]
+    linarith [h16]
   -- |J| < 1
   have hJabs_lt : |(J:ℝ)| < 1 := by
     rw [hJval]
