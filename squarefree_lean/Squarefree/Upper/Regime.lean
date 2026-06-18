@@ -22,7 +22,7 @@ open Squarefree.Counting
 
 namespace Squarefree
 
-set_option maxHeartbeats 4000000
+set_option maxHeartbeats 400000
 
 namespace Prop61
 
@@ -86,7 +86,7 @@ private theorem Omega_le_H_RHS3 {P : Globals} (S : Scale P)
     rw [show (4096:ℝ) = Real.sqrt 16777216 by rw [show (16777216:ℝ) = 4096^2 by norm_num,
       Real.sqrt_sq (by norm_num)]]
     exact Real.sqrt_le_sqrt hΩfloor
-  nlinarith [h4096, hΩ]
+  exact le_mul_of_one_le_left hΩ.le (by linarith [h4096])
 
 /-- `R²/(H·RHS₃)² = F/H` (exact scale identity). -/
 private theorem R_sq_over {P : Globals} (S : Scale P) :
@@ -121,7 +121,7 @@ private theorem R_le_sqrt_FH_RHS3 {P : Globals} (S : Scale P) :
     have hsqsq : (Real.sqrt (S.F / P.H) * V) ^ 2 = S.R ^ 2 := by
       rw [mul_pow, Real.sq_sqrt (show (0:ℝ) ≤ S.F / P.H by positivity), hkey]
     have hnn : 0 ≤ Real.sqrt (S.F / P.H) * V := mul_nonneg (Real.sqrt_nonneg _) hVpos.le
-    nlinarith [hsqsq, hnn, hRpos.le, sq_nonneg (S.R - Real.sqrt (S.F / P.H) * V)]
+    exact ((pow_left_inj₀ hnn hRpos.le (by norm_num)).mp hsqsq).symm
   exact le_of_eq heq
 
 /-- Monotonicity in the budget constant: bumping `C₀ ↦ C` (with `C₀ ≤ C`) only enlarges
@@ -142,14 +142,14 @@ private theorem widen_budget {P : Globals} (S : Scale P) (Sr C₀ C : ℝ)
   refine le_trans h ?_
   have hH := P.H_pos
   have hxle : P.X ^ (C₀ * P.u) ≤ P.X ^ (C * P.u) :=
-    Real.rpow_le_rpow_of_exponent_le hX (by nlinarith [hu, hCC])
+    Real.rpow_le_rpow_of_exponent_le hX (mul_le_mul_of_nonneg_right hCC hu)
   have hpos0 : (0:ℝ) ≤ P.X ^ (C₀ * P.u) := (Real.rpow_pos_of_pos (by linarith) _).le
   have hCHle : C₀ * P.H * P.X ^ (C₀ * P.u) ≤ C * P.H * P.X ^ (C * P.u) := by
-    have h1 : C₀ * P.H ≤ C * P.H := by nlinarith [hH.le, hCC]
+    have h1 : C₀ * P.H ≤ C * P.H := mul_le_mul_of_nonneg_right hCC hH.le
     calc C₀ * P.H * P.X ^ (C₀ * P.u) ≤ C * P.H * P.X ^ (C₀ * P.u) := by
           exact mul_le_mul_of_nonneg_right h1 hpos0
       _ ≤ C * P.H * P.X ^ (C * P.u) := by
-          have : (0:ℝ) ≤ C * P.H := by nlinarith [hH.le, hC₀, hCC]
+          have : (0:ℝ) ≤ C * P.H := mul_nonneg (by linarith) hH.le
           exact mul_le_mul_of_nonneg_left hxle this
   exact mul_le_mul_of_nonneg_right hCHle hrhs
 
@@ -170,8 +170,8 @@ private theorem K0delta0_le {P : Globals} (S : Scale P)
   rw [div_le_iff₀ (by positivity)]
   rw [show K0 * S.F / 16777216 * (P.G * P.H * S.Ω ^ 3)
       = (K0 * S.F) * ((P.G * P.H * S.Ω ^ 3) / 16777216) by ring]
-  nlinarith [hKF, hΩfloor, mul_le_mul_of_nonneg_left
-    (show (1:ℝ) ≤ (P.G * P.H * S.Ω ^ 3) / 16777216 by rw [le_div_iff₀ (by norm_num)]; linarith) hKF]
+  exact le_mul_of_one_le_right hKF
+    (show (1:ℝ) ≤ (P.G * P.H * S.Ω ^ 3) / 16777216 by rw [le_div_iff₀ (by norm_num)]; linarith)
 
 /-- The §6 low-curvature (elementary-count) branch of Prop 6.1. -/
 private theorem prop6_lowF :
@@ -237,7 +237,7 @@ private theorem prop6_lowF :
   have hδ0AF : delta0 S * S.A / S.F = S.Ω / S.R := by
     have hkey : S.R * delta0 S * S.A / S.F = S.Ω := R_delta0_A_div_F S
     field_simp at hkey ⊢
-    nlinarith [hkey, hRpos]
+    linear_combination hkey
   have hlead : 2 * δ / (cderiv6 * S.F / S.A) = (2 * K0 / cderiv6) * (S.Ω / S.R) := by
     rw [hδdef, ← hδ0AF]
     field_simp
@@ -304,7 +304,7 @@ private theorem prop6_lowF :
     -- Ω/R ≤ 16Ω,  1 ≤ 16R
     have hΩR : S.Ω / S.R ≤ 16 * S.Ω := by
       rw [div_le_iff₀ hRpos]
-      nlinarith [hRge, hΩ, mul_le_mul_of_nonneg_left hRge (by positivity : (0:ℝ) ≤ 16 * S.Ω)]
+      linarith [mul_le_mul_of_nonneg_left hRge (by positivity : (0:ℝ) ≤ 16 * S.Ω)]
     -- collapse to (64K0/cderiv6)Ω + 32R, times B₁
     set q : ℝ := S.Ω / S.R with hqdef
     have hqR : q * S.R = S.Ω := by rw [hqdef]; field_simp
@@ -314,18 +314,20 @@ private theorem prop6_lowF :
     have hcollapse : (Ua.card : ℝ) * (B₁ * (k * q + 1))
         ≤ B₁ * ((64 * K0 / cderiv6) * S.Ω + 32 * S.R) := by
       have hpf : (0:ℝ) ≤ B₁ * (k * q + 1) := by
-        have : (0:ℝ) ≤ k * q := mul_nonneg hk hqnn
-        nlinarith [hB1pos]
+        have hkq : (0:ℝ) ≤ k * q := mul_nonneg hk hqnn
+        exact mul_nonneg hB1pos.le (by linarith)
       have h16R : (1:ℝ) ≤ 16 * S.R := by linarith [hRge]
       -- (16R+1)·(kq+1) = 16R·kq + kq + 16R + 1 ≤ 16kΩ + 16kΩ + 16R + 16R
       have hstepc : (16 * S.R + 1) * (k * q + 1)
           ≤ (64 * K0 / cderiv6) * S.Ω + 32 * S.R := by
         have e1 : (16 * S.R) * (k * q) = 16 * k * S.Ω := by rw [← hqR]; ring
         have e2 : k * q ≤ 16 * k * S.Ω := by
-          have := mul_le_mul_of_nonneg_left hΩR hk; nlinarith [this, hqdef]
+          linarith [mul_le_mul_of_nonneg_left hΩR hk]
         have hkΩ : (64 * K0 / cderiv6) * S.Ω = 16 * k * S.Ω + 16 * k * S.Ω := by
           rw [hkdef]; ring
-        nlinarith [e1, e2, h16R, hkΩ, hk, hΩ, mul_nonneg hk hqnn]
+        have hexp : (16 * S.R + 1) * (k * q + 1)
+            = 16 * S.R * (k * q) + 16 * S.R + k * q + 1 := by ring
+        linarith [e1, e2, h16R, hkΩ, hexp]
       calc (Ua.card : ℝ) * (B₁ * (k * q + 1))
           ≤ (16 * S.R + 1) * (B₁ * (k * q + 1)) :=
             mul_le_mul_of_nonneg_right hcardle hpf
@@ -343,7 +345,9 @@ private theorem prop6_lowF :
         rw [hsrtdef]
         apply Real.sqrt_le_sqrt
         rw [div_le_iff₀ hH, one_div, inv_mul_eq_div, le_div_iff₀ hLo]
-        nlinarith [hFle, hHge1, hLo, hFpos]
+        have h1 := mul_le_mul_of_nonneg_right hFle hLo.le
+        have h2 : (1 / prop6ScaleLo) * prop6ScaleLo = 1 := by field_simp
+        linarith [h1, h2, hHge1]
       exact mul_le_mul_of_nonneg_right hsqle hV3pos.le
     -- B₁·((64K0/cderiv6)Ω + 32R) ≤ C·V3 ≤ C·H·X^{Cu}·RHS
     have hstep : B₁ * ((64 * K0 / cderiv6) * S.Ω + 32 * S.R) ≤ C * V3 := by
@@ -361,7 +365,9 @@ private theorem prop6_lowF :
       rw [this]
       have hVle : (B₁ * (64 * K0 / cderiv6) + 32 * B₁ * srt) * V3
           ≤ (B₁ * (64 * K0 / cderiv6) + 32 * B₁ * srt + 1) * V3 := by
-        nlinarith [hV3pos]
+        have hd : (B₁ * (64 * K0 / cderiv6) + 32 * B₁ * srt + 1) * V3
+            = (B₁ * (64 * K0 / cderiv6) + 32 * B₁ * srt) * V3 + V3 := by ring
+        linarith [hV3pos, hd]
       exact hVle
     refine le_trans hstep ?_
     -- C·V3 = C·H·RHS3 ≤ C·H·RHS3·X^{Cu} ≤ C·H·X^{Cu}·(RHS)
@@ -372,15 +378,14 @@ private theorem prop6_lowF :
     calc C * P.H * (P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ))
         ≤ C * P.H * P.X ^ (C * P.u) * (P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ)) := by
           have hCHnn : (0:ℝ) ≤ C * P.H := by positivity
-          nlinarith [hRHS3pos, hXpow, hCHnn,
-            mul_le_mul_of_nonneg_left hXpow hCHnn]
+          exact mul_le_mul_of_nonneg_right (le_mul_of_one_le_right hCHnn hXpow) hRHS3pos.le
       _ ≤ C * P.H * P.X ^ (C * P.u) *
           ( S.x * P.G * S.Ω ^ 2
           + S.x ^ (2/3 : ℝ) * P.G ^ (4/3 : ℝ) * S.Ω ^ (11/3 : ℝ)
           + P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ) ) := by
           have hCHX : (0:ℝ) ≤ C * P.H * P.X ^ (C * P.u) := by positivity
-          have := RHS1_nonneg S; have := RHS2_nonneg S
-          nlinarith [hCHX, this, RHS1_nonneg S, RHS2_nonneg S, hRHS3pos]
+          have hr1 := RHS1_nonneg S; have hr2 := RHS2_nonneg S
+          exact mul_le_mul_of_nonneg_left (by linarith) hCHX
 
 /-! ## High-curvature branch (`1 < prop6ScaleLo·F`) -/
 
@@ -495,7 +500,7 @@ private theorem highF_H_le {P : Globals} (S : Scale P)
     rw [hXid]; field_simp; ring
   rw [heq] at hchain
   rw [le_div_iff₀ (by positivity)] at hchain
-  nlinarith [hchain, hH]
+  linarith [hchain, hH]
 
 /-- **Index bridge**: the count over the integer window `[⌈A⌉, ⌊2A⌋]` is at most the count over
 the real image of the half-open window `(⌊A⌋, ⌊2A⌋]` plus one (the possibly-omitted endpoint
@@ -603,7 +608,9 @@ private theorem highF_perr_count {P : Globals} (S : Scale P) {r : ℝ}
   set Tt3arg : ℝ := S.A * Real.sqrt ((K0 * delta0 S) / T) with hTt3argdef
   have hTt1pos : 0 < Tt1 := by rw [hTt1def]; exact Real.rpow_pos_of_pos (by positivity) _
   have hTt1ge1 : (1:ℝ) ≤ Tt1 := by
-    rw [hTt1def]; apply Real.one_le_rpow _ (by norm_num); nlinarith [hA1, hT1]
+    rw [hTt1def]; apply Real.one_le_rpow _ (by norm_num)
+    calc (1:ℝ) = 1 * 1 := (one_mul 1).symm
+      _ ≤ S.A * T := mul_le_mul hA1.le hT1.le zero_le_one (by linarith [hA1])
   have hTt3argnn : 0 ≤ Tt3arg := by rw [hTt3argdef]; positivity
   have hkk0 : 0 ≤ kk := hcc.le
   -- (1) (A·T)^{1/3} ≤ prop6ScaleHi^{1/3}·AF13
@@ -639,7 +646,7 @@ private theorem highF_perr_count {P : Globals} (S : Scale P) {r : ℝ}
     rw [show S.A ^ 2 * (K0 * delta0 S / T) = K0 * (S.A ^ 2 * delta0 S) / T by ring,
         highF_A2delta0 S]
     rw [div_le_iff₀ hTpos]
-    nlinarith [hK0, hH, hT1.le, mul_pos hK0 hH]
+    exact le_mul_of_one_le_right (mul_pos hK0 hH).le hT1.le
   -- log bound: log(2+Tt3arg) ≤ logc·X^u
   have hlogbound : Real.log (2 + Tt3arg) ≤ logc * P.X ^ P.u := by
     have hmono : Real.log (2 + Tt3arg) ≤ Real.log (2 + Real.sqrt (K0 * P.H)) :=
@@ -649,7 +656,10 @@ private theorem highF_perr_count {P : Globals} (S : Scale P) {r : ℝ}
       rw [show (1:ℝ) = Real.sqrt 1 by simp]; exact Real.sqrt_le_sqrt hHge1
     have hsplit : Real.sqrt (K0 * P.H) = Real.sqrt K0 * Real.sqrt P.H := Real.sqrt_mul hK0.le P.H
     have hub : (2:ℝ) + Real.sqrt (K0 * P.H) ≤ (2 + Real.sqrt K0) * Real.sqrt P.H := by
-      rw [hsplit]; nlinarith [Real.sqrt_nonneg K0, hsqrtH1]
+      rw [hsplit]
+      have hd : (2 + Real.sqrt K0) * Real.sqrt P.H
+          = 2 * Real.sqrt P.H + Real.sqrt K0 * Real.sqrt P.H := by ring
+      linarith [hd, hsqrtH1]
     have hlogle : Real.log (2 + Real.sqrt (K0 * P.H))
         ≤ Real.log (2 + Real.sqrt K0) + Real.log (Real.sqrt P.H) := by
       refine le_trans (Real.log_le_log (by positivity) hub) ?_
@@ -658,14 +668,13 @@ private theorem highF_perr_count {P : Globals} (S : Scale P) {r : ℝ}
     have hlogsqrtH : Real.log (Real.sqrt P.H) ≤ (1/2) * P.X ^ P.u := by
       rw [Real.log_sqrt hH.le]
       have hlH : Real.log P.H ≤ Real.log P.X := Real.log_le_log hH hHleX
-      have hXu0 : (0:ℝ) ≤ P.X ^ P.u := (Real.rpow_pos_of_pos hX0 _).le
-      nlinarith [hlH, hlog, hXu0]
+      linarith [hlH, hlog]
     have hXupow : (1:ℝ) ≤ P.X ^ P.u := Real.one_le_rpow hX hu.le
     have hl2K0 : (0:ℝ) ≤ Real.log (2 + Real.sqrt K0) :=
       Real.log_nonneg (by have := Real.sqrt_nonneg K0; linarith)
     rw [hlogcdef]
-    have hself : Real.log (2 + Real.sqrt K0) ≤ Real.log (2 + Real.sqrt K0) * P.X ^ P.u := by
-      nlinarith [hl2K0, hXupow]
+    have hself : Real.log (2 + Real.sqrt K0) ≤ Real.log (2 + Real.sqrt K0) * P.X ^ P.u :=
+      le_mul_of_one_le_right hl2K0 hXupow
     rw [show (Real.log (2 + Real.sqrt K0) + 1/2) * P.X ^ P.u
           = Real.log (2 + Real.sqrt K0) * P.X ^ P.u + (1/2) * P.X ^ P.u from by ring]
     linarith [hself, hlogsqrtH]
@@ -686,7 +695,9 @@ private theorem highF_perr_count {P : Globals} (S : Scale P) {r : ℝ}
   have q3 : kk * (Tt3arg * Real.log (2 + Tt3arg))
       ≤ kk * (Real.sqrt (K0 / prop6ScaleLo) * sd0F * (logc * P.X ^ P.u)) :=
     mul_le_mul_of_nonneg_left hb3logterm hkk0
-  have q4 : kk * 1 + 1 ≤ 2 * (kk * SAF) := by nlinarith [hcc, hkk2, hSAF1]
+  have q4 : kk * 1 + 1 ≤ 2 * (kk * SAF) := by
+    have hmul : kk ≤ kk * SAF := le_mul_of_one_le_right hcc.le hSAF1
+    linarith [hmul, hkk2]
   rw [show kk * (Tt1 + K0 * (S.A * delta0 S) + Tt3arg * Real.log (2 + Tt3arg) + 1) + 1
         = kk * Tt1 + kk * (K0 * (S.A * delta0 S))
           + kk * (Tt3arg * Real.log (2 + Tt3arg)) + (kk * 1 + 1) from by ring]
@@ -737,7 +748,8 @@ private theorem prop6_highF :
   refine ⟨96 * kk * Ccoef + 1, by positivity, ?_⟩
   set C : ℝ := 96 * kk * Ccoef + 1 with hCdef
   have hCpos : 0 < C := by rw [hCdef]; positivity
-  have hC1 : (1:ℝ) ≤ C := by rw [hCdef]; nlinarith [mul_nonneg (mul_nonneg (by norm_num : (0:ℝ) ≤ 96) hcc.le) hCcoef0.le]
+  have hC1 : (1:ℝ) ≤ C := by
+    rw [hCdef]; linarith [mul_nonneg (mul_nonneg (by norm_num : (0:ℝ) ≤ 96) hcc.le) hCcoef0.le]
   intro P S hX hu hg1 hAD hband hΩfloor hlog hF RaOf hwit
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hH := P.H_pos; have hG := P.G_pos; have hΔ := S.Δ_pos; have hΩ := S.Ω_pos
@@ -865,24 +877,34 @@ private theorem prop6_highF :
       Real.log_nonneg (by have := Real.sqrt_nonneg K0; linarith)
     -- coefficient bounds: each absolute coeff ≤ C
     have hSHicoef : (96:ℝ) * kk * prop6ScaleHi ^ (1/3 : ℝ) ≤ C := by
-      rw [hCdef, hCcoefdef]
-      have h1 : (0:ℝ) ≤ K0 := hK0.le
       have h2 : (0:ℝ) ≤ Real.sqrt (K0 / prop6ScaleLo) * logc := mul_nonneg hsKL0 hlogc0
-      nlinarith [hkk0, hSHi13nn, h1, h2, hsrt0, mul_nonneg hkk0 hSHi13nn]
+      have hle : prop6ScaleHi ^ (1/3 : ℝ) ≤ Ccoef := by
+        rw [hCcoefdef]; linarith [hK0.le, h2, hsrt0]
+      calc (96:ℝ) * kk * prop6ScaleHi ^ (1/3 : ℝ)
+          ≤ 96 * kk * Ccoef := mul_le_mul_of_nonneg_left hle (by linarith [hkk0])
+        _ ≤ C := by rw [hCdef]; linarith
     have hK0coef : (32:ℝ) * kk * K0 ≤ C := by
-      rw [hCdef, hCcoefdef]
-      have h1 : (0:ℝ) ≤ prop6ScaleHi ^ (1/3 : ℝ) := hSHi13nn
       have h2 : (0:ℝ) ≤ Real.sqrt (K0 / prop6ScaleLo) * logc := mul_nonneg hsKL0 hlogc0
-      nlinarith [hkk0, hK0, h1, h2, hsrt0, mul_nonneg hkk0 hK0.le]
+      have hle : K0 ≤ Ccoef := by
+        rw [hCcoefdef]; linarith [hSHi13nn, h2, hsrt0]
+      calc (32:ℝ) * kk * K0
+          ≤ 96 * kk * Ccoef :=
+            mul_le_mul (by linarith [hkk0]) hle hK0.le (by linarith [hkk0])
+        _ ≤ C := by rw [hCdef]; linarith
     have hRHS3coef : (32:ℝ) * kk * Real.sqrt (K0 / prop6ScaleLo) * logc ≤ C := by
-      rw [hCdef, hCcoefdef]
-      have h1 : (0:ℝ) ≤ prop6ScaleHi ^ (1/3 : ℝ) := hSHi13nn
-      have h2 : (0:ℝ) ≤ K0 := hK0.le
       have h3 : (0:ℝ) ≤ Real.sqrt (K0 / prop6ScaleLo) * logc := mul_nonneg hsKL0 hlogc0
-      nlinarith [hkk0, h1, h2, h3, hsrt0, mul_nonneg hkk0 h3]
+      have hle : Real.sqrt (K0 / prop6ScaleLo) * logc ≤ Ccoef := by
+        rw [hCcoefdef]; linarith [hSHi13nn, hK0.le, hsrt0]
+      have heq : (32:ℝ) * kk * Real.sqrt (K0 / prop6ScaleLo) * logc
+          = 32 * kk * (Real.sqrt (K0 / prop6ScaleLo) * logc) := by ring
+      rw [heq]
+      calc (32:ℝ) * kk * (Real.sqrt (K0 / prop6ScaleLo) * logc)
+          ≤ 96 * kk * Ccoef :=
+            mul_le_mul (by linarith [hkk0]) hle h3 (by linarith [hkk0])
+        _ ≤ C := by rw [hCdef]; linarith
     -- X^u ≤ X^{Cu}
     have hXuCu : P.X ^ P.u ≤ P.X ^ (C * P.u) :=
-      Real.rpow_le_rpow_of_exponent_le hX (by nlinarith [hu.le, hC1])
+      Real.rpow_le_rpow_of_exponent_le hX (le_mul_of_one_le_left hu.le hC1)
     have hHnn : (0:ℝ) ≤ P.H := hH.le
     have hkkH : (0:ℝ) ≤ kk := hkk0
     -- term 1 (RHS2)
@@ -964,7 +986,7 @@ private theorem prop6_highF :
       rw [← nsmul_eq_mul]
       exact Finset.sum_le_card_nsmul Ua _ _ hperr2
     refine le_trans hsum2 ?_
-    have h64R : (Ua.card : ℝ) * 2 ≤ 64 * S.R := by nlinarith [hcardle, hRpos]
+    have h64R : (Ua.card : ℝ) * 2 ≤ 64 * S.R := by linarith [hcardle]
     refine le_trans h64R ?_
     -- 64R = 64·A·RHS1 ≤ 64·H·RHS1 ≤ Tgt
     have hReq : S.R = S.A * RHS1 := by rw [hRHS1def]; exact highF_R_eq_A_RHS1 S
@@ -980,10 +1002,12 @@ private theorem prop6_highF :
       have h1 : (0:ℝ) ≤ prop6ScaleHi ^ (1/3 : ℝ) := Real.rpow_nonneg hHi.le _
       have h2 : (0:ℝ) ≤ Real.sqrt (K0 / prop6ScaleLo) * logc :=
         mul_nonneg (Real.sqrt_nonneg _) hlogc0
-      nlinarith [hK0, hsrt0, h1, h2]
+      linarith [hK0, hsrt0, h1, h2]
     have h64C : (64:ℝ) ≤ C := by
       rw [hCdef]
-      nlinarith [hkk2, hCcoef1, mul_le_mul hkk2 hCcoef1 (by norm_num) hcc.le]
+      have hm : (2:ℝ) ≤ kk * Ccoef := by
+        have := mul_le_mul hkk2 hCcoef1 (by norm_num) hcc.le; linarith [this]
+      linarith [hm]
     have e1 : (64:ℝ) * (P.H * RHS1) ≤ C * (P.H * RHS1) :=
       mul_le_mul_of_nonneg_right h64C (by positivity)
     refine le_trans e1 ?_

@@ -760,7 +760,7 @@ private theorem sec7_ra_B3_k0_scale {P : Globals} {S : Scale P} {a d : ℝ}
     positivity
   have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
   have hd0 : 0 < d := lt_of_lt_of_le (by positivity : 0 < S.D / 16) hd_lo
-  have hDle : S.D ≤ 16 * d := by nlinarith
+  have hDle : S.D ≤ 16 * d := by linarith [hd_lo]
   have hD4 : S.D ^ 4 ≤ (16 * d) ^ 4 := pow_le_pow_left₀ hDpos.le hDle 4
   have hD4' : S.D ^ 4 ≤ 16 ^ 4 * d ^ 4 := by
     calc
@@ -1478,7 +1478,7 @@ private theorem sec7_ra_dBreve_deriv3_image_sharp_close {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = (51 / 100 : ℝ) * z ^ 6 := by ring
     rw [hP_def]
-    nlinarith [h1, h2, h3, h4, h5, h6, pow_nonneg hz.le 6]
+    linarith [h1, h2, h3, h4, h5, h6, pow_nonneg hz.le 6]
   have hza_bound : (z + a) ^ 2 ≤ ((151 / 100 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (151 / 100 : ℝ) * z := by nlinarith
     exact pow_le_pow_left₀ (by positivity : 0 ≤ z + a) hza 2
@@ -1492,7 +1492,7 @@ private theorem sec7_ra_dBreve_deriv3_image_sharp_close {X a d z : ℝ}
       _ ≤ 12 * 3 ^ 5 * z ^ 8 := by
             have hconst : (3 * (151 / 100 : ℝ) ^ 2 * 400) ≤ 12 * 3 ^ 5 := by
               norm_num
-            nlinarith [hconst, pow_nonneg hz.le 8]
+            linarith [mul_le_mul_of_nonneg_right hconst (pow_nonneg hz.le 8)]
   have hnum_core :
       3 * z ^ 7 * (z + a) ^ 7 * P ≤ 12 * z ^ 10 * Q ^ 5 := by
     calc
@@ -1514,7 +1514,7 @@ private theorem sec7_ra_dBreve_deriv3_image_sharp_close {X a d z : ℝ}
     have hden_right : 0 < (X * a) ^ 3 := by positivity
     rw [div_le_div_iff₀ hden_left hden_right]
     have hmul := mul_le_mul_of_nonneg_right hnum_core (by positivity : 0 ≤ X ^ 3 * a ^ 3)
-    nlinarith
+    linarith [hmul]
   calc
     3 * z ^ 7 * (z + a) ^ 7 * P / (8 * X ^ 3 * a ^ 3 * Q ^ 5)
         ≤ (3 / 2 : ℝ) * z ^ 10 / (X * a) ^ 3 := hstep
@@ -1529,7 +1529,7 @@ private theorem sec7_ra_dBreve_deriv3_image_sharp_close {X a d z : ℝ}
                 (101 / 100 : ℝ) ^ 10 * d ^ 10 by ring]
             have hconst : (3 / 2 : ℝ) * (101 / 100 : ℝ) ^ 10 ≤ 2 := by
               norm_num
-            nlinarith [hconst, pow_nonneg hd.le 10]
+            linarith [mul_le_mul_of_nonneg_right hconst (pow_nonneg hd.le 10)]
           exact div_le_div_of_nonneg_right hnum (by positivity)
 
 private theorem sec7_ra_dBreve_deriv4_Ffun_eq {X a d : ℝ}
@@ -1627,7 +1627,7 @@ private theorem sec7_ra_dBreve_deriv4_image_sharp_close {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = (51 / 100 : ℝ) * z ^ 8 := by ring
     rw [hP_def]
-    nlinarith [h1, h2, h3, h4, h5, h6, h7, h8, pow_nonneg hz.le 8]
+    linarith [h1, h2, h3, h4, h5, h6, h7, h8, pow_nonneg hz.le 8]
   have hza_bound : (z + a) ^ 2 ≤ ((151 / 100 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (151 / 100 : ℝ) * z := by nlinarith
     exact pow_le_pow_left₀ (by positivity : 0 ≤ z + a) hza 2
@@ -1671,7 +1671,7 @@ private theorem sec7_ra_dBreve_deriv4_image_sharp_close {X a d z : ℝ}
     have hden_right : 0 < (X * a) ^ 4 := by positivity
     rw [div_le_div_iff₀ hden_left hden_right]
     have hmul := mul_le_mul_of_nonneg_right hnum_core (by positivity : 0 ≤ X ^ 4 * a ^ 4)
-    nlinarith
+    linarith [hmul]
   calc
     15 * z ^ 9 * (z + a) ^ 9 * (a + 2 * z) * P /
           (16 * X ^ 4 * a ^ 4 * Q ^ 7)
@@ -1686,7 +1686,7 @@ private theorem sec7_ra_dBreve_deriv4_image_sharp_close {X a d z : ℝ}
                 (101 / 100 : ℝ) ^ 13 * d ^ 13 by ring]
             have hconst : 5 * (101 / 100 : ℝ) ^ 13 ≤ 6 := by
               norm_num
-            nlinarith [hconst, pow_nonneg hd.le 13]
+            linarith [mul_le_mul_of_nonneg_right hconst (pow_nonneg hd.le 13)]
           exact div_le_div_of_nonneg_right hnum (by positivity)
 
 private theorem sec7_ra_dBreve_deriv5_Ffun_eq {X a d : ℝ}
@@ -1801,7 +1801,7 @@ private theorem sec7_ra_dBreve_deriv5_image_sharp_close {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = (51 / 100 : ℝ) * z ^ 12 := by ring
     rw [hP_def]
-    nlinarith [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12,
+    linarith [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12,
       pow_nonneg hz.le 12]
   have hza_bound : (z + a) ^ 2 ≤ ((151 / 100 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (151 / 100 : ℝ) * z := by nlinarith
@@ -1840,7 +1840,7 @@ private theorem sec7_ra_dBreve_deriv5_image_sharp_close {X a d z : ℝ}
     have hden_right : 0 < (X * a) ^ 5 := by positivity
     rw [div_le_div_iff₀ hden_left hden_right]
     have hmul := mul_le_mul_of_nonneg_right hnum_core (by positivity : 0 ≤ X ^ 5 * a ^ 5)
-    nlinarith
+    linarith [hmul]
   calc
     45 * z ^ 11 * (z + a) ^ 11 * P / (32 * X ^ 5 * a ^ 5 * Q ^ 9)
         ≤ 20 * z ^ 16 / (X * a) ^ 5 := hstep
@@ -1854,7 +1854,7 @@ private theorem sec7_ra_dBreve_deriv5_image_sharp_close {X a d z : ℝ}
                 (101 / 100 : ℝ) ^ 16 * d ^ 16 by ring]
             have hconst : 20 * (101 / 100 : ℝ) ^ 16 ≤ 25 := by
               norm_num
-            nlinarith [hconst, pow_nonneg hd.le 16]
+            linarith [mul_le_mul_of_nonneg_right hconst (pow_nonneg hd.le 16)]
           exact div_le_div_of_nonneg_right hnum (by positivity)
 
 private theorem sec7_ra_dBreve_deriv6_image_sharp_close {X a d z : ℝ}
@@ -1946,7 +1946,7 @@ private theorem sec7_ra_dBreve_deriv6_image_sharp_close {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = (51 / 100 : ℝ) * z ^ 14 := by ring
     rw [hP_def]
-    nlinarith [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14,
+    linarith [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14,
       pow_nonneg hz.le 14]
   have hza_bound : (z + a) ^ 2 ≤ ((151 / 100 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (151 / 100 : ℝ) * z := by nlinarith
@@ -1992,7 +1992,7 @@ private theorem sec7_ra_dBreve_deriv6_image_sharp_close {X a d z : ℝ}
     have hden_right : 0 < (X * a) ^ 6 := by positivity
     rw [div_le_div_iff₀ hden_left hden_right]
     have hmul := mul_le_mul_of_nonneg_right hnum_core (by positivity : 0 ≤ X ^ 6 * a ^ 6)
-    nlinarith
+    linarith [hmul]
   calc
     315 * z ^ 13 * (z + a) ^ 13 * (a + 2 * z) * P /
           (64 * X ^ 6 * a ^ 6 * Q ^ 11)
@@ -2007,7 +2007,7 @@ private theorem sec7_ra_dBreve_deriv6_image_sharp_close {X a d z : ℝ}
                 (101 / 100 : ℝ) ^ 19 * d ^ 19 by ring]
             have hconst : 112 * (101 / 100 : ℝ) ^ 19 ≤ 150 := by
               norm_num
-            nlinarith [hconst, pow_nonneg hd.le 19]
+            linarith [mul_le_mul_of_nonneg_right hconst (pow_nonneg hd.le 19)]
           exact div_le_div_of_nonneg_right hnum (by positivity)
 
 private theorem sec7_ra_dBreve_iteratedDeriv1_eventually {X a d : ℝ}
@@ -3285,12 +3285,12 @@ private theorem sec7_ra_B3_bound_sharp_k3 {P : Globals} {S : Scale P} {a d j : �
             |F3 * H1 + 3 * F1 * F2 * H2 + F1 ^ 3 * H3|
                 ≤ |F3 * H1 + 3 * F1 * F2 * H2| + |F1 ^ 3 * H3| := abs_add_le _ _
             _ ≤ |F3 * H1| + |3 * F1 * F2 * H2| + |F1 ^ 3 * H3| := by
-                  nlinarith [abs_add_le (F3 * H1) (3 * F1 * F2 * H2)]
+                  linarith [abs_add_le (F3 * H1) (3 * F1 * F2 * H2)]
     _ ≤ (128 * P.X * a / d ^ 6) * ((2 * d ^ 7 / (P.X * a) ^ 2) * |j|) +
         3 * (7 * P.X * a / d ^ 4) * (26 * P.X * a / d ^ 5) *
           ((2 * d ^ 10 / (P.X * a) ^ 3) * |j|) +
         (7 * P.X * a / d ^ 4) ^ 3 * ((6 * d ^ 13 / (P.X * a) ^ 4) * |j|) := by
-          nlinarith [hterm1, hterm2, hterm3]
+          linarith [hterm1, hterm2, hterm3]
     _ = 3406 * |j| * d / (P.X * a) := by
           field_simp [P.X_pos.ne', ha0.ne', hd.ne']
           ring
@@ -3452,7 +3452,7 @@ private theorem sec7_ra_B3_bound_sharp_k4 {P : Globals} {S : Scale P} {a d j : �
                     6 * F1 ^ 2 * F2 * H3| + |F1 ^ 4 * H4| := abs_add_le _ _
             _ ≤ |F4 * H1| + |(4 * F1 * F3 + 3 * F2 ^ 2) * H2| +
                 |6 * F1 ^ 2 * F2 * H3| + |F1 ^ 4 * H4| := by
-                  nlinarith [abs_add_le (F4 * H1 + (4 * F1 * F3 + 3 * F2 ^ 2) * H2)
+                  linarith [abs_add_le (F4 * H1 + (4 * F1 * F3 + 3 * F2 ^ 2) * H2)
                     (6 * F1 ^ 2 * F2 * H3),
                     abs_add_le (F4 * H1) ((4 * F1 * F3 + 3 * F2 ^ 2) * H2)]
     _ ≤ (800 * P.X * a / d ^ 7) * ((2 * d ^ 7 / (P.X * a) ^ 2) * |j|) +
@@ -3462,7 +3462,7 @@ private theorem sec7_ra_B3_bound_sharp_k4 {P : Globals} {S : Scale P} {a d j : �
         6 * (7 * P.X * a / d ^ 4) ^ 2 * (26 * P.X * a / d ^ 5) *
           ((6 * d ^ 13 / (P.X * a) ^ 4) * |j|) +
         (7 * P.X * a / d ^ 4) ^ 4 * ((25 * d ^ 16 / (P.X * a) ^ 5) * |j|) := by
-          nlinarith [hterm1, hterm2, hterm3, hterm4]
+          linarith [hterm1, hterm2, hterm3, hterm4]
     _ = 118713 * |j| / (P.X * a) := by
           field_simp [P.X_pos.ne', ha0.ne', hd.ne']
           ring
@@ -3701,7 +3701,7 @@ private theorem sec7_ra_B3_bound_sharp_k5 {P : Globals} {S : Scale P} {a d j : �
     _ ≤ |F5 * H1| + |(5 * F1 * F4 + 10 * F2 * F3) * H2| +
         |5 * F1 * (2 * F1 * F3 + 3 * F2 ^ 2) * H3| +
         |10 * F1 ^ 3 * F2 * H4| + |F1 ^ 5 * H5| := by
-          nlinarith [abs_add_le
+          linarith [abs_add_le
             (F5 * H1 + (5 * F1 * F4 + 10 * F2 * F3) * H2 +
               5 * F1 * (2 * F1 * F3 + 3 * F2 ^ 2) * H3 +
               10 * F1 ^ 3 * F2 * H4) (F1 ^ 5 * H5),
@@ -3724,7 +3724,7 @@ private theorem sec7_ra_B3_bound_sharp_k5 {P : Globals} {S : Scale P} {a d j : �
         (10 * (7 * P.X * a / d ^ 4) ^ 3 * (26 * P.X * a / d ^ 5)) *
           ((25 * d ^ 16 / (P.X * a) ^ 5) * |j|) +
         (7 * P.X * a / d ^ 4) ^ 5 * ((150 * d ^ 19 / (P.X * a) ^ 6) * |j|) := by
-          nlinarith [hterm1, hterm2, hterm3, hterm4, hterm5]
+          linarith [hterm1, hterm2, hterm3, hterm4, hterm5]
     _ = 5687310 * |j| / (d * (P.X * a)) := by
           field_simp [P.X_pos.ne', ha0.ne', hd.ne']
           ring
@@ -4121,7 +4121,7 @@ private theorem sec7_ra_dBreve_deriv3_image_sharp_close_aled {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = 2 * z ^ 6 := by ring
     rw [hP_def]
-    nlinarith [h1, h2, h3, h4, h5, h6, pow_nonneg hz.le 6]
+    linarith [h1, h2, h3, h4, h5, h6, pow_nonneg hz.le 6]
   have hza_bound : (z + a) ^ 2 ≤ ((3 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (3 : ℝ) * z := by nlinarith
     exact pow_le_pow_left₀ (by positivity : 0 ≤ z + a) hza 2
@@ -4157,7 +4157,7 @@ private theorem sec7_ra_dBreve_deriv3_image_sharp_close_aled {X a d z : ℝ}
     have hden_right : 0 < (X * a) ^ 3 := by positivity
     rw [div_le_div_iff₀ hden_left hden_right]
     have hmul := mul_le_mul_of_nonneg_right hnum_core (by positivity : 0 ≤ X ^ 3 * a ^ 3)
-    nlinarith
+    linarith [hmul]
   calc
     3 * z ^ 7 * (z + a) ^ 7 * P / (8 * X ^ 3 * a ^ 3 * Q ^ 5)
         ≤ 150 * z ^ 10 / (X * a) ^ 3 := hstep
@@ -4172,7 +4172,7 @@ private theorem sec7_ra_dBreve_deriv3_image_sharp_close_aled {X a d z : ℝ}
                 (101 / 100 : ℝ) ^ 10 * d ^ 10 by ring]
             have hconst : 150 * (101 / 100 : ℝ) ^ 10 ≤ 200 := by
               norm_num
-            nlinarith [hconst, pow_nonneg hd.le 10]
+            linarith [mul_le_mul_of_nonneg_right hconst (pow_nonneg hd.le 10)]
           exact div_le_div_of_nonneg_right hnum (by positivity)
 
 theorem sec7_ra_B3H_bounds12_sharp_aled {P : Globals} {S : Scale P} {a d j : ℝ}
@@ -4318,7 +4318,7 @@ private theorem sec7_ra_dBreve_deriv4_image_sharp_close_aled {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = 2 * z ^ 8 := by ring
     rw [hP_def]
-    nlinarith [h1, h2, h3, h4, h5, h6, h7, h8, pow_nonneg hz.le 8]
+    linarith [h1, h2, h3, h4, h5, h6, h7, h8, pow_nonneg hz.le 8]
   have hza_bound : (z + a) ^ 2 ≤ ((3 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (3 : ℝ) * z := by nlinarith
     exact pow_le_pow_left₀ (by positivity : 0 ≤ z + a) hza 2
@@ -4359,7 +4359,7 @@ private theorem sec7_ra_dBreve_deriv4_image_sharp_close_aled {X a d z : ℝ}
     have hden_right : 0 < (X * a) ^ 4 := by positivity
     rw [div_le_div_iff₀ hden_left hden_right]
     have hmul := mul_le_mul_of_nonneg_right hnum_core (by positivity : 0 ≤ X ^ 4 * a ^ 4)
-    nlinarith
+    linarith [hmul]
   calc
     15 * z ^ 9 * (z + a) ^ 9 * (a + 2 * z) * P /
           (16 * X ^ 4 * a ^ 4 * Q ^ 7)
@@ -4374,7 +4374,7 @@ private theorem sec7_ra_dBreve_deriv4_image_sharp_close_aled {X a d z : ℝ}
                 (101 / 100 : ℝ) ^ 13 * d ^ 13 by ring]
             have hconst : 2000 * (101 / 100 : ℝ) ^ 13 ≤ 3000 := by
               norm_num
-            nlinarith [hconst, pow_nonneg hd.le 13]
+            linarith [mul_le_mul_of_nonneg_right hconst (pow_nonneg hd.le 13)]
           exact div_le_div_of_nonneg_right hnum (by positivity)
 
 theorem sec7_ra_B3H_bound3_sharp_aled {P : Globals} {S : Scale P} {a d j : ℝ}
@@ -4465,12 +4465,12 @@ private theorem sec7_ra_B3_bound_sharp_aled_k3 {P : Globals} {S : Scale P} {a d 
             |F3 * H1 + 3 * F1 * F2 * H2 + F1 ^ 3 * H3|
                 ≤ |F3 * H1 + 3 * F1 * F2 * H2| + |F1 ^ 3 * H3| := abs_add_le _ _
             _ ≤ |F3 * H1| + |3 * F1 * F2 * H2| + |F1 ^ 3 * H3| := by
-                  nlinarith [abs_add_le (F3 * H1) (3 * F1 * F2 * H2)]
+                  linarith [abs_add_le (F3 * H1) (3 * F1 * F2 * H2)]
     _ ≤ (128 * P.X * a / d ^ 6) * ((300 * d ^ 7 / (P.X * a) ^ 2) * |j|) +
         3 * (7 * P.X * a / d ^ 4) * (26 * P.X * a / d ^ 5) *
           ((200 * d ^ 10 / (P.X * a) ^ 3) * |j|) +
         (7 * P.X * a / d ^ 4) ^ 3 * ((3000 * d ^ 13 / (P.X * a) ^ 4) * |j|) := by
-          nlinarith [hterm1, hterm2, hterm3]
+          linarith [hterm1, hterm2, hterm3]
     _ = 1176600 * |j| * d / (P.X * a) := by
           field_simp [P.X_pos.ne', ha0.ne', hd.ne']
           ring
@@ -4555,7 +4555,7 @@ private theorem sec7_ra_dBreve_deriv5_image_sharp_close_aled {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = 2 * z ^ 12 := by ring
     rw [hP_def]
-    nlinarith [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12,
+    linarith [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12,
       pow_nonneg hz.le 12]
   have hza_bound : (z + a) ^ 2 ≤ ((3 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (3 : ℝ) * z := by nlinarith
@@ -4594,7 +4594,7 @@ private theorem sec7_ra_dBreve_deriv5_image_sharp_close_aled {X a d z : ℝ}
     have hden_right : 0 < (X * a) ^ 5 := by positivity
     rw [div_le_div_iff₀ hden_left hden_right]
     have hmul := mul_le_mul_of_nonneg_right hnum_core (by positivity : 0 ≤ X ^ 5 * a ^ 5)
-    nlinarith
+    linarith [hmul]
   calc
     45 * z ^ 11 * (z + a) ^ 11 * P / (32 * X ^ 5 * a ^ 5 * Q ^ 9)
         ≤ 41000 * z ^ 16 / (X * a) ^ 5 := hstep
@@ -4608,7 +4608,7 @@ private theorem sec7_ra_dBreve_deriv5_image_sharp_close_aled {X a d z : ℝ}
                 (101 / 100 : ℝ) ^ 16 * d ^ 16 by ring]
             have hconst : 41000 * (101 / 100 : ℝ) ^ 16 ≤ 50000 := by
               norm_num
-            nlinarith [hconst, pow_nonneg hd.le 16]
+            linarith [mul_le_mul_of_nonneg_right hconst (pow_nonneg hd.le 16)]
           exact div_le_div_of_nonneg_right hnum (by positivity)
 
 theorem sec7_ra_B3H_bound4_sharp_aled {P : Globals} {S : Scale P} {a d j : ℝ}
@@ -4738,7 +4738,7 @@ private theorem sec7_ra_B3_bound_sharp_aled_k4 {P : Globals} {S : Scale P} {a d 
                     6 * F1 ^ 2 * F2 * H3| + |F1 ^ 4 * H4| := abs_add_le _ _
             _ ≤ |F4 * H1| + |(4 * F1 * F3 + 3 * F2 ^ 2) * H2| +
                 |6 * F1 ^ 2 * F2 * H3| + |F1 ^ 4 * H4| := by
-                  nlinarith [abs_add_le (F4 * H1 + (4 * F1 * F3 + 3 * F2 ^ 2) * H2)
+                  linarith [abs_add_le (F4 * H1 + (4 * F1 * F3 + 3 * F2 ^ 2) * H2)
                     (6 * F1 ^ 2 * F2 * H3),
                     abs_add_le (F4 * H1) ((4 * F1 * F3 + 3 * F2 ^ 2) * H2)]
     _ ≤ (800 * P.X * a / d ^ 7) * ((300 * d ^ 7 / (P.X * a) ^ 2) * |j|) +
@@ -4748,7 +4748,7 @@ private theorem sec7_ra_B3_bound_sharp_aled_k4 {P : Globals} {S : Scale P} {a d 
         6 * (7 * P.X * a / d ^ 4) ^ 2 * (26 * P.X * a / d ^ 5) *
           ((3000 * d ^ 13 / (P.X * a) ^ 4) * |j|) +
         (7 * P.X * a / d ^ 4) ^ 4 * ((50000 * d ^ 16 / (P.X * a) ^ 5) * |j|) := by
-          nlinarith [hterm1, hterm2, hterm3, hterm4]
+          linarith [hterm1, hterm2, hterm3, hterm4]
     _ = 144344400 * |j| / (P.X * a) := by
           field_simp [P.X_pos.ne', ha0.ne', hd.ne']
           ring
@@ -4844,7 +4844,7 @@ private theorem sec7_ra_dBreve_deriv6_image_sharp_close_aled {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = 2 * z ^ 14 := by ring
     rw [hP_def]
-    nlinarith [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14,
+    linarith [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14,
       pow_nonneg hz.le 14]
   have hza_bound : (z + a) ^ 2 ≤ ((3 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (3 : ℝ) * z := by nlinarith
@@ -4888,7 +4888,7 @@ private theorem sec7_ra_dBreve_deriv6_image_sharp_close_aled {X a d z : ℝ}
     have hden_right : 0 < (X * a) ^ 6 := by positivity
     rw [div_le_div_iff₀ hden_left hden_right]
     have hmul := mul_le_mul_of_nonneg_right hnum_core (by positivity : 0 ≤ X ^ 6 * a ^ 6)
-    nlinarith
+    linarith [hmul]
   calc
     315 * z ^ 13 * (z + a) ^ 13 * (a + 2 * z) * P /
           (64 * X ^ 6 * a ^ 6 * Q ^ 11)
@@ -4904,7 +4904,7 @@ private theorem sec7_ra_dBreve_deriv6_image_sharp_close_aled {X a d z : ℝ}
                 (101 / 100 : ℝ) ^ 19 * d ^ 19 by ring]
             have hconst : 1093750 * (101 / 100 : ℝ) ^ 19 ≤ 1500000 := by
               norm_num
-            nlinarith [hconst, pow_nonneg hd.le 19]
+            linarith [mul_le_mul_of_nonneg_right hconst (pow_nonneg hd.le 19)]
           exact div_le_div_of_nonneg_right hnum (by positivity)
 
 theorem sec7_ra_B3H_bound5_sharp_aled {P : Globals} {S : Scale P} {a d j : ℝ}
@@ -5357,7 +5357,7 @@ theorem sec7_ra_dBreve6ImageK_deriv_bound_aled {X a d z : ℝ}
       sec7_ra_dBreve6ImageUDeriv a z ≤
         100000 * z ^ 18 * (((3 : ℝ) * z * (z + a)) ^ 11) := by
     unfold sec7_ra_dBreve6ImageUDeriv
-    nlinarith [hT1, hT2, hT3, hT4]
+    linarith [hT1, hT2, hT3, hT4]
   have hUd_nonneg : 0 ≤ sec7_ra_dBreve6ImageUDeriv a z := by
     unfold sec7_ra_dBreve6ImageUDeriv sec7_ra_dBreve6ImagePoly sec7_ra_dBreve6ImagePolyDeriv
     positivity
@@ -5434,7 +5434,7 @@ theorem sec7_ra_dBreve6ImageK_deriv_bound_aled {X a d z : ℝ}
         linarith [hA_nonneg]
     have hsum : A + B ≤ 150000 * z ^ 18 := by
       dsimp [A, B]
-      nlinarith [hUd_div, hRec_div]
+      linarith [hUd_div, hRec_div]
     exact le_trans (by simpa [A, B] using htri) hsum
   have hC_nonneg : 0 ≤ 315 / (64 * X ^ 6 * a ^ 6) := by positivity
   have hz18_le : z ^ 18 ≤ (((101 / 100 : ℝ) * d) ^ 18) :=
@@ -5459,7 +5459,7 @@ theorem sec7_ra_dBreve6ImageK_deriv_bound_aled {X a d z : ℝ}
           have hconst : 315 * (150000 * (101 / 100 : ℝ) ^ 18) ≤
               1500000 * 64 := by
             norm_num
-          nlinarith [hconst, pow_nonneg hd.le 18]
+          linarith [mul_le_mul_of_nonneg_right hconst (pow_nonneg hd.le 18)]
 
 private theorem sec7_ra_B3H_bound6_sharp_aled {P : Globals} {S : Scale P} {a d j : ℝ}
     (hAD : 10 * S.A ≤ S.D) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
@@ -5512,10 +5512,10 @@ private theorem sec7_ra_B3H_bound6_sharp_aled {P : Globals} {S : Scale P} {a d j
       · rw [uIcc_of_le hqd_le] at hu
         constructor
         · exact le_trans hqwin.1 hu.1
-        · nlinarith [hd, hu.2]
+        · linarith [hd, hu.2]
       · rw [uIcc_of_ge hd_le] at hu
         constructor
-        · nlinarith [hd, hu.1]
+        · linarith [hd, hu.1]
         · exact le_trans hu.2 hqwin.2
     simpa [L, hL_def] using
       sec7_ra_dBreve6ImageK_deriv_bound_aled (X := P.X) (a := a) (d := d)
@@ -5725,7 +5725,7 @@ private theorem sec7_ra_B3_bound_sharp_aled_k5 {P : Globals} {S : Scale P} {a d 
     _ ≤ |F5 * H1| + |(5 * F1 * F4 + 10 * F2 * F3) * H2| +
         |5 * F1 * (2 * F1 * F3 + 3 * F2 ^ 2) * H3| +
         |10 * F1 ^ 3 * F2 * H4| + |F1 ^ 5 * H5| := by
-          nlinarith [abs_add_le
+          linarith [abs_add_le
             (F5 * H1 + (5 * F1 * F4 + 10 * F2 * F3) * H2 +
               5 * F1 * (2 * F1 * F3 + 3 * F2 ^ 2) * H3 +
               10 * F1 ^ 3 * F2 * H4) (F1 ^ 5 * H5),
@@ -5748,7 +5748,7 @@ private theorem sec7_ra_B3_bound_sharp_aled_k5 {P : Globals} {S : Scale P} {a d 
         (10 * (7 * P.X * a / d ^ 4) ^ 3 * (26 * P.X * a / d ^ 5)) *
           ((50000 * d ^ 16 / (P.X * a) ^ 5) * |j|) +
         (7 * P.X * a / d ^ 4) ^ 5 * ((1500000 * d ^ 19 / (P.X * a) ^ 6) * |j|) := by
-          nlinarith [hterm1, hterm2, hterm3, hterm4, hterm5]
+          linarith [hterm1, hterm2, hterm3, hterm4, hterm5]
     _ = 30084656000 * |j| / (d * (P.X * a)) := by
           field_simp [P.X_pos.ne', ha0.ne', hd.ne']
           ring
@@ -5887,7 +5887,7 @@ private theorem sec7_ra_B3_bound_sharp_aled_k6 {P : Globals} {S : Scale P} {a d 
         |(15 * F1 ^ 2 * F4 + 60 * F1 * F2 * F3 + 15 * F2 ^ 3) * H3| +
         |(20 * F1 ^ 3 * F3 + 45 * F1 ^ 2 * F2 ^ 2) * H4| +
         |15 * F1 ^ 4 * F2 * H5| + |F1 ^ 6 * H6| := by
-          nlinarith [abs_add_le
+          linarith [abs_add_le
             (F6 * H1 + (6 * F1 * F5 + 15 * F2 * F4 + 10 * F3 ^ 2) * H2 +
               (15 * F1 ^ 2 * F4 + 60 * F1 * F2 * F3 + 15 * F2 ^ 3) * H3 +
               (20 * F1 ^ 3 * F3 + 45 * F1 ^ 2 * F2 ^ 2) * H4 +
@@ -5920,7 +5920,7 @@ private theorem sec7_ra_B3_bound_sharp_aled_k6 {P : Globals} {S : Scale P} {a d 
         (15 * (7 * P.X * a / d ^ 4) ^ 4 * (26 * P.X * a / d ^ 5)) *
           ((1500000 * d ^ 19 / (P.X * a) ^ 6) * |j|) +
         (7 * P.X * a / d ^ 4) ^ 6 * ((3000000 * d ^ 22 / (P.X * a) ^ 7) * |j|) := by
-          nlinarith [hterm1, hterm2, hterm3, hterm4, hterm5, hterm6]
+          linarith [hterm1, hterm2, hterm3, hterm4, hterm5, hterm6]
     _ = 60985797208000 * |j| / (d ^ 2 * (P.X * a)) := by
           field_simp [P.X_pos.ne', ha0.ne', hd.ne']
           ring
@@ -5986,7 +5986,7 @@ private theorem sec7_ra_B3_k2_scale {P : Globals} {S : Scale P} {a d : ℝ}
     unfold Scale.F
     positivity
   have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
-  have hDle : S.D ≤ 16 * d := by nlinarith
+  have hDle : S.D ≤ 16 * d := by linarith [hd_lo]
   have hD7 : S.D ^ 7 ≤ 16 ^ 7 * d ^ 7 := by
     have hpow : S.D ^ 7 ≤ (16 * d) ^ 7 := pow_le_pow_left₀ hDpos.le hDle 7
     calc
@@ -6018,7 +6018,7 @@ private theorem sec7_ra_B3_k2_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (sq_pos_of_pos hApos) (pow_pos hd 5)))
               (mul_pos P.X_pos ha0)]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul P.X_pos.le]
       _ ≤ (10 ^ 40 : ℝ) * d ^ 2 / (P.X * a) := by
             have hconst : (11310 * sec7_cPh : ℝ) * (11 ^ 2 * 16 ^ 7) ≤ 10 ^ 40 := by
               norm_num [sec7_cPh]
@@ -6041,7 +6041,7 @@ private theorem sec7_ra_B3_k2_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (pow_pos hApos 3) (pow_pos hd 8)))
               (mul_pos P.X_pos ha0)]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul P.X_pos.le]
       _ ≤ (10 ^ 110 : ℝ) * d ^ 2 / (P.X * a) := by
             have hconst : (314 ^ 2 * (10 ^ 80 : ℝ)) * (11 ^ 3 * 16 ^ 10) ≤
                 10 ^ 110 := by
@@ -6076,7 +6076,7 @@ private theorem sec7_ra_B3_k3_scale {P : Globals} {S : Scale P} {a d : ℝ}
     exact mul_pos S.Δ_pos S.Ω_pos
   have hDpos : 0 < S.D := S.D_pos
   have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
-  have hDle : S.D ≤ 16 * d := by nlinarith
+  have hDle : S.D ≤ 16 * d := by linarith [hd_lo]
   have hD7 : S.D ^ 7 ≤ 16 ^ 7 * d ^ 7 := by
     have hpow : S.D ^ 7 ≤ (16 * d) ^ 7 := pow_le_pow_left₀ hDpos.le hDle 7
     calc
@@ -6116,7 +6116,7 @@ private theorem sec7_ra_B3_k3_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (sq_pos_of_pos hApos) (pow_pos hd 6)))
               (mul_pos P.X_pos ha0)]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul P.X_pos.le]
       _ ≤ (10 ^ 129 : ℝ) * d / (P.X * a) := by
             have hconst : (542904 * sec7_cPh : ℝ) * (11 ^ 2 * 16 ^ 7) ≤ 10 ^ 129 := by
               norm_num [sec7_cPh]
@@ -6141,7 +6141,7 @@ private theorem sec7_ra_B3_k3_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (pow_pos hApos 3) (pow_pos hd 9)))
               (mul_pos P.X_pos ha0)]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul P.X_pos.le]
       _ ≤ (10 ^ 129 : ℝ) * d / (P.X * a) := by
             have hconst : (3 * 314 * 11310 * (10 ^ 80 : ℝ)) * (11 ^ 3 * 16 ^ 10) ≤
                 10 ^ 129 := by
@@ -6165,7 +6165,7 @@ private theorem sec7_ra_B3_k3_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (pow_pos hApos 4) (pow_pos hd 12)))
               (mul_pos P.X_pos ha0)]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul P.X_pos.le]
       _ ≤ (10 ^ 129 : ℝ) * d / (P.X * a) := by
             have hconst : (314 ^ 3 * (10 ^ 100 : ℝ)) * (11 ^ 4 * 16 ^ 13) ≤
                 10 ^ 129 := by
@@ -6207,7 +6207,7 @@ private theorem sec7_ra_B3_k4_scale {P : Globals} {S : Scale P} {a d : ℝ}
     exact mul_pos S.Δ_pos S.Ω_pos
   have hDpos : 0 < S.D := S.D_pos
   have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
-  have hDle : S.D ≤ 16 * d := by nlinarith
+  have hDle : S.D ≤ 16 * d := by linarith [hd_lo]
   have hD7 : S.D ^ 7 ≤ 16 ^ 7 * d ^ 7 := by
     have hpow : S.D ^ 7 ≤ (16 * d) ^ 7 := pow_le_pow_left₀ hDpos.le hDle 7
     calc
@@ -6255,7 +6255,7 @@ private theorem sec7_ra_B3_k4_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (sq_pos_of_pos hApos) (pow_pos hd 7)))
               (mul_pos P.X_pos ha0)]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul P.X_pos.le]
       _ ≤ (10 ^ 139 : ℝ) / (P.X * a) := by
             have hconst : (32574360 * sec7_cPh : ℝ) * (11 ^ 2 * 16 ^ 7) ≤
                 10 ^ 139 := by
@@ -6283,7 +6283,7 @@ private theorem sec7_ra_B3_k4_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (pow_pos hApos 3) (pow_pos hd 10)))
               (mul_pos P.X_pos ha0)]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul P.X_pos.le]
       _ ≤ (10 ^ 139 : ℝ) / (P.X * a) := by
             have hconst :
                 ((4 * 314 * 542904 + 3 * 11310 ^ 2) * (10 ^ 80 : ℝ)) *
@@ -6309,7 +6309,7 @@ private theorem sec7_ra_B3_k4_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (pow_pos hApos 4) (pow_pos hd 13)))
               (mul_pos P.X_pos ha0)]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul P.X_pos.le]
       _ ≤ (10 ^ 139 : ℝ) / (P.X * a) := by
             have hconst : (6 * 314 ^ 2 * 11310 * (10 ^ 100 : ℝ)) *
                 (11 ^ 4 * 16 ^ 13) ≤ 10 ^ 139 := by
@@ -6332,7 +6332,7 @@ private theorem sec7_ra_B3_k4_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (pow_pos hApos 5) (pow_pos hd 16)))
               (mul_pos P.X_pos ha0)]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul P.X_pos.le]
       _ ≤ (10 ^ 139 : ℝ) / (P.X * a) := by
             have hconst : (314 ^ 4 * (10 ^ 100 : ℝ)) * (11 ^ 5 * 16 ^ 16) ≤
                 10 ^ 139 := by
@@ -6379,7 +6379,7 @@ private theorem sec7_ra_B3_k5_scale {P : Globals} {S : Scale P} {a d : ℝ}
     exact mul_pos S.Δ_pos S.Ω_pos
   have hDpos : 0 < S.D := S.D_pos
   have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
-  have hDle : S.D ≤ 16 * d := by nlinarith
+  have hDle : S.D ≤ 16 * d := by linarith [hd_lo]
   have hD7 : S.D ^ 7 ≤ 16 ^ 7 * d ^ 7 := by
     have hpow : S.D ^ 7 ≤ (16 * d) ^ 7 := pow_le_pow_left₀ hDpos.le hDle 7
     calc
@@ -6438,7 +6438,7 @@ private theorem sec7_ra_B3_k5_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (sq_pos_of_pos hApos) (pow_pos hd 8)))
               htarget_pos]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul (mul_nonneg P.X_pos.le hd.le)]
       _ ≤ (10 ^ 142 : ℝ) / (d * (P.X * a)) := by
             have hconst : (2345354640 * sec7_cPh : ℝ) * (11 ^ 2 * 16 ^ 7) ≤
                 10 ^ 142 := by
@@ -6467,7 +6467,7 @@ private theorem sec7_ra_B3_k5_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (pow_pos hApos 3) (pow_pos hd 11)))
               htarget_pos]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul (mul_nonneg P.X_pos.le hd.le)]
       _ ≤ (10 ^ 142 : ℝ) / (d * (P.X * a)) := by
             have hconst :
                 ((5 * 314 * 32574360 + 10 * 11310 * 542904) * (10 ^ 80 : ℝ)) *
@@ -6501,7 +6501,7 @@ private theorem sec7_ra_B3_k5_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (pow_pos hApos 4) (pow_pos hd 14)))
               htarget_pos]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul (mul_nonneg P.X_pos.le hd.le)]
       _ ≤ (10 ^ 142 : ℝ) / (d * (P.X * a)) := by
             have hconst :
                 (5 * 314 * (2 * 314 * 542904 + 3 * 11310 ^ 2) *
@@ -6527,7 +6527,7 @@ private theorem sec7_ra_B3_k5_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (pow_pos hApos 5) (pow_pos hd 17)))
               htarget_pos]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul (mul_nonneg P.X_pos.le hd.le)]
       _ ≤ (10 ^ 142 : ℝ) / (d * (P.X * a)) := by
             have hconst : (10 * 314 ^ 3 * 11310 * (10 ^ 100 : ℝ)) *
                 (11 ^ 5 * 16 ^ 16) ≤ 10 ^ 142 := by
@@ -6550,7 +6550,7 @@ private theorem sec7_ra_B3_k5_scale {P : Globals} {S : Scale P} {a d : ℝ}
             rw [div_le_div_iff₀
               (mul_pos P.X_pos (mul_pos (pow_pos hApos 6) (pow_pos hd 20)))
               htarget_pos]
-            nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+            linarith [mul_le_mul_of_nonneg_left hmul (mul_nonneg P.X_pos.le hd.le)]
       _ ≤ (10 ^ 142 : ℝ) / (d * (P.X * a)) := by
             have hconst : (314 ^ 5 * (10 ^ 100 : ℝ)) * (11 ^ 6 * 16 ^ 19) ≤
                 10 ^ 142 := by
@@ -6603,7 +6603,7 @@ private theorem sec7_ra_B3_k1_scale {P : Globals} {S : Scale P} {a d : ℝ}
     unfold Scale.F
     positivity
   have ha0 : 0 < a := lt_of_lt_of_le (by positivity : 0 < S.A / 5) ha_lo
-  have hDle : S.D ≤ 16 * d := by nlinarith
+  have hDle : S.D ≤ 16 * d := by linarith [hd_lo]
   have hD7 : S.D ^ 7 ≤ (16 * d) ^ 7 := pow_le_pow_left₀ hDpos.le hDle 7
   have hD7' : S.D ^ 7 ≤ 16 ^ 7 * d ^ 7 := by
     calc
@@ -6626,7 +6626,7 @@ private theorem sec7_ra_B3_k1_scale {P : Globals} {S : Scale P} {a d : ℝ}
           rw [div_le_div_iff₀
             (mul_pos P.X_pos (mul_pos (sq_pos_of_pos hApos) (pow_pos hd 4)))
             (mul_pos P.X_pos ha0)]
-          nlinarith [hmul, P.X_pos, hApos, ha0, hd]
+          linarith [mul_le_mul_of_nonneg_left hmul P.X_pos.le]
     _ ≤ sec7_ra_B3Scale 1 * d ^ 3 / (P.X * a) := by
           exact div_le_div_of_nonneg_right
             (mul_le_mul_of_nonneg_right hconst (by positivity)) (mul_pos P.X_pos ha0).le

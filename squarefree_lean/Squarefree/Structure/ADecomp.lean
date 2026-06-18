@@ -24,7 +24,7 @@ open Classical Finset
 
 namespace Squarefree
 
-set_option maxHeartbeats 1000000
+set_option maxHeartbeats 400000
 
 /-- Separated integers in `[lo, hi]` are few: if every two distinct elements of `T ⊆ Icc lo hi`
 differ by `> g > 0`, then `#T ≤ (hi-lo)/g + 1`. -/
@@ -94,7 +94,6 @@ private theorem thr_cube (X D : ℝ) (hX : 0 < X) (hD : 0 < D) :
   rw [show ((X ^ (1/3 : ℝ)) ^ 3 : ℝ) = (X ^ (1/3 : ℝ)) ^ (3:ℕ) from rfl, e2]
   push_cast; ring
 
-set_option maxHeartbeats 4000000 in
 /-- **§3 A-decomposition** (writeup 256–267). Self-contained Nair–Roth reduction.
 
 Threshold constant changed from the verbatim `D^{4/3}/X^{1/3}` to `D^{4/3}/(4 X^{1/3})`
@@ -124,7 +123,11 @@ theorem a_decomposition (P : Globals) (D : ℝ)
     have : D ^ 2 ≤ (X ^ (1/2:ℝ)) ^ 2 := by apply pow_le_pow_left₀ hDpos.le hD2
     rwa [← Real.rpow_natCast (X ^ (1/2:ℝ)) 2, ← Real.rpow_mul hXpos.le,
       show (1/2:ℝ) * (2:ℕ) = 1 by push_cast; ring, Real.rpow_one] at this
-  have hReg4 : 4 * H ≤ D ^ 2 := by nlinarith [hDlarge, hH1, hDpos, hHpos]
+  have hReg4 : 4 * H ≤ D ^ 2 := by
+    have hprod : (1025 * H) * (1025 * H) ≤ D * D :=
+      mul_le_mul hDlarge hDlarge (by positivity) hDpos.le
+    have hHsq : H ≤ H * H := le_mul_of_one_le_left hHpos.le hH1
+    rw [pow_two]; linarith [hprod, hHsq, hHpos]
   -- thresholds
   set T0 : ℝ := D ^ (4/3 : ℝ) / (4 * X ^ (1/3 : ℝ)) with hT0def
   set Du : ℝ := (D / H) * U with hDudef
@@ -145,9 +148,9 @@ theorem a_decomposition (P : Globals) (D : ℝ)
     rw [hlhs, hcubeval]
     rw [show 512 * H ^ 3 * (D ^ 4 / (8 * X)) = 64 * H ^ 3 * D ^ 4 / X by field_simp; ring]
     rw [div_le_iff₀ hXpos]
-    have : 64 * H ^ 3 * D ^ 4 = (64 * H ^ 3) * D ^ 4 := by ring
-    nlinarith [hEps, pow_pos hDpos 4, hXpos, sq_nonneg (D^2), pow_pos hDpos 2,
-      mul_le_mul_of_nonneg_right hEps (by positivity : (0:ℝ) ≤ D ^ 4)]
+    calc 64 * H ^ 3 * D ^ 4 ≤ (X * D ^ 2) * D ^ 4 :=
+          mul_le_mul_of_nonneg_right hEps (by positivity)
+      _ = (D ^ 2) ^ 3 * X := by ring
   -- ============================ combinatorial layer ============================
   set lo : ℤ := ⌈D⌉ with hlodef
   set hi : ℤ := ⌊2 * D⌋ with hhidef
@@ -248,11 +251,16 @@ theorem a_decomposition (P : Globals) (D : ℝ)
     rw [hMiddef, hBigdef, Finset.card_filter_add_card_filter_not]
   -- 2 T0 = thr ≤ D
   have hD2 : (2:ℝ) ≤ D := by linarith [hDlarge, hH1]
-  have hD8X : D ≤ 8 * X := by nlinarith [hDX, hD2, hXpos]
+  have hD8X : D ≤ 8 * X := by
+    have hDD : D ≤ D ^ 2 := by
+      have h := le_mul_of_one_le_left hDpos.le (by linarith [hD2] : (1:ℝ) ≤ D)
+      rw [pow_two]; linarith [h]
+    linarith [hDD, hDX, hXpos]
   have hthr_le_D : 2 * T0 ≤ D := by
     have hbase : (2 * T0) ^ 3 ≤ D ^ 3 := by
       rw [h2T0, thr_cube X D hXpos hDpos, div_le_iff₀ (by positivity)]
-      nlinarith [hD8X, pow_pos hDpos 3, hXpos, hDpos]
+      calc D ^ 4 = D ^ 3 * D := by ring
+        _ ≤ D ^ 3 * (8 * X) := mul_le_mul_of_nonneg_left hD8X (by positivity)
     refine le_of_pow_le_pow_left₀ (n := 3) (by norm_num) hDpos.le hbase
   -- tiny-gap lower bound: gap d ≥ D³/(6X) for d ∈ Sgap
   have htiny : ∀ d ∈ Sgap, D ^ 3 / (6 * X) ≤ (gap d : ℝ) := by
@@ -302,16 +310,27 @@ theorem a_decomposition (P : Globals) (D : ℝ)
       -- a ≥ D³/(6X) ⇒ X·a ≥ D³/6 ;  ab ≥ a
       have hXa : D ^ 3 / 6 ≤ X * (a:ℝ) := by
         rw [div_le_iff₀ (by norm_num)]
-        have := (div_le_iff₀ (by positivity : (0:ℝ) < 6 * X)).mp ha_lo
-        nlinarith [this, hXpos]
-      have hab_ge_a : (a:ℝ) ≤ (a:ℝ) * (b:ℝ) := by nlinarith [haR, hbge1]
+        have h := (div_le_iff₀ (by positivity : (0:ℝ) < 6 * X)).mp ha_lo
+        linarith [h]
+      have hab_ge_a : (a:ℝ) ≤ (a:ℝ) * (b:ℝ) := le_mul_of_one_le_right haR.le hbge1
       -- now: (3/256)X ab/D⁴ ≥ (3/256)(D³/6)/D⁴ = D^{-1}/512;  and 2H/D² < that ⟺ 1024 H < D
       rw [div_lt_div_iff₀ (by positivity) (by positivity)]
       -- 2H·D⁴ < (3/256)X ab·D²
-      have hXab : D ^ 3 / 6 ≤ X * ((a:ℝ) * (b:ℝ)) := by nlinarith [hXa, hab_ge_a, hXpos]
+      have hXab : D ^ 3 / 6 ≤ X * ((a:ℝ) * (b:ℝ)) := by
+        have h := mul_le_mul_of_nonneg_left hab_ge_a hXpos.le
+        linarith [hXa, h]
       have hDgt : 1024 * H < D := by linarith [hDlarge, hHpos]
-      nlinarith [hXab, hDgt, pow_pos hDpos 2, pow_pos hDpos 4, hHpos, hDpos,
-        mul_pos (pow_pos hDpos 2) (pow_pos hDpos 4), mul_le_mul_of_nonneg_right hXab (by positivity : (0:ℝ) ≤ D ^ 2)]
+      have hb5 : 1024 * H * D ^ 4 < D ^ 5 := by
+        have h := mul_lt_mul_of_pos_right hDgt (pow_pos hDpos 4)
+        calc 1024 * H * D ^ 4 < D * D ^ 4 := h
+          _ = D ^ 5 := by ring
+      calc 2 * H * D ^ 4
+          < (1 / 512 : ℝ) * D ^ 5 := by linarith [hb5]
+        _ = (3 / 256 : ℝ) * (D ^ 3 / 6) * D ^ 2 := by ring
+        _ ≤ (3 / 256 : ℝ) * (X * ((a:ℝ) * (b:ℝ))) * D ^ 2 :=
+              mul_le_mul_of_nonneg_right
+                (mul_le_mul_of_nonneg_left hXab (by norm_num)) (by positivity)
+        _ = 3 / 256 * X * ((a:ℝ) * (b:ℝ)) * D ^ 2 := by ring
     exact no_two_small_gaps X H D a b d T0 hXpos hHpos hDpos hapos hbpos hdlo hdhi hab_d
       (by rw [hadef]; exact hgapd_le) (by rw [hbdef]; exact hgape_le) hT0pos hcube heps hab_big
       hdinD heinD hebinD
@@ -455,6 +474,6 @@ theorem a_decomposition (P : Globals) (D : ℝ)
     _ ≤ 2 * (∑ a ∈ Asum, (DaCard X H a D : ℝ)) + 2 * (H / U + 1) + 2 := by
         gcongr
     _ ≤ 6 * (∑ a ∈ Asum, (DaCard X H a D : ℝ)) + 6 * (H / U) := by
-        nlinarith [hSumnn, hHU1]
+        linarith [hSumnn, hHU1]
 
 end Squarefree
