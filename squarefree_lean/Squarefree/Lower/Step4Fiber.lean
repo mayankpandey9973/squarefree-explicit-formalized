@@ -37,7 +37,7 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 3200000
+set_option maxHeartbeats 400000
 
 /-- Combined Taylor window with the defect term `|v|`: `4(a + W·|b₀| + |v|) ≤ dd`, mirror of
 `Step4SWitness.window_with_v` (re-stated here to avoid touching that vacuous file). -/
@@ -56,7 +56,7 @@ private theorem fiber_window_with_v {Wc b₀ v dd : ℝ}
     have hRUW' : P.U * (P.G * P.U ^ 5) ≤ P.H * P.G * S.Ω ^ 3 / S.Δ := by
       simpa [Globals.Wval, Scale.R] using hRUW
     rw [le_div_iff₀ hΔ] at hRUW'
-    have hcancel : P.G * (P.U ^ 6 * S.Δ) ≤ P.G * (P.H * S.Ω ^ 3) := by nlinarith [hRUW']
+    have hcancel : P.G * (P.U ^ 6 * S.Δ) ≤ P.G * (P.H * S.Ω ^ 3) := by nlinarith only [hRUW']
     exact le_of_mul_le_mul_left hcancel hG
   have hΩ4 : S.Ω ^ 4 ≤ P.U ^ 4 := pow_le_pow_left₀ (le_of_lt hΩ) hΩU 4
   have hΩ3pos : (0:ℝ) < S.Ω ^ 3 := by positivity
@@ -79,17 +79,21 @@ private theorem fiber_window_with_v {Wc b₀ v dd : ℝ}
     mul_le_mul_of_nonneg_right ha_hi'' (le_of_lt hΩ3pos)
   have hKEY : 44 * S.Ω ^ 4 + 1560000000000000 * P.U ^ 5 * S.Δ
         + 400000000000000000000 * (S.Δ * P.U ^ 5) ≤ P.H * S.Ω ^ 3 := by
-    have hU8 : (800000000000000000000:ℝ) ≤ P.U := by nlinarith [hUbig]
+    have hU8 : (800000000000000000000:ℝ) ≤ P.U := by nlinarith only [hUbig]
     have hUΔ : (0:ℝ) < P.U ^ 5 * S.Δ := by positivity
     have hb : 800000000000000000000 * P.U ^ 5 * S.Δ ≤ P.U ^ 6 * S.Δ := by
       have : 800000000000000000000 * P.U ^ 5 ≤ P.U * P.U ^ 5 :=
         mul_le_mul_of_nonneg_right hU8 (by positivity)
-      nlinarith [this, hΔ]
+      nlinarith only [this, hΔ]
     have hc : 88 * S.Ω ^ 4 ≤ P.U ^ 6 * S.Δ := by
-      have hU2Δ : (88:ℝ) ≤ P.U ^ 2 * S.Δ := by nlinarith [hUbig, hΔ1]
+      have hU2Δ : (88:ℝ) ≤ P.U ^ 2 * S.Δ := by
+        have hU2 : (88:ℝ) ≤ P.U ^ 2 := by nlinarith only [hUbig]
+        have hmul : P.U ^ 2 * 1 ≤ P.U ^ 2 * S.Δ :=
+          mul_le_mul_of_nonneg_left hΔ1 (by positivity)
+        linarith only [hU2, hmul]
       have h1 : 88 * P.U ^ 4 ≤ P.U ^ 6 * S.Δ := by
-        nlinarith [hU2Δ, pow_pos (lt_of_lt_of_le (by norm_num : (0:ℝ) < 1) hU1) 4]
-      nlinarith [hΩ4, h1, pow_pos (lt_of_lt_of_le (by norm_num : (0:ℝ) < 1) hU1) 4]
+        nlinarith only [hU2Δ, pow_pos hUpos 4]
+      linarith only [hΩ4, h1]
     nlinarith [hb, hc, hcore, hUΔ]
   rw [Scale.D, ← mul_le_mul_iff_of_pos_right hΩ3pos]
   have hKEYΔ : (44 * S.Ω ^ 4 + 1560000000000000 * P.U ^ 5 * S.Δ
@@ -97,12 +101,12 @@ private theorem fiber_window_with_v {Wc b₀ v dd : ℝ}
     mul_le_mul_of_nonneg_right hKEY (le_of_lt hΔ)
   have hsum : 4 * (a + Wc * |b₀| + |v|) * S.Ω ^ 3
       ≤ 4 * (11 * (S.Δ * S.Ω) * S.Ω ^ 3) + 4 * (390000000000000 * P.U ^ 5 * S.Δ ^ 2)
-          + 4 * (10 ^ 20 * (S.Δ * P.U ^ 5)) := by nlinarith [ha3, hslope3, hvΩ, hΩ3pos]
+          + 4 * (10 ^ 20 * (S.Δ * P.U ^ 5)) := by nlinarith only [ha3, hslope3, hvΩ, hΩ3pos]
   refine le_trans hsum ?_
   have hΔU : 400000000000000000000 * (S.Δ * P.U ^ 5)
       ≤ 400000000000000000000 * (S.Δ * P.U ^ 5) * S.Δ := by
-    nlinarith [hΔ1, mul_pos hΔ (pow_pos hUpos 5)]
-  nlinarith [hKEYΔ, hΔU]
+    nlinarith only [hΔ1, mul_pos hΔ (pow_pos hUpos 5)]
+  linarith only [hKEYΔ, hΔU]
 
 /-- **Sound witness → `distInt(Σ_closed(b₀,v,dStar))` bound** via `Sigma_closed_near_int_neg`
 (the `bᵢ ≤ 0` keystone).  This is the witness→`inD` recognition block of
@@ -211,13 +215,13 @@ theorem fiber_near_int_at_witness {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ
             have : |((ℓ₂ : ℤ) : ℝ) - ((ℓ₁ : ℤ) : ℝ)| ≤ ((ℓ₂ : ℤ) : ℝ) := by
               rw [abs_of_nonneg (by linarith [hℓ12R] : (0:ℝ) ≤ ((ℓ₂:ℤ):ℝ) - ((ℓ₁:ℤ):ℝ))]
               linarith [hℓ1R]
-            nlinarith [this, abs_nonneg b₀]
+            nlinarith only [this, abs_nonneg b₀]
     have := hwin3v (a:ℝ) ha_hi ha_nn
-    nlinarith [hb3le, this]
+    linarith only [hb3le, this]
   have hshiftpos : 0 < (d : ℝ) + ((ℓ₁ : ℤ) : ℝ) * b₀ := by
     rw [hd'def]; exact lt_of_lt_of_le hDS_pos hd1win.1
   have hshift2 : (d : ℝ) / 2 ≤ (d : ℝ) + ((ℓ₁ : ℤ) : ℝ) * b₀ := by
-    rw [hd'def]; nlinarith [hdwin.2, hd1win.1, hDS_pos]
+    rw [hd'def]; linarith only [hdwin.2, hd1win.1]
   have hb1ne : ((ℓ₁ : ℤ) : ℝ) * b₀ ≠ 0 := by
     rw [hb0def]; intro h; exact hd1ned (by linarith [sub_eq_zero.mp h])
   have hb2ne : ((ℓ₂ : ℤ) : ℝ) * b₀ + v ≠ 0 := by
@@ -279,7 +283,7 @@ theorem fiber_near_int_at_witness {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ
     rw [hb₀_def, hv_def, hd_def, hd1_def]; norm_num
   rw [hgoal_eq]; exact hmain
 
-set_option maxHeartbeats 25600000 in
+set_option maxHeartbeats 400000 in
 /-- **§5 Step-4 large-defect per-`r` smooth-point `s`-extraction** (writeup 1025–1052).
 
 The per-`r` `dStar`-witness bundle mirrors `phiv_distInt_from_witness`/`sigma_s_extract_from_witness`
@@ -349,11 +353,12 @@ theorem step4_fiber_extract {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ → �
   have hΔpos : 0 < S.Δ := S.Δ_pos
   have hΩpos : 0 < S.Ω := S.Ω_pos
   have hXpos : 0 < P.X := P.X_pos
+  have _ := hHbig
   have hApos : 0 < S.A := by unfold Scale.A; positivity
   have hBpos : 0 < S.B := by unfold Scale.B; positivity
   have hDpos : 0 < S.D := by unfold Scale.D; positivity
   have hV2nn : 0 ≤ V₂ P S := by rw [V₂]; positivity
-  have hVcut : V₂ P S ≤ |vval P a dStar ℓ₁ ℓ₂ r| := by nlinarith [hVbig, hV2nn]
+  have hVcut : V₂ P S ≤ |vval P a dStar ℓ₁ ℓ₂ r| := by nlinarith only [hVbig, hV2nn]
   have hℓ1Z : (0 : ℤ) < (ℓ₁ : ℤ) := by exact_mod_cast hℓ1
   have hℓ12Z : (ℓ₁ : ℤ) < (ℓ₂ : ℤ) := by exact_mod_cast hℓ12
   have ha0R : (0 : ℝ) < (a : ℝ) := by exact_mod_cast ha0
@@ -480,8 +485,8 @@ theorem step4_fiber_extract {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ → �
     have hL13 : (1:ℝ) ≤ ((ℓ₁ : ℤ) : ℝ) ^ 3 := one_le_pow₀ hℓ1_loR
     have h21 : (1:ℝ) ≤ ((ℓ₂ : ℤ) : ℝ) - ((ℓ₁ : ℤ) : ℝ) := by linarith [hℓ12'R]
     have h2 : (2:ℝ) ≤ ((ℓ₂ : ℤ) : ℝ) := by linarith [hℓ12'R, hℓ1_loR]
-    have hp1 : (2:ℝ) ≤ ((ℓ₁ : ℤ) : ℝ) ^ 3 * ((ℓ₂ : ℤ) : ℝ) := by nlinarith [hL13, h2]
-    nlinarith [hp1, h21, mul_nonneg (by positivity : (0:ℝ) ≤ ((ℓ₁ : ℤ) : ℝ) ^ 3) (le_of_lt (lt_trans hℓ1R hℓ12R))]
+    have hp1 : (2:ℝ) ≤ ((ℓ₁ : ℤ) : ℝ) ^ 3 * ((ℓ₂ : ℤ) : ℝ) := by nlinarith only [hL13, h2]
+    nlinarith only [hp1, h21, mul_nonneg (by positivity : (0:ℝ) ≤ ((ℓ₁ : ℤ) : ℝ) ^ 3) (le_of_lt (lt_trans hℓ1R hℓ12R))]
   -- the V₂ split and the squared floor
   set T1 : ℝ := (S.Δ ^ 3 / P.H) * (P.G ^ 2 * Real.sqrt P.G * (P.U ^ 22 * Real.sqrt P.U)) / S.Ω ^ 6
     with hT1_def
@@ -493,7 +498,7 @@ theorem step4_fiber_extract {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ → �
     rw [← hVeq, hv_def]; exact hVbig
   have hvsqfloor : 10 ^ 120 * (T1 ^ 2 + T2 ^ 2) ≤ v ^ 2 := by
     have hm := mul_le_mul hVbig' hVbig' (by positivity) (abs_nonneg v)
-    nlinarith [hm, sq_abs v, mul_nonneg hT1nn hT2nn]
+    nlinarith only [hm, sq_abs v, mul_nonneg hT1nn hT2nn]
   have hT2sq : T2 ^ 2 = S.Δ * (P.G ^ 4 * P.U ^ 20 * S.Ω ^ 2) := by
     rw [hT2_def, mul_pow, Real.sq_sqrt hΔpos.le]; ring
   have hT1sq : T1 ^ 2 = S.Δ ^ 6 * P.G ^ 5 * P.U ^ 45 / (P.H ^ 2 * S.Ω ^ 12) := by
@@ -509,7 +514,7 @@ theorem step4_fiber_extract {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ → �
   have hAfloor2 : 2 * 10 ^ 120 * (T1 ^ 2 + T2 ^ 2) / (S.Δ ^ 2 * S.Ω ^ 2) ≤ A := by
     rw [hA_def]
     apply div_le_div_of_nonneg_right ?_ (by positivity : (0:ℝ) ≤ S.Δ ^ 2 * S.Ω ^ 2)
-    nlinarith [hLge, hvsqfloor, sq_nonneg v]
+    nlinarith only [hLge, hvsqfloor, sq_nonneg v]
   have hSgT_floor : 10 ^ 112 * (T1 ^ 2 + T2 ^ 2) / (S.Δ ^ 2 * S.Ω ^ 2) ≤ |SgT| := by
     refine le_trans ?_ hlow'
     have h2A : 2 * 10 ^ 120 * (T1 ^ 2 + T2 ^ 2) / (S.Δ ^ 2 * S.Ω ^ 2) ≤ A := hAfloor2
@@ -529,7 +534,7 @@ theorem step4_fiber_extract {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ → �
   -- the t3-core regime collapse : `21·10⁹⁷·U¹⁵Δ ≤ HΩ¹¹`
   have hΔU : 10 ^ 15 * P.U ^ 20 ≤ S.Δ := by
     have hG4 : (1:ℝ) ≤ P.G ^ 4 := one_le_pow₀ hG1
-    nlinarith [hDeW, pow_pos hUpos 20]
+    nlinarith only [hDeW, pow_pos hUpos 20, hG4]
   have hU10' : (10:ℝ) ^ 330 ≤ P.U ^ 10 := by
     calc (10:ℝ) ^ 330 = ((10:ℝ) ^ 33) ^ 10 := by rw [← pow_mul]
       _ ≤ P.U ^ 10 := pow_le_pow_left₀ (by norm_num) hUbig 10
@@ -641,7 +646,7 @@ theorem step4_fiber_extract {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ → �
             * (Lc * ((10 ^ 40 : ℝ) * (S.Δ ^ 2 * P.U ^ 10 / S.Ω ^ 6)) / (S.Δ ^ 2 * S.Ω ^ 2)) := by
       have hd := div_le_div_of_nonneg_right h1c
         (by positivity : (0:ℝ) ≤ S.Δ ^ 2 * S.Ω ^ 2)
-      nlinarith [hd]
+      linarith only [hd]
     calc (10 ^ 15 : ℝ) * (Lc * v ^ 2 / (S.Δ ^ 2 * S.Ω ^ 2))
         ≤ (10 ^ 15 : ℝ)
             * (Lc * ((10 ^ 40 : ℝ) * (S.Δ ^ 2 * P.U ^ 10 / S.Ω ^ 6)) / (S.Δ ^ 2 * S.Ω ^ 2)) := hmid
@@ -670,7 +675,7 @@ theorem step4_fiber_extract {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ → �
       have he2 : (10 ^ 56 : ℝ) * Lc * P.U ^ 10 / S.Ω ^ 8
           = (10 ^ 56 : ℝ) * (Lc * P.U ^ 10 / S.Ω ^ 8) := by ring
       rw [he1, he2]
-      nlinarith [hbase2]
+      nlinarith only [hbase2]
     linarith [hsle, hSgT_cap, hcap10]
 
 end Squarefree
