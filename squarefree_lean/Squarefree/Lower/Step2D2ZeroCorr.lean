@@ -70,79 +70,79 @@ lemma w2_correction_abstract {d d1 d2 s4 d4 e1 e2 e3 e4 B R l1 : ℝ}
       ≤ B ^ 7 / (2 * 10 ^ 42) := by
   have hRne : R ≠ 0 := hR.ne'
   have hb0 : |8 * d ^ 4 * d1 * d2 * e4| ≤ 8 * (18 * (B * R)) ^ 4 * (10 ^ 6 * B) * (10 ^ 13 * (B / R)) * (l1 * (118098 * 10 ^ 28 * (B / R ^ 4))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb1 : |8 * d ^ 4 * d1 * s4 * e3| ≤ 8 * (18 * (B * R)) ^ 4 * (10 ^ 6 * B) * (10 ^ 19 * (B / R ^ 2)) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb2 : |24 * d ^ 4 * d2 ^ 2 * e3| ≤ 24 * (18 * (B * R)) ^ 4 * (10 ^ 13 * (B / R)) ^ 2 * (l1 * (2 * 10 ^ 25 * (B / R ^ 3))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb3 : |8 * d ^ 4 * d2 * d4 * e1| ≤ 8 * (18 * (B * R)) ^ 4 * (10 ^ 13 * (B / R)) * (2 * 10 ^ 25 * (B / R ^ 3)) * (l1 * (10 ^ 13 * (B / R))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb4 : |8 * d ^ 4 * d2 * e1 * e4| ≤ 8 * (18 * (B * R)) ^ 4 * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 13 * (B / R))) * (l1 * (118098 * 10 ^ 28 * (B / R ^ 4))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb5 : |24 * d ^ 4 * d2 * e2 * e3| ≤ 24 * (18 * (B * R)) ^ 4 * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 19 * (B / R ^ 2))) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb6 : |8 * d ^ 4 * d2 * s4 * e2| ≤ 8 * (18 * (B * R)) ^ 4 * (10 ^ 13 * (B / R)) * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 19 * (B / R ^ 2))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb7 : |8 * d ^ 4 * s4 * e1 * e3| ≤ 8 * (18 * (B * R)) ^ 4 * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 13 * (B / R))) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb8 : |8 * d ^ 4 * s4 ^ 2 * e1| ≤ 8 * (18 * (B * R)) ^ 4 * (10 ^ 19 * (B / R ^ 2)) ^ 2 * (l1 * (10 ^ 13 * (B / R))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb9 : |8 * d ^ 4 * s4 * e2 ^ 2| ≤ 8 * (18 * (B * R)) ^ 4 * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 19 * (B / R ^ 2))) ^ 2 := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb10 : |24 * d ^ 3 * d1 ^ 3 * e4| ≤ 24 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) ^ 3 * (l1 * (118098 * 10 ^ 28 * (B / R ^ 4))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb11 : |24 * d ^ 3 * d1 ^ 2 * d2 * e3| ≤ 24 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) ^ 2 * (10 ^ 13 * (B / R)) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb12 : |24 * d ^ 3 * d1 ^ 2 * d4 * e1| ≤ 24 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) ^ 2 * (2 * 10 ^ 25 * (B / R ^ 3)) * (l1 * (10 ^ 13 * (B / R))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb13 : |24 * d ^ 3 * d1 ^ 2 * e1 * e4| ≤ 24 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) ^ 2 * (l1 * (10 ^ 13 * (B / R))) * (l1 * (118098 * 10 ^ 28 * (B / R ^ 4))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb14 : |72 * d ^ 3 * d1 ^ 2 * e2 * e3| ≤ 72 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) ^ 2 * (l1 * (10 ^ 19 * (B / R ^ 2))) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb15 : |88 * d ^ 3 * d1 ^ 2 * s4 * e2| ≤ 88 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) ^ 2 * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 19 * (B / R ^ 2))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb16 : |216 * d ^ 3 * d1 * d2 ^ 2 * e2| ≤ 216 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) * (10 ^ 13 * (B / R)) ^ 2 * (l1 * (10 ^ 19 * (B / R ^ 2))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb17 : |96 * d ^ 3 * d1 * d2 * e1 * e3| ≤ 96 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 13 * (B / R))) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb18 : |80 * d ^ 3 * d1 * d2 * s4 * e1| ≤ 80 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) * (10 ^ 13 * (B / R)) * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 13 * (B / R))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb19 : |96 * d ^ 3 * d1 * d2 * e2 ^ 2| ≤ 96 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 19 * (B / R ^ 2))) ^ 2 := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb20 : |16 * d ^ 3 * d1 * s4 * e1 * e2| ≤ 16 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 13 * (B / R))) * (l1 * (10 ^ 19 * (B / R ^ 2))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb21 : |24 * d ^ 3 * d2 ^ 3 * e1| ≤ 24 * (18 * (B * R)) ^ 3 * (10 ^ 13 * (B / R)) ^ 3 * (l1 * (10 ^ 13 * (B / R))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb22 : |24 * d ^ 3 * d2 ^ 2 * e1 * e2| ≤ 24 * (18 * (B * R)) ^ 3 * (10 ^ 13 * (B / R)) ^ 2 * (l1 * (10 ^ 13 * (B / R))) * (l1 * (10 ^ 19 * (B / R ^ 2))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb23 : |120 * d ^ 2 * d1 ^ 4 * e3| ≤ 120 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 4 * (l1 * (2 * 10 ^ 25 * (B / R ^ 3))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb24 : |120 * d ^ 2 * d1 ^ 3 * d2 * e2| ≤ 120 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 3 * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 19 * (B / R ^ 2))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb25 : |120 * d ^ 2 * d1 ^ 3 * e1 * e3| ≤ 120 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 3 * (l1 * (10 ^ 13 * (B / R))) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb26 : |160 * d ^ 2 * d1 ^ 3 * s4 * e1| ≤ 160 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 3 * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 13 * (B / R))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb27 : |120 * d ^ 2 * d1 ^ 3 * e2 ^ 2| ≤ 120 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 3 * (l1 * (10 ^ 19 * (B / R ^ 2))) ^ 2 := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb28 : |240 * d ^ 2 * d1 ^ 2 * d2 ^ 2 * e1| ≤ 240 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 2 * (10 ^ 13 * (B / R)) ^ 2 * (l1 * (10 ^ 13 * (B / R))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb29 : |120 * d ^ 2 * d1 ^ 2 * d2 * e1 * e2| ≤ 120 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 2 * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 13 * (B / R))) * (l1 * (10 ^ 19 * (B / R ^ 2))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb30 : |20 * d ^ 2 * d1 ^ 2 * s4 * e1 ^ 2| ≤ 20 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 2 * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 13 * (B / R))) ^ 2 := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb31 : |60 * d ^ 2 * d1 * d2 ^ 2 * e1 ^ 2| ≤ 60 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) * (10 ^ 13 * (B / R)) ^ 2 * (l1 * (10 ^ 13 * (B / R))) ^ 2 := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb32 : |240 * d * d1 ^ 5 * e2| ≤ 240 * (18 * (B * R)) * (10 ^ 6 * B) ^ 5 * (l1 * (10 ^ 19 * (B / R ^ 2))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb33 : |240 * d * d1 ^ 4 * d2 * e1| ≤ 240 * (18 * (B * R)) * (10 ^ 6 * B) ^ 4 * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 13 * (B / R))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb34 : |240 * d * d1 ^ 4 * e1 * e2| ≤ 240 * (18 * (B * R)) * (10 ^ 6 * B) ^ 4 * (l1 * (10 ^ 13 * (B / R))) * (l1 * (10 ^ 19 * (B / R ^ 2))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb35 : |240 * d1 ^ 6 * e1| ≤ 240 * (10 ^ 6 * B) ^ 6 * (l1 * (10 ^ 13 * (B / R))) := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have hb36 : |120 * d1 ^ 5 * e1 ^ 2| ≤ 120 * (10 ^ 6 * B) ^ 5 * (l1 * (10 ^ 13 * (B / R))) ^ 2 := by
-    simp only [abs_mul, abs_pow]; gcongr <;> first | norm_num | positivity
+    simp only [abs_mul, abs_pow]; gcongr; norm_num
   have htri : |8 * d ^ 4 * d1 * d2 * e4
         - 8 * d ^ 4 * d1 * s4 * e3
         + 24 * d ^ 4 * d2 ^ 2 * e3
@@ -360,118 +360,6 @@ lemma w2_correction_abstract {d d1 d2 s4 d4 e1 e2 e3 e4 B R l1 : ℝ}
       _ = (21970653527040000000000000000000000000000000000000000000000 / 10 ^ 110 + 111899368070400000000000000000000000000000000000000000000000000000 / 10 ^ 220) * B ^ 7 := by ring
       _ ≤ (1 / (2 * 10 ^ 42)) * B ^ 7 := hcoef2
       _ = B ^ 7 / (2 * 10 ^ 42) := by ring
-  calc |8 * d ^ 4 * d1 * d2 * e4
-        - 8 * d ^ 4 * d1 * s4 * e3
-        + 24 * d ^ 4 * d2 ^ 2 * e3
-        + 8 * d ^ 4 * d2 * d4 * e1
-        + 8 * d ^ 4 * d2 * e1 * e4
-        + 24 * d ^ 4 * d2 * e2 * e3
-        + 8 * d ^ 4 * d2 * s4 * e2
-        - 8 * d ^ 4 * s4 * e1 * e3
-        - 8 * d ^ 4 * s4 ^ 2 * e1
-        - 8 * d ^ 4 * s4 * e2 ^ 2
-        + 24 * d ^ 3 * d1 ^ 3 * e4
-        - 24 * d ^ 3 * d1 ^ 2 * d2 * e3
-        + 24 * d ^ 3 * d1 ^ 2 * d4 * e1
-        + 24 * d ^ 3 * d1 ^ 2 * e1 * e4
-        + 72 * d ^ 3 * d1 ^ 2 * e2 * e3
-        + 88 * d ^ 3 * d1 ^ 2 * s4 * e2
-        - 216 * d ^ 3 * d1 * d2 ^ 2 * e2
-        - 96 * d ^ 3 * d1 * d2 * e1 * e3
-        - 80 * d ^ 3 * d1 * d2 * s4 * e1
-        - 96 * d ^ 3 * d1 * d2 * e2 ^ 2
-        + 16 * d ^ 3 * d1 * s4 * e1 * e2
-        - 24 * d ^ 3 * d2 ^ 3 * e1
-        - 24 * d ^ 3 * d2 ^ 2 * e1 * e2
-        - 120 * d ^ 2 * d1 ^ 4 * e3
-        - 120 * d ^ 2 * d1 ^ 3 * d2 * e2
-        - 120 * d ^ 2 * d1 ^ 3 * e1 * e3
-        - 160 * d ^ 2 * d1 ^ 3 * s4 * e1
-        - 120 * d ^ 2 * d1 ^ 3 * e2 ^ 2
-        + 240 * d ^ 2 * d1 ^ 2 * d2 ^ 2 * e1
-        + 120 * d ^ 2 * d1 ^ 2 * d2 * e1 * e2
-        - 20 * d ^ 2 * d1 ^ 2 * s4 * e1 ^ 2
-        + 60 * d ^ 2 * d1 * d2 ^ 2 * e1 ^ 2
-        + 240 * d * d1 ^ 5 * e2
-        + 240 * d * d1 ^ 4 * d2 * e1
-        + 240 * d * d1 ^ 4 * e1 * e2
-        - 240 * d1 ^ 6 * e1
-        - 120 * d1 ^ 5 * e1 ^ 2|
-      ≤ |8 * d ^ 4 * d1 * d2 * e4|
-        + |8 * d ^ 4 * d1 * s4 * e3|
-        + |24 * d ^ 4 * d2 ^ 2 * e3|
-        + |8 * d ^ 4 * d2 * d4 * e1|
-        + |8 * d ^ 4 * d2 * e1 * e4|
-        + |24 * d ^ 4 * d2 * e2 * e3|
-        + |8 * d ^ 4 * d2 * s4 * e2|
-        + |8 * d ^ 4 * s4 * e1 * e3|
-        + |8 * d ^ 4 * s4 ^ 2 * e1|
-        + |8 * d ^ 4 * s4 * e2 ^ 2|
-        + |24 * d ^ 3 * d1 ^ 3 * e4|
-        + |24 * d ^ 3 * d1 ^ 2 * d2 * e3|
-        + |24 * d ^ 3 * d1 ^ 2 * d4 * e1|
-        + |24 * d ^ 3 * d1 ^ 2 * e1 * e4|
-        + |72 * d ^ 3 * d1 ^ 2 * e2 * e3|
-        + |88 * d ^ 3 * d1 ^ 2 * s4 * e2|
-        + |216 * d ^ 3 * d1 * d2 ^ 2 * e2|
-        + |96 * d ^ 3 * d1 * d2 * e1 * e3|
-        + |80 * d ^ 3 * d1 * d2 * s4 * e1|
-        + |96 * d ^ 3 * d1 * d2 * e2 ^ 2|
-        + |16 * d ^ 3 * d1 * s4 * e1 * e2|
-        + |24 * d ^ 3 * d2 ^ 3 * e1|
-        + |24 * d ^ 3 * d2 ^ 2 * e1 * e2|
-        + |120 * d ^ 2 * d1 ^ 4 * e3|
-        + |120 * d ^ 2 * d1 ^ 3 * d2 * e2|
-        + |120 * d ^ 2 * d1 ^ 3 * e1 * e3|
-        + |160 * d ^ 2 * d1 ^ 3 * s4 * e1|
-        + |120 * d ^ 2 * d1 ^ 3 * e2 ^ 2|
-        + |240 * d ^ 2 * d1 ^ 2 * d2 ^ 2 * e1|
-        + |120 * d ^ 2 * d1 ^ 2 * d2 * e1 * e2|
-        + |20 * d ^ 2 * d1 ^ 2 * s4 * e1 ^ 2|
-        + |60 * d ^ 2 * d1 * d2 ^ 2 * e1 ^ 2|
-        + |240 * d * d1 ^ 5 * e2|
-        + |240 * d * d1 ^ 4 * d2 * e1|
-        + |240 * d * d1 ^ 4 * e1 * e2|
-        + |240 * d1 ^ 6 * e1|
-        + |120 * d1 ^ 5 * e1 ^ 2| := htri
-    _ ≤ 8 * (18 * (B * R)) ^ 4 * (10 ^ 6 * B) * (10 ^ 13 * (B / R)) * (l1 * (118098 * 10 ^ 28 * (B / R ^ 4)))
-        + 8 * (18 * (B * R)) ^ 4 * (10 ^ 6 * B) * (10 ^ 19 * (B / R ^ 2)) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3)))
-        + 24 * (18 * (B * R)) ^ 4 * (10 ^ 13 * (B / R)) ^ 2 * (l1 * (2 * 10 ^ 25 * (B / R ^ 3)))
-        + 8 * (18 * (B * R)) ^ 4 * (10 ^ 13 * (B / R)) * (2 * 10 ^ 25 * (B / R ^ 3)) * (l1 * (10 ^ 13 * (B / R)))
-        + 8 * (18 * (B * R)) ^ 4 * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 13 * (B / R))) * (l1 * (118098 * 10 ^ 28 * (B / R ^ 4)))
-        + 24 * (18 * (B * R)) ^ 4 * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 19 * (B / R ^ 2))) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3)))
-        + 8 * (18 * (B * R)) ^ 4 * (10 ^ 13 * (B / R)) * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 19 * (B / R ^ 2)))
-        + 8 * (18 * (B * R)) ^ 4 * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 13 * (B / R))) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3)))
-        + 8 * (18 * (B * R)) ^ 4 * (10 ^ 19 * (B / R ^ 2)) ^ 2 * (l1 * (10 ^ 13 * (B / R)))
-        + 8 * (18 * (B * R)) ^ 4 * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 19 * (B / R ^ 2))) ^ 2
-        + 24 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) ^ 3 * (l1 * (118098 * 10 ^ 28 * (B / R ^ 4)))
-        + 24 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) ^ 2 * (10 ^ 13 * (B / R)) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3)))
-        + 24 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) ^ 2 * (2 * 10 ^ 25 * (B / R ^ 3)) * (l1 * (10 ^ 13 * (B / R)))
-        + 24 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) ^ 2 * (l1 * (10 ^ 13 * (B / R))) * (l1 * (118098 * 10 ^ 28 * (B / R ^ 4)))
-        + 72 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) ^ 2 * (l1 * (10 ^ 19 * (B / R ^ 2))) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3)))
-        + 88 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) ^ 2 * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 19 * (B / R ^ 2)))
-        + 216 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) * (10 ^ 13 * (B / R)) ^ 2 * (l1 * (10 ^ 19 * (B / R ^ 2)))
-        + 96 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 13 * (B / R))) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3)))
-        + 80 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) * (10 ^ 13 * (B / R)) * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 13 * (B / R)))
-        + 96 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 19 * (B / R ^ 2))) ^ 2
-        + 16 * (18 * (B * R)) ^ 3 * (10 ^ 6 * B) * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 13 * (B / R))) * (l1 * (10 ^ 19 * (B / R ^ 2)))
-        + 24 * (18 * (B * R)) ^ 3 * (10 ^ 13 * (B / R)) ^ 3 * (l1 * (10 ^ 13 * (B / R)))
-        + 24 * (18 * (B * R)) ^ 3 * (10 ^ 13 * (B / R)) ^ 2 * (l1 * (10 ^ 13 * (B / R))) * (l1 * (10 ^ 19 * (B / R ^ 2)))
-        + 120 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 4 * (l1 * (2 * 10 ^ 25 * (B / R ^ 3)))
-        + 120 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 3 * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 19 * (B / R ^ 2)))
-        + 120 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 3 * (l1 * (10 ^ 13 * (B / R))) * (l1 * (2 * 10 ^ 25 * (B / R ^ 3)))
-        + 160 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 3 * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 13 * (B / R)))
-        + 120 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 3 * (l1 * (10 ^ 19 * (B / R ^ 2))) ^ 2
-        + 240 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 2 * (10 ^ 13 * (B / R)) ^ 2 * (l1 * (10 ^ 13 * (B / R)))
-        + 120 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 2 * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 13 * (B / R))) * (l1 * (10 ^ 19 * (B / R ^ 2)))
-        + 20 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 2 * (10 ^ 19 * (B / R ^ 2)) * (l1 * (10 ^ 13 * (B / R))) ^ 2
-        + 60 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) * (10 ^ 13 * (B / R)) ^ 2 * (l1 * (10 ^ 13 * (B / R))) ^ 2
-        + 240 * (18 * (B * R)) * (10 ^ 6 * B) ^ 5 * (l1 * (10 ^ 19 * (B / R ^ 2)))
-        + 240 * (18 * (B * R)) * (10 ^ 6 * B) ^ 4 * (10 ^ 13 * (B / R)) * (l1 * (10 ^ 13 * (B / R)))
-        + 240 * (18 * (B * R)) * (10 ^ 6 * B) ^ 4 * (l1 * (10 ^ 13 * (B / R))) * (l1 * (10 ^ 19 * (B / R ^ 2)))
-        + 240 * (10 ^ 6 * B) ^ 6 * (l1 * (10 ^ 13 * (B / R)))
-        + 120 * (10 ^ 6 * B) ^ 5 * (l1 * (10 ^ 13 * (B / R))) ^ 2 := hSbd
-    _ = (21970653527040000000000000000000000000000000000000000000000 : ℝ) * (l1 * B ^ 7 / R) + 111899368070400000000000000000000000000000000000000000000000000000 * (l1 ^ 2 * B ^ 7 / R ^ 2) := hcomb
-    _ ≤ B ^ 7 / (2 * 10 ^ 42) := hfinal
+  exact htri.trans ((hSbd.trans hcomb.le).trans hfinal)
 
 end Squarefree

@@ -27,7 +27,7 @@ namespace DyadicAssembly
 over `[⌈t⌉, ⌊t·2^{K+1}⌋]` is at most the sum of the `K+1` dyadic blocks `[⌈t·2^k⌉, ⌊t·2^{k+1}⌋]`.
 The blocks adjoin with no integer gap because `2·(t·2^k) = t·2^{k+1}` and
 `⌈y⌉ ≤ ⌊y⌋ + 1`. -/
-theorem dyadic_cover_sum (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t : ℝ) (ht : 0 < t) :
+theorem dyadic_cover_sum (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t : ℝ) (_ht : 0 < t) :
     ∀ K : ℕ,
       ∑ a ∈ Finset.Icc ⌈t⌉ ⌊t * 2 ^ (K + 1)⌋, f a ≤
         ∑ k ∈ Finset.range (K + 1),
@@ -88,12 +88,12 @@ theorem exists_cover_exp (t b : ℝ) (ht : 0 < t) (hb : t ≤ b) :
     have hpow : (2 : ℝ) ^ (n + 1) = 2 * 2 ^ n := by ring
     have h2 : (2 : ℝ) ^ n * t ≤ b := by
       rw [← le_div_iff₀ ht]; exact hn1
-    rw [hpow]; nlinarith [h2]
+    rw [hpow]; linarith [h2]
   · -- 2^{n+1} ≤ 2b/t
     have hpow : (2 : ℝ) ^ (n + 1) = 2 * 2 ^ n := by ring
     have h2 : (2 : ℝ) ^ n * t ≤ b := by
       rw [← le_div_iff₀ ht]; exact hn1
-    rw [hpow, le_div_iff₀ ht]; nlinarith [h2]
+    rw [hpow, le_div_iff₀ ht]; linarith [h2]
 
 /-- Threshold identity `(1/4)·(D/H)^{4/3}·(H⁴/X)^{1/3} = D^{4/3}/(4·X^{1/3})`. -/
 private theorem thr_identity {H X D : ℝ} (hH : 0 < H) (hX : 0 < X) (hD : 0 < D) :
@@ -117,7 +117,7 @@ private theorem two_bb_le_sq_t {H X U D : ℝ} (hH : 1 ≤ H) (hX : 0 < X) (hD :
   have hDD43 : D ≤ D ^ (4/3 : ℝ) := by
     have he : D ^ (4/3 : ℝ) = D * D ^ (1/3 : ℝ) := by
       rw [show (4/3 : ℝ) = 1 + 1/3 by norm_num, Real.rpow_add hDpos, Real.rpow_one]
-    rw [he]; nlinarith [hDpos, hD13]
+    rw [he]; exact le_mul_of_one_le_right hDpos.le hD13
   have ht_eq : X ^ (2:ℝ) * (D ^ (4/3 : ℝ) / (4 * X ^ (1/3 : ℝ)))
       = X ^ (5/3 : ℝ) * D ^ (4/3 : ℝ) / 4 := by
     rw [show X ^ (2:ℝ) = X ^ (5/3 : ℝ) * X ^ (1/3 : ℝ) by rw [← Real.rpow_add hX0]; norm_num]
@@ -127,14 +127,14 @@ private theorem two_bb_le_sq_t {H X U D : ℝ} (hH : 1 ≤ H) (hX : 0 < X) (hD :
   calc 2 * (D / H * U) * 4 = 8 * U * (D / H) := by ring
     _ ≤ 8 * U * D := by
         apply mul_le_mul_of_nonneg_left _ (by positivity)
-        rw [div_le_iff₀ hHpos]; nlinarith [hDpos, hH]
+        rw [div_le_iff₀ hHpos]; exact le_mul_of_one_le_right hDpos.le hH
     _ ≤ X ^ (5/3 : ℝ) * D := mul_le_mul_of_nonneg_right h8 hDpos.le
     _ ≤ X ^ (5/3 : ℝ) * D ^ (4/3 : ℝ) := mul_le_mul_of_nonneg_left hDD43 hX53pos.le
 
 /-- Cover-and-count: if the dyadic blocks of `f` are each `≤ B ≥ 0` and `[⌈t⌉,⌊bb⌋]` is covered by
 the first `n+1` blocks, then `∑_{[⌈t⌉,⌊bb⌋]} f ≤ (n+1)·B`. -/
 theorem cover_sum_le (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t bb B : ℝ) (ht : 0 < t)
-    (n : ℕ) (hcov : bb ≤ t * 2 ^ (n + 1)) (hB : 0 ≤ B)
+    (n : ℕ) (hcov : bb ≤ t * 2 ^ (n + 1)) (_hB : 0 ≤ B)
     (hblock : ∀ k ∈ Finset.range (n + 1),
         ∑ a ∈ Finset.Icc ⌈t * 2 ^ k⌉ ⌊t * 2 ^ (k + 1)⌋, f a ≤ B) :
     ∑ a ∈ Finset.Icc ⌈t⌉ ⌊bb⌋, f a ≤ ((n : ℝ) + 1) * B := by
@@ -174,7 +174,7 @@ private theorem rpow_dominate {c α β : ℝ} (hc : 0 < c) (hαβ : α < β) {X 
       Real.rpow_one] at this
   -- multiply by X^α > 0
   have hXα : 0 < X ^ α := Real.rpow_pos_of_pos hX0 _
-  calc c * X ^ α ≤ X ^ (β - α) * X ^ α := by nlinarith [hXα]
+  calc c * X ^ α ≤ X ^ (β - α) * X ^ α := mul_le_mul_of_nonneg_right hcle hXα.le
     _ = X ^ β := by rw [← Real.rpow_add hX0]; ring_nf
 
 end DyadicAssembly
@@ -191,8 +191,8 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
   obtain ⟨C_s, hC_s, hsmall⟩ := dblock_small_omega c₀ hc₀
   obtain ⟨u_2, hu_2, C_2, hC_2, X_2, h2⟩ := prop_2_4 g hg hg'
   -- u_b < 1/100 < 1/200 from the optimization budget 18977 g + 15315 u_b < 2
-  have hub100 : u_b < 1 / 100 := by nlinarith [hg, hopt]
-  have hub200 : u_b < 1 / 200 := by nlinarith [hg, hopt]
+  have hub100 : u_b < 1 / 100 := by linarith [hg, hopt]
+  have hub200 : u_b < 1 / 200 := by linarith [hg, hopt]
   -- result exponent: below both u_b/2 (room for the O(log) shrink) and u_2 (prop_2_4 budget)
   refine ⟨min (u_b / 2) u_2, lt_min (by linarith) hu_2, ?_⟩
   set u : ℝ := min (u_b / 2) u_2 with hudef
@@ -208,7 +208,7 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
   -- abbreviation for the H-exponent
   set a : ℝ := (1 - g) / 5 with hadef
   have ha0 : 0 < a := by rw [hadef]; linarith
-  have hub_a : u_b < a := by rw [hadef]; nlinarith [hg, hub100]
+  have hub_a : u_b < a := by rw [hadef]; linarith [hg', hub100]
   -- the (absolute) thresholds X must exceed
   set Tlog : ℝ := (8 / (u_b * Real.log 2)) ^ ((u_b / 4)⁻¹) with hTlogdef
   set t8  : ℝ := 8 ^ ((1 - (a + 1/2))⁻¹) with ht8def
@@ -266,12 +266,12 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
     have hcomb : (2 / Real.log 2) * Real.log X ≤ X ^ (u_b / 2) := le_trans hmid hdom
     have hmono : X ^ (u_b / 2) ≤ X ^ u_b := Real.rpow_le_rpow_of_exponent_le hX1 (by linarith)
     have hlog2_le1 : Real.log 2 ≤ 1 := by
-      nlinarith [Real.log_le_sub_one_of_pos (show (0:ℝ) < 2 by norm_num)]
+      linarith [Real.log_le_sub_one_of_pos (show (0:ℝ) < 2 by norm_num)]
     have h2log_ge1 : (1:ℝ) ≤ 2 / Real.log 2 := by
       rw [le_div_iff₀ (Real.log_pos (by norm_num))]; linarith [hlog2_le1]
     have hlogXnn : 0 ≤ Real.log X := Real.log_nonneg hX1
     have hself : Real.log X ≤ (2 / Real.log 2) * Real.log X := by
-      nlinarith [mul_nonneg hlogXnn (show (0:ℝ) ≤ 2 / Real.log 2 - 1 by linarith [h2log_ge1])]
+      linarith [mul_nonneg hlogXnn (show (0:ℝ) ≤ 2 / Real.log 2 - 1 by linarith [h2log_ge1])]
     linarith [hself, hcomb, hmono]
   -- the global parameter pack (with u = u_b)
   set P : Globals := ⟨X, g, u_b, hX0⟩ with hPdef
@@ -317,7 +317,7 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
           apply mul_le_mul_of_nonneg_left hmono hC_2.le
       _ ≤ (6 * C_blk + 6 + C_2) * (X ^ a / X ^ u) := by
           apply mul_le_mul_of_nonneg_right _ (by positivity)
-          nlinarith [hCblk_pos]
+          linarith [hCblk_pos]
       _ = (6 * C_blk + 6 + C_2) * P.H / X ^ u := by rw [hPH]; ring
   · -- LONG regime: a_decomposition + dyadic blocks
     have hX13pos : (0 : ℝ) < X ^ (1/3 : ℝ) := Real.rpow_pos_of_pos hX0 _
@@ -332,7 +332,7 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
       have h2 : 8 * X ^ a * X ^ (1/2 : ℝ) = 8 * X ^ (a + 1/2) := by
         rw [Real.rpow_add hX0]; ring
       have h3 : 8 * X ^ (a + 1/2) ≤ X ^ (1 : ℝ) :=
-        rpow_dominate (by norm_num) (by rw [hadef]; nlinarith [hg]) hX1 hXt8
+        rpow_dominate (by norm_num) (by rw [hadef]; linarith [hg]) hX1 hXt8
       rw [Real.rpow_one] at h3
       rw [h2] at h1; linarith
     have hDlarge : 1025 * P.H ≤ D := by
@@ -341,7 +341,8 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
           (by rw [ht1025def] at hXt1025; rw [show ((1:ℝ)/100 - 0) = (1:ℝ)/100 by ring]; exact hXt1025)
       rw [Real.rpow_zero, mul_one] at h1025
       calc 1025 * P.H = 1025 * X ^ a := by rw [hPH]
-        _ ≤ X ^ (1/100 : ℝ) * X ^ a := by nlinarith [Real.rpow_pos_of_pos hX0 a]
+        _ ≤ X ^ (1/100 : ℝ) * X ^ a :=
+            mul_le_mul_of_nonneg_right h1025 (Real.rpow_pos_of_pos hX0 a).le
         _ = X ^ a * X ^ (1/100 : ℝ) := by ring
         _ = P.H * P.X ^ (1/100 : ℝ) := by rw [hPH, hPdef]
         _ ≤ D := hLong.le
@@ -355,7 +356,7 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
         rw [mul_pow, ← Real.rpow_natCast (X ^ (1/100:ℝ)) 2, ← Real.rpow_mul hX0.le]
         norm_num
       have h64 : 64 * X ^ a ≤ X ^ (1 + 1/50 : ℝ) :=
-        rpow_dominate (by norm_num) (by rw [hadef]; nlinarith [hg]) hX1 hXt64
+        rpow_dominate (by norm_num) (by rw [hadef]; linarith [hg]) hX1 hXt64
       have hXsplit : X ^ (1 + 1/50 : ℝ) = X * X ^ (1/50 : ℝ) := by
         rw [show (1 + 1/50 : ℝ) = (1:ℝ) + 1/50 from rfl, Real.rpow_add hX0, Real.rpow_one]
       -- assemble
@@ -432,7 +433,7 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
       have hNR : (1/4 : ℝ) * (Sk k).Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ (Sk k).A := by
         rw [hSkA k, hSkΔ, hthr]
         have h2k : (1:ℝ) ≤ 2 ^ k := one_le_pow₀ (by norm_num)
-        nlinarith [htpos, h2k]
+        exact le_mul_of_one_le_right htpos.le h2k
       have hAD : 2 * (Sk k).A ≤ (Sk k).D := by rw [hSkA k, hSkD k]; exact h2A
       have hΩUle : (Sk k).Ω ≤ P.U := by
         show (t / Δ) * 2 ^ k ≤ P.U; exact hΩU

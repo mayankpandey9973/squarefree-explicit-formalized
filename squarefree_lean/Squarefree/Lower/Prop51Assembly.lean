@@ -54,6 +54,7 @@ theorem prop51_perpair
     ((Ra.filter (fun r => r + ℓ₁ ∈ Ra ∧ r + ℓ₂ ∈ Ra)).card : ℝ)
       ≤ Bcombine P S ℓ₁ ℓ₂ := by
   classical
+  have _ := hGHΩ; have _ := hpop; have _ := hΩH
   obtain ⟨hℓ1, hℓ12, hℓ2W⟩ := hℓ
   have hℓ1pos : 0 < ℓ₁ := hℓ1
   have hGpos := P.G_pos; have hUpos := P.U_pos; have hHpos := P.H_pos
@@ -93,7 +94,10 @@ theorem prop51_perpair
       rw [this]
       exact mul_le_mul_of_nonneg_left hℓ1GU (by positivity)
     have hc : (10:ℝ) ^ 110 * (130 * (P.G * P.U ^ 5)) ≤ 10 ^ 113 * (P.G * P.U ^ 5) := by
-      nlinarith [mul_pos hGpos (pow_pos hUpos 5)]
+      have hXnn : (0:ℝ) ≤ P.G * P.U ^ 5 := (mul_pos hGpos (pow_pos hUpos 5)).le
+      rw [show (10:ℝ) ^ 110 * (130 * (P.G * P.U ^ 5))
+          = (10 ^ 110 * 130) * (P.G * P.U ^ 5) from by ring]
+      exact mul_le_mul_of_nonneg_right (by norm_num) hXnn
     linarith
   have hM2nn : (0:ℝ) ≤ Mbound P S ℓ₁ (10 ^ 65 * (S.Δ ^ 3 * P.U ^ 10 / (P.H * S.Ω ^ 6)))
       + 1 / 2 := by
@@ -114,7 +118,7 @@ theorem prop51_perpair
     N₂ hNcap2 hNenv2
   -- ===== s₃ : the range V₁ < |v| ≤ V₊ =====
   have hV2nn0 : (0:ℝ) ≤ V₂ P S := by rw [V₂]; positivity
-  have hVpnn : (0:ℝ) ≤ 10 ^ 60 * V₂ P S := by nlinarith [hV2nn0]
+  have hVpnn : (0:ℝ) ≤ 10 ^ 60 * V₂ P S := mul_nonneg (by positivity) hV2nn0
   have hM3nn : (0:ℝ) ≤ Mbound P S ℓ₁ (10 ^ 60 * V₂ P S) + 1 / 2 := by
     rw [Mbound]
     have hℓnn : (0:ℝ) ≤ ((ℓ₁ : ℤ) : ℝ) := by positivity
@@ -142,7 +146,8 @@ theorem prop51_perpair
     rw [Scale.R]; positivity
   have hℓ1leR : (ℓ₁ : ℝ) ≤ S.R := by
     have h1' : 130 * (P.G * P.U ^ 5) ≤ 10 ^ 113 * (P.G * P.U ^ 5) := by
-      nlinarith [mul_pos hGpos (pow_pos hUpos 5)]
+      have hXnn : (0:ℝ) ≤ P.G * P.U ^ 5 := (mul_pos hGpos (pow_pos hUpos 5)).le
+      exact mul_le_mul_of_nonneg_right (by norm_num) hXnn
     linarith
   have hr01 : (1/72) * S.R ≤ 16 * S.R - (ℓ₁ : ℝ) := by linarith
   have hr1hi : (16 * S.R - (ℓ₁ : ℝ)) + (ℓ₁ : ℝ) ≤ 16 * S.R := le_of_eq (by ring)
@@ -156,8 +161,9 @@ theorem prop51_perpair
     have hL : (1:ℝ) ≤ (ℓ₁:ℝ) ^ 3 * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ)) := by
       have h3 : (1:ℝ) ≤ (ℓ₁:ℝ) ^ 3 := one_le_pow₀ hℓ1R
       have hℓ2R : (1:ℝ) ≤ (ℓ₂ : ℝ) := by linarith
-      have h31 : (1:ℝ) ≤ (ℓ₁:ℝ) ^ 3 * (ℓ₂:ℝ) := by nlinarith [h3, hℓ2R]
-      nlinarith [h31, hd1]
+      have h31 : (1:ℝ) ≤ (ℓ₁:ℝ) ^ 3 * (ℓ₂:ℝ) :=
+        one_le_mul_of_one_le_of_one_le h3 hℓ2R
+      exact one_le_mul_of_one_le_of_one_le h31 hd1
     have hUΩ : S.Ω ^ 8 ≤ P.U ^ 10 := by
       calc S.Ω ^ 8 ≤ P.U ^ 8 := pow_le_pow_left₀ hΩpos.le hΩU 8
         _ ≤ P.U ^ 10 := pow_le_pow_right₀ hU1 (by norm_num)
@@ -165,7 +171,9 @@ theorem prop51_perpair
         = 10 ^ 56 * ((ℓ₁:ℝ) ^ 3 * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ))) * (P.U ^ 10 / S.Ω ^ 8)
         from by ring]
     have hquot : (1:ℝ) ≤ P.U ^ 10 / S.Ω ^ 8 := (one_le_div (by positivity)).mpr hUΩ
-    nlinarith [hL, hquot]
+    have h56 : (1:ℝ) ≤ 10 ^ 56 := by norm_num
+    exact one_le_mul_of_one_le_of_one_le
+      (one_le_mul_of_one_le_of_one_le h56 hL) hquot
   set N₄ : ℕ := ⌈10 ^ 56 * ((ℓ₁:ℝ) ^ 3 * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ)))
       * P.U ^ 10 / S.Ω ^ 8⌉₊ with hN₄def
   have hNlo4 : 10 ^ 56 * ((ℓ₁:ℝ) ^ 3 * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ))) * P.U ^ 10 / S.Ω ^ 8
@@ -231,6 +239,7 @@ theorem prop51_perpair
     Ra N₄ ((10:ℝ) ^ 57) le_rfl (by norm_num) hNlo4 hNcap04 hfibre hb0box hvmax hb0gap hmem
   -- ===== summation =====
   have hsum := perpair_sum_le_Bcombine (P := P) (S := S) hℓ1pos hℓ12
+  set_option exponentiation.threshold 410 in
   linarith [hpart, hs1, hs2, hs3, hs4, hsum]
 
 end Squarefree
