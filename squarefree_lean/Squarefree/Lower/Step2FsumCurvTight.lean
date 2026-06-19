@@ -20,7 +20,7 @@ private theorem w6_le_u10 {w u : ℝ} (hw0 : 0 < w) (hu1 : 1 ≤ u) (hwu : w ≤
   le_trans (pow_le_pow_left₀ hw0.le hwu 6) (pow_le_pow_right₀ hu1 (by norm_num))
 
 /-- `2n+1 ≤ 3·(10⁹⁸·g²u¹⁵/w⁵)` from the `N`-cap and `n ≥ 1`. -/
-private theorem cap3 {g u w n : ℝ} (hg : 0 < g) (hu : 0 < u) (hw : 0 < w)
+private theorem cap3 {g u w n : ℝ} (_hg : 0 < g) (_hu : 0 < u) (_hw : 0 < w)
     (hn1 : 1 ≤ n) (hncap : n ≤ 10 ^ 98 * (g ^ 2 * u ^ 15 / w ^ 5)) :
     2 * n + 1 ≤ 3 * (10 ^ 98 * (g ^ 2 * u ^ 15 / w ^ 5)) := by linarith [hncap, hn1]
 
@@ -119,7 +119,7 @@ private theorem mon_t5 {g u d w h n : ℝ} (hg : 0 < g) (hu : 0 < u) (hd : 0 < d
 
 /-- term 2 (half-power): `(2n+1)·(2h·sg⁶·w³·u¹⁰/sd³) ≤ 6·10⁹⁸·(h·sg¹⁰·u³⁵/(sd³·w⁸))`. -/
 private theorem mon_t2 {sg sd u w h n : ℝ} (hsg : 0 < sg) (hsd : 0 < sd) (hu : 0 < u) (hw : 0 < w)
-    (hh : 0 < h) (hsg1 : 1 ≤ sg) (hu1 : 1 ≤ u) (hwu : w ≤ u) (hn1 : 1 ≤ n)
+    (hh : 0 < h) (_hsg1 : 1 ≤ sg) (hu1 : 1 ≤ u) (hwu : w ≤ u) (hn1 : 1 ≤ n)
     (hncap : n ≤ 10 ^ 98 * (sg ^ 4 * u ^ 15 / w ^ 5)) :
     (2 * n + 1) * (2 * h * sg ^ 6 * w ^ 3 * u ^ 10 / sd ^ 3)
       ≤ 6 * 10 ^ 98 * (h * sg ^ 10 * u ^ 35 / (sd ^ 3 * w ^ 8)) := by
@@ -164,7 +164,6 @@ private theorem mon_t4 {sg sd u w h n : ℝ} (hsg : 0 < sg) (hsd : 0 < sd) (hu :
     linarith [hc1, hc2, hc3]
   nlinarith [mul_le_mul_of_nonneg_left hkey (show (0:ℝ) ≤ sg ^ 4 * u ^ 15 * w ^ 5 by positivity)]
 
-set_option maxHeartbeats 1600000 in
 /-- **§5 Step-2 curvature `f`-sum scale-domination.** -/
 theorem step2_fsum_curv_le_t2t3 {P : Globals} {S : Scale P}
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H)
@@ -199,7 +198,7 @@ theorem step2_fsum_curv_le_t2t3 {P : Globals} {S : Scale P}
   have hΔ12 : S.Δ ^ ((1:ℝ)/2) = sD := hsD_def.symm
   have hHbig : S.Δ ^ 2 * P.G * P.U ^ 10 ≤ P.H := by
     have hΔ2 : (0:ℝ) < S.Δ ^ 2 := by positivity
-    nlinarith [(le_div_iff₀ hΔ2).mp h1]
+    linarith only [(le_div_iff₀ hΔ2).mp h1]
   -- scale identities
   have hRval : S.R = P.H * P.G * S.Ω ^ 3 / S.Δ := by unfold Scale.R; field_simp
   have hκval : S.D ^ 4 / (P.X * S.A) = S.Δ ^ 3 / (P.H * P.G * S.Ω) := defect_D4_div_XA S
@@ -276,7 +275,7 @@ theorem step2_fsum_curv_le_t2t3 {P : Globals} {S : Scale P}
           + (2 * N + 1) * Tc + (2 * N + 1) * 1 + (2 * N + 1) * (N * (S.Δ ^ 3 / (P.H * P.G * S.Ω))) := by
       ring
     rw [hexp]
-    nlinarith [ht1, ht2, ht3, ht4, ht5, hMGnn, hMHnn]
+    linarith only [ht1, ht2, ht3, ht4, ht5, hMGnn, hMHnn]
   -- final chain
   have hkey : (2 * N + 1) * 10 ^ 200 * (S.R * (δ' + Real.sqrt (δ' / Tc)) + Tc + 1
         + N * (S.Δ ^ 3 / (P.H * P.G * S.Ω)))
@@ -302,6 +301,6 @@ theorem step2_fsum_curv_le_t2t3 {P : Globals} {S : Scale P}
   have hg : (10:ℝ) ^ 397 * MG ≤ 10 ^ 400 * MG := mul_le_mul_of_nonneg_right p1 hMGnn
   have hh : (10:ℝ) ^ 299 * MH ≤ 10 ^ 400 * MH := mul_le_mul_of_nonneg_right p2 hMHnn
   calc (10:ℝ) ^ 397 * MG + 10 ^ 299 * MH ≤ 10 ^ 400 * MG + 10 ^ 400 * MH := add_le_add hg hh
-    _ = 10 ^ 400 * (MG + MH) := by ring
+    _ = 10 ^ 400 * (MG + MH) := by rw [mul_add]
 
 end Squarefree

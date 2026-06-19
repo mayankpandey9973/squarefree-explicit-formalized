@@ -38,8 +38,6 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 1600000
-
 /-- **The `f`-free Wronskian identity `W₂ = χ‴ψ″ − χ″ψ‴`** (order-2 analogue of `welim_poly`).
 With the `phif_iteratedDeriv{2,3}_eq` atom expansions at `f = 0`
 (`χ″ = ψ″φ + 2ψ'φ' + ψφ''`, `χ‴ = ψ‴φ + 3ψ″φ' + 3ψ'φ'' + ψφ'''`, ψ-tower in `d̃`-atoms), the
@@ -75,7 +73,7 @@ analogue of `chi2_poly`).  Substituting the closed `φ`-tower forms `φ' = K b(2
 `− 120 b b'' d² d̃'³ + 16 b b' d³ d̃' s4 − 24 b b' d³ d̃''² + 120 b b' d² d̃'² d̃'' + 240 b b' d d̃'⁴`
 `+ 8 b b''' d⁴ d̃'' + 24 b b''' d³ d̃'² + 24 b'' b' d⁴ d̃'' + 72 b'' b' d³ d̃'² − 8 b'² d⁴ s4`
 `− 96 b'² d³ d̃' d̃'' − 120 b'² d² d̃'³` (sympy-verified). -/
-lemma w2_poly (X a d d1 d2 s4 b bp bd bt3 K : ℝ) (hd : d ≠ 0) (h6 : (6 : ℝ) * X * a ≠ 0) :
+lemma w2_poly (X a d d1 d2 s4 b bp bd bt3 K : ℝ) (hd : d ≠ 0) (_h6 : (6 : ℝ) * X * a ≠ 0) :
     (3 * ((12 * d ^ 2 * d1 ^ 2 + 4 * d ^ 3 * d2) / (6 * X * a)) ^ 2
           - 2 * (4 * d ^ 3 * d1 / (6 * X * a))
               * ((24 * d * d1 ^ 3 + 36 * d ^ 2 * d1 * d2 + 4 * d ^ 3 * s4) / (6 * X * a)))
@@ -107,7 +105,7 @@ substitution `b → d̃', b' → d̃'', b'' → d̃''', b''' → d̃''''` the 17
 and substituting the `d̃`-tower closed forms gives
 `W2num_s = −3 d̃⁷ (a+d̃)³ P₈ / (16 r⁷ (a+2d̃)¹¹)` with
 `P₈ = 35a⁸+552a⁷d̃+4014a⁶d̃²+16847a⁵d̃³+44170a⁴d̃⁴+74048a³d̃⁵+77708a²d̃⁶+46840a d̃⁷+12480 d̃⁸ > 0`. -/
-lemma smooth_W2_eq (a d r : ℝ) (hr : r ≠ 0) (had2 : a + 2 * d ≠ 0) :
+lemma smooth_W2_eq (a d r : ℝ) (hr : r ≠ 0) (_had2 : a + 2 * d ≠ 0) :
     8 * d ^ 4 * (-d * (d + a) / (2 * r * (a + 2 * d)))
           * (d * (d + a) * (3 * a ^ 2 + 10 * a * d + 10 * d ^ 2) / (4 * r ^ 2 * (a + 2 * d) ^ 3))
           * (3 * d * (d + a)

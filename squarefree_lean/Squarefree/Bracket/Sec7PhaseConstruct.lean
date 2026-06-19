@@ -1756,8 +1756,8 @@ private theorem sec7_phase_f3D_rpow_factor_bounds {P : Globals} {S : Scale P}
     have hhi : y ^ (-((1 : ℝ) / 4)) ≤ (10 : ℝ) ^ 8 := by
       simpa using hhi₀
     constructor
-    · convert hlo using 2 <;> ring
-    · convert hhi using 2 <;> ring
+    · convert hlo using 2; ring
+    · convert hhi using 2; ring
   · have hpowhi : y ^ 5 ≤ ((10 : ℝ) ^ 6) ^ 4 := by
       have hbase : y ^ 5 ≤ (41 : ℝ) ^ 5 := pow_le_pow_left₀ hy0 hyhi 5
       exact le_trans hbase (by norm_num)
@@ -1776,8 +1776,8 @@ private theorem sec7_phase_f3D_rpow_factor_bounds {P : Globals} {S : Scale P}
     have hhi : y ^ (-((5 : ℝ) / 4)) ≤ (10 : ℝ) ^ 8 := by
       simpa using hhi₀
     constructor
-    · convert hlo using 2 <;> ring
-    · convert hhi using 2 <;> ring
+    · convert hlo using 2; ring
+    · convert hhi using 2; ring
   · have hpowhi : y ^ 9 ≤ ((10 : ℝ) ^ 6) ^ 4 := by
       have hbase : y ^ 9 ≤ (41 : ℝ) ^ 9 := pow_le_pow_left₀ hy0 hyhi 9
       exact le_trans hbase (by norm_num)
@@ -1796,8 +1796,8 @@ private theorem sec7_phase_f3D_rpow_factor_bounds {P : Globals} {S : Scale P}
     have hhi : y ^ (-((9 : ℝ) / 4)) ≤ (10 : ℝ) ^ 8 := by
       simpa using hhi₀
     constructor
-    · convert hlo using 2 <;> ring
-    · convert hhi using 2 <;> ring
+    · convert hlo using 2; ring
+    · convert hhi using 2; ring
   · have hpowhi : y ^ 13 ≤ ((10 : ℝ) ^ 6) ^ 4 := by
       have hbase : y ^ 13 ≤ (41 : ℝ) ^ 13 := pow_le_pow_left₀ hy0 hyhi 13
       exact le_trans hbase (by norm_num)
@@ -1816,8 +1816,8 @@ private theorem sec7_phase_f3D_rpow_factor_bounds {P : Globals} {S : Scale P}
     have hhi : y ^ (-((13 : ℝ) / 4)) ≤ (10 : ℝ) ^ 8 := by
       simpa using hhi₀
     constructor
-    · convert hlo using 2 <;> ring
-    · convert hhi using 2 <;> ring
+    · convert hlo using 2; ring
+    · convert hhi using 2; ring
 
 private theorem sec7_phase_f3D_monomial_scale {P : Globals} {S : Scale P}
     {W : ℝ} {a j : ℤ} {m : ℕ} {r : ℝ}
@@ -3908,7 +3908,7 @@ private theorem sec7_ra_j_over_F_le_relErrF_tiny {P : Globals} {S : Scale P}
 
 private theorem sec7_ra_rho1_A_rescaled_bound {P : Globals} {S : Scale P} {W : ℝ}
     {a : ℤ} {r : ℝ} {i : ℕ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
-    (hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (_hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
@@ -4036,7 +4036,7 @@ private theorem sec7_ra_rho1_A_rescaled_bound {P : Globals} {S : Scale P} {W : �
 
 private theorem sec7_ra_rho3_A_rescaled_bound_sharp {P : Globals} {S : Scale P} {W : ℝ}
     {a : ℤ} {r : ℝ} {i : ℕ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
-    (hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (_hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
@@ -4117,7 +4117,7 @@ private theorem sec7_ra_rho3_A_rescaled_bound_sharp {P : Globals} {S : Scale P} 
 
 private theorem sec7_ra_rho3_A_rescaled_bound_sharp6 {P : Globals} {S : Scale P} {W : ℝ}
     {a : ℤ} {r : ℝ} {i : ℕ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
-    (hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
+    (_hG1 : 1 ≤ P.G) (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
@@ -6974,8 +6974,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
     exact sec7_ra_e₃D_core6 P S W a ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd
       hbud hg0 hu0 hUbig j hj m hm r hr
   phiContDiff := by
-    intro j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hj hbound
-    intro x hx
+    intro j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hj hbound x hx
     obtain ⟨hx1, hx2⟩ := Set.mem_Ioo.mp hx
     obtain ⟨⟨⟨hh1lo, hh1hi⟩, ⟨hh2lo, hh2hi⟩, ⟨hh3lo, hh3hi⟩⟩, hξ1, hξ2, hξ3⟩ := hbound
     have hW2 : (1 : ℝ) ≤ W ^ 2 := by linarith [hW, sq_nonneg (W - 1)]
@@ -7073,7 +7072,7 @@ private theorem sec7_Ffun_clean {X a d : ℝ} (hX : 0 < X) (ha : 0 < a) (had : a
 
 /-- Lower bound on `m · |u − v|` by the `F_a`-gap, via the mean value theorem with a uniform
 lower bound `m` on `|F_a'|` over `[lo, hi]`. -/
-private theorem sec7_Ffun_dist_lt {X a u v lo hi m : ℝ} (hX : 0 < X) (ha : 0 < a)
+private theorem sec7_Ffun_dist_lt {X a u v lo hi m : ℝ} (_hX : 0 < X) (ha : 0 < a)
     (hlo : 0 < lo) (huv : u < v) (hu : lo ≤ u) (hv : v ≤ hi)
     (hbd : ∀ c, lo ≤ c → c ≤ hi → m ≤ |deriv (fun x => Ffun X a x) c|) :
     m * (v - u) ≤ |Ffun X a u - Ffun X a v| := by

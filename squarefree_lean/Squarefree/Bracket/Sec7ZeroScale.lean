@@ -92,7 +92,7 @@ private theorem Sec7MonExp.Cstar_lower_tight {P : Globals} {S : Scale P} {a : �
     rw [abs_mul, abs_mul]
     norm_num
   rw [habs]
-  nlinarith [abs_nonneg ME.c₁, abs_nonneg ME.c₂]
+  nlinarith only [h1, h2, abs_nonneg ME.c₁, abs_nonneg ME.c₂]
 
 private theorem Sec7MonExp.Cstar_upper_tight {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ}
     {Ph : Sec7Phase P S W a} {j h₁ h₂ h₃ : ℤ} {ξ₁ ξ₂ ξ₃ : ℝ}
@@ -105,7 +105,7 @@ private theorem Sec7MonExp.Cstar_upper_tight {P : Globals} {S : Scale P} {a : �
     rw [abs_mul, abs_mul]
     norm_num
   rw [habs]
-  nlinarith [abs_nonneg ME.c₁, abs_nonneg ME.c₂]
+  nlinarith only [h1, h2, abs_nonneg ME.c₁, abs_nonneg ME.c₂]
 
 private theorem sec7_Pprod_ge_one_of_box {W : ℝ} {h₁ h₂ h₃ : ℤ}
     (hbox : sec7_shiftBox W h₁ h₂ h₃) :
@@ -914,7 +914,7 @@ private theorem sec7_zero_principal_deriv_upper {P : Globals} {S : Scale P} {a :
   have hcoef :
       746496 * |B| + 262020096 * |C| ≤
         300000000 * (|B| + |C|) := by
-    nlinarith [abs_nonneg B, abs_nonneg C]
+    linarith only [abs_nonneg B, abs_nonneg C]
   calc
     |deriv (ME.principal ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r|
         ≤ 746496 * |B| / S.R + 262020096 * |C| / S.R := htri
@@ -1034,9 +1034,9 @@ private theorem sec7_wronskian_two_monomials_lower {B C y : ℝ}
               abs_of_nonneg (pow_nonneg hy.le 4)]
             try ring
       _ ≤ (8 / 65) * ((221 / 16) * 4096 * |U| + (13 / 4) * 65536 * |V|) := by
-            linarith [hUbd', hVbd']
+            linarith only [hUbd', hVbd']
       _ ≤ 7000 * |U| + 27000 * |V| := by
-            linarith [abs_nonneg U, abs_nonneg V]
+            linarith only [abs_nonneg U, abs_nonneg V]
   have hCbd : |C| ≤ (97000 : ℝ) * |U| + (517000 : ℝ) * |V| := by
     rw [hCsol, abs_mul, abs_of_pos (by norm_num : (0 : ℝ) < (8 / 65 : ℝ))]
     have htri := abs_add_le (6 * y ^ ((17 : ℝ) / 4) * U) (2 * y ^ ((21 : ℝ) / 4) * V)
@@ -1058,15 +1058,15 @@ private theorem sec7_wronskian_two_monomials_lower {B C y : ℝ}
               abs_of_pos (by norm_num : (0 : ℝ) < (2 : ℝ)), abs_of_pos hy21pos]
             try ring
       _ ≤ (8 / 65) * (6 * 131072 * |U| + 2 * 2097152 * |V|) := by
-            linarith [hUbd', hVbd']
+            linarith only [hUbd', hVbd']
       _ ≤ 97000 * |U| + 517000 * |V| := by
-            linarith [abs_nonneg U, abs_nonneg V]
+            linarith only [abs_nonneg U, abs_nonneg V]
   calc
     |B| + |C|
         ≤ (7000 * |U| + 27000 * |V|) + (97000 * |U| + 517000 * |V|) :=
           add_le_add hBbd hCbd
     _ ≤ 700000 * (|U| + |V|) := by
-          linarith [abs_nonneg U, abs_nonneg V]
+          linarith only [abs_nonneg U, abs_nonneg V]
     _ = 700000 *
         (|(-2 : ℝ) * B * y ^ (-(3 : ℝ)) - (13 / 4 : ℝ) * C * y ^ (-(17 : ℝ) / 4)| +
           |(6 : ℝ) * B * y ^ (-(4 : ℝ)) +
@@ -1386,7 +1386,7 @@ private theorem sec7_zero_err_combo_subordinate {P : Globals} {S : Scale P} {a :
           add_le_add hE1 hE2
     _ ≤ (1 / (10 : ℝ) ^ 7) * (ME.Tscale ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ / S.R) := by
           norm_num
-          nlinarith
+          nlinarith only [hTnonneg]
 
 section N12
 
@@ -1442,7 +1442,7 @@ theorem sec7_zero_deriv_upper (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁
     hprHas.differentiableAt
   have hrwin : r ∈ Set.Ioo (S.R / 144 - 1) (40 * S.R + 1) := by
     rw [Set.mem_Ioo]
-    exact ⟨by nlinarith [hrb.1, hR], by nlinarith [hrb.2, hR]⟩
+    exact ⟨by linarith only [hrb.1, hR], by linarith only [hrb.2, hR]⟩
   have hPhiDiff :
       DifferentiableAt ℝ
         (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r :=
@@ -1478,7 +1478,7 @@ theorem sec7_zero_deriv_upper (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁
         add_le_add hpr hErr
     _ ≤ sec7_cDer * (ME.Tscale ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ / S.R) := by
         norm_num [sec7_cDer]
-        nlinarith
+        nlinarith only [hTnonneg]
 
 /- N12 (md 1694–96, 1730–34): "The two monomials y⁻² and y^{-13/4} have nonzero Wronskian,
    so the principal parts of Φ'_{ρ,u} and RΦ''_{ρ,u} cannot vanish simultaneously. …
@@ -1934,7 +1934,7 @@ private theorem sec7_zero_deriv_few {P : Globals} {S : Scale P} {a : ℤ} {W : �
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (Hyp : Sec7ZeroHyp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃)
     (p q : ℕ) (hwin : Finset.Icc (p : ℤ) (q : ℤ) ⊆ Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋)
-    (hdyad : q ≤ 2 * p) :
+    (_hdyad : q ≤ 2 * p) :
     (Set.Icc (p : ℝ) (q : ℝ) ∩
         {r | deriv (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r = 0}).Finite ∧
       (Set.Icc (p : ℝ) (q : ℝ) ∩
@@ -2122,7 +2122,7 @@ private theorem sec7_zero_deriv_few {P : Globals} {S : Scale P} {a : ℤ} {W : �
     have hDeq : (65 / 16 : ℝ) * (ME.Cstar * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) * S.R *
         (x / S.R) ^ (-(9 : ℝ) / 4) =
         -(3 * x ^ 2 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 1 x +
-          x ^ 3 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x) := by linarith [hz]
+          x ^ 3 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x) := by linarith only [hz]
     rw [hDeq, abs_neg] at hlt
     exact lt_irrefl _ hlt
   have hcont : ContinuousOn (fun r => r ^ 3 * sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 1 r)
@@ -2169,7 +2169,7 @@ kept against `P·T₃/R³` rather than collapsed to `T_{ρ,u}`; content `6.0·10
 private theorem sec7_zero_errScale_m3_le_Cbase {P : Globals} {S : Scale P} {a : ℤ}
     {W : ℝ} {Ph : Sec7Phase P S W a} {j h₁ h₂ h₃ : ℤ} {ξ₁ ξ₂ ξ₃ : ℝ}
     {ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ}
-    (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
+    (_ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (Hyp : Sec7ZeroHyp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) :
     sec7_cErr3Lead * sec7_errScale_LEAD P S h₁ h₂ h₃
         + sec7_cErr3Res * sec7_errScale_RES P S h₁ h₂ h₃ ≤
@@ -2325,7 +2325,7 @@ private theorem sec7_zero_deriv2_few {P : Globals} {S : Scale P} {a : ℤ} {W : 
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (Hyp : Sec7ZeroHyp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃)
     (p q : ℕ) (hwin : Finset.Icc (p : ℤ) (q : ℤ) ⊆ Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋)
-    (hdyad : q ≤ 2 * p) :
+    (_hdyad : q ≤ 2 * p) :
     (Set.Icc (p : ℝ) (q : ℝ) ∩
         {r | iteratedDeriv 2
           (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r = 0}).Finite ∧
@@ -2542,7 +2542,7 @@ private theorem sec7_zero_deriv2_few {P : Globals} {S : Scale P} {a : ℤ} {W : 
     have hDeq : -(1105 / 64 : ℝ) * (ME.Cstar * sec7_Pprod h₁ h₂ h₃ * (S.T₃ / S.R ^ 3)) * S.R *
         (x / S.R) ^ (-(9 : ℝ) / 4) =
         -(4 * x ^ 3 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 x +
-          x ^ 4 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x) := by linarith [hz]
+          x ^ 4 * sec7_ErrJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 3 x) := by linarith only [hz]
     rw [hDeq, abs_neg] at hlt
     exact lt_irrefl _ hlt
   have hcont : ContinuousOn (fun r => r ^ 4 * sec7_PhiJet ME ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ 2 r)
@@ -2927,7 +2927,7 @@ private theorem sec7_bands_count_active_split_slack (N T δ a b cu cl : ℝ) (K 
       simp
     rw [hzero, Nat.cast_zero]
     have hK1 : (0 : ℝ) ≤ (K : ℝ) + 1 := by positivity
-    nlinarith [mul_nonneg hK1 hBnn]
+    nlinarith only [hBdef, mul_nonneg hK1 hBnn]
   obtain ⟨L, hLlen, hLchain⟩ :=
     sec7_exists_mono_piece_breakpoints a b K φ hab hcd hz2fin hz2
   have hcountchain :
@@ -2981,14 +2981,14 @@ private theorem sec7_bands_count_slack_split (N T δ a b cu cl : ℝ) (K : ℕ)
   · have hnot : cl ^ 2 * T ≤ 4 * δ := le_of_not_gt hactive
     have hratio : (cl / 2) ^ 2 ≤ δ / T := by
       rw [le_div_iff₀ hT]
-      nlinarith [hnot, hcl.le]
+      nlinarith only [hnot, hcl.le]
     have hsqrt : cl / 2 ≤ Real.sqrt (δ / T) := by
       have h := Real.sqrt_le_sqrt hratio
       rwa [Real.sqrt_sq (by positivity)] at h
     have hlen := Counting.card_filter_le_length a b δ φ
     have hRHSnn : 0 ≤ N * (δ + Real.sqrt (δ / T)) + T + 1 := by
       have hs : 0 ≤ Real.sqrt (δ / T) := Real.sqrt_nonneg _
-      nlinarith [hN.le, hT.le, hδ.le]
+      nlinarith only [hN.le, hT.le, hδ.le, hs]
     rcases le_or_gt a b with hab | hba
     · have haIcc : a ∈ Set.Icc N (3 * N) := hsub ⟨le_refl a, hab⟩
       have hbIcc : b ∈ Set.Icc N (3 * N) := hsub ⟨hab, le_refl b⟩
@@ -3007,14 +3007,14 @@ private theorem sec7_bands_count_slack_split (N T δ a b cu cl : ℝ) (K : ℕ)
                   rw [show (4 / cl) * Real.sqrt (δ / T) =
                       (4 * Real.sqrt (δ / T)) / cl by ring]
                   rw [le_div_iff₀ hcl]
-                  nlinarith [hsqrt]
+                  linarith only [hsqrt]
                 have hmul := mul_le_mul_of_nonneg_right hcoef hN.le
-                nlinarith [hmul]
+                nlinarith only [hmul]
               linarith
       have hK1 : (1 : ℝ) ≤ (K : ℝ) + 1 := by exact_mod_cast Nat.succ_le_succ (Nat.zero_le K)
       have hcucl : 1 ≤ cu / cl := by
         rw [le_div_iff₀ hcl]
-        nlinarith [hcu, hcl1]
+        linarith only [hcu, hcl1]
       calc
         (((Finset.Icc ⌈a⌉ ⌊b⌋).filter
           (fun (n : ℤ) => Counting.distInt (φ (n : ℝ)) ≤ δ)).card : ℝ)
@@ -3028,16 +3028,16 @@ private theorem sec7_bands_count_slack_split (N T δ a b cu cl : ℝ) (K : ℕ)
                   112 * cu * ((K : ℝ) + 1) by
                     field_simp [hcl.ne']
                     ]
-              nlinarith [hcu, hK1]
+              nlinarith only [hcu, hK1]
             have hleft₁ : (4 / cl) * N * Real.sqrt (δ / T)
                 ≤ 112 * (cu / cl) * ((K : ℝ) + 1) *
                     (N * Real.sqrt (δ / T)) := by
               have hNs : 0 ≤ N * Real.sqrt (δ / T) := mul_nonneg hN.le hs
               have hmul := mul_le_mul_of_nonneg_right hcoeff hNs
-              nlinarith [hmul]
+              nlinarith only [hmul]
             have hleft₂ : (1 : ℝ)
                 ≤ 112 * (cu / cl) * ((K : ℝ) + 1) * 1 := by
-              nlinarith [hK1, hcucl]
+              nlinarith only [hK1, hcucl]
             have hC0 : 0 ≤ 112 * (cu / cl) * ((K : ℝ) + 1) := by
               have : 0 ≤ cu / cl := div_nonneg (le_trans zero_le_one hcu) hcl.le
               positivity
@@ -3047,8 +3047,8 @@ private theorem sec7_bands_count_slack_split (N T δ a b cu cl : ℝ) (K : ℕ)
                   ≤ 112 * (cu / cl) * ((K : ℝ) + 1) *
                     (N * (δ + Real.sqrt (δ / T)) + T + 1) := by
               apply mul_le_mul_of_nonneg_left _ hC0
-              nlinarith [hN.le, hT.le, hδ.le, hs]
-            nlinarith [hleft₁, hleft₂, hmonoR]
+              nlinarith only [hN.le, hT.le, hδ.le, hs]
+            nlinarith only [hleft₁, hleft₂, hmonoR]
     · have hltceil : ⌊b⌋ < ⌈a⌉ := by
         have h1 : a ≤ (⌈a⌉ : ℝ) := Int.le_ceil a
         have h2 : (⌊b⌋ : ℝ) ≤ b := Int.floor_le b
@@ -3134,14 +3134,14 @@ private theorem sec7_bands_count_slack_split_contDiffOn (N T δ a b cu cl : ℝ)
         (fun (n : ℤ) => Counting.distInt (φ (n : ℝ)) ≤ δ)).card ≤ 1 :=
       le_trans (Finset.card_filter_le _ _) hcardle
     have hcucl : (1 : ℝ) ≤ cu / cl := by
-      rw [le_div_iff₀ hcl]; nlinarith [hcu, hcl1]
+      rw [le_div_iff₀ hcl]; linarith only [hcu, hcl1]
     have hK1 : (1 : ℝ) ≤ (K : ℝ) + 1 := by
       have : (0 : ℝ) ≤ (K : ℝ) := Nat.cast_nonneg K
       linarith
     have hbig : (1 : ℝ) ≤ N * (δ + Real.sqrt (δ / T)) + T + 1 := by
       have hs : 0 ≤ Real.sqrt (δ / T) := Real.sqrt_nonneg _
-      nlinarith [hN.le, hδ.le, hT.le, hs]
-    have hp1 : (1 : ℝ) ≤ 112 * (cu / cl) := by nlinarith [hcucl]
+      nlinarith only [hN.le, hδ.le, hT.le, hs]
+    have hp1 : (1 : ℝ) ≤ 112 * (cu / cl) := by linarith only [hcucl]
     have hp2 : (1 : ℝ) ≤ 112 * (cu / cl) * ((K : ℝ) + 1) := by
       have := mul_le_mul hp1 hK1 (by norm_num) (le_trans zero_le_one hp1)
       simpa using this
@@ -3404,7 +3404,6 @@ private theorem sec7_R_sqrt_Ssym_eval {P : Globals} {S : Scale P} {h₁ h₂ h�
    `bands_count_mono_slack`/`bands_count` (`Counting/Bands.lean`, log-free: the writeup's
    dyadic-band log is already absorbed there); `sec7_cN13` absorbs its constant `112`,
    the `(KZero+1)` piece count, and the evaluation constants. -/
-set_option maxHeartbeats 600000
 
 /-- **N13** (md 1740–81): the per-triple, per-branch, per-fiber near-integer count in its
 explicit (7.6)-form — the shape N15 harvests.  Conclusion terms, in order: the three
@@ -3474,7 +3473,7 @@ theorem sec7_zero_triple_count {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ} {
     have h3 : (0 : ℝ) ≤ (h₃ : ℝ) := by
       exact_mod_cast (le_trans (by norm_num : (0 : ℤ) ≤ 1) Hyp.hbox.2.2.1)
     unfold sec7_Ssym
-    nlinarith [mul_nonneg h1 h2, mul_nonneg h1 h3, mul_nonneg h2 h3]
+    linarith only [mul_nonneg h1 h2, mul_nonneg h1 h3, mul_nonneg h2 h3]
   have hHsum0 : 0 ≤ sec7_hSum h₁ h₂ h₃ := by
     have hS3 : (3 : ℝ) ≤ sec7_hSum h₁ h₂ h₃ :=
       sec7_hSum_ge3 Hyp.hbox.1.1 Hyp.hbox.2.1.1 Hyp.hbox.2.2.1

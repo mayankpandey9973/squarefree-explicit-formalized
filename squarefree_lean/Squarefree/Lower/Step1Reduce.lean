@@ -19,8 +19,6 @@ namespace Squarefree
 
 open Squarefree.Counting
 
-set_option maxHeartbeats 1600000
-
 /-- `distInt (x + s) ≤ distInt x + |s|`: small triangle helper. -/
 private theorem distInt_add_le_add_abs (x s : ℝ) :
     distInt (x + s) ≤ distInt x + |s| := by
@@ -28,7 +26,7 @@ private theorem distInt_add_le_add_abs (x s : ℝ) :
   have e : (x + s) - (round x : ℝ) = (x - round x) + s := by ring
   rw [e]
   refine le_trans (abs_add_le _ _) ?_
-  simp only [distInt, le_refl, add_le_add_iff_right]
+  simp only [distInt, le_refl]
 
 /-- `distInt (-x) = distInt x`. -/
 private theorem distInt_neg (x : ℝ) : distInt (-x) = distInt x := by

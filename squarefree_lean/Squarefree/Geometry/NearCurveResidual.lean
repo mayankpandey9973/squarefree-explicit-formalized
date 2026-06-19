@@ -105,7 +105,7 @@ points are collinear (each `collinearDet f n₀ n₁ nᵢ = 0`) lie on a common 
 (ℓ_{n₁}−ℓ_{n₀})/(n₁−n₀)` reduced (gcd factor `c`); collinearity through the first
 two points forces all five onto the cleared-denominator line. -/
 theorem collinear_five_on_majorLine {f : ℝ → ℝ} {n₀ n₁ n₂ n₃ n₄ : ℤ}
-    (h01 : n₀ < n₁) (h12 : n₁ < n₂) (h23 : n₂ < n₃) (h34 : n₃ < n₄)
+    (h01 : n₀ < n₁) (_h12 : n₁ < n₂) (_h23 : n₂ < n₃) (_h34 : n₃ < n₄)
     (hc012 : collinearDet f n₀ n₁ n₂ = 0)
     (hc013 : collinearDet f n₀ n₁ n₃ = 0)
     (hc014 : collinearDet f n₀ n₁ n₄ = 0) :
@@ -329,7 +329,7 @@ theorem residual_card_bound {f : ℝ → ℝ} {N lam δ : ℝ}
           mul_le_mul_of_nonneg_right h4cube hl13
         have hLN : lam ^ (1/3:ℝ) ≤ N * lam ^ (1/3:ℝ) := by nlinarith [hl13, hN1]
         have hδN : δ ≤ N * δ := by nlinarith [hδ.le, hN1]
-        nlinarith [hLL, hLN, hδN, hl13, hδ.le, hNpos.le,
+        nlinarith only [hLL, hLN, hδN, hl13, hδ.le, hNpos.le,
           mul_nonneg hl13 hNpos.le, mul_nonneg hδ.le hNpos.le]
 
 /-! ## Type I / Type II card bounds (writeup 581–666) — concrete stubs
@@ -385,7 +385,7 @@ theorem typeI_card_bound {f : ℝ → ℝ} {N lam δ : ℝ}
             ≤ ((Finset.Icc ⌊N⌋ ⌊2 * N⌋).card : ℝ) := by exact_mod_cast hcardle
         _ ≤ N + 2 := hIcccard
     -- `N ≤ 2Nδ` (since `δ ≥ 1/2`), so `N + 2 ≤ 2Nδ + 2 ≤ 384(Nδ+1)`.
-    nlinarith [hcardleR, hN0, hδhalf, mul_nonneg hN0 hδ.le]
+    nlinarith only [hcardleR, hN0, hδhalf, mul_nonneg hN0 hδ.le]
 
 /-- **Prop 4.3, λ-normalized core with the pinned constant** (writeup line 482).  Assembled from the
 residual bound and the Type I / Type II card bounds via the concrete partitions
@@ -434,7 +434,7 @@ theorem prop43_local_explicit :
       mul_nonneg hsq hlog
     have hNl : 0 ≤ N * lam ^ (1/3 : ℝ) := by positivity
     have hNd : 0 ≤ N * δ := by positivity
-    nlinarith [hres, hI, hII, hslog, hNl, hNd]
+    linarith only [hres, hI, hII, hslog, hNl, hNd]
   · -- Small `N` (`N < 2`): `#nearSet ≤ ⌊2N⌋ - ⌊N⌋ + 1`, bounded by a constant.
     push Not at hN2
     have hsub : nearSet f N δ ⊆ Finset.Icc ⌊N⌋ ⌊2 * N⌋ := Finset.filter_subset _ _
@@ -464,7 +464,7 @@ theorem prop43_local_explicit :
       apply Real.log_nonneg; linarith [hsq]
     have hslog : 0 ≤ Real.sqrt (δ / lam) * Real.log (2 + Real.sqrt (δ / lam)) :=
       mul_nonneg hsq hlog
-    nlinarith [hcardleR, hNl, hNd, hslog, hN2]
+    linarith only [hcardleR, hNl, hNd, hslog, hN2]
 
 theorem prop43_local : ∃ C : ℝ, 0 < C ∧
     ∀ (N lam δ : ℝ) (f : ℝ → ℝ), 0 < N → 0 < lam → 0 < δ → δ < 1 → ContDiff ℝ 2 f →

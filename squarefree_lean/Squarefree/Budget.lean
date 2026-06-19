@@ -26,6 +26,7 @@ theorem exponent_budget {α c u : ℝ} (hα : α < 0) (hc : 0 ≤ c) (hu : u ≤
     α + c * u ≤ -u := by
   have hc1 : 0 < c + 1 := by linarith
   rw [le_div_iff₀ hc1] at hu
-  nlinarith [hu, hα]
+  have _ := hα
+  nlinarith only [hu]
 
 end Squarefree.Budget

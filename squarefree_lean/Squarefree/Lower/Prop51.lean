@@ -16,6 +16,7 @@ open Classical Finset
 
 namespace Squarefree
 
+set_option exponentiation.threshold 500 in
 /-- **Prop 5.1** (writeup 731–741). `Ra` is the §3 set `ℛ_a` (cardinality `#ℛ_a`):
 the structural hypothesis `∀ r ∈ Ra, RaWitness P S a r` records that each `r ∈ Ra` is
 witnessed by a popular `d` at the `D`-scale with `r ≈ R_a(d)` (writeup §3 / `DaSpacing`).

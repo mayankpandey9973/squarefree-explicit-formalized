@@ -92,7 +92,7 @@ private theorem thr_cube (X D : ℝ) (hX : 0 < X) (hD : 0 < D) :
   rw [div_pow, mul_pow]
   rw [show ((D ^ (4/3 : ℝ)) ^ 3 : ℝ) = (D ^ (4/3 : ℝ)) ^ (3:ℕ) from rfl, e1]
   rw [show ((X ^ (1/3 : ℝ)) ^ 3 : ℝ) = (X ^ (1/3 : ℝ)) ^ (3:ℕ) from rfl, e2]
-  push_cast; ring
+  ring
 
 /-- **§3 A-decomposition** (writeup 256–267). Self-contained Nair–Roth reduction.
 
@@ -100,8 +100,8 @@ Threshold constant changed from the verbatim `D^{4/3}/X^{1/3}` to `D^{4/3}/(4 X^
 (`= ½·(D⁴/(8X))^{1/3}`, still `≍ D^{4/3}/X^{1/3}`, faithful). Added regime hypotheses (all hold
 for `X` large in the paper's range): `8HD ≤ X`, `1025 H ≤ D`, `64 H³ ≤ X D²`, `U ≤ H`. -/
 theorem a_decomposition (P : Globals) (D : ℝ)
-    (hX1 : 1 ≤ P.X) (hg : 0 < P.g) (hg' : P.g < 2 / 18977) (hu : 0 < P.u)
-    (hD1 : P.H * P.X ^ (1 / 100 : ℝ) ≤ D) (hD2 : D ≤ P.X ^ (1 / 2 : ℝ))
+    (hX1 : 1 ≤ P.X) (hg : 0 < P.g) (hg' : P.g < 2 / 18977) (_hu : 0 < P.u)
+    (_hD1 : P.H * P.X ^ (1 / 100 : ℝ) ≤ D) (hD2 : D ≤ P.X ^ (1 / 2 : ℝ))
     (hHD : 8 * P.H * D ≤ P.X) (hDlarge : 1025 * P.H ≤ D)
     (hEps : 64 * P.H ^ 3 ≤ P.X * D ^ 2) (hHU : P.U ≤ P.H) :
       (dCard P.X P.H D : ℝ) ≤

@@ -56,7 +56,7 @@ private theorem continuous_deriv_lineRes_pub {D₀ : MajorLine} (hf : ContDiff �
 
 /-- The **signed residual** `H = sign·g` of the reference line `D₀`, the function fed to the
 generic convex-arc lemma. -/
-private noncomputable def signedRes (f : ℝ → ℝ) (N δ : ℝ) (D₀ : MajorLine) : ℝ → ℝ :=
+private noncomputable def signedRes (f : ℝ → ℝ) (N _δ : ℝ) (D₀ : MajorLine) : ℝ → ℝ :=
   fun x => lineSign' f N D₀ * lineRes f D₀ x
 
 /-- `H` has derivative `sign·(f'(x) − p/q)` everywhere. -/
@@ -212,7 +212,7 @@ which the `≤ 6` count is pure integer-interval arithmetic. -/
 private theorem typeII_shift_loc (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
     (hδ : 0 < δ) (hN2 : 2 ≤ N)
     (hlower : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), lam ≤ |iteratedDeriv 2 f x|)
-    (hupper : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), |iteratedDeriv 2 f x| ≤ 256 * lam)
+    (_hupper : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), |iteratedDeriv 2 f x| ≤ 256 * lam)
     (q : ℤ) (D₀ : MajorLine) :
     ∃ c : ℝ, ∀ D ∈ (typeIILines f N lam δ).filter
         (fun D => D.denom = q ∧ D.slope = D₀.slope),
@@ -230,7 +230,7 @@ private theorem typeII_shift_loc (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
   -- The common analytic hypotheses for the generic convex-arc lemma.
   have hAB : A ≤ B := by rw [hAdef, hBdef]; linarith
   have hHc : ContinuousOn H (Set.Icc A B) := by
-    simp only [hHdef, signedRes]
+    simp only [hHdef]
     exact (continuousOn_const.mul (differentiable_lineRes_pub hf).continuous.continuousOn)
   have hHd : ∀ x ∈ Set.Icc A B, DifferentiableAt ℝ H x := by
     intro x _; rw [hHdef]; exact differentiable_signedRes hf x
@@ -242,7 +242,7 @@ private theorem typeII_shift_loc (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
       fun y => (hasDerivAt_deriv_of_contDiff hf y).differentiableAt
     exact (fun y _ => ((hf' y).sub_const _).const_mul sgn |>.differentiableWithinAt)
   have hconv : ConvexOn ℝ (Set.Icc A B) H := by
-    simp only [hHdef, signedRes, hAdef, hBdef]
+    simp only [hHdef, hAdef, hBdef]
     exact convexOn_signed_lineRes hf hlam hlower
   have hH'' : ∀ x ∈ Set.Ioo A B, lam ≤ deriv (deriv H) x := by
     intro x hx
@@ -253,7 +253,7 @@ private theorem typeII_shift_loc (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
   obtain ⟨hx₀mem0, hx₀min0⟩ := lineSplit'_isMinOn (D := D₀) (δ := δ) hf hlam hN2 hlower
   have hx₀mem : x₀ ∈ Set.Icc A B := by rw [hx₀def, hAdef, hBdef]; exact hx₀mem0
   have hx₀min : IsMinOn H (Set.Icc A B) x₀ := by
-    simp only [hHdef, hx₀def, hAdef, hBdef, signedRes]; exact hx₀min0
+    simp only [hHdef, hx₀def, hAdef, hBdef]; exact hx₀min0
   -- The localization center (depends only on `D₀`, `q`).
   refine ⟨(D₀.shift : ℝ) / (q : ℝ) + sgn * (M + 512 / (q : ℝ)), ?_⟩
   intro D hD

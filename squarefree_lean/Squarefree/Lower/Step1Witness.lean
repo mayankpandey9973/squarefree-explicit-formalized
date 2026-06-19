@@ -24,7 +24,7 @@ variable {P : Globals} {S : Scale P}
 `|b₀| ≤ 3·10¹²·B` and `ℓ₂ ≤ W`, while `R ≥ U·W` with `U ≥ 10³³`, so the perturbation
 `a + ℓ₂|b₀| ≪ D ≤ d`. -/
 theorem step1_window_bound {a ℓ₂ : ℤ} {b₀ dd : ℝ}
-    (ha_hi : (a:ℝ) ≤ 11 * S.A) (hℓ2W : (ℓ₂:ℝ) ≤ 130 * P.Wval) (hℓ2nn : 0 ≤ (ℓ₂:ℝ))
+    (ha_hi : (a:ℝ) ≤ 11 * S.A) (hℓ2W : (ℓ₂:ℝ) ≤ 130 * P.Wval) (_hℓ2nn : 0 ≤ (ℓ₂:ℝ))
     (hb0 : |b₀| ≤ 3000000000000 * S.B)
     (hdD : S.D ≤ dd)
     (hRUW : P.U * P.Wval ≤ S.R)

@@ -161,7 +161,7 @@ three lattice points `(nᵢ, ℓᵢ)` are non-collinear (the integer
 `u := ℓ₀(n₂-n₁) + ℓ₁(n₀-n₂) + ℓ₂(n₁-n₀)` is nonzero), then
 `1 ≤ Λ·L³ + 2δ·L` where `L = n₂ - n₀`. -/
 theorem noncollinear_span_lower {f : ℝ → ℝ} {Λ δ : ℝ} {n₀ n₁ n₂ ℓ₀ ℓ₁ ℓ₂ : ℤ}
-    (hδ : 0 ≤ δ) (h01 : n₀ < n₁) (h12 : n₁ < n₂)
+    (_hδ : 0 ≤ δ) (h01 : n₀ < n₁) (h12 : n₁ < n₂)
     (hf : ContDiffOn ℝ 2 f (Set.Icc (n₀ : ℝ) (n₂ : ℝ)))
     (hf2 : ∀ x ∈ Set.Icc (n₀ : ℝ) (n₂ : ℝ), |iteratedDeriv 2 f x| ≤ Λ)
     (hd0 : |f (n₀ : ℝ) - (ℓ₀ : ℝ)| ≤ δ) (hd1 : |f (n₁ : ℝ) - (ℓ₁ : ℝ)| ≤ δ)
@@ -310,7 +310,7 @@ If `g` is twice continuously differentiable on `[a, a+L]` with `|g''| ≥ Λlo` 
 `L ≪ √(δ/λ)` from the writeup: applying the second divided-difference MVT at the
 equally-spaced nodes `a, a+L/2, a+L` gives
 `g(a) - 2g(a+L/2) + g(a+L) = (L²/4)·g''(ξ)`, whose LHS is `O(δ)`. -/
-theorem majorArc_length_bound {g : ℝ → ℝ} {a L δ Λlo : ℝ} (hL : 0 < L) (hδ : 0 ≤ δ)
+theorem majorArc_length_bound {g : ℝ → ℝ} {a L δ Λlo : ℝ} (hL : 0 < L) (_hδ : 0 ≤ δ)
     (hg : ContDiffOn ℝ 2 g (Set.Icc a (a + L)))
     (hg2 : ∀ x ∈ Set.Icc a (a + L), Λlo ≤ |iteratedDeriv 2 g x|)
     (hgδ : ∀ x ∈ Set.Icc a (a + L), |g x| ≤ δ) :
@@ -465,7 +465,7 @@ theorem residueClass_card_le {q : ℤ} (hq : 0 < q) (r : ℤ) (lo hi : ℝ)
 If at least two elements of a finite set `S ⊆ ℤ` lie in `[lo, hi]` and satisfy
 `q ∣ (n - r)`, then `q ≤ hi - lo`: two points in the same residue class mod `q`
 are at least `q` apart, so the span of `S` is at least `q`. -/
-theorem residueClass_denom_le {q : ℤ} (hq : 0 < q) (r : ℤ) (lo hi : ℝ) (S : Finset ℤ)
+theorem residueClass_denom_le {q : ℤ} (_hq : 0 < q) (r : ℤ) (lo hi : ℝ) (S : Finset ℤ)
     (h2 : 2 ≤ S.card)
     (hmem : ∀ n ∈ S, lo ≤ (n : ℝ) ∧ (n : ℝ) ≤ hi ∧ (q : ℤ) ∣ (n - r)) :
     (q : ℝ) ≤ hi - lo := by

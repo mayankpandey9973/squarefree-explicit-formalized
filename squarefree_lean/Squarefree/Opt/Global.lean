@@ -20,7 +20,6 @@ open Classical Finset
 
 namespace Squarefree
 
-set_option maxHeartbeats 1600000 in
 /-- **On-strip case** of `dblock_bound` (§9 core, writeup 2083–2221). Shared params `u, c₀, Cu`.
 On the strip `G^{-2}Ω^{-11/2}X^{-Cu·u} ≤ x ≤ G^{17}Ω^{-26}X^{Cu·u}`, `𝐃(Ω) ≪ H/U` via Prop 7.3 with
 `W = W_{≠0}` and `18977g+15315u<2`. Added hypothesis `hubudget : 18977g+(18675+790·Cu)u ≤ 2`
@@ -87,7 +86,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   have hAD10 : 10 * S.A ≤ S.D := by
     have hexp : (1/100 : ℝ) ≤ (1 - P.g) / 5 - P.u := by
       rw [hg, hu]
-      linarith [hg1, hu2]
+      linarith only [hg1, hu2]
     have hXpow10 : (10 : ℝ) ≤ P.X ^ (1/100 : ℝ) := by
       linarith [hX0big]
     have hXpow_le : P.X ^ (1/100 : ℝ) ≤ P.X ^ ((1 - P.g) / 5 - P.u) :=
@@ -102,7 +101,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
     have hΩH : 10 * S.Ω ≤ P.H := by
       exact le_trans (mul_le_mul_of_nonneg_left hΩU (by norm_num : (0:ℝ) ≤ 10)) hHU
     rw [show S.A = S.Δ * S.Ω from rfl, show S.D = P.H * S.Δ from rfl]
-    nlinarith [S.Δ_pos, hΩH]
+    nlinarith only [S.Δ_pos, hΩH]
   -- per-a bound:  DaCard ≤ C₂'·(C₇·10²⁵)·(1+φ)·(1+H/A²)·(X^{2u}·R/Wnz)
   set M : ℝ := C₂' * (C₇ * 10 ^ 25 * ((1 + StripAux.fiberφ P S)
       * ((1 + P.H / S.A ^ 2)
@@ -124,7 +123,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       refine le_trans ?_ (le_trans hNR hAa)
       have hthr : (0:ℝ) ≤ S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) :=
         mul_nonneg (Real.rpow_nonneg hΔ.le _) (Real.rpow_nonneg (by positivity) _)
-      nlinarith [hthr]
+      nlinarith only [hthr]
     obtain ⟨Ra, _dStar, _hinDa, _hband, _hnear, hwit, hDaC⟩ :=
       hfiber' P S a ha0 hΔlong hX0big hloq hAa ha2A hAD D hDpos hDeq
     have h73raw := hp73 P S a ha0 hAD10 hG1 hAa ha2A
@@ -216,17 +215,13 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
   set C6 : ℝ := StripAux.C6 with hC6def
   set Cu : ℝ := (3/2) * C6 + 232 with hCudef
   have hCu_off : (3/2) * StripAux.C6 + 232 ≤ Cu := by rw [hCudef, hC6def]
-  have hCu_on : (1:ℝ) ≤ Cu := by rw [hCudef]; nlinarith [hC6]
+  have hCu_on : (1:ℝ) ≤ Cu := by rw [hCudef]; linarith only [hC6]
   -- positivity of the denominators / numerators in the witness
   have hden1 : (0:ℝ) < C6 + 100 := by linarith
-  have hden2 : (0:ℝ) < 18675 + 790 * Cu := by nlinarith [hCu_on]
+  have hden2 : (0:ℝ) < 18675 + 790 * Cu := by linarith only [hCu_on]
   have hg1' : g < 1 / 4000 := by linarith [hg1]
   have hnum1 : (0:ℝ) < 1/200 - 20 * g := by linarith [hg1']
-  have hnum2 : (0:ℝ) < 2 - 18977 * g := by
-    have : 18977 * g < 2 := by
-      have : g < 2 / 18977 := hg1
-      nlinarith [hg1]
-    linarith
+  have hnum2 : (0:ℝ) < 2 - 18977 * g := by linarith only [hg1]
   -- u witness: half of the min of the three constraints' thresholds
   set u : ℝ := min ((1/200 - 20 * g) / (C6 + 100))
       (min ((2 - 18977 * g) / (18675 + 790 * Cu)) (1/100)) / 2 with hudef
@@ -254,12 +249,12 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
   -- on budget: 18977g + (18675+790Cu)·u ≤ 2
   have hubud_on : 18977 * g + (18675 + 790 * Cu) * u ≤ 2 := by
     have := (le_div_iff₀ hden2).mp hu_on
-    nlinarith [this]
+    linarith only [this]
   -- goal opt: 18977g + 15315u < 2  (strict, via 15315 < 18675+790Cu and u>0)
   have hopt : 18977 * g + 15315 * u < 2 := by
     have hcoef : 15315 * u < (18675 + 790 * Cu) * u := by
       apply mul_lt_mul_of_pos_right _ hu0
-      nlinarith [hCu_on]
+      linarith only [hCu_on]
     linarith [hubud_on, hcoef]
   refine ⟨u, hu0, hopt, ?_⟩
   -- instantiate the two halves

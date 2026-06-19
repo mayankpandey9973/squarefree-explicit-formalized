@@ -35,8 +35,6 @@ variable {P : Globals} {S : Scale P}
 noncomputable def V_s (S : Scale P) (s : ℤ) (ℓ₁ ℓ₂ : ℝ) : ℝ :=
   S.Δ * S.Ω * Real.sqrt (|(s : ℝ)| / (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁)))
 
-set_option maxHeartbeats 1600000
-
 /-- **Raw `v²`-magnitude LOWER bound** (the `B`-cancelled half of `sigma_s_magnitude_lower`,
 kept in `v²`-form rather than `|s|`-form):
 `(1/(2·10⁸))·(ℓ₁³ℓ₂(ℓ₂−ℓ₁)·v²)/(Δ²Ω²) ≤ |Σ_closed|`.  No `s`, no pin. -/
@@ -106,12 +104,10 @@ theorem sigma_v2_lower
     -- X·(A/5)·B·d⁵ ≤ X·a·B·(33·D⁵) ;  a ≥ A/5, d⁵ ≤ 33 D⁵.
     have hd5 : d ^ 5 ≤ 33 * S.D ^ 5 := by
       have h2e : d ^ 5 ≤ (2 * S.D * (1 + 1/10 ^ 9)) ^ 5 := pow_le_pow_left₀ hd_pos.le hd2D 5
-      nlinarith [h2e, hD5pos]
+      nlinarith only [h2e, hD5pos]
     have haA : P.X * (S.A / 5) ≤ P.X * a := mul_le_mul_of_nonneg_left ha_lo hXpos.le
-    nlinarith [mul_le_mul haA hd5 (by positivity : (0:ℝ) ≤ d ^ 5)
-      (by positivity : (0:ℝ) ≤ P.X * a), hBpos, mul_pos hXpos ha0,
-      mul_nonneg (mul_pos hXpos hApos).le hBpos.le, hD5pos,
-      mul_pos (mul_pos hXpos ha0) hBpos]
+    nlinarith only [mul_le_mul haA hd5 (by positivity : (0:ℝ) ≤ d ^ 5)
+      (by positivity : (0:ℝ) ≤ P.X * a), hBpos]
   -- |b₀| ≥ B/(2·10⁶), so Q·|b₀| ≥ Q·B/(2·10⁶) ≥ (1/(160·2·10⁶))/(Δ²Ω²)
   have hQb0lo : (1 / (330000000 : ℝ)) * (1 / (S.Δ ^ 2 * S.Ω ^ 2)) ≤ Q * |b₀| := by
     have h1' : Q * (S.B / 2000000) ≤ Q * |b₀| :=
@@ -119,7 +115,7 @@ theorem sigma_v2_lower
     have h2' : (1 / (330000000:ℝ)) * (1 / (S.Δ ^ 2 * S.Ω ^ 2)) ≤ Q * (S.B / 2000000) := by
       rw [show Q * (S.B / 2000000) = (Q * S.B) / 2000000 by ring]
       rw [le_div_iff₀ (by norm_num : (0:ℝ) < 2000000)]
-      nlinarith [hQBlo, (by positivity : (0:ℝ) < S.Δ ^ 2 * S.Ω ^ 2)]
+      linarith only [hQBlo]
     linarith [h1', h2']
   -- assemble: |Σ_closed| ≥ 2·Q·L·|b₀|·v² ≥ 2·(1/(330000000))·L·v²/(Δ²Ω²) = (1/(165000000))·…
   have hLv2nn : 0 ≤ L * v ^ 2 := by positivity
@@ -151,12 +147,12 @@ theorem sigma_v2_lower
 `|Σ_closed| ≤ 10¹⁵·(ℓ₁³ℓ₂(ℓ₂−ℓ₁)·v²)/(Δ²Ω²)`.  No `s`, no pin. -/
 theorem sigma_v2_upper
     {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
-    (ha0 : 0 < a) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (ha0 : 0 < a) (_ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ12' : ℓ₁ + 1 ≤ ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hb0lo : S.B / 2000000 ≤ |b₀|)
     (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
     (hvlo : 10 * (ℓ₂ * (ℓ₂ - ℓ₁) * b₀ ^ 2 / d) ≤ |v|)
-    (hdD : S.D * (1 - 1/10 ^ 9) ≤ d) (hd2D : d ≤ 2 * S.D * (1 + 1/10 ^ 9))
+    (hdD : S.D * (1 - 1/10 ^ 9) ≤ d) (_hd2D : d ≤ 2 * S.D * (1 + 1/10 ^ 9))
     (hReg : S.Δ ^ 2 * P.U ^ 5 ≤ P.H * S.Ω ^ 3)
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
@@ -220,13 +216,13 @@ theorem sigma_v2_upper
     have hXAB : (0:ℝ) < P.X * S.A * S.B := by positivity
     have haA : P.X * a ≤ P.X * (11 * S.A) := mul_le_mul_of_nonneg_left ha_hi hXpos.le
     have e1 : P.X * a * S.B * S.D ^ 5 ≤ P.X * (11 * S.A) * S.B * S.D ^ 5 := by
-      nlinarith [mul_le_mul_of_nonneg_right haA (mul_nonneg hBpos.le hD5pos.le)]
+      nlinarith only [mul_le_mul_of_nonneg_right haA (mul_nonneg hBpos.le hD5pos.le)]
     have e2 : P.X * ((111/10) * S.A) * S.B * (S.D ^ 5 * (1 - 1/10 ^ 9) ^ 5)
         ≤ P.X * ((111/10) * S.A) * S.B * d ^ 5 :=
       mul_le_mul_of_nonneg_left hD5d5 (by positivity)
     have e3 : P.X * (11 * S.A) * S.B * S.D ^ 5
         ≤ P.X * ((111/10) * S.A) * S.B * (S.D ^ 5 * (1 - 1/10 ^ 9) ^ 5) := by
-      nlinarith [mul_pos hXAB hD5pos]
+      nlinarith only [mul_pos hXAB hD5pos]
     linarith [e1, e2, e3]
   -- |b₀| ≤ 3·10¹²·B, so Q·|b₀| ≤ 3·10¹²·Q·B ≤ 33·10¹²/(Δ²Ω²)
   have hQb0hi : Q * |b₀| ≤ (333 * 10 ^ 11 : ℝ) * (1 / (S.Δ ^ 2 * S.Ω ^ 2)) := by
@@ -234,7 +230,7 @@ theorem sigma_v2_upper
       mul_le_mul_of_nonneg_left hb0 hQpos.le
     have h2' : Q * (3000000000000 * S.B) ≤ (333 * 10 ^ 11:ℝ) * (1 / (S.Δ ^ 2 * S.Ω ^ 2)) := by
       rw [show Q * (3000000000000 * S.B) = 3000000000000 * (Q * S.B) by ring]
-      nlinarith [hQBhi, (by positivity : (0:ℝ) < S.Δ ^ 2 * S.Ω ^ 2)]
+      linarith only [hQBhi]
     linarith [h1', h2']
   -- assemble: |Σ_closed| ≤ 28·Q·L·|b₀|·v² ≤ 28·33·10¹²·L·v²/(Δ²Ω²) ≤ 10¹⁵·L·v²/(Δ²Ω²)
   have hLv2nn : 0 ≤ L * v ^ 2 := by positivity
@@ -324,7 +320,7 @@ theorem v_inversion
       have h3 := abs_sub_abs_le_abs_sub (s:ℝ) (Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂)
       rw [abs_sub_comm (s:ℝ)] at h3
       linarith [h3, hhalf]
-    nlinarith [h2, hs1]
+    linarith only [h2, hs1]
   -- raw magnitude bounds
   have hlow := sigma_v2_lower (P := P) (S := S) (a := a) ha0 ha_lo ha_hi hℓ1 hℓ12 hℓ12' hℓ2W
     hb0 hb0lo hv hvlo (S.D_eps_lo hdD) (S.D_eps_hi hd2D) hReg h1 hG1 hU1 hΔ1 hΩU hUbig hDeW
@@ -342,7 +338,7 @@ theorem v_inversion
     -- hchain : |s|/2 · (Δ²Ω²) ≤ 10¹⁵ · (L v²)
     have hv2lo : S.Δ ^ 2 * S.Ω ^ 2 * |(s:ℝ)| / (2 * 10 ^ 15 * L) ≤ v ^ 2 := by
       rw [div_le_iff₀ (by positivity : (0:ℝ) < 2 * 10 ^ 15 * L)]
-      nlinarith [hchain, hLpos, hDΩ2pos, hsnn]
+      linarith only [hchain]
     refine le_trans ?_ hv2lo
     rw [show (1 / (2 * 10 ^ 15 : ℝ)) * (S.Δ ^ 2 * S.Ω ^ 2 * |(s : ℝ)| / L)
           = S.Δ ^ 2 * S.Ω ^ 2 * |(s:ℝ)| / (2 * 10 ^ 15 * L) by field_simp]
@@ -357,7 +353,7 @@ theorem v_inversion
     -- ⟹ L v² ≤ 4·10⁸·|s|·Δ²Ω²  ⟹ v² ≤ 4·10⁸·|s|·Δ²Ω²/L
     have hv2hi : v ^ 2 ≤ (4 * 10 ^ 8 : ℝ) * (S.Δ ^ 2 * S.Ω ^ 2 * |(s:ℝ)|) / L := by
       rw [le_div_iff₀ hLpos]
-      nlinarith [hchain, hDΩ2pos, hsnn, hLpos]
+      linarith only [hchain]
     refine le_trans hv2hi ?_
     rw [show (4 * 10 ^ 8 : ℝ) * (S.Δ ^ 2 * S.Ω ^ 2 * |(s : ℝ)| / L)
           = (4 * 10 ^ 8 : ℝ) * (S.Δ ^ 2 * S.Ω ^ 2 * |(s:ℝ)|) / L by ring]
@@ -366,7 +362,7 @@ theorem v_inversion
 `v ∈ ℓ₁⁻¹ℤ` with `|v| ≤ C·V_s` number `≤ 1 + 2C·ℓ₁·V_s`.  Pure lattice count, specialising
 `step4_v_count` to the `V_s`-confinement window. -/
 theorem vlattice_count (C : ℝ) (s : ℤ) (ℓ₁ ℓ₂ : ℝ)
-    (hℓ1 : 0 < ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hC : 0 ≤ C)
+    (hℓ1 : 0 < ℓ₁) (_hℓ12 : ℓ₁ < ℓ₂) (hC : 0 ≤ C)
     (Vset : Finset ℝ) (mOf : ℝ → ℤ)
     (hlat : ∀ v ∈ Vset, (mOf v : ℝ) = ℓ₁ * v)
     (hconf : ∀ v ∈ Vset, |v| ≤ C * V_s S s ℓ₁ ℓ₂) :

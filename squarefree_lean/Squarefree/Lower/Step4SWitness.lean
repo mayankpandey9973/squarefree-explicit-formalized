@@ -53,14 +53,14 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 3200000
+set_option maxHeartbeats 400000
 
 /-- Combined Taylor window with the defect term `|v|`: `4(a + W·|b₀| + |v|) ≤ dd`, for `W = GU⁵`
 the slope cap (so `(ℓ:ℝ) ≤ W` covers `ℓ₂`, `ℓ₂−ℓ₁`).  Same scale arithmetic as
 `step1_window_bound` with the extra `4|v|` absorbed via `|v| ≤ 10²⁰·ΔU⁵/Ω³`. -/
 private theorem window_with_v {Wc b₀ v dd : ℝ}
-    (ha_hi : (0:ℝ) ≤ 11 * S.A) (haA : ∃ a : ℝ, a ≤ 11 * S.A ∧ 0 ≤ a) (hWc : Wc ≤ 130 * P.Wval)
-    (hWcnn : 0 ≤ Wc) (hb0 : |b₀| ≤ 3000000000000 * S.B)
+    (_ha_hi : (0:ℝ) ≤ 11 * S.A) (_haA : ∃ a : ℝ, a ≤ 11 * S.A ∧ 0 ≤ a) (hWc : Wc ≤ 130 * P.Wval)
+    (_hWcnn : 0 ≤ Wc) (hb0 : |b₀| ≤ 3000000000000 * S.B)
     (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
     (hdD : S.D ≤ dd) (hRUW : P.U * P.Wval ≤ S.R)
     (hΩU : S.Ω ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hU1 : 1 ≤ P.U) (hUbig : (10:ℝ)^33 ≤ P.U) :
@@ -113,7 +113,7 @@ private theorem window_with_v {Wc b₀ v dd : ℝ}
       have h1 : 88 * P.U ^ 4 ≤ P.U ^ 6 * S.Δ := by
         nlinarith [hU2Δ, pow_pos (lt_of_lt_of_le (by norm_num : (0:ℝ) < 1) hU1) 4]
       nlinarith [hΩ4, h1, pow_pos (lt_of_lt_of_le (by norm_num : (0:ℝ) < 1) hU1) 4]
-    nlinarith [hb, hc, hcore, hUΔ]
+    linarith only [hb, hc, hcore, mul_pos (pow_pos hUpos 6) hΔ]
   rw [Scale.D, ← mul_le_mul_iff_of_pos_right hΩ3pos]
   -- target: 4(a + Wc|b₀| + |v|)·Ω³ ≤ H·Δ·Ω³
   have hKEYΔ : (44 * S.Ω ^ 4 + 1560000000000000 * P.U ^ 5 * S.Δ
@@ -122,12 +122,12 @@ private theorem window_with_v {Wc b₀ v dd : ℝ}
   -- the accumulated LHS bound:  4(a+Wc|b₀|+|v|)Ω³ ≤ 44ΔΩ⁴ + 12e12U⁵Δ² + 4e20Δ²U⁵
   have hsum : 4 * (a + Wc * |b₀| + |v|) * S.Ω ^ 3
       ≤ 4 * (11 * (S.Δ * S.Ω) * S.Ω ^ 3) + 4 * (390000000000000 * P.U ^ 5 * S.Δ ^ 2)
-          + 4 * (10 ^ 20 * (S.Δ * P.U ^ 5)) := by nlinarith [ha3, hslope3, hvΩ, hΩ3pos]
+          + 4 * (10 ^ 20 * (S.Δ * P.U ^ 5)) := by linarith only [ha3, hslope3, hvΩ]
   refine le_trans hsum ?_
   have hΔU : 400000000000000000000 * (S.Δ * P.U ^ 5)
       ≤ 400000000000000000000 * (S.Δ * P.U ^ 5) * S.Δ := by
     nlinarith [hΔ1, mul_pos hΔ (pow_pos hUpos 5)]
-  nlinarith [hKEYΔ, hΔU]
+  linarith only [hKEYΔ, hΔU]
 
 /-- **§5 Step-4 per-`r` integer `s`-extraction from `dStar` witnesses** (writeup 1033–1043). -/
 theorem sigma_s_extract_from_witness {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ → ℤ}
@@ -266,13 +266,13 @@ theorem sigma_s_extract_from_witness {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : 
               rw [abs_of_nonneg (by linarith [hℓ12R] : (0:ℝ) ≤ ((ℓ₂:ℤ):ℝ) - ((ℓ₁:ℤ):ℝ))]
               linarith [hℓ1R]
             have hb0nn : (0:ℝ) ≤ |b₀| := abs_nonneg _
-            nlinarith [this, hb0nn]
+            linarith only [mul_le_mul_of_nonneg_right this hb0nn]
     have := hwin3v (a:ℝ) ha_hi ha_nn
-    nlinarith [hb3le, this]
+    linarith only [hb3le, this]
   have hshiftpos : 0 < (d : ℝ) + ((ℓ₁ : ℤ) : ℝ) * b₀ := by
     rw [hd'def]; exact lt_of_lt_of_le hDS_pos hd1win.1
   have hshift2 : (d : ℝ) / 2 ≤ (d : ℝ) + ((ℓ₁ : ℤ) : ℝ) * b₀ := by
-    rw [hd'def]; nlinarith [hdwin.2, hd1win.1, hDS_pos]
+    rw [hd'def]; linarith only [hdwin.2, hd1win.1]
   -- nonzero shift facts (from the distinctness of the witnesses)
   have hb1ne : ((ℓ₁ : ℤ) : ℝ) * b₀ ≠ 0 := by
     rw [hb0def]; intro h; exact hd1ned (by linarith [sub_eq_zero.mp h])

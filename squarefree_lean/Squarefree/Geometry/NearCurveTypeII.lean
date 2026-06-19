@@ -40,7 +40,7 @@ variable {f : ℝ → ℝ} {N lam δ : ℝ}
 
 /-! ## §4.3 Type II line count per denominator (the combine) -/
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 300000 in
 /-- **Type II lines per denominator** (writeup 624–650).  For a fixed denominator
 `q`, the number of Type II witness lines is `≤ ⌈852800(qNλ+1)⌉₊`.
 
@@ -328,7 +328,7 @@ and `typeII_double_sum` evaluates it to the closed form.  The constant `16384` i
 `typeII_double_sum` constant (the factor `2` and per-line ceiling are already inside
 the summand). -/
 theorem typeII_card_bound {f : ℝ → ℝ} {N lam δ : ℝ}
-    (hN2 : 2 ≤ N) (hlam : 0 < lam) (hδ : 0 < δ) (hδ1 : δ < 1) (hf : ContDiff ℝ 2 f)
+    (hN2 : 2 ≤ N) (hlam : 0 < lam) (hδ : 0 < δ) (_hδ1 : δ < 1) (hf : ContDiff ℝ 2 f)
     (hlower : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), lam ≤ |iteratedDeriv 2 f x|)
     (hupper : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), |iteratedDeriv 2 f x| ≤ 256 * lam) :
     ((typeIISet f N lam δ).card : ℝ)

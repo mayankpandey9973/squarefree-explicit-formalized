@@ -19,8 +19,6 @@ open Classical Finset Set Real Squarefree.FiniteDiff
 
 namespace Squarefree
 
-set_option maxHeartbeats 1600000
-
 /-- **N11 order-3 numeric assembly** (two-constant; ρ₀ = 0).  The ten group numerators of
 `Err^{(3)}` against the LEAD slots at `10⁴⁴` and the RES slots at `10⁵²`. -/
 private theorem sec7E_num_final_m3 {T1 T2 T3 R hS Pv relF rel a b c : ℝ}
@@ -115,9 +113,9 @@ private theorem sec7E_num_final_m3 {T1 T2 T3 R hS Pv relF rel a b c : ℝ}
     rw [huvw] at key
     have b1 : u * hS * T1 / R ^ 2 ≤ hS ^ 2 * T1 / R ^ 2 := by
       rw [div_le_div_iff_of_pos_right (by positivity)]
-      nlinarith [mul_nonneg (mul_nonneg (sub_nonneg.mpr hule) hhS0) hT1.le]
+      nlinarith only [mul_nonneg (mul_nonneg (sub_nonneg.mpr hule) hhS0) hT1.le]
     have b2 : u * (T1 / R) * relF ≤ hS * (T1 / R) * relF := by
-      nlinarith [mul_nonneg (mul_nonneg (sub_nonneg.mpr hule) hT1R) hrelF]
+      nlinarith only [mul_nonneg (mul_nonneg (sub_nonneg.mpr hule) hT1R) hrelF]
     linarith [key, b1, b2]
   have HG5 : ∀ u v w : ℝ, u * (v * w) = a * b * c →
       8 * ((4 * 10 ^ 18 * (u * (T1 / R))) *
@@ -178,6 +176,11 @@ theorem sec7_err_deriv_bound_m3 {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
       |iteratedDeriv 3 (ME.Err ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r| ≤
         sec7_cErr3Lead * sec7_errScale_LEAD P S h₁ h₂ h₃ / S.R ^ 3 +
           sec7_cErr3Res * sec7_errScale_RES P S h₁ h₂ h₃ / S.R ^ 3 := by
+  have _ := hj
+  have _ := hrelF143
+  have _ := hρ₁
+  have _ := hρ₂
+  have _ := hρ₃
   have hh₁ : 1 ≤ h₁ := hbox.1.1
   have hh₂ : 1 ≤ h₂ := hbox.2.1.1
   have hh₃ : 1 ≤ h₃ := hbox.2.2.1
@@ -435,8 +438,8 @@ theorem sec7_err_deriv_bound_m3 {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
     linarith
   have hPv1 : (1:ℝ) ≤ sec7_Pprod h₁ h₂ h₃ := by
     unfold sec7_Pprod
-    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith
-    nlinarith [h12, a3]
+    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith only [a1, a2]
+    nlinarith only [h12, a3]
   have hnum := sec7E_num_final_m3 (T1 := S.T₁) (T2 := S.T₂) (T3 := S.T₃) (R := S.R)
     (hS := sec7_hSum h₁ h₂ h₃) (Pv := sec7_Pprod h₁ h₂ h₃)
     (relF := sec7_relErrF P S) (rel := sec7_relErr P S)

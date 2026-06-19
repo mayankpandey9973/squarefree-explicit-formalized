@@ -25,7 +25,6 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 3200000 in
 /-- **§5 Step-4 `W`-bridge (writeup 1086–1124).**  From the `V_s` squared pin (with `|s|` set to the
 fibre index `n`) and the absolute defect lower bound `hv2`, in the §5 regime, derive the three
 `step4_hperv` inputs `hvlarge`/`hWhi`/`hWlo` with the scale `Lr = ℓ₁·ℓ₂·(ℓ₂−ℓ₁)`. -/
@@ -44,6 +43,7 @@ theorem step4_W_from_Vs {a w ℓ₁ ℓ₂ n : ℝ}
         ≤ 10 ^ 9 * (Real.sqrt n / (S.Δ * S.Ω * Real.sqrt (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)))))
     ∧ (Real.sqrt n / (S.Δ * S.Ω * Real.sqrt (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)))
         ≤ 10 ^ 9 * (ℓ₁ * P.X * a * |w| / (S.D ^ 4 * S.R))) := by
+  have _ := hReg; have _ := hDeW
   have hGpos := P.G_pos; have hHpos := P.H_pos; have hUpos := P.U_pos
   have hΔpos := S.Δ_pos; have hΩpos := S.Ω_pos; have hXpos := P.X_pos
   have hGne : P.G ≠ 0 := hGpos.ne'; have hHne : P.H ≠ 0 := hHpos.ne'
@@ -69,9 +69,9 @@ theorem step4_W_from_Vs {a w ℓ₁ ℓ₂ n : ℝ}
   have hden_T_pos : 0 < (S.Δ * S.Ω) ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) := by positivity
   -- `a²` window
   have hAAnn : (0:ℝ) ≤ S.Δ ^ 2 * S.Ω ^ 2 := by positivity
-  have ha2hi : a ^ 2 ≤ 121 * (S.Δ ^ 2 * S.Ω ^ 2) := by nlinarith [ha_hi2, ha0, hΔpos, hΩpos]
+  have ha2hi : a ^ 2 ≤ 121 * (S.Δ ^ 2 * S.Ω ^ 2) := by nlinarith only [ha_hi2, ha0, hΔpos, hΩpos]
   have ha2lo : S.Δ ^ 2 * S.Ω ^ 2 / 25 ≤ a ^ 2 := by
-    nlinarith [ha_lo2, ha0, hΔpos, hΩpos, mul_pos hΔpos hΩpos]
+    nlinarith only [ha_lo2, ha0, hΔpos, hΩpos, mul_pos hΔpos hΩpos]
   have hQw_nn : (0:ℝ) ≤ ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * w ^ 2 :=
     mul_nonneg (mul_nonneg (mul_nonneg (pow_nonneg hℓ1pos.le 3) hℓ2pos.le) hℓ21pos.le) (sq_nonneg w)
   refine ⟨?_, ?_, ?_⟩
@@ -93,7 +93,7 @@ theorem step4_W_from_Vs {a w ℓ₁ ℓ₂ n : ℝ}
               / S.Ω ^ 6 := by
         rw [div_le_div_iff₀ (by positivity) (by positivity)]
         have hfac : (1:ℝ) ≤ Real.sqrt P.G * Real.sqrt P.U := by
-          nlinarith [hsqG, hsqU, Real.sqrt_nonneg P.G, Real.sqrt_nonneg P.U]
+          nlinarith only [hsqG, hsqU, Real.sqrt_nonneg P.G, Real.sqrt_nonneg P.U]
         have hRHSeq : (S.Δ ^ 3 / P.H) * (P.G ^ 2 * Real.sqrt P.G * (P.U ^ 22 * Real.sqrt P.U))
               * (P.H * S.Ω ^ 6)
             = (S.Δ ^ 3 * (P.G ^ 2 * P.U ^ 22) * S.Ω ^ 6)
@@ -129,8 +129,8 @@ theorem step4_W_from_Vs {a w ℓ₁ ℓ₂ n : ℝ}
         gcongr
       refine le_trans ?_ step2
       have hcomb : (84500:ℝ) * 10 ^ 47 ≤ P.G ^ 2 * P.U ^ 12 := by
-        nlinarith [hU12, hG2, pow_pos hUpos 12]
-      nlinarith [mul_le_mul_of_nonneg_right hcomb
+        nlinarith only [hU12, hG2, pow_pos hUpos 12]
+      nlinarith only [mul_le_mul_of_nonneg_right hcomb
         (by positivity : (0:ℝ) ≤ P.G ^ 2 * P.U ^ 10 * S.Δ ^ 4 * (P.H * S.Ω ^ 6))]
     -- assemble the fraction inequality from `hpoly`
     rw [show (10:ℝ) ^ 47 * (ℓ₂ * (ℓ₂ - ℓ₁) / (P.G * S.Ω ^ 5)) * (S.Δ ^ 4 / (P.G * P.H * a))
@@ -150,15 +150,15 @@ theorem step4_W_from_Vs {a w ℓ₁ ℓ₂ n : ℝ}
         = n / ((S.Δ * S.Ω) ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁))) := by
       rw [div_pow, mul_pow, Real.sq_sqrt hn_nn, Real.sq_sqrt hLr_nn]
     have hmid_hi : ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * a ^ 2 * w ^ 2 ≤ 10 ^ 18 * n * (S.Δ ^ 2 * S.Ω ^ 2) ^ 2 := by
-      nlinarith [mul_nonneg (by linarith [ha2hi] : (0:ℝ) ≤ 121 * (S.Δ ^ 2 * S.Ω ^ 2) - a ^ 2) hQw_nn,
+      nlinarith only [mul_nonneg (by linarith only [ha2hi] : (0:ℝ) ≤ 121 * (S.Δ ^ 2 * S.Ω ^ 2) - a ^ 2) hQw_nn,
         mul_nonneg (by positivity : (0:ℝ) ≤ 121 * (S.Δ ^ 2 * S.Ω ^ 2))
-          (by linarith [hpin_hi] : (0:ℝ) ≤ 1000000 * (S.Δ ^ 2 * S.Ω ^ 2 * n)
+          (by linarith only [hpin_hi] : (0:ℝ) ≤ 1000000 * (S.Δ ^ 2 * S.Ω ^ 2 * n)
             - ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * w ^ 2),
         mul_nonneg (mul_nonneg hAAnn hAAnn) hn_nn]
     have hcross_hi : ℓ₁ ^ 2 * P.X ^ 2 * a ^ 2 * w ^ 2 * ((S.Δ * S.Ω) ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)))
         ≤ 10 ^ 18 * n * (S.D ^ 8 * S.R ^ 2) := by
       rw [hid]
-      nlinarith [mul_le_mul_of_nonneg_right hmid_hi
+      nlinarith only [mul_le_mul_of_nonneg_right hmid_hi
         (show (0:ℝ) ≤ P.X ^ 2 * (S.Δ * S.Ω) ^ 2 by positivity)]
     have hW_nn : (0:ℝ) ≤ ℓ₁ * P.X * a * |w| / (S.D ^ 4 * S.R) :=
       div_nonneg (mul_nonneg (mul_nonneg (mul_nonneg hℓ1pos.le hXpos.le) ha0.le) (abs_nonneg _))
@@ -185,16 +185,16 @@ theorem step4_W_from_Vs {a w ℓ₁ ℓ₂ n : ℝ}
         = n / ((S.Δ * S.Ω) ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁))) := by
       rw [div_pow, mul_pow, Real.sq_sqrt hn_nn, Real.sq_sqrt hLr_nn]
     have hmid_lo : n * (S.Δ ^ 2 * S.Ω ^ 2) ^ 2 ≤ 10 ^ 18 * (ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁)) * a ^ 2 * w ^ 2 := by
-      nlinarith [mul_nonneg (by linarith [ha2lo] : (0:ℝ) ≤ a ^ 2 - S.Δ ^ 2 * S.Ω ^ 2 / 25) hQw_nn,
+      nlinarith only [mul_nonneg (by linarith only [ha2lo] : (0:ℝ) ≤ a ^ 2 - S.Δ ^ 2 * S.Ω ^ 2 / 25) hQw_nn,
         mul_nonneg (by positivity : (0:ℝ) ≤ S.Δ ^ 2 * S.Ω ^ 2 / 25)
-          (by linarith [hpin_lo] : (0:ℝ) ≤ ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * w ^ 2
+          (by linarith only [hpin_lo] : (0:ℝ) ≤ ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * w ^ 2
             - (1 / 150 : ℝ) * (S.Δ ^ 2 * S.Ω ^ 2 * n)),
         mul_nonneg (mul_nonneg hAAnn hAAnn) hn_nn]
     have hcross_lo : n * (S.D ^ 8 * S.R ^ 2)
         ≤ 10 ^ 18 * (ℓ₁ ^ 2 * P.X ^ 2 * a ^ 2 * w ^ 2)
             * ((S.Δ * S.Ω) ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁))) := by
       rw [hid]
-      nlinarith [mul_le_mul_of_nonneg_right hmid_lo
+      nlinarith only [mul_le_mul_of_nonneg_right hmid_lo
         (show (0:ℝ) ≤ P.X ^ 2 * (S.Δ * S.Ω) ^ 2 by positivity)]
     have hW_nn : (0:ℝ) ≤ ℓ₁ * P.X * a * |w| / (S.D ^ 4 * S.R) :=
       div_nonneg (mul_nonneg (mul_nonneg (mul_nonneg hℓ1pos.le hXpos.le) ha0.le) (abs_nonneg _))

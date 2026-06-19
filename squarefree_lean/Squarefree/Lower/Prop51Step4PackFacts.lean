@@ -17,8 +17,6 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 1600000
-
 /-- Closeness of the witness defect to the smooth profile, at a fiber point, with the
 shifted-cast form `dtilde (r + (ℓ:ℤ:ℝ))`. -/
 private theorem pack_close {a : ℤ} {Ra : Finset ℕ} {r ℓ : ℕ}
@@ -36,7 +34,7 @@ private theorem pack_close {a : ℤ} {Ra : Finset ℕ} {r ℓ : ℕ}
 theorem step4_pack_b0box {a : ℤ} {Ra : Finset ℕ} {ℓ₁ ℓ₂ : ℕ}
     (hAD : 10 * S.A ≤ S.D) (ha0 : 0 < a)
     (ha_lo : S.A / 5 ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 11 * S.A)
-    (hℓ1 : 0 < ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
+    (hℓ1 : 0 < ℓ₁) (_hℓ12 : ℓ₁ < ℓ₂)
     (hG1 : 1 ≤ P.G) (hΔ1 : 1 ≤ S.Δ)
     (hRa : ∀ r' ∈ Ra, RaWitness P S a r')
     {r : ℕ} (hr : r ∈ Ra) (hr1 : r + ℓ₁ ∈ Ra) :

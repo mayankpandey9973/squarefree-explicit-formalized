@@ -56,27 +56,45 @@ theorem Rfun_diff_lb (X a d₁ dk D : ℝ) (hX : 0 < X) (hD : 0 < D)
       rw [hf1, hfk]; ring
     rw [hfact]
     have hg1 : 2 * D ≤ a + d₁ + dk := by linarith
+    have hkD : D ≤ dk := le_trans h1lo hlt.le
     have hg2 : 2 * D ^ 2 ≤ a * d₁ + a * dk + d₁ ^ 2 + dk ^ 2 := by
-      nlinarith [h1lo, hkhi, hlt.le, ha.le, mul_pos hd1pos hdkpos, sq_nonneg (d₁ - D),
-        sq_nonneg (dk - D)]
+      have h1sq : D ^ 2 ≤ d₁ ^ 2 := by nlinarith only [h1lo, hD.le]
+      have hksq : D ^ 2 ≤ dk ^ 2 := by nlinarith only [hkD, hD.le]
+      have ha1 : (0:ℝ) ≤ a * d₁ := mul_nonneg ha.le hd1pos.le
+      have hak : (0:ℝ) ≤ a * dk := mul_nonneg ha.le hdkpos.le
+      linarith only [h1sq, hksq, ha1, hak]
     have hdpos : (0:ℝ) ≤ dk - d₁ := by linarith
     have hp1 : (0:ℝ) ≤ a + d₁ + dk := by positivity
-    have hp2 : (0:ℝ) ≤ a * d₁ + a * dk + d₁ ^ 2 + dk ^ 2 := by positivity
-    nlinarith [mul_le_mul hg1 hg2 (by positivity) hp1, mul_nonneg hdpos
-      (mul_nonneg hp1 hp2), hdpos]
+    calc 4 * D ^ 3 * (dk - d₁)
+        = (dk - d₁) * (2 * D * (2 * D ^ 2)) := by ring
+      _ ≤ (dk - d₁) * ((a + d₁ + dk) * (a * d₁ + a * dk + d₁ ^ 2 + dk ^ 2)) :=
+          mul_le_mul_of_nonneg_left (mul_le_mul hg1 hg2 (by positivity) hp1) hdpos
+      _ = (dk - d₁) * (a + d₁ + dk) * (a * d₁ + a * dk + d₁ ^ 2 + dk ^ 2) := by ring
   -- upper bound on (f1 · fk):  f1 · fk ≤ 1296 D⁸  (uses a ≤ D, d ≤ 2D)
   have hf1ub : f1 ≤ 36 * D ^ 4 := by
-    have h1 : d₁ ^ 2 ≤ 4 * D ^ 2 := by nlinarith [h1lo, hlt.le, hkhi, hd1pos.le]
-    have h2 : (d₁ + a) ^ 2 ≤ 9 * D ^ 2 := by nlinarith [h1lo, hlt.le, hkhi, haD, ha.le, hd1pos.le]
-    rw [hf1]; nlinarith [mul_le_mul h1 h2 (by positivity) (by positivity : (0:ℝ) ≤ 4 * D ^ 2)]
+    have h1 : d₁ ^ 2 ≤ 4 * D ^ 2 := by nlinarith only [h1lo, hlt.le, hkhi, hd1pos.le]
+    have h2 : (d₁ + a) ^ 2 ≤ 9 * D ^ 2 := by
+      have hle : d₁ + a ≤ 3 * D := by linarith
+      have hge : (0:ℝ) ≤ d₁ + a := by positivity
+      nlinarith only [hle, hge]
+    rw [hf1]
+    calc d₁ ^ 2 * (d₁ + a) ^ 2 ≤ (4 * D ^ 2) * (9 * D ^ 2) :=
+          mul_le_mul h1 h2 (by positivity) (by positivity)
+      _ = 36 * D ^ 4 := by ring
   have hfkub : fk ≤ 36 * D ^ 4 := by
-    have h1 : dk ^ 2 ≤ 4 * D ^ 2 := by nlinarith [hkhi, hdkpos.le]
-    have h2 : (dk + a) ^ 2 ≤ 9 * D ^ 2 := by nlinarith [hkhi, haD, ha.le, hdkpos.le]
-    rw [hfk]; nlinarith [mul_le_mul h1 h2 (by positivity) (by positivity : (0:ℝ) ≤ 4 * D ^ 2)]
+    have h1 : dk ^ 2 ≤ 4 * D ^ 2 := by nlinarith only [hkhi, hdkpos.le]
+    have h2 : (dk + a) ^ 2 ≤ 9 * D ^ 2 := by
+      have hle : dk + a ≤ 3 * D := by linarith
+      have hge : (0:ℝ) ≤ dk + a := by positivity
+      nlinarith only [hle, hge]
+    rw [hfk]
+    calc dk ^ 2 * (dk + a) ^ 2 ≤ (4 * D ^ 2) * (9 * D ^ 2) :=
+          mul_le_mul h1 h2 (by positivity) (by positivity)
+      _ = 36 * D ^ 4 := by ring
   have hfprod : f1 * fk ≤ 1296 * D ^ 8 := by
-    have h1 : (0:ℝ) ≤ f1 := hf1pos.le
-    have h2 : (0:ℝ) ≤ fk := hfkpos.le
-    nlinarith [mul_le_mul hf1ub hfkub h2 (by positivity : (0:ℝ) ≤ 36 * D ^ 4)]
+    calc f1 * fk ≤ (36 * D ^ 4) * (36 * D ^ 4) :=
+          mul_le_mul hf1ub hfkub hfkpos.le (by positivity)
+      _ = 1296 * D ^ 8 := by ring
   -- assemble
   have hXa3 : (0:ℝ) ≤ X * a ^ 3 := by positivity
   have hdkd1 : (0:ℝ) ≤ dk - d₁ := by linarith
@@ -89,7 +107,7 @@ theorem Rfun_diff_lb (X a d₁ dk D : ℝ) (hX : 0 < X) (hD : 0 < D)
         exact mul_le_mul_of_nonneg_left hflb hXa3
 
 /-- Cube of the regime bound on `a`:  `a ≥ 64 Δ^{4/3}(H⁴/X)^{1/3}  ⇒  a³ ≥ 64³ Δ⁴ H⁴/X`. -/
-theorem a_cubed_lb (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ) (ha : 0 < a)
+theorem a_cubed_lb (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ) (_ha : 0 < a)
     (ha_lo : (64 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ) ≤ a) :
     (262144 : ℝ) * Δ ^ (4:ℕ) * (H ^ 4 / X) ≤ a ^ 3 := by
   have hcube : ((64 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ)) ^ 3
@@ -116,7 +134,7 @@ theorem a_cubed_lb (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ) (ha : 0 < a)
 From `a ≥ (1/4)·Δ^{4/3}(H⁴/X)^{1/3}` we only get `a³ ≥ (1/64)·Δ⁴·H⁴/X`; trading one power of
 `Δ` against the floor `Δ ≥ 2²⁴` recovers the same `262144·Δ³·(H⁴/X) ≤ a³` shape the fiber
 proofs consume (now with `Δ³` rather than `Δ⁴`).  Used by `prop_3_2_fiber(_dStar)`. -/
-theorem a_cubed_lb_quarter (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ) (ha : 0 < a)
+theorem a_cubed_lb_quarter (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ) (_ha : 0 < a)
     (hΔlb : (16777216 : ℝ) ≤ Δ)
     (ha_lo : (1/4 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ) ≤ a) :
     (262144 : ℝ) * Δ ^ (3:ℕ) * (H ^ 4 / X) ≤ a ^ 3 := by
@@ -147,10 +165,8 @@ theorem a_cubed_lb_quarter (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ) (ha : 0 
     have hΔ4 : Δ ^ (4:ℕ) = Δ ^ (3:ℕ) * Δ := by ring
     rw [hΔ4]
     have hstep : (262144 : ℝ) * Δ ^ (3:ℕ) ≤ (1/64 : ℝ) * (Δ ^ (3:ℕ) * Δ) := by
-      have : (1/64 : ℝ) * (Δ ^ (3:ℕ) * Δ) - 262144 * Δ ^ (3:ℕ)
-          = Δ ^ (3:ℕ) * ((1/64 : ℝ) * Δ - 262144) := by ring
-      nlinarith [hΔ3pos, hΔlb]
-    nlinarith [mul_le_mul_of_nonneg_right hstep hHXpos]
+      nlinarith only [hΔ3pos, hΔlb]
+    nlinarith only [mul_le_mul_of_nonneg_right hstep hHXpos]
   linarith [htrade, hquarter]
 
 /-- The spacing threshold `spc := (1/10) a^{-1/3} Δ^{5/3}(H⁵/X)^{1/3}` is positive with
@@ -308,7 +324,7 @@ theorem Rfun_diff_lb_abs (X a d₁ d₂ D : ℝ) (hX : 0 < X) (hD : 0 < D)
 
 /-- **Near-integer property** (writeup line 363): `R_a(d) = (integer) + O(H/D)`.
 With `D ≤ d ≤ 2D`, `0 < a ≤ D`, there is `J ∈ ℤ` with `|R_a(d) − J| ≤ 14·H/D`. -/
-theorem Rfun_near_int (X H a d D : ℝ) (hX : 0 < X) (hH : 0 < H) (hD : 0 < D)
+theorem Rfun_near_int (X H a d D : ℝ) (_hX : 0 < X) (hH : 0 < H) (hD : 0 < D)
     (ha : 0 < a) (haD : a ≤ D) (hd_lo : D ≤ d) (hd_hi : d ≤ 2 * D)
     (m₁ m₂ : ℤ)
     (he1 : 0 ≤ (m₁:ℝ) - X / d ^ 2) (he1' : (m₁:ℝ) - X / d ^ 2 ≤ H / d ^ 2)
@@ -336,9 +352,9 @@ theorem Rfun_near_int (X H a d D : ℝ) (hX : 0 < X) (hH : 0 < H) (hD : 0 < D)
   -- e bounds vs H/D²:  H/d² ≤ H/D², H/(d+a)² ≤ H/D²
   have hD2 : (0:ℝ) < D ^ 2 := by positivity
   have hHd : H / d ^ 2 ≤ H / D ^ 2 :=
-    div_le_div_of_nonneg_left hH.le hD2 (by nlinarith)
+    div_le_div_of_nonneg_left hH.le hD2 (by nlinarith only [hd_lo, hD.le])
   have hHda : H / (d + a) ^ 2 ≤ H / D ^ 2 :=
-    div_le_div_of_nonneg_left hH.le hD2 (by nlinarith)
+    div_le_div_of_nonneg_left hH.le hD2 (by nlinarith only [hd_lo, ha.le, hD.le])
   have he1'' : e1 ≤ H / D ^ 2 := le_trans he1' hHd
   have he2'' : e2 ≤ H / D ^ 2 := le_trans he2' hHda
   have hHDnn : (0:ℝ) ≤ H / D ^ 2 := by positivity

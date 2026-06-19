@@ -16,7 +16,6 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 1600000 in
 /-- **§5 Step-4 delta: the pref-free `v`-replacement piece** (piece 3). -/
 theorem vterm_le {a : ℤ} {r : ℝ} {ℓ₁ v : ℝ} {d : ℝ}
     (hAD : 10 * S.A ≤ S.D) (ha0 : 0 < a)
@@ -30,6 +29,8 @@ theorem vterm_le {a : ℤ} {r : ℝ} {ℓ₁ v : ℝ} {d : ℝ}
     (hH1 : 1 ≤ P.H) (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U) :
     6 * ℓ₁ * P.X * (a : ℝ) * |v| * |1 / (dtilde P.X r (a : ℝ)) ^ 4 - 1 / d ^ 4|
       ≤ (1 / S.Δ) * P.G ^ 4 * P.U ^ 15 / S.Ω ^ 5 := by
+  have _ := hΔreg
+  have _ := hΩU
   have hHpos : 0 < P.H := P.H_pos
   have hGpos : 0 < P.G := P.G_pos
   have hUpos : 0 < P.U := P.U_pos
@@ -52,12 +53,12 @@ theorem vterm_le {a : ℤ} {r : ℝ} {ℓ₁ v : ℝ} {d : ℝ}
   have hdr_nonneg : 0 ≤ dr := hdr_pos.le
   have hdr_ne : dr ≠ 0 := ne_of_gt hdr_pos
   have hdt_ne : dt ≠ 0 := ne_of_gt hdt_pos
-  have hdr_hi' : dr ≤ 18 * S.D := le_trans hdr_hi (by nlinarith [hDpos])
+  have hdr_hi' : dr ≤ 18 * S.D := le_trans hdr_hi (by linarith only [hDpos])
   have hℓ1W' : ℓ₁ ≤ 130 * (P.G * P.U ^ 5) := by rw [Globals.Wval] at hℓ1W; exact hℓ1W
   have hvabs_nonneg : 0 ≤ |v| := abs_nonneg v
   -- ===== factor 1: 6Xa/dt⁴ ≤ 660000·HGΩ/Δ³ =====
   have hpref : 6 * P.X * (a : ℝ) / dt ^ 4 ≤ 660000 * (P.H * P.G * S.Ω / S.Δ ^ 3) := by
-    have hnum : 6 * P.X * (a : ℝ) ≤ 66 * (P.X * S.A) := by nlinarith [ha_hi, hXpos.le]
+    have hnum : 6 * P.X * (a : ℝ) ≤ 66 * (P.X * S.A) := by nlinarith only [ha_hi, hXpos.le]
     have hden_lo : (S.D / 10) ^ 4 ≤ dt ^ 4 := pow_le_pow_left₀ (by positivity) hdt_lo 4
     have hden_pos : (0:ℝ) < (S.D / 10) ^ 4 := by positivity
     have hstep : 6 * P.X * (a : ℝ) / dt ^ 4 ≤ 66 * (P.X * S.A) / (S.D / 10) ^ 4 :=
@@ -66,7 +67,7 @@ theorem vterm_le {a : ℤ} {r : ℝ} {ℓ₁ v : ℝ} {d : ℝ}
     have hXAD : P.X * S.A / S.D ^ 4 = P.H * P.G * S.Ω / S.Δ ^ 3 := by
       have := defect_D4_div_XA (P := P) (S := S)
       rw [div_eq_div_iff (by positivity) (by positivity)] at this ⊢
-      nlinarith [this, hΔpos, hHpos, hGpos, hΩpos, hXpos, hApos, hDpos]
+      linear_combination -this
     rw [show (66:ℝ) * (P.X * S.A) / (S.D / 10) ^ 4 = 660000 * (P.X * S.A / S.D ^ 4) by
       field_simp; ring, hXAD]
   have hpref_nn : 0 ≤ 6 * P.X * (a : ℝ) / dt ^ 4 := by positivity
@@ -150,8 +151,7 @@ theorem vterm_le {a : ℤ} {r : ℝ} {ℓ₁ v : ℝ} {d : ℝ}
     calc (660000 * (130 * 4 * 18 ^ 3 * 1000000000000 * 10 ^ 20) : ℝ) ≤ P.U ^ 5 := hUconst
       _ = 1 * 1 * P.U ^ 5 := by ring
       _ ≤ S.Δ * P.G ^ 3 * P.U ^ 5 := by gcongr
-  nlinarith [mul_le_mul_of_nonneg_right hconst
-      (by positivity : (0:ℝ) ≤ P.G * P.U ^ 10 * (S.Δ * S.Ω ^ 5)),
-    hΔpos, hGpos, hUpos, hΩpos]
+  nlinarith only [mul_le_mul_of_nonneg_right hconst
+      (by positivity : (0:ℝ) ≤ P.G * P.U ^ 10 * (S.Δ * S.Ω ^ 5))]
 
 end Squarefree

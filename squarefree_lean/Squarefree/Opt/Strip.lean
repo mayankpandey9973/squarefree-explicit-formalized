@@ -30,7 +30,7 @@ namespace Squarefree
 /-- In the §6 range, `10U ≤ H`: with `H = X^{(1-g)/5}`, `U = X^u`, the exponent gap
 `(1-g)/5 - u ≥ 1/100` and `X^{1/100} ≥ 16777216 ≥ 10`. -/
 private theorem five_U_le_H (P : Globals) (hX : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ))
-    (hg : P.g < 2 / 18977) (hu : P.u ≤ 1 / 100) (hg0 : 0 ≤ P.g) : 10 * P.U ≤ P.H := by
+    (hg : P.g < 2 / 18977) (hu : P.u ≤ 1 / 100) (_hg0 : 0 ≤ P.g) : 10 * P.U ≤ P.H := by
   have hX0 : 0 < P.X := P.X_pos
   -- X > 1 (else X^{1/100} ≤ 1 < 16777216)
   have hX1 : (1:ℝ) ≤ P.X := by
@@ -40,7 +40,7 @@ private theorem five_U_le_H (P : Globals) (hX : (16777216 : ℝ) ≤ P.X ^ (1/10
       Real.rpow_le_one hX0.le h.le (by norm_num : (0:ℝ) ≤ 1/100)
     linarith
   -- exponent gap ≥ 1/100
-  have hexp : (1/100 : ℝ) ≤ (1 - P.g) / 5 - P.u := by linarith [hg, hu, hg0]
+  have hexp : (1/100 : ℝ) ≤ (1 - P.g) / 5 - P.u := by linarith [hg, hu]
   -- X^{(1-g)/5 - u} ≥ X^{1/100} ≥ 16777216 ≥ 5
   have hmono : P.X ^ (1/100 : ℝ) ≤ P.X ^ ((1 - P.g) / 5 - P.u) :=
     Real.rpow_le_rpow_of_exponent_le hX1 hexp
@@ -108,7 +108,7 @@ private theorem ghΩ3_ge_500 (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 1
         apply mul_le_mul_of_nonneg_left hΩ3
         positivity
 
-set_option maxHeartbeats 1000000 in
+set_option maxHeartbeats 600000 in
 /-- **Off-strip case** of `dblock_bound` (Prop 8.1, writeup 2020–2079). `u, c₀, Cu` are shared
 parameters (the merger `dblock_bound` picks them). Small-x edge `x ≤ G^{-2}Ω^{-11/2}X^{-Cu·u}` via
 `prop_6_1` (binding term `x^{2/3}G^{4/3}Ω^{11/3}`); large-x edge `x ≥ G^{17}Ω^{-26}X^{Cu·u}` via
@@ -614,7 +614,6 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
                     + Bf * (c₀ ^ (-1 : ℝ) + c₀ ^ (-13 : ℝ) + c₀ ^ (-14 : ℝ))) * (P.H / P.U)) by ring]
           linarith [hslackL]
 
-set_option maxHeartbeats 400000 in
 /-- Small-Ω block bound (below the band): the trivial Prop 3.2 bound (writeup 400–406), no §5/§6/§7.
 Uniform (absolute) `C`, valid for any band constant `c₀` (with `C` depending on `c₀`). The regime
 hypotheses match `dblock_bound`'s, so the two compose over `a_decomposition`'s sum.

@@ -23,7 +23,7 @@ namespace Squarefree
 theorem phif_dist_le {P : Globals} {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v 𝒬 f : ℝ} {d : ℝ} {M : ℤ}
     (ha : 0 < (a : ℝ)) (hd : 0 < d) (hℓ1 : 0 < ℓ₁)
     (hM : ℓ₁ * v = (M : ℝ))
-    (h𝒬 : 𝒬 = ℓ₁ * Fab P.X (a : ℝ) (ℓ₂ * b₀ + v) d - ℓ₂ * Fab P.X (a : ℝ) (ℓ₁ * b₀) d) :
+    (_h𝒬 : 𝒬 = ℓ₁ * Fab P.X (a : ℝ) (ℓ₂ * b₀ + v) d - ℓ₂ * Fab P.X (a : ℝ) (ℓ₁ * b₀) d) :
     distInt (phif P.X (a : ℝ) ℓ₁ ℓ₂ f r)
       ≤ (dtilde P.X r (a : ℝ)) ^ 4 / (6 * P.X * (a : ℝ))
           * ( |f - 𝒬|

@@ -58,7 +58,7 @@ private theorem step4_fit_cCM_E
     (hℓ1W : ℓ₁ ≤ 130 * (P.G * P.U ^ 5)) (hℓ2W : ℓ₂ ≤ 130 * (P.G * P.U ^ 5))
     (C : ℝ) (hC : 1 ≤ C)
     (hNcap : (N : ℝ) ≤ C * ℓ₁ ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * P.U ^ 10 / S.Ω ^ 8)
-    (a : ℝ) (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
+    (a : ℝ) (_ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     (10 ^ 44 * a * P.G * S.Ω ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * S.B ^ 3 / (S.Δ ^ 3 * S.D))
         * b * (N : ℝ)
@@ -135,7 +135,7 @@ private theorem step4_fit_cCM_E
       _ ≤ P.U ^ 14 * P.U ^ 11 := mul_le_mul_of_nonneg_right hU14 (by positivity)
       _ = 1 * P.U ^ 25 := by ring
       _ ≤ 4 * P.G ^ 4 * P.U ^ 25 := by
-          have h4G : (1:ℝ) ≤ 4 * P.G ^ 4 := by nlinarith
+          have h4G : (1:ℝ) ≤ 4 * P.G ^ 4 := by linarith only [hG4]
           exact mul_le_mul_of_nonneg_right h4G (by positivity)
   -- step 5: cross-multiplied comparison
   have hfin : 11 * 10 ^ 44 * C * P.G ^ 3 * P.U ^ 25 * S.Δ
@@ -171,7 +171,7 @@ private theorem step4_fit_cCM_F
     (hℓ1W : ℓ₁ ≤ 130 * (P.G * P.U ^ 5)) (hℓ2W : ℓ₂ ≤ 130 * (P.G * P.U ^ 5))
     (C : ℝ) (hC : 1 ≤ C) (hCcap : C ≤ (10:ℝ) ^ 120)
     (hNcap : (N : ℝ) ≤ C * ℓ₁ ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * P.U ^ 10 / S.Ω ^ 8)
-    (a : ℝ) (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
+    (a : ℝ) (_ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
     (dc : ℝ)
     (hdc : dc = P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4 * Real.sqrt (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁))) :
     (10 ^ 44 * a * P.G * S.Ω ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * S.B ^ 3 / (S.Δ ^ 3 * S.D))

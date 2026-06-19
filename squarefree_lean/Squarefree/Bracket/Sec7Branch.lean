@@ -40,6 +40,7 @@ theorem sec7_branch_exists {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ} (Ph :
     -- producer: `ftil_prox` (Bracket/Sec7Prox.lean:100) — its EXACT conclusion shape
     (hprox : |FdStar - Ph.ftil r| ≤ 10 ^ 18 * (P.H / S.A ^ 2)) :
     ∃ j : ℤ, sec7_jBand P S j ∧ fStar = ⌊Ph.ftil r⌋ + j := by
+  have _ := hr
   refine ⟨fStar - ⌊Ph.ftil r⌋, ?_, by ring⟩
   have hH := P.H_pos
   have hΔ := S.Δ_pos
@@ -54,7 +55,7 @@ theorem sec7_branch_exists {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ} (Ph :
   -- A–D separation: 2H/D² ≤ H/A²
   have hD2 : 2 * P.H / S.D ^ 2 ≤ P.H / S.A ^ 2 := by
     rw [div_le_div_iff₀ (by positivity) (by positivity)]
-    nlinarith [mul_le_mul hAD hAD (by positivity : (0:ℝ) ≤ 10 * S.A) hDpos.le]
+    nlinarith only [mul_le_mul hAD hAD (by positivity : (0:ℝ) ≤ 10 * S.A) hDpos.le, hH]
   -- triangle inequality and the cJ headroom
   simp only [sec7_jBand, sec7_cJ]
   push_cast
@@ -63,8 +64,9 @@ theorem sec7_branch_exists {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ} (Ph :
     have := abs_sub_le ((fStar : ℝ)) FdStar (⌊Ph.ftil r⌋ : ℝ)
     have := abs_sub_le FdStar (Ph.ftil r) (⌊Ph.ftil r⌋ : ℝ)
     linarith
-  have h18 : (10:ℝ) ^ 18 * (P.H / S.A ^ 2) ≤ 10 ^ 20 * (P.H / S.A ^ 2) := by nlinarith
-  nlinarith [htri, hnear, hprox, hfr, hD2, h18, hHA]
+  have h18 : (10:ℝ) ^ 18 * (P.H / S.A ^ 2) ≤ 10 ^ 20 * (P.H / S.A ^ 2) := by
+    linarith only [hHA]
+  linarith only [htri, hnear, hprox, hfr, hD2, h18, hHA]
 
 /- N4 (md 1332–1361): "Using  d_a^*(r) = d̆_a(f_a^*(r)) + O(Δ²/(H²GA))  … we may Taylor
    expand d̆_a at f̃_a(r)+j:  d̆_a(f_a^*(r)) = d̆_a(f̃_a(r)+j) − d̆_a'(f̃_a(r)+j){f̃_a(r)}
@@ -168,13 +170,13 @@ theorem sec7_branch_reduction {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ} (P
           + -((dStar r : ℝ) - Ph.dBreve (c - s)) by ring]
       refine le_trans (abs_add_le _ _) ?_
       rw [abs_neg, abs_neg]
-    have hs2 : s ^ 2 ≤ 1 := by nlinarith
+    have hs2 : s ^ 2 ≤ 1 := by nlinarith only [hs0, hs1]
     have h3 : sec7_cPh * (P.H * S.Δ / S.F ^ 2) * s ^ 2 ≤
         sec7_cPh * (S.Δ ^ 5 / (P.H ^ 3 * S.Ω ^ 2)) := by
       refine le_trans ?_ hTaylor
       have hpos : 0 ≤ sec7_cPh * (P.H * S.Δ / S.F ^ 2) := by
         have := sec7_cPh_pos; positivity
-      nlinarith
+      nlinarith only [hpos, hs2]
     -- numeric close: `cPh·X + cdMar·Y ≤ cTay·(X + Y)` with `δ₀ = X + Y`
     have hX0 : (0:ℝ) ≤ S.Δ ^ 5 / (P.H ^ 3 * S.Ω ^ 2) := by positivity
     have hY0 : (0:ℝ) ≤ S.Δ ^ 2 / (P.H ^ 2 * P.G * S.A) := by positivity
@@ -189,7 +191,7 @@ theorem sec7_branch_reduction {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ} (P
             + sec7_cdMar * (S.Δ ^ 2 / (P.H ^ 2 * P.G * S.A)) :=
           add_le_add (le_trans htay h3) hdd
       _ ≤ sec7_cTay * (S.Δ ^ 5 / (P.H ^ 3 * S.Ω ^ 2)
-            + S.Δ ^ 2 / (P.H ^ 2 * P.G * S.A)) := by nlinarith
+            + S.Δ ^ 2 / (P.H ^ 2 * P.G * S.A)) := by nlinarith only [hc1, hc2, hX0, hY0]
   -- count: `Ra ⊆ ⋃_j T j` and `card ⋃ ≤ Σ card`
   calc (Ra.card : ℝ)
       ≤ (((Finset.Icc (-⌊z⌋) ⌊z⌋).biUnion T).card : ℝ) := by
@@ -243,6 +245,7 @@ theorem sec7_third_diff_product_rule {P : Globals} {S : Scale P} {a : ℤ}
               + diff1 (h₃ : ℝ) (Ph.f1D j 0) (r + sec7_hSum h₁ h₂ h₃ - h₃) *
                   diff1 (h₁ : ℝ) (diff1 (h₂ : ℝ) (fun t => Int.fract (Ph.f2D 0 t))) (r + ξ₃))| ≤
           sec7_cN6 * (sec7_Ssym h₁ h₂ h₃ * S.T₁ / S.R ^ 2) := by
+  have _ := Env
   -- real-valued shift-box facts
   have e1 : (1:ℝ) ≤ (h₁:ℝ) := by exact_mod_cast hbox.1.1
   have e2 : (1:ℝ) ≤ (h₂:ℝ) := by exact_mod_cast hbox.2.1.1
@@ -531,6 +534,7 @@ theorem sec7_phi_near_int {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ} (Ph : 
       diff1 (h₁ : ℝ) (diff1 (h₂ : ℝ) (Ph.f2D 0)) ((r : ℝ) + ξ₃) - u₃ + ρ₃) :
     Counting.distInt (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ (r : ℝ)) ≤
       sec7_cCal * sec7_delta1 P S h₁ h₂ h₃ := by
+  have _ := hj; have _ := hg; have _ := hr
   have hH := P.H_pos; have hG := P.G_pos; have hΔ := S.Δ_pos; have hΩ := S.Ω_pos
   have hA : (0:ℝ) < S.A := by unfold Scale.A; positivity
   have hR : (0:ℝ) < S.R := by unfold Scale.R; positivity
@@ -540,7 +544,7 @@ theorem sec7_phi_near_int {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ} (Ph : 
   have e2 : (1:ℝ) ≤ (h₂:ℝ) := by exact_mod_cast hbox.2.1.1
   have e3 : (1:ℝ) ≤ (h₃:ℝ) := by exact_mod_cast hbox.2.2.1
   have hQ : (0:ℝ) ≤ sec7_Ssym h₁ h₂ h₃ * S.T₁ / S.R ^ 2 := by
-    have hS : (0:ℝ) ≤ sec7_Ssym h₁ h₂ h₃ := by simp only [sec7_Ssym]; nlinarith
+    have hS : (0:ℝ) ≤ sec7_Ssym h₁ h₂ h₃ := by simp only [sec7_Ssym]; nlinarith only [e1, e2, e3]
     exact div_nonneg (mul_nonneg hS hT1.le) (pow_nonneg hR.le 2)
   -- 8-corner near-integrality: `‖Δ_{h₁,h₂,h₃}g_j(r)‖ ≤ 8·cTay·δ₀` (md 1494–97)
   have c000 := hcorner 0 0 0 (by norm_num) (by norm_num) (by norm_num)
@@ -592,7 +596,7 @@ theorem sec7_phi_near_int {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ} (Ph : 
       sec7_cN6 * (sec7_Ssym h₁ h₂ h₃ * S.T₁ / S.R ^ 2) ≤
       sec7_cCal * sec7_delta1 P S h₁ h₂ h₃ := by
     simp only [sec7_delta1, sec7_cTay, sec7_cN6, sec7_cCal]
-    nlinarith [hδ0, hQ]
+    linarith only [hδ0, hQ]
   exact (htrans.trans (add_le_add h8 hclose)).trans hfin
 
 end Squarefree

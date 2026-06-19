@@ -304,7 +304,7 @@ expression in `a + 2 d̃ₐ(r)`, which in turn equals a nested square root in `a
 the curvature stage (the `a`-derivatives of `f̃ₐ`). -/
 
 /-- **`a + 2 d̃ₐ(r) = √(a² + 4√(X a³/r))`.**  Immediate from the definition of `d̃ₐ(r)`. -/
-theorem dtilde_two_plus {X r a : ℝ} (hX : 0 < X) (ha : 0 < a) (hr : 0 < r) :
+theorem dtilde_two_plus {X r a : ℝ} (_hX : 0 < X) (_ha : 0 < a) (_hr : 0 < r) :
     a + 2 * dtilde X r a = Real.sqrt (a ^ 2 + 4 * Real.sqrt (X * a ^ 3 / r)) := by
   unfold dtilde; ring
 

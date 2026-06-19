@@ -74,6 +74,7 @@ theorem typeII_slope_localized (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
     {D : MajorLine} (hD : D ∈ typeIILines f N lam δ) :
     |(D.slope : ℝ) - deriv f N| ≤ 384 * N * lam + 32 * Real.sqrt (lam / (D.denom : ℝ)) := by
   classical
+  have _ := hlower
   have hqZ : 0 < D.denom := D.denom_pos
   have hqR : (0 : ℝ) < (D.denom : ℝ) := by exact_mod_cast hqZ
   -- arc is nonempty (≥2 points).

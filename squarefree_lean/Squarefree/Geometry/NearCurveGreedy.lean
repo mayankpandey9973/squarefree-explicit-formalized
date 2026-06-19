@@ -145,7 +145,7 @@ private theorem densArc'_nonneg {D : MajorLine} (hδ : 0 < δ) :
   positivity
 
 /-- `densAt` is nonnegative for a Type I point. -/
-theorem densAt_nonneg {n : ℤ} (hδ : 0 < δ) (hn : n ∈ typeISet f N lam δ) :
+theorem densAt_nonneg {n : ℤ} (hδ : 0 < δ) (_hn : n ∈ typeISet f N lam δ) :
     0 ≤ densAt f N lam δ n :=
   densArc'_nonneg hδ
 
@@ -348,8 +348,8 @@ structure GreedySel (f : ℝ → ℝ) (N lam δ : ℝ) where
 `nu_le` is `windowResidueSet_card_le`; `card_le_two_sum_nu` is `card_le_card cover`
 chased through `card_biUnion_le` and the per-line factor 2 `line_two`. -/
 noncomputable def greedyPacking_of_greedySel
-    (hN2 : 2 ≤ N) (hlam : 0 < lam) (hδ : 0 < δ) (hf : ContDiff ℝ 2 f)
-    (hlower : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), lam ≤ |iteratedDeriv 2 f x|)
+    (hN2 : 2 ≤ N) (_hlam : 0 < lam) (hδ : 0 < δ) (_hf : ContDiff ℝ 2 f)
+    (_hlower : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), lam ≤ |iteratedDeriv 2 f x|)
     (S : GreedySel f N lam δ) :
     GreedyPacking f N lam δ where
   G := S.G
@@ -360,7 +360,7 @@ noncomputable def greedyPacking_of_greedySel
   dens_nonneg := fun g hg => densAt_nonneg hδ (S.mem g hg)
   nu_le := fun g hg => windowResidueSet_card_le hδ (S.mem g hg)
   dens_le_cap := S.dens_le
-  cap_le := by nlinarith [hN2]
+  cap_le := by linarith only [hN2]
   base_mem := S.base_mem
   interval_disjoint := S.gap
   card_le_two_sum_nu := by
@@ -627,7 +627,7 @@ point `n`, the un-windowed proper strip-arc of its witness line `D := witnessLin
 satisfies the **Type I** sharp bound `properHi' − properLo' ≤ δ·√(q/λ)`, `q := D.denom`.
 This is exactly the `OnTypeIArc` filter condition, recovered through `witness_spec`. -/
 theorem properArc_span_typeI {f : ℝ → ℝ} {N lam δ : ℝ}
-    (hlam : 0 < lam) {n : ℤ} (hn : n ∈ typeISet f N lam δ) :
+    (_hlam : 0 < lam) {n : ℤ} (hn : n ∈ typeISet f N lam δ) :
     (properHi' f N δ (witnessLine f N lam δ n) : ℝ)
         - (properLo' f N δ (witnessLine f N lam δ n) : ℝ)
       ≤ δ * Real.sqrt ((witnessLine f N lam δ n).denom / (256 * lam)) :=
@@ -664,8 +664,8 @@ theorem densAt_le_floor {f : ℝ → ℝ} {N lam δ : ℝ}
     rw [Real.sqrt_le_iff]
     refine ⟨by positivity, ?_⟩
     rw [div_le_iff₀ hlam]
-    have hq2 : q ≤ q ^ 2 := by nlinarith [hq1]
-    nlinarith [hfloor, hq2, hqpos, mul_pos hNpos hqpos, hlam.le,
+    have hq2 : q ≤ q ^ 2 := by nlinarith only [hq1]
+    nlinarith only [hfloor, hq2, hqpos, mul_pos hNpos hqpos, hlam.le,
       mul_nonneg (mul_nonneg (sq_nonneg N) hlam.le) (sq_nonneg q)]
   rw [hdens]
   have hqδ : (0 : ℝ) < q * δ := by positivity
@@ -693,7 +693,7 @@ monotone proper side, where `P = lineVal D`.  But `OnLine f D lo` makes the line
 the carrier; and lying between the proper-arc points `lo` and `hi`, it is on the proper
 side (`mem_properArc'_of_between`). -/
 private theorem second_point_mem_properArc'
-    (hN2 : 2 ≤ N) (hlam : 0 < lam) (hδ : 0 < δ) (hδhalf : δ < 1/2) (hf : ContDiff ℝ 2 f)
+    (hN2 : 2 ≤ N) (hlam : 0 < lam) (_hδ : 0 < δ) (hδhalf : δ < 1/2) (hf : ContDiff ℝ 2 f)
     (hlower : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), lam ≤ |iteratedDeriv 2 f x|)
     {g : ℤ} (hg : g ∈ typeISet f N lam δ) :
     (properLo' f N δ (witnessLine f N lam δ g) + (witnessLine f N lam δ g).denom)
@@ -878,7 +878,7 @@ private theorem properArc_directed_gap
     rwa [hrw] at hcut
   have hqcut : (D.denom : ℝ) ≤ 1 / (4 * δ) := by
     have h64 : (1 : ℝ) / (64 * δ) ≤ 1 / (4 * δ) := by
-      apply div_le_div_of_nonneg_left (by norm_num) (by positivity) (by nlinarith [hδ])
+      apply div_le_div_of_nonneg_left (by norm_num) (by positivity) (by linarith only [hδ])
     linarith [hqcut64]
   have hspan : ((pHi : ℝ) - (pLo : ℝ)) ≤ δ * Real.sqrt ((D.denom : ℝ) / (256 * lam)) :=
     properArc_span_typeI hlam hg
@@ -959,10 +959,10 @@ private theorem properArc_directed_gap
     have hdge : (1:ℝ)/δ ≤ ((pHi : ℝ) - (pLo : ℝ)) / ((D.denom : ℝ) * δ) := by
       rw [div_le_div_iff₀ hδ (by positivity)]
       have : (D.denom : ℝ) ≤ (pHi : ℝ) - (pLo : ℝ) := hdenom_le
-      nlinarith [this, hqjpos, hδ]
+      nlinarith only [this, hqjpos, hδ]
     -- `q_k·64·δ ≤ 1`, so `q_k·64 ≤ 1/δ ≤ d(A_j)`.
     have hqk64 : (qk : ℝ) * 64 ≤ 1/δ := by
-      rw [le_div_iff₀ hδ]; nlinarith [hqkcut]
+      rw [le_div_iff₀ hδ]; nlinarith only [hqkcut]
     calc (qk : ℝ) * 64 ≤ 1/δ := hqk64
       _ ≤ ((pHi : ℝ) - (pLo : ℝ)) / ((D.denom : ℝ) * δ) := hdge
   -- assemble: `lo_k ≥ m − q_k ≥ pLo + d/24 − d/64 ≥ pLo + d/48`.
@@ -1065,7 +1065,7 @@ private theorem greedySel_dens_le
   intro g hg
   have hN0 : (0 : ℝ) ≤ N := by linarith
   have := densAt_le_floor hN2 hlam hδ hfloor (greedySelSet_subset g hg)
-  nlinarith [this, hN0]
+  linarith only [this, hN0]
 
 /-! ### The ≤2-components combinatorics (LINE-keyed)
 

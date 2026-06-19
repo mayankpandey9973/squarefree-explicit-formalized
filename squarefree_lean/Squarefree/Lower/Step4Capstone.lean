@@ -17,9 +17,6 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 1600000
-
-set_option maxHeartbeats 6400000 in
 /-- **§5 Step-4 capstone (writeup 1025–1124): the large-defect range count.**
 
 The range filter `Rng = {r ∈ Ra : r+ℓ₁, r+ℓ₂ ∈ Ra, V₂var < |v(r)|}` is counted by the
@@ -122,8 +119,8 @@ theorem ra_step4_range_complete
   have hHcap : P.G * P.U ^ 10 * S.Δ ^ 2 ≤ P.H := (le_div_iff₀ (by positivity)).mp h1
   have hU10H : P.U ^ 10 ≤ P.H := by
     have hGΔ2 : (1:ℝ) ≤ P.G * S.Δ ^ 2 := by
-      nlinarith [one_le_pow₀ hΔ1 (n := 2), hG1]
-    nlinarith [hHcap, pow_pos hUpos 10]
+      nlinarith only [one_le_pow₀ hΔ1 (n := 2), hG1]
+    nlinarith only [hHcap, pow_pos hUpos 10, hGΔ2]
   have hΩH : 60 * S.Ω ≤ P.H := by
     have hU9 : (10:ℝ) ^ 297 ≤ P.U ^ 9 := by
       calc (10:ℝ) ^ 297 = ((10:ℝ) ^ 33) ^ 9 := by rw [← pow_mul]
@@ -138,15 +135,16 @@ theorem ra_step4_range_complete
     linarith [mul_le_mul_of_nonneg_left hΩU (by norm_num : (0:ℝ) ≤ 60)]
   have hΔreg : P.G ^ 2 * P.U ^ 5 ≤ S.Δ := by
     have hGU : (1:ℝ) ≤ P.G ^ 2 * P.U ^ 15 := by
-      nlinarith [one_le_pow₀ hG1 (n := 2), one_le_pow₀ hU1 (n := 15)]
-    nlinarith [hDeW, mul_le_mul_of_nonneg_left hGU
+      nlinarith only [one_le_pow₀ hG1 (n := 2), one_le_pow₀ hU1 (n := 15)]
+    nlinarith only [hDeW, mul_le_mul_of_nonneg_left hGU
+      (by positivity : (0:ℝ) ≤ P.G ^ 2 * P.U ^ 5),
       (by positivity : (0:ℝ) ≤ P.G ^ 2 * P.U ^ 5)]
   have hA1 : (1:ℝ) ≤ (ℓ₁:ℝ) * (ℓ₂:ℝ) := by
-    nlinarith [mul_nonneg (by linarith : (0:ℝ) ≤ (ℓ₁:ℝ) - 1)
-      (by linarith : (0:ℝ) ≤ (ℓ₂:ℝ) - 1)]
+    nlinarith only [mul_nonneg (by linarith : (0:ℝ) ≤ (ℓ₁:ℝ) - 1)
+      (by linarith : (0:ℝ) ≤ (ℓ₂:ℝ) - 1), hℓ1R, hℓ1ltR]
   have hL1 : (1:ℝ) ≤ (ℓ₁:ℝ) * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ)) := by
-    nlinarith [mul_nonneg (by linarith : (0:ℝ) ≤ (ℓ₁:ℝ) * (ℓ₂:ℝ) - 1)
-      (by linarith : (0:ℝ) ≤ (ℓ₂:ℝ) - (ℓ₁:ℝ) - 1)]
+    nlinarith only [mul_nonneg (by linarith : (0:ℝ) ≤ (ℓ₁:ℝ) * (ℓ₂:ℝ) - 1)
+      (by linarith : (0:ℝ) ≤ (ℓ₂:ℝ) - (ℓ₁:ℝ) - 1), hA1, hℓ12R]
   have hLnn : (0:ℝ) ≤ (ℓ₁:ℝ) * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ)) := le_trans zero_le_one hL1
   have hℓ1GU : (ℓ₁:ℝ) ≤ 130 * (P.G * P.U ^ 5) := by linarith
   have hLW3 : (ℓ₁:ℝ) * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ)) ≤ 130 ^ 3 * (P.G * P.U ^ 5) ^ 3 := by
@@ -177,7 +175,6 @@ theorem ra_step4_range_complete
   have hNloZ : 10 ^ 56 * (((ℓ₁ : ℤ) : ℝ) ^ 3 * ((ℓ₂ : ℤ) : ℝ)
       * (((ℓ₂ : ℤ) : ℝ) - ((ℓ₁ : ℤ) : ℝ))) * P.U ^ 10 / S.Ω ^ 8 ≤ (N : ℝ) := by
     push_cast
-    push_cast at hNlo
     exact hNlo
   obtain ⟨sgn, hsgn⟩ := step4_fibre_window_data (P := P) (S := S) (V₂ := V₂var)
     hAD ha0 ha_lo ha_hi hℓ1n hℓ12n hℓ12 hℓ2WZ hReg h1 hband hG1 hU1 hΔ1 hH1 hΩU hUbig
@@ -196,7 +193,7 @@ theorem ra_step4_range_complete
       have hmem' : r ∈ Ra.filter (fun r => (r + ℓ₁ ∈ Ra) ∧ (r + ℓ₂ ∈ Ra)
           ∧ V₂var < |vval P a dStar ℓ₁ ℓ₂ r|) := by rwa [hRngDef] at hr
       have h60 := le_trans hV2ge (Finset.mem_filter.mp hmem').2.2.2.le
-      nlinarith [h60, hV2nn0]
+      linarith only [h60, hV2nn0]
     have hℓ1Rpos : (0:ℝ) < (ℓ₁:ℝ) := by linarith
     have hb0neg : ((dStar (r + ℓ₁) : ℝ) - (dStar r : ℝ)) / (ℓ₁ : ℝ) < 0 := by
       apply div_neg_of_neg_of_pos ?_ hℓ1Rpos
@@ -231,7 +228,7 @@ theorem ra_step4_range_complete
     have hsub : Rng.filter (fun r => (sgn r).natAbs = n) ⊆ Rng := Finset.filter_subset _ _
     have herr_small : step4ErrU P S ≤ (1/4) * (n:ℝ) := by
       have hn1R : (1:ℝ) ≤ (n:ℝ) := by exact_mod_cast hn1
-      nlinarith [hbud]
+      linarith only [hbud, hn1R]
     have hnNcap : (n:ℝ) ≤ 10 ^ 57 * (ℓ₁:ℝ) ^ 2 * ((ℓ₁:ℝ) * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ)))
         * P.U ^ 10 / S.Ω ^ 8 := by
       have hcast : (n:ℝ) ≤ (N:ℝ) := by exact_mod_cast hnN
@@ -261,7 +258,7 @@ theorem ra_step4_range_complete
           have hx := hsub hr; rwa [hRngDef] at hx
         have hV2nn0 : 0 ≤ V₂ P S := by rw [V₂]; positivity
         have h60 := le_trans hV2ge (Finset.mem_filter.mp hr').2.2.2.le
-        nlinarith [h60, hV2nn0])
+        linarith only [h60, hV2nn0])
       (fun r hr => by
         obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, h22,
           _, _⟩ := hfibre r (hsub hr)

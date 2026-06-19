@@ -98,6 +98,7 @@ theorem step3_smooth_count {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f r₀ r
         (fun (n : ℤ) => Counting.distInt (phif P.X a ℓ₁ ℓ₂ f (n : ℝ)) ≤ δ)).card : ℝ)
       ≤ (10 ^ 6 * (|f| * S.D ^ 4 / (P.X * S.A)) + 2 * δ + 1)
         * (2 * δ / (|f| * S.D ^ 4 / (P.X * S.A * S.R * 10 ^ 50)) + 1) := by
+  have _ := hr01
   -- abbreviations matching `preimage_count`
   set φ : ℝ → ℝ := fun s => phif P.X a ℓ₁ ℓ₂ f s with hφ_def
   set V : ℝ := 10 ^ 6 * (|f| * S.D ^ 4 / (P.X * S.A)) with hV_def

@@ -36,8 +36,6 @@ open Real
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 1600000
-
 /-- Total coefficient of `V¹` in `P2AbsMaj ℓ₁ ℓ₂ B V`: `5·ℓ₁³·ℓ₂²·(ℓ₂−ℓ₁)²·B³`. -/
 noncomputable def P2HybCoeff1 (ℓ₁ ℓ₂ B : ℝ) : ℝ :=
   5 * ℓ₁ ^ 3 * ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) ^ 2 * B ^ 3
@@ -59,7 +57,7 @@ private theorem coeff1_nonneg {ℓ₁ ℓ₂ B : ℝ} (hℓ1 : 1 ≤ ℓ₁) (h�
   unfold P2HybCoeff1; positivity
 
 private theorem coeff2_nonneg {ℓ₁ ℓ₂ B : ℝ} (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
-    (hB0 : 0 ≤ B) : 0 ≤ P2HybCoeff2 ℓ₁ ℓ₂ B := by
+    (_hB0 : 0 ≤ B) : 0 ≤ P2HybCoeff2 ℓ₁ ℓ₂ B := by
   have hℓ1pos : 0 < ℓ₁ := lt_of_lt_of_le one_pos hℓ1
   have hℓ2pos : 0 < ℓ₂ := lt_trans hℓ1pos hℓ12
   have h21 : (0:ℝ) ≤ ℓ₂ - ℓ₁ := by linarith

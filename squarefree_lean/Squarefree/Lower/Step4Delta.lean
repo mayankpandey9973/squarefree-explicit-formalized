@@ -25,8 +25,6 @@ re-scale of the `v_replace_le` mechanism (piece 3), and `phi_d_replace` (piece 4
 
 open Squarefree.Counting
 
-set_option maxHeartbeats 1600000
-
 namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
@@ -35,7 +33,7 @@ variable {P : Globals} {S : Scale P}
 private theorem phiv_dist_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v 𝒬 : ℝ} {d : ℝ} {f : ℤ}
     (ha : 0 < (a : ℝ)) (hd : 0 < d) (hℓ1 : 0 < ℓ₁)
     (hdt : 0 < dtilde P.X r (a : ℝ))
-    (h𝒬 : 𝒬 = ℓ₁ * Fab P.X (a : ℝ) (ℓ₂ * b₀ + v) d - ℓ₂ * Fab P.X (a : ℝ) (ℓ₁ * b₀) d) :
+    (_h𝒬 : 𝒬 = ℓ₁ * Fab P.X (a : ℝ) (ℓ₂ * b₀ + v) d - ℓ₂ * Fab P.X (a : ℝ) (ℓ₁ * b₀) d) :
     distInt (phiv P.X (a : ℝ) ℓ₁ ℓ₂ v r)
       ≤ |(f : ℝ) - 𝒬|
         + |𝒬 - (6 * ℓ₁ * P.X * (a : ℝ) * v / d ^ 4
@@ -200,14 +198,15 @@ theorem phiv_delta_le {a : ℤ} {r : ℝ}
     have hΩ5 : S.Ω ^ 5 ≤ P.U ^ 5 := pow_le_pow_left₀ hΩpos.le hΩU 5
     have hU10 : (1040:ℝ) ≤ P.U ^ 10 := by
       have : (10:ℝ) ^ 10 ≤ P.U ^ 10 := pow_le_pow_left₀ (by norm_num) (le_trans (by norm_num) hUbig) 10
-      nlinarith [this]
+      exact le_trans (by norm_num) this
     have hG3 : (1:ℝ) ≤ P.G ^ 3 := one_le_pow₀ hG1
     have h8U5 : (1040:ℝ) ≤ P.U ^ 5 := by
       have : (10:ℝ) ^ 5 ≤ P.U ^ 5 := pow_le_pow_left₀ (by norm_num) (le_trans (by norm_num) hUbig) 5
-      nlinarith [this]
+      exact le_trans (by norm_num) this
     have hcore : (1040:ℝ) * S.Ω ^ 5 ≤ P.G ^ 3 * P.U ^ 10 * P.H * S.Δ := by
       have hstep : (1040:ℝ) * S.Ω ^ 5 ≤ P.U ^ 10 := by
-        calc (1040:ℝ) * S.Ω ^ 5 ≤ P.U ^ 5 * P.U ^ 5 := by nlinarith [hΩ5, h8U5, pow_nonneg hΩpos.le 5]
+        calc (1040:ℝ) * S.Ω ^ 5 ≤ P.U ^ 5 * P.U ^ 5 :=
+              mul_le_mul h8U5 hΩ5 (pow_nonneg hΩpos.le 5) (pow_nonneg hUpos.le 5)
           _ = P.U ^ 10 := by ring
       have hub : P.U ^ 10 ≤ P.G ^ 3 * P.U ^ 10 * P.H * S.Δ := by
         have h1' : (1:ℝ) * P.U ^ 10 * 1 * 1 ≤ P.G ^ 3 * P.U ^ 10 * P.H * S.Δ := by

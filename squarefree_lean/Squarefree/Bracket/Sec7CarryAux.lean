@@ -338,7 +338,7 @@ theorem sec7_carry_fiber_cover_core {P : Globals} {S : Scale P} {a : ℤ}
     · exact pow_le_pow_right₀ hW1 (by norm_num)
   have hMR : W + W ^ 2 + W ^ 4 ≤ S.R / 1000 := by
     obtain ⟨q1, q2, q3⟩ := hW21
-    nlinarith [hRW]
+    linarith only [hRW, q1, q2, q3, hR]
   have hWin : ∀ y : ℝ, S.R / 144 - 2 * (W + W ^ 2 + W ^ 4) ≤ y →
       y ≤ 40 * S.R + 2 * (W + W ^ 2 + W ^ 4) → y ∈ sec7_rWin S W := by
     intro y hy1 hy2
@@ -429,7 +429,7 @@ theorem sec7_carry_fiber_cover_core {P : Globals} {S : Scale P} {a : ℤ}
       div_le_one hGR5pos]
     simp only [sec7_cPh]
     have hW27 : (0:ℝ) ≤ W ^ 27 := by positivity
-    nlinarith [hGR, hprod]
+    linarith only [hGR, hprod, hW27]
   -- the cover data
   set q1 : ℤ → ℤ :=
     fun r => ⌊diff1 (h₂ : ℝ) (diff1 (h₃ : ℝ) (Ph.f2D 0)) ((r : ℝ) + ξ₁)⌋ with hq1
@@ -663,7 +663,7 @@ theorem sec7_carry_fiber_cover_core {P : Globals} {S : Scale P} {a : ℤ}
         simp only [hpcf, Finset.mem_product]
         refine ⟨⟨?_, ?_, ?_, ?_⟩, Finset.mem_image_of_mem _ hr,
           Finset.mem_singleton_self _⟩
-        · simpa [hp0z]
+        · simp [hp0z]
         · exact Finset.mem_Icc.mpr (abs_le.mp (by exact_mod_cast hk1))
         · exact Finset.mem_Icc.mpr (abs_le.mp (by exact_mod_cast hk2))
         · exact Finset.mem_Icc.mpr (abs_le.mp (by exact_mod_cast hk3))

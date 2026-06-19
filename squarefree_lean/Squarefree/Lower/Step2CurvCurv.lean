@@ -29,13 +29,11 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 1600000
-
 /-- **Piece (A), closed form.**  With the closed forms `p = d̃' = −d(d+a)/(2r(a+2d))`,
 `q = d̃'' = d(d+a)(3a²+10a d+10 d²)/(4r²(a+2d)³)`,
 `s4 = d̃''' = −3 d(d+a)(5a⁴+34a³d+94a²d²+120a d³+60 d⁴)/(8r³(a+2d)⁵)`, the *smooth* Wronskian
 numerator `p·(5p⁴ − 10 p² q d + 2 p s4 d²)` has the closed product form. (sympy-verified.) -/
-theorem smooth_wronskian_numerator_eq (a d r : ℝ) (hr : r ≠ 0) (had2 : a + 2 * d ≠ 0) :
+theorem smooth_wronskian_numerator_eq (a d r : ℝ) (hr : r ≠ 0) (_had2 : a + 2 * d ≠ 0) :
     (-d * (d + a) / (2 * r * (a + 2 * d)))
         * (5 * (-d * (d + a) / (2 * r * (a + 2 * d))) ^ 4
            - 10 * (-d * (d + a) / (2 * r * (a + 2 * d))) ^ 2
@@ -81,7 +79,7 @@ the actual derivatives).  Given `R ≥ 0`, `C ≥ 1`, and the derivative-ratio b
 `|ψ'| ≤ C·R·|ψ''|`, the LP-dual estimate `|𝒲| ≤ C·|ψ''|·(|D1| + R·|D2|)` holds.  Dividing by
 `C·|ψ''|` yields `|φ_f'| + R·|φ_f''| ≥ |𝒲|/(C|ψ''|)`, the curvature lower bound's engine. -/
 theorem lp_duality_lower {W ψ' ψ'' D1 D2 C R : ℝ}
-    (hR : 0 ≤ R) (hC : 1 ≤ C) (hWdef : W = ψ'' * D1 - ψ' * D2)
+    (_hR : 0 ≤ R) (hC : 1 ≤ C) (hWdef : W = ψ'' * D1 - ψ' * D2)
     (hψ' : |ψ'| ≤ C * R * |ψ''|) :
     |W| ≤ C * |ψ''| * (|D1| + R * |D2|) := by
   have habs : |W| ≤ |ψ''| * |D1| + |ψ'| * |D2| := by

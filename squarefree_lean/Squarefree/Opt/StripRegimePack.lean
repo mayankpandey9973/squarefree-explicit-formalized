@@ -167,7 +167,7 @@ theorem regime_Hbig (P : Globals) (S : Scale P) (Cu : ℝ) (hCu : (232:ℝ) ≤ 
     have hexp : P.X ^ (P.u * 83) * P.X ^ (-(Cu * P.u) * 2) ≤ P.X ^ (P.u * (-381 : ℝ)) := by
       rw [← Real.rpow_add hX0]
       apply Real.rpow_le_rpow_of_exponent_le hX
-      nlinarith [hu0, hCu]
+      linarith only [mul_le_mul_of_nonneg_left hCu hu0.le]
     have hXneg : P.X ^ (P.u * (-381 : ℝ)) ≤ ((10:ℝ) ^ 33) ^ (-381 : ℝ) := by
       rw [Real.rpow_mul hX0.le]
       exact Real.rpow_le_rpow_of_nonpos (by positivity) hUbig (by norm_num)
@@ -269,6 +269,7 @@ theorem regime_logcap (P : Globals) (S : Scale P)
         + 10 ^ 90 * (P.G ^ 2 * P.U ^ 15 / S.Ω ^ 5)) + 1
       ≤ P.G ^ 3 * P.U ^ 15 * Real.sqrt S.Δ * S.Ω := by
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
+  have _ := hg0
   have hG := P.G_pos; have hU := P.U_pos; have hΩ := S.Ω_pos
   have hΔp := S.Δ_pos; have hH := P.H_pos
   have hinvΩ := inv_omega5_le P S hband6
@@ -287,7 +288,7 @@ theorem regime_logcap (P : Globals) (S : Scale P)
           ← Real.rpow_mul hX0.le, ← Real.rpow_mul hX0.le, ← Real.rpow_add hX0]
     rw [hcoll]
     calc P.X ^ (P.g * ((9:ℝ)/2 + 5/4) + P.u * ((55:ℝ)/2 + 15/4)) ≤ P.X ^ (1:ℝ) :=
-          Real.rpow_le_rpow_of_exponent_le hX (by nlinarith)
+          Real.rpow_le_rpow_of_exponent_le hX (by linarith only [hg1, hu2])
       _ = P.X := Real.rpow_one _
   -- cap monomial 2: `Nb ≤ X`
   have hNb : P.H * P.G ^ 4 * S.Ω ^ 2 * P.U ^ 15 / S.Δ ^ ((5:ℝ)/2) ≤ P.X := by
@@ -330,7 +331,7 @@ theorem regime_logcap (P : Globals) (S : Scale P)
     calc P.X ^ (P.g * (((2:ℕ):ℝ) + 5/4) + P.u * (((15:ℕ):ℝ) + 15/4)) ≤ P.X ^ (1:ℝ) := by
           apply Real.rpow_le_rpow_of_exponent_le hX
           push_cast
-          nlinarith
+          linarith only [hg1, hu2]
       _ = P.X := Real.rpow_one _
   -- the argument is ≤ X²
   set E : ℝ := 10 ^ 90 * (P.G ^ ((9:ℝ)/2) * P.U ^ ((55:ℝ)/2) / S.Ω ^ 5)

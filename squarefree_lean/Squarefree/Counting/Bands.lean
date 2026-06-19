@@ -310,7 +310,7 @@ private theorem mono_low_length (N T F₀ s t : ℝ) (φ : ℝ → ℝ)
 `2δ/|φ'| ≤ 1/2` makes `band_count_uniform` give `count ≤ (3/2)·(T/N·(v-u) + 2δ + 1)`.  No blow-up:
 the `2δ/F` factor is `≤ 1/2`. -/
 private theorem bands_count_mono_high (N T δ u v : ℝ) (φ : ℝ → ℝ)
-    (hN : 0 < N) (hδ : 0 < δ) (hdiff : Differentiable ℝ φ) (huv : u ≤ v)
+    (_hN : 0 < N) (hδ : 0 < δ) (hdiff : Differentiable ℝ φ) (huv : u ≤ v)
     (hlb : ∀ z ∈ Set.Icc u v, 4 * δ ≤ |deriv φ z|)
     (hub : ∀ z ∈ Set.Icc u v, |deriv φ z| ≤ T / N) :
     (((Finset.Icc ⌈u⌉ ⌊v⌋).filter (fun (n : ℤ) => distInt (φ (n : ℝ)) ≤ δ)).card : ℝ)
@@ -617,7 +617,6 @@ private theorem bands_dyadic_sum :
         · have hb1 := huwHigh hLhigh
           nlinarith [hs, hb1, hb2, hlinL]
 
-set_option maxHeartbeats 1000000 in
 /-- **MID dyadic-sum core (the genuine crux of Lemma 4.2 — concrete remaining stub).**
 On a sub-interval `[u,v]` where `deriv φ` has **constant sign** and is monotone-or-antitone (so
 `|deriv φ|` is monotone), with `√(δT)/N ≤ |deriv φ| ≤ 4δ`, the near-integer count is bounded by
@@ -660,7 +659,7 @@ private theorem bands_count_mono_mid (N T δ u v : ℝ) (φ : ℝ → ℝ)
         mul_div_assoc, div_self (ne_of_gt hT), mul_one]
     rw [div_div_eq_mul_div, eq_comm, ← hsqrt_eq]
     have hself : Real.sqrt (δ * T) * Real.sqrt (δ * T) = δ * T := Real.mul_self_sqrt (by positivity)
-    rw [eq_div_iff (ne_of_gt hsqrtδT_pos)]; field_simp; nlinarith [hself]
+    rw [eq_div_iff (ne_of_gt hsqrtδT_pos)]; field_simp; nlinarith only [hself]
   -- `s ≥ 1/4` (band non-empty: `√(δT)/N ≤ 4δ` at `u`).
   have hband_u : F₀ ≤ 4 * δ := le_trans (hlb u ⟨le_refl u, huv⟩) (hub u ⟨le_refl u, huv⟩)
   have hs_quarter : (1:ℝ)/4 ≤ s := by
@@ -668,21 +667,21 @@ private theorem bands_count_mono_mid (N T δ u v : ℝ) (φ : ℝ → ℝ)
     have h1 : Real.sqrt (δ * T) ≤ 4 * δ * N := by
       have := hband_u; rw [hF₀def, div_le_iff₀ hN] at this; linarith
     have h2 : δ * T ≤ (4 * δ * N)^2 := by
-      nlinarith [Real.sqrt_nonneg (δ*T), h1, Real.sq_sqrt (show (0:ℝ) ≤ δ * T by positivity)]
+      nlinarith only [Real.sqrt_nonneg (δ*T), h1, Real.sq_sqrt (show (0:ℝ) ≤ δ * T by positivity)]
     have h3 : (1:ℝ)/(16 * N^2) ≤ δ / T := by
-      rw [div_le_div_iff₀ (by positivity) hT]; nlinarith [h2, hδ.le, hT.le, hN.le]
+      rw [div_le_div_iff₀ (by positivity) hT]; nlinarith only [h2, hδ, hT.le, hN.le]
     have h4 : Real.sqrt ((1:ℝ)/(16*N^2)) ≤ Real.sqrt (δ/T) := Real.sqrt_le_sqrt h3
     have h5 : Real.sqrt ((1:ℝ)/(16*N^2)) = 1/(4*N) := by
       rw [show (1:ℝ)/(16*N^2) = (1/(4*N))^2 by field_simp; ring, Real.sqrt_sq (by positivity)]
     rw [h5] at h4
-    nlinarith [h4, hN.le, show N * (1/(4*N)) = (1:ℝ)/4 by field_simp]
+    nlinarith only [h4, hN.le, show N * (1/(4*N)) = (1:ℝ)/4 by field_simp]
   -- `√(δ/T) < 1/2`, so `s < N/2`.
   have hsqrt_half : Real.sqrt (δ / T) < 1 / 2 := by
     have hlt : δ / T < 1/4 := by rw [div_lt_iff₀ hT]; linarith
     have h := Real.sqrt_lt_sqrt (by positivity) hlt
     rwa [show Real.sqrt ((1:ℝ)/4) = 1/2 by
       rw [show (1:ℝ)/4 = (1/2)^2 by norm_num, Real.sqrt_sq (by norm_num)]] at h
-  have hsN2 : s < N / 2 := by rw [hsdef]; nlinarith [hsqrt_half, hN, Real.sqrt_nonneg (δ/T)]
+  have hsN2 : s < N / 2 := by rw [hsdef]; nlinarith only [hsqrt_half, hN, Real.sqrt_nonneg (δ/T)]
   -- length `v - u ≤ 2N`.
   have hlen2N : v - u ≤ 2 * N := by
     have hu := (hsub ⟨le_refl u, huv⟩).1; have hv := (hsub ⟨huv, le_refl v⟩).2; linarith
@@ -713,13 +712,13 @@ private theorem bands_count_mono_mid (N T δ u v : ℝ) (φ : ℝ → ℝ)
         have hpoweq : (2:ℝ) ^ (Nat.find hex) = 2 * 2 ^ (Nat.find hex - 1) := by
           conv_lhs => rw [show Nat.find hex = (Nat.find hex - 1) + 1 by omega]
           rw [pow_succ]; ring
-        rw [hpoweq]; nlinarith [hmin, hF₀.le]
+        rw [hpoweq]; nlinarith only [hmin, hF₀.le]
   -- `4δ/F₀ = 4s` (twice `2δ/F₀ = 2s`); hence `J + 1 ≤ 4s + 2 ≤ 12s`.
   have h4δF_eq : 4 * δ / F₀ = 4 * s := by
     have : 4 * δ / F₀ = 2 * (2 * δ / F₀) := by ring
     rw [this, h2δF]; ring
   have hJ1_12s : (J : ℝ) + 1 ≤ 12 * s := by
-    rw [h4δF_eq] at hJle; nlinarith [hJle, hs_quarter]
+    rw [h4δF_eq] at hJle; nlinarith only [hJle, hs_quarter]
   -- Apply the recursive dyadic band sum with `F = F₀`, level `J`.
   have hubJ : ∀ z ∈ Set.Icc u v, |deriv φ z| ≤ 2 ^ J * F₀ :=
     fun z hz => le_trans (hub z hz) hJspec
@@ -728,31 +727,31 @@ private theorem bands_count_mono_mid (N T δ u v : ℝ) (φ : ℝ → ℝ)
   -- Now bound each term; `2δ/F₀ = 2s`, `2^J F₀ ≤ 8δ`, `v-u ≤ 2N`, `s ≤ N/2`, `s ≥ 1/4`.
   rw [h2δF] at hdyadic
   -- `√(δ/T) ≤ 1/2`-flavoured facts: `δ·s ≤ Nδ/2` and `s ≤ N/2`.
-  have hδs : δ * s ≤ N * δ / 2 := by nlinarith [hsN2, hδ.le, hsnn]
+  have hδs : δ * s ≤ N * δ / 2 := by nlinarith only [hsN2, hδ.le, hsnn]
   have hsNδ : 0 ≤ N * δ := by positivity
   have hlennn : 0 ≤ v - u := by linarith
   -- length-coefficient bounds.
-  have hL1 : 4 * δ * (v - u) ≤ 8 * (N * δ) := by nlinarith [hlen2N, hδ.le, hlennn]
+  have hL1 : 4 * δ * (v - u) ≤ 8 * (N * δ) := by nlinarith only [hlen2N, hδ.le, hlennn]
   have hL2 : 2 * (2 ^ J * F₀) * (v - u) ≤ 32 * (N * δ) := by
     have hge : 2 * (2 ^ J * F₀) * (v - u) ≤ 2 * (8 * δ) * (v - u) := by
       apply mul_le_mul_of_nonneg_right _ hlennn
-      nlinarith [hpow8δ]
-    nlinarith [hge, hlen2N, hδ.le, hlennn]
+      nlinarith only [hpow8δ]
+    nlinarith only [hge, hlen2N, hδ.le, hlennn]
   -- geometric term: `2(2δ+1)(2s) = 8δs + 4s ≤ 8·(Nδ/2) + 4s = 4Nδ + 4s`.
-  have hL3 : 2 * (2 * δ + 1) * (2 * s) ≤ 4 * (N * δ) + 4 * s := by nlinarith [hδs, hsnn, hδ.le]
+  have hL3 : 2 * (2 * δ + 1) * (2 * s) ≤ 4 * (N * δ) + 4 * s := by nlinarith only [hδs, hsnn, hδ.le]
   -- band term: `(J+1)(2δ+1) ≤ 12s(2δ+1) = 24δs + 12s ≤ 24·(Nδ/2) + 12s = 12Nδ + 12s`.
   have hL4 : ((J : ℝ) + 1) * (2 * δ + 1) ≤ 12 * (N * δ) + 12 * s := by
     have hb : (0:ℝ) ≤ 2 * δ + 1 := by linarith
     have hstep : ((J : ℝ) + 1) * (2 * δ + 1) ≤ 12 * s * (2 * δ + 1) := by
       apply mul_le_mul_of_nonneg_right hJ1_12s hb
-    nlinarith [hstep, hδs, hsnn, hδ.le]
+    nlinarith only [hstep, hδs, hsnn, hδ.le]
   -- conclude: total ≤ 56Nδ + 16s ≤ 16s + 56Nδ + 1.  (`16 * N√(δ/T) = 16 s`.)
   have hfinal : (((Finset.Icc ⌈u⌉ ⌊v⌋).filter (fun (n : ℤ) => distInt (φ (n : ℝ)) ≤ δ)).card : ℝ)
       ≤ 16 * s + 56 * (N * δ) := by
     have := hdyadic
     linarith [this, hL1, hL2, hL3, hL4]
   rw [hsdef] at hfinal
-  nlinarith [hfinal, hsnn, hsNδ]
+  nlinarith only [hfinal, hsnn, hsNδ]
 
 /-- **Monotone threshold split.**  For `g` continuous and monotone on `[p,q]` (`p ≤ q`) and a
 threshold pair `-c ≤ c` (`0 ≤ c`), there are `p ≤ c₁ ≤ c₂ ≤ q` with: the middle `[c₁,c₂]` is Low
@@ -885,7 +884,7 @@ middle length degrades by exactly `cl⁻¹`, so `count ≤ cl⁻¹·(4N√(δ/T)
 hypothesis must be strengthened to `4δ < cl²·T` (needed for `√(δT) ≤ cl·T/2` in the curvature step,
 since the threshold is unmoved). -/
 private theorem bands_count_mono_low_slack (N T δ cl u v : ℝ) (φ : ℝ → ℝ)
-    (hN : 0 < N) (hT : 0 < T) (hδ : 0 < δ) (hcl : 0 < cl) (hcl1 : cl ≤ 1)
+    (hN : 0 < N) (hT : 0 < T) (hδ : 0 < δ) (hcl : 0 < cl) (_hcl1 : cl ≤ 1)
     (hactive : 4 * δ < cl ^ 2 * T) (huv : u ≤ v)
     (hcd : ContDiff ℝ 2 φ)
     (hsmall : ∀ z ∈ Set.Icc u v, |deriv φ z| ≤ Real.sqrt (δ * T) / N)
@@ -1060,7 +1059,7 @@ private theorem bands_count_mono_band_slack (N T δ cu u v : ℝ) (φ : ℝ → 
     have hstep := mul_le_mul_of_nonneg_left hlen2N hcoefnn
     have hNN : cu * T / N * (2 * N) = 2 * cu * T := by field_simp
     rw [hNN] at hstep; exact hstep
-  nlinarith [hs, hsum, hTN2N, hactive, mul_nonneg (sub_nonneg.mpr hcu) hT.le,
+  nlinarith only [hs, hsum, hTN2N, hactive, mul_nonneg (sub_nonneg.mpr hcu) hT.le,
     hN.le, hδ.le, hsqrtnn]
 
 /-- **SLACK Low/Band/Band assembly.**  The Low/Band/Band assembly where the two ends carry `cu` on
@@ -1099,7 +1098,7 @@ private theorem bands_count_mono_of_split_slack (N T δ cu cl p q c₁ c₂ : �
       = cl * (32 * N * r + 112 * N * δ + 8 * cu * T + 7) + 4 * N * r := by
     field_simp; ring
   rw [hclear] at hmulcl
-  nlinarith [hmulcl, hcl, hcl1, hcu, hcunn, hNr, hNδ, hT.le,
+  nlinarith only [hmulcl, hcl, hcl1, hcu, hcunn, hNr, hNδ, hT.le,
     mul_nonneg (sub_nonneg.mpr hcu) hNr, mul_nonneg (sub_nonneg.mpr hcl1) hNr,
     mul_nonneg (sub_nonneg.mpr hcu) hNδ, mul_nonneg (sub_nonneg.mpr hcl1) hNδ,
     mul_nonneg hcunn hT.le, mul_nonneg (sub_nonneg.mpr hcl1) (mul_nonneg hcunn hT.le)]
@@ -1385,8 +1384,8 @@ nonzero, so (being continuous, `ContDiff ℝ 2 φ`) of one sign by IVT, giving `
 The finiteness of the zero set is carried explicitly (`hz2fin`): `ncard ≤ K` alone does not
 imply finiteness (an infinite set has `ncard = 0`), and the math intends finitely many zeros. -/
 private theorem exists_mono_piece_breakpoints (N T δ a b : ℝ) (K : ℕ) (φ : ℝ → ℝ)
-    (hN : 0 < N) (hT : 0 < T) (hδ : 0 < δ) (hab : a ≤ b)
-    (hsub : Set.Icc a b ⊆ Set.Icc N (3 * N)) (hcd : ContDiff ℝ 2 φ)
+    (_hN : 0 < N) (_hT : 0 < T) (_hδ : 0 < δ) (hab : a ≤ b)
+    (_hsub : Set.Icc a b ⊆ Set.Icc N (3 * N)) (hcd : ContDiff ℝ 2 φ)
     (hz2fin : (Set.Icc a b ∩ {x | iteratedDeriv 2 φ x = 0}).Finite)
     (hz2 : (Set.Icc a b ∩ {x | iteratedDeriv 2 φ x = 0}).ncard ≤ K) :
     ∃ L : List ℝ, L.length ≤ K ∧
@@ -1442,7 +1441,7 @@ private theorem bands_count_active_split (N T δ a b : ℝ) (K : ℕ) (φ : ℝ 
     (hsub : Set.Icc a b ⊆ Set.Icc N (3 * N)) (hcd : ContDiff ℝ 2 φ)
     (hd1 : ∀ x ∈ Set.Icc a b, |deriv φ x| ≤ T / N)
     (hlower : ∀ x ∈ Set.Icc a b, T / N ≤ |deriv φ x| + N * |iteratedDeriv 2 φ x|)
-    (hz1 : (Set.Icc a b ∩ {x | deriv φ x = 0}).ncard ≤ K)
+    (_hz1 : (Set.Icc a b ∩ {x | deriv φ x = 0}).ncard ≤ K)
     (hz2fin : (Set.Icc a b ∩ {x | iteratedDeriv 2 φ x = 0}).Finite)
     (hz2 : (Set.Icc a b ∩ {x | iteratedDeriv 2 φ x = 0}).ncard ≤ K) :
     (((Finset.Icc ⌈a⌉ ⌊b⌋).filter (fun (n : ℤ) => distInt (φ (n : ℝ)) ≤ δ)).card : ℝ)

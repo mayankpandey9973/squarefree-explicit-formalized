@@ -25,7 +25,7 @@ theorem phif_distInt_from_witness {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂
     (ha_lo : S.A / 5 ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 11 * S.A)
     (hℓ1 : 0 < ℓ₁) (hℓ1_lo : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ2W : (ℓ₂ : ℝ) ≤ 130 * P.Wval)
     (hr_lo : (1/72) * S.R ≤ r) (hr1_hi : r + (ℓ₁ : ℝ) ≤ 16 * S.R) (hr2_hi : r + (ℓ₂ : ℝ) ≤ 16 * S.R)
-    (hin : inDa P.X P.H a d) (hin1 : inDa P.X P.H a d₁) (hin2 : inDa P.X P.H a d₂)
+    (_hin : inDa P.X P.H a d) (_hin1 : inDa P.X P.H a d₁) (_hin2 : inDa P.X P.H a d₂)
     (hdwin : S.D ≤ (d : ℝ) ∧ (d : ℝ) ≤ 2 * S.D) (hd1win : S.D ≤ (d₁ : ℝ) ∧ (d₁ : ℝ) ≤ 2 * S.D)
     (hd2win : S.D ≤ (d₂ : ℝ) ∧ (d₂ : ℝ) ≤ 2 * S.D)
     (hRd  : |Rfun P.X (a : ℝ) (d : ℝ)  - r|             ≤ 14 * P.H / S.D)

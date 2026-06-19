@@ -9,7 +9,7 @@ variable {P : Globals} {S : Scale P}
 
 /-- `weight5` is monotone in the band slot `ev` (for `n ≥ 0`). -/
 theorem weight5_mono_ev {b ev ev' dc cE cE₂ cC n : ℝ}
-    (hb : 0 ≤ b) (hdc : 0 ≤ dc) (hn : 0 ≤ n) (h : ev ≤ ev') :
+    (hb : 0 ≤ b) (hdc : 0 ≤ dc) (_hn : 0 ≤ n) (h : ev ≤ ev') :
     weight5 b ev dc cE cE₂ cC n ≤ weight5 b ev' dc cE cE₂ cC n := by
   unfold weight5
   rcases eq_or_lt_of_le (Real.sqrt_nonneg n) with h0 | h0
@@ -18,7 +18,7 @@ theorem weight5_mono_ev {b ev ev' dc cE cE₂ cC n : ℝ}
 
 /-- Scaling the band slot `ev` by `k ≥ 1` scales `weight5` by at most `k`. -/
 theorem weight5_ev_scale {k b ev dc cE cE₂ cC n : ℝ}
-    (hk : 1 ≤ k) (hb : 0 ≤ b) (hdc : 0 ≤ dc) (hev : 0 ≤ ev)
+    (hk : 1 ≤ k) (hb : 0 ≤ b) (hdc : 0 ≤ dc) (_hev : 0 ≤ ev)
     (hcE : 0 ≤ cE) (hcE₂ : 0 ≤ cE₂) (hcC : 0 ≤ cC) (hn : 0 ≤ n) :
     weight5 b (k * ev) dc cE cE₂ cC n ≤ k * weight5 b ev dc cE cE₂ cC n := by
   unfold weight5
@@ -52,7 +52,7 @@ theorem Step4EcubV_mono {ℓ₁ ℓ₂ V V' : ℝ} (hℓ1 : 1 ≤ ℓ₁) (hℓ1
 /-- `Step4EremHyb` is monotone in the fibre-local box `V` (on `0 ≤ V`): the first term
 is quadratic in `V`, the flat-drift term is `V`-free, the `p₂` term is `E0_p2_hyb_mono`. -/
 theorem Step4EremHyb_mono {a ℓ₁ ℓ₂ gap V V' : ℝ}
-    (ha0 : 0 < a) (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
+    (_ha0 : 0 < a) (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
     (hgap0 : 0 ≤ gap) (hV0 : 0 ≤ V) (hVV' : V ≤ V') :
     Step4EremHyb P S a ℓ₁ ℓ₂ gap V ≤ Step4EremHyb P S a ℓ₁ ℓ₂ gap V' := by
   have hGpos := P.G_pos; have hΩpos := S.Ω_pos; have hΔpos := S.Δ_pos

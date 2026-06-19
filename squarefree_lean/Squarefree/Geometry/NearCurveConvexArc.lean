@@ -91,7 +91,7 @@ cannot exceed the minimum by more than `δ + 4·(μ/λ)/q`.  The genuine lower b
 (used in the Taylor/argmin step), while the long-arc scale uses `μ` (the §4.3 upper
 curvature `256λ`); they are decoupled so that `μ > λ` costs only the constant `μ/λ`. -/
 theorem convex_arc_height_le_min {H : ℝ → ℝ} {A B x₀ M w lo hi δ lam mu q : ℝ}
-    (hAB : A ≤ B) (hHc : ContinuousOn H (Set.Icc A B))
+    (_hAB : A ≤ B) (hHc : ContinuousOn H (Set.Icc A B))
     (hHd : ∀ x ∈ Set.Icc A B, DifferentiableAt ℝ H x)
     (hHc' : ContinuousOn (deriv H) (Set.Icc A B))
     (hHd' : DifferentiableOn ℝ (deriv H) (Set.Ioo A B))
@@ -119,8 +119,8 @@ theorem convex_arc_height_le_min {H : ℝ → ℝ} {A B x₀ M w lo hi δ lam mu
     have hsqrt_pos : 0 < Real.sqrt (q / mu) := Real.sqrt_pos.mpr (by positivity)
     have hWpos : 0 < δ * Real.sqrt (q / mu) := by positivity
     have hsq : (δ * Real.sqrt (q / mu)) ^ 2 < L ^ 2 := by
-      have := sq_lt_sq' (by linarith [hWpos.le] : -(L) < δ * Real.sqrt (q / mu)) hlong
-      nlinarith [hWpos, hLpos]
+      have := sq_lt_sq' (by linarith only [hWpos.le, hLpos] : -(L) < δ * Real.sqrt (q / mu)) hlong
+      linarith only [this]
     have hsqrtsq : Real.sqrt (q / mu) * Real.sqrt (q / mu) = q / mu :=
       Real.mul_self_sqrt (by positivity : (0:ℝ) ≤ q / mu)
     have hexpand : (δ * Real.sqrt (q / mu)) ^ 2 = δ ^ 2 * (q / mu) := by
@@ -132,13 +132,13 @@ theorem convex_arc_height_le_min {H : ℝ → ℝ} {A B x₀ M w lo hi δ lam mu
         mul_lt_mul_of_pos_right hsq hmupos
       have hcancel : δ ^ 2 * (q / mu) * mu = δ ^ 2 * q := by
         field_simp
-      nlinarith [hql, hcancel, hLpos, hmupos]
+      linarith only [hql, hcancel]
     rw [div_lt_div_iff₀ (by positivity) hq]
     -- Goal: `4δ²·q < 4(μ/λ)·(λL²)`.  RHS `= 4μL²`; from `δ²q < μL²`.
     have hexp : 4 * (mu / lam) * (lam * L ^ 2) = 4 * (mu * L ^ 2) := by
       field_simp
     rw [hexp]
-    nlinarith [hδ2q, hLpos, hmupos]
+    linarith only [hδ2q]
   -- Convenient closed-interval differentiability facts.
   have hHdIcc : ∀ x ∈ Set.Icc lo hi, DifferentiableAt ℝ H x := fun x hx =>
     hHd x ⟨le_trans hlo.1 hx.1, le_trans hx.2 hhi.2⟩

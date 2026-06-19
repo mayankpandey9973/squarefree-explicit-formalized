@@ -54,7 +54,7 @@ theorem v_replace_le {a : ℤ} {r : ℝ} {ℓ₁ v : ℝ} {d : ℤ}
   have hdr_ne : dr ≠ 0 := ne_of_gt hdr_pos
   have hD4_pos : 0 < S.D ^ 4 := by positivity
   -- both ≤ 18 D
-  have hdr_hi' : dr ≤ 18 * S.D := le_trans hdr_hi (by nlinarith [hDpos])
+  have hdr_hi' : dr ≤ 18 * S.D := le_trans hdr_hi (by linarith only [hDpos])
   -- KEY abs bound : |(dt/dr)^4 - 1| ≤ 4 * 18^3 * |dr - dt| / S.D
   have habs : |(dt / dr) ^ 4 - 1| ≤ 4 * 18 ^ 3 * |dr - dt| / S.D := by
     -- rewrite (dt/dr)^4 - 1 = (dt^4 - dr^4)/dr^4
@@ -331,7 +331,7 @@ theorem near_int_piece_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℝ}
       _ ≤ S.Δ * P.G * P.U ^ 15 * P.H := by
           gcongr
   -- goal: (8*10^6 * Δ * U^5) * (H * Ω^6) ≤ (Δ²GU²⁰)*(H²Ω)
-  nlinarith [mul_le_mul_of_nonneg_right hcore
+  nlinarith only [mul_le_mul_of_nonneg_right hcore
       (by positivity : (0:ℝ) ≤ S.Δ * P.U ^ 5 * P.H * S.Ω),
     hΩpos, hΔpos, hGpos, hHpos, hUpos]
 
@@ -342,7 +342,7 @@ theorem replace_piece_le {a : ℤ} {r : ℝ}
     (ha_lo : S.A / 5 ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 11 * S.A)
     (hr_lo : (1/72) * S.R ≤ r) (hr_hi : r ≤ 16 * S.R)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
-    (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U) :
+    (_hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U) :
     (dtilde P.X r (a : ℝ)) ^ 4 / (6 * P.X * (a : ℝ))
         * ((10:ℝ) ^ 45 * ((1 / S.Δ) * P.G ^ 3 * P.U ^ 10 / S.Ω ^ 5))
       ≤ S.Δ ^ 2 * P.G ^ 2 * P.U ^ 20 / (P.H * S.Ω ^ 6) := by
@@ -381,7 +381,7 @@ theorem replace_piece_le {a : ℤ} {r : ℝ}
     calc (10:ℝ) ^ 51 ≤ ((10:ℝ) ^ 33) ^ 10 := by norm_num
       _ ≤ P.U ^ 10 := this
   -- multiply by common positive factor (Δ²*G²*U^10*H*Ω^6)
-  nlinarith [mul_le_mul_of_nonneg_right hU10
+  nlinarith only [mul_le_mul_of_nonneg_right hU10
       (by positivity : (0:ℝ) ≤ S.Δ ^ 2 * P.G ^ 2 * P.U ^ 10 * (P.H * S.Ω ^ 6)),
     hΔpos, hGpos, hHpos, hUpos, hΩpos]
 

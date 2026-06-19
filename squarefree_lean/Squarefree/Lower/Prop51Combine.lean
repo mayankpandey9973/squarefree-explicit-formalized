@@ -33,7 +33,7 @@ namespace Squarefree
 
 open Finset
 
-set_option maxHeartbeats 3200000
+set_option exponentiation.threshold 500
 
 variable {P : Globals} {S : Scale P}
 
@@ -108,7 +108,7 @@ theorem prop51_combine
     have hsq : (g ^ 4 * u ^ 10) ^ 2 ≤ dl ^ 2 := by
       have e1 : (g ^ 4 * u ^ 10) ^ 2 = (g ^ 4) ^ 2 * (u ^ 4) ^ 5 := by ring
       rw [e1, hg4, hu4, hdl2]; exact hΔreg
-    nlinarith [hsq, hlhsnn, hdl0.le, hlhsnn]
+    nlinarith only [hsq, hlhsnn, hdl0.le]
   -- band → combine form `1 ≤ g * u^3 * ω`
   have hband' : 1 ≤ g * u ^ 3 * ω := by
     have hbtc := band_to_combine (P := P) (S := S) hband hG1 hU1 hΩpos
@@ -158,17 +158,17 @@ theorem prop51_combine
         have hL0 : Lp ≤ 0 := by
           by_contra hpos
           push Not at hpos
-          have hprodpos : (0 : ℝ) < (ℓ₁ : ℝ) * (ℓ₂ : ℝ) := by nlinarith
+          have hprodpos : (0 : ℝ) < (ℓ₁ : ℝ) * (ℓ₂ : ℝ) := by nlinarith only [h1', h2']
           have hdiffpos : (0 : ℝ) < (ℓ₂ : ℝ) - (ℓ₁ : ℝ) := by
             by_contra hd
             push Not at hd
             have : Lp ≤ 0 := by rw [hLp]; exact mul_nonpos_of_nonneg_of_nonpos hprodpos.le hd
-            linarith
-          have h12 : ℓ₁ < ℓ₂ := by exact_mod_cast (by linarith : (ℓ₁ : ℝ) < (ℓ₂ : ℝ))
+            linarith only [this, hpos]
+          have h12 : ℓ₁ < ℓ₂ := by exact_mod_cast (by linarith only [hdiffpos] : (ℓ₁ : ℝ) < (ℓ₂ : ℝ))
           have h12' : ((ℓ₁ + 1 : ℕ) : ℝ) ≤ (ℓ₂ : ℝ) := by exact_mod_cast h12
-          have hd1 : (1 : ℝ) ≤ (ℓ₂ : ℝ) - (ℓ₁ : ℝ) := by push_cast at h12'; linarith
-          have : (1 : ℝ) ≤ Lp := by rw [hLp]; nlinarith
-          linarith
+          have hd1 : (1 : ℝ) ≤ (ℓ₂ : ℝ) - (ℓ₁ : ℝ) := by push_cast at h12'; linarith only [h12']
+          have : (1 : ℝ) ≤ Lp := by rw [hLp]; nlinarith only [hprodpos, hd1, h1', h2']
+          linarith only [this, hL1]
         calc P.G * S.Ω ^ 5 / Lp ≤ 0 := div_nonpos_iff.mpr (Or.inl ⟨hGΩnn, hL0⟩)
           _ ≤ P.G * S.Ω ^ 5 := hGΩnn
     -- `t1·(GΩ⁵) = t1b` exactly
@@ -186,7 +186,7 @@ theorem prop51_combine
             * (P.G * S.Ω ^ 5 / ((ℓ₁ : ℝ) * (ℓ₂ : ℝ) * ((ℓ₂ : ℝ) - (ℓ₁ : ℝ))))
           ≤ g ^ 16 * u ^ 60 / (dl ^ 2 * ω ^ 2) * (P.G * S.Ω ^ 5) :=
         mul_le_mul_of_nonneg_left hwle ht1pos
-      nlinarith [hmul, ht1b]
+      linarith only [hmul, ht1b]
     have hbr : g ^ 16 * u ^ 60 / (dl ^ 2 * ω ^ 2)
             * (1 + P.G * S.Ω ^ 5 / ((ℓ₁ : ℝ) * (ℓ₂ : ℝ) * ((ℓ₂ : ℝ) - (ℓ₁ : ℝ))))
           + dl ^ 4 * g ^ 20 * u ^ 180 / (P.H * ω ^ 14)
@@ -195,7 +195,7 @@ theorem prop51_combine
           + g ^ 28 * u ^ 140 / (dl * ω)
           + g ^ 60 * u ^ 300 / (dl ^ 2 * ω ^ 13)
           + dl ^ 4 * g ^ 60 * u ^ 360 / (P.H * ω ^ 27) ≤ L := by
-      rw [hLdef]; linarith [hsplit]
+      rw [hLdef]; linarith only [hsplit]
     calc 10 ^ 409 * (P.H / S.Δ) *
         ( g ^ 16 * u ^ 60 / (dl ^ 2 * ω ^ 2)
             * (1 + P.G * S.Ω ^ 5 / ((ℓ₁ : ℝ) * (ℓ₂ : ℝ) * ((ℓ₂ : ℝ) - (ℓ₁ : ℝ))))
@@ -207,7 +207,7 @@ theorem prop51_combine
           + dl ^ 4 * g ^ 60 * u ^ 360 / (P.H * ω ^ 27) )
         ≤ 10 ^ 409 * (P.H / S.Δ) * L := by
           apply mul_le_mul_of_nonneg_left hbr (by positivity)
-      _ = 10 ^ 409 * ((P.H / S.Δ) * L) := by ring
+      _ = 10 ^ 409 * ((P.H / S.Δ) * L) := by rw [mul_assoc]
   -- ===== `Σ B ≤ Wnat²·(10⁴⁰⁹·(H/Δ)·L)` =====
   have hsumB : (∑ p ∈ Finset.Icc 1 Wnat ×ˢ Finset.Icc 1 Wnat, B p.1 p.2)
       ≤ (Wnat : ℝ) ^ 2 * (10 ^ 409 * ((P.H / S.Δ) * L)) := by
@@ -235,7 +235,7 @@ theorem prop51_combine
         ≤ (Wnat : ℝ) ^ 2 * (10 ^ 409 * ((P.H / S.Δ) * (3 * RHS3))) := by
       apply mul_le_mul_of_nonneg_left _ hWsq_nn
       apply mul_le_mul_of_nonneg_left hLR (by positivity)
-    nlinarith [hsumB, hWLR]
+    nlinarith only [hsumB, hWLR]
   refine le_trans hstep1 ?_
   -- `Wnat² ≤ 130²·Wval² = 16900·G²U¹⁰`
   have hW2 : (Wnat : ℝ) ^ 2 ≤ 16900 * (P.G ^ 2 * P.U ^ 10) := by
@@ -243,7 +243,7 @@ theorem prop51_combine
     have h130 : (Wnat : ℝ) ^ 2 ≤ (130 * P.Wval) ^ 2 := pow_le_pow_left₀ hWnn hWcast.2 2
     have he : (130 * P.Wval) ^ 2 = 16900 * (P.G ^ 2 * P.U ^ 10) := by
       rw [Globals.Wval]; ring
-    linarith
+    linarith only [h130, he]
   -- rpow translations of the three RHS3 monomials
   have hg28 : g ^ 28 = P.G ^ 7 := by
     rw [hgdef, ← Real.rpow_natCast (P.G ^ ((1:ℝ)/4)) 28, ← Real.rpow_mul hGpos.le,

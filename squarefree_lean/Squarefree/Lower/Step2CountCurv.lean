@@ -28,7 +28,6 @@ open Real
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 1600000
 
 open Metric in
 /-- Bump-extension of a `ContDiffOn ℝ 2` function on `Ioo (r₀-1) (r₁+1)` to a global `C²` function
@@ -346,7 +345,7 @@ theorem phif_deriv_ub_allf {a ℓ₁ ℓ₂ f r : ℝ}
       ≤ ((4 * 18 ^ 3 * 1000000 * 5 / 6) * (W * |f|)
           + (4 * 18 ^ 3 * 1000000 * 5 / 6) * 10 ^ 20 * (W * L)) + 10 ^ 40 * (W * L) :=
         add_le_add hterm1 hterm2
-    _ ≤ 10 ^ 41 * (W * |f| + W * L) := by nlinarith [hWfnn, hWLnn]
+    _ ≤ 10 ^ 41 * (W * |f| + W * L) := by linarith only [hWfnn, hWLnn]
 
 /-- **§5 Step-2 ALL-`f` curvature lower bound, at band scale `N`.**  The keystone
 `phif_curvature_lower_curv` (curvature lower bound at scale `R`) repackaged to a band scale
@@ -360,7 +359,7 @@ theorem phif_curvature_lower_band {a ℓ₁ ℓ₂ f r N : ℝ}
     (hℓ1 : 0 < ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
     (hr_lo : (1 / 72) * S.R ≤ r) (hrl_hi : r + ℓ₁ ≤ 16 * S.R)
     (hsmall : (10 : ℝ) ^ 78 * ℓ₁ ≤ S.R)
-    (hNpos : 0 < N) (hRN : S.R ≤ 72 * N) :
+    (_hNpos : 0 < N) (hRN : S.R ≤ 72 * N) :
     (1 / (5184 * 10 ^ 72)) * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁) * S.B ^ 2 / S.D) / N
       ≤ |deriv (fun s => phif P.X a ℓ₁ ℓ₂ f s) r|
         + N * |iteratedDeriv 2 (fun s => phif P.X a ℓ₁ ℓ₂ f s) r| := by

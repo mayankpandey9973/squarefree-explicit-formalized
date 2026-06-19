@@ -10,7 +10,6 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 1600000
 
 /-- Flat `Ecap4` piece: `(480·a·L·ℓ₁²·Vmax²/D²)·b·m` fits one `C¹`-block (fraction form). -/
 private theorem step4_fitEA_capFlat
@@ -185,7 +184,7 @@ theorem step4_fitEA_cap
     (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
     (ℓ₁ ℓ₂ : ℝ) (hℓ1lo : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ + 1 ≤ ℓ₂)
     (hℓ1W : ℓ₁ ≤ 130 * (P.G * P.U ^ 5)) (hℓ2W : ℓ₂ ≤ 130 * (P.G * P.U ^ 5))
-    (m C : ℝ) (hC : 1 ≤ C) (hCcap : C ≤ (10:ℝ) ^ 120)
+    (m C : ℝ) (hC : 1 ≤ C) (_hCcap : C ≤ (10:ℝ) ^ 120)
     (hm : m ≤ 10 ^ 60 * C * ℓ₁ ^ 3 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * P.U ^ 15 / S.Ω ^ 12)
     (hm0 : 0 ≤ m)
     (a : ℝ) (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
@@ -328,6 +327,6 @@ theorem step4_fit_cE_A
     positivity
   have htot := add_le_add (add_le_add hT1 hT2) hCap
   refine le_trans htot ?_
-  nlinarith [hblock0]
+  linarith only [hblock0]
 
 end Squarefree

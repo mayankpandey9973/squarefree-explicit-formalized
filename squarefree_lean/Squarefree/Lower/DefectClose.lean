@@ -16,11 +16,10 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 1600000
 
 /-- **MVT slope identity** for `R_a` on `[p,q]` (`0 < p < q`): there is an interior point `c`
 with `R_a(q) − R_a(p) = R_a'(c)·(q − p)`, where `R_a'(c) = −2 X a³ (2c+a)/(c³(c+a)³)`. -/
-private theorem Rfun_mvt_close {X a p q : ℝ} (hX : 0 < X) (ha : 0 < a) (hp : 0 < p) (hpq : p < q) :
+private theorem Rfun_mvt_close {X a p q : ℝ} (_hX : 0 < X) (ha : 0 < a) (hp : 0 < p) (hpq : p < q) :
     ∃ c, p < c ∧ c < q ∧
       Rfun X a q - Rfun X a p
         = (-2 * X * a ^ 3 * (2 * c + a) / (c ^ 3 * (c + a) ^ 3)) * (q - p) := by
@@ -61,7 +60,7 @@ theorem dtilde_close {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : ℝ}
     rw [Scale.R, hAeq, hDeq, P.X_eq_G_mul_H_pow_five]; field_simp
   have hRpos : 0 < S.R := by
     have : 0 < S.R * S.D ^ 4 := by rw [← hXA3]; positivity
-    nlinarith [this, pow_pos hDpos 4]
+    nlinarith only [this, pow_pos hDpos 4]
   -- r > 0  (from (1/72)·R ≤ r and R > 0)
   have hr0 : 0 < r := lt_of_lt_of_le (by positivity) hr_lo
   -- d̃ window from dtilde_asymp_D
@@ -73,7 +72,7 @@ theorem dtilde_close {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : ℝ}
   -- A ≤ D/10  (from 10A ≤ D)
   have hAD10 : S.A ≤ S.D / 10 := by linarith [hAD]
   -- a ≤ 11·D/10  (from a ≤ 11A and A ≤ D/10), so c + a ≤ 20D on the window
-  have ha11D : (a : ℝ) ≤ 11 * S.D / 10 := by nlinarith [ha_hi, hAD10]
+  have ha11D : (a : ℝ) ≤ 11 * S.D / 10 := by linarith only [ha_hi, hAD10]
   -- target RHS equals 14·10¹¹·H/R ≤ 10¹²·H/R  bound; we land on 2.1·10¹¹·H/R
   have hHR : P.H / S.R = S.Δ / (P.G * S.Ω ^ 3) := by rw [Scale.R]; field_simp
   -- lower bound on |R_a'(c)| for c ∈ [D/10, 18D]: |R_a'(c)| ≥ R/(15000000000 D)
@@ -109,7 +108,9 @@ theorem dtilde_close {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : ℝ}
     -- combine: R·c³(c+a)³ ≤ R·46656000 D⁶ ;  15000000000 D·(num) ≥ 15000000000 D·(2/625) R D⁵
     calc S.R * (c ^ 3 * (c + (a:ℝ)) ^ 3) ≤ S.R * (46656000 * S.D ^ 6) :=
           mul_le_mul_of_nonneg_left hcub hRpos.le
-      _ ≤ (15000000000 * S.D) * ((2 / 625) * S.R * S.D ^ 5) := by ring_nf; nlinarith [pow_pos hDpos 6, hRpos]
+      _ ≤ (15000000000 * S.D) * ((2 / 625) * S.R * S.D ^ 5) := by
+            have h6 : (0:ℝ) ≤ S.R * S.D ^ 6 := by positivity
+            nlinarith only [h6]
       _ ≤ (15000000000 * S.D) * (2 * P.X * (a:ℝ) ^ 3 * (2 * c + (a:ℝ))) :=
           mul_le_mul_of_nonneg_left hnum_lb (by have := hDpos; positivity)
       _ = 2 * P.X * (a:ℝ) ^ 3 * (2 * c + (a:ℝ)) * (15000000000 * S.D) := by ring
@@ -184,7 +185,7 @@ theorem dtilde_close {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : ℝ}
   calc |d - dt| ≤ 210000000000 * P.H / S.R := hbound
     _ ≤ 1000000000000 * P.H / S.R := by
         gcongr
-        nlinarith [hH.le]
+        linarith only [hH.le]
     _ = 1000000000000 * (S.Δ / (P.G * S.Ω ^ 3)) := by rw [← hHR]; ring
 
 end Squarefree

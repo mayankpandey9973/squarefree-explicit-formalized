@@ -23,7 +23,7 @@ open Squarefree.Counting
 
 namespace Squarefree
 
-set_option maxHeartbeats 1000000
+set_option maxHeartbeats 400000
 
 /-- `R_a` is antitone on the positive reals (for `0 < X`, `0 < a`): the closed form
 `X a³/(d²(d+a)²)` has a decreasing denominator. -/
@@ -275,7 +275,7 @@ theorem ftil_dtilde_window {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : 
 
 /-- **MVT slope identity** for `R_a` on `[p,q]` (`0 < p < q`): there is an interior point `c`
 with `R_a(q) − R_a(p) = R_a'(c)·(q − p)`, where `R_a'(c) = −2 X a³ (2c+a)/(c³(c+a)³)`. -/
-private theorem Rfun_mvt {X a p q : ℝ} (hX : 0 < X) (ha : 0 < a) (hp : 0 < p) (hpq : p < q) :
+private theorem Rfun_mvt {X a p q : ℝ} (_hX : 0 < X) (ha : 0 < a) (hp : 0 < p) (hpq : p < q) :
     ∃ c, p < c ∧ c < q ∧
       Rfun X a q - Rfun X a p
         = (-2 * X * a ^ 3 * (2 * c + a) / (c ^ 3 * (c + a) ^ 3)) * (q - p) := by

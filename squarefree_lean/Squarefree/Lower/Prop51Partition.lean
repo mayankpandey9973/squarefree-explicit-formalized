@@ -29,7 +29,7 @@ variable {P : Globals} {S : Scale P}
 /-- **§5 per-`r` defect** `v(r)`. Matches the `hVplus` argument of
 `Qval_abs_le_from_witness`: the cast shape is
 `(d*(r+ℓ₂) − d*(r)) − (ℓ₂/ℓ₁)·(d*(r+ℓ₁) − d*(r))`. -/
-noncomputable def vval (P : Globals) (a : ℤ) (dStar : ℕ → ℤ) (ℓ₁ ℓ₂ r : ℕ) : ℝ :=
+noncomputable def vval (_P : Globals) (_a : ℤ) (dStar : ℕ → ℤ) (ℓ₁ ℓ₂ r : ℕ) : ℝ :=
   ((dStar (r + ℓ₂) : ℝ) - (dStar r : ℝ))
     - ((ℓ₂ : ℤ) : ℝ) / ((ℓ₁ : ℤ) : ℝ) * ((dStar (r + ℓ₁) : ℝ) - (dStar r : ℝ))
 

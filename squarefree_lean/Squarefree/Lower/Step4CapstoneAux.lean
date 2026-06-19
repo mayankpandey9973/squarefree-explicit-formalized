@@ -17,8 +17,6 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 1600000
-
 /-- The uniform near-integer budget over the fibre: the `step4_fibre_window_data` budget with
 `|d̃ₐ − dStar r|` capped by the `dtilde_close` tolerance `10¹²·Δ/(GΩ³)`. -/
 noncomputable def step4ErrU (P : Globals) (S : Scale P) : ℝ :=
@@ -41,8 +39,8 @@ theorem step4ErrU_nonneg : 0 ≤ step4ErrU P S := by
 band slot `(G⁴U²⁰/Δ + Δ⁴G⁵U⁴⁵/(H²Ω¹⁴))·ΔΩ/√L` that `ra_step4_range_add5` consumes (the
 post-sweep `errU` carries `10¹¹⁹·UpsT`, so `88·10¹¹⁹ ≤ 10¹²²`). -/
 theorem step4_ev_bridge {a L : ℝ}
-    (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
-    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΩU : S.Ω ≤ P.U)
+    (_ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
+    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (_hΩU : S.Ω ≤ P.U)
     (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
     (hReg : S.Δ ^ 2 * P.U ^ 5 ≤ P.H * S.Ω ^ 3)
     (hDeW : 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) ≤ S.Δ) (hL1 : 1 ≤ L) :

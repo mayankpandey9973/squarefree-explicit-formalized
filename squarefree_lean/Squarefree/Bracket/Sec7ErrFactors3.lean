@@ -15,8 +15,6 @@ open Classical Finset Set Real Squarefree.FiniteDiff
 
 namespace Squarefree
 
-set_option maxHeartbeats 1600000
-
 section Factors
 
 variable {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ} {Ph : Sec7Phase P S W a}
@@ -56,6 +54,7 @@ include hh₁ hh₂ hh₃ hW hpad hshift
 /-- `cExp3·h_Σ ≤ R` from the envelope smallness. -/
 theorem sec7E_cExp3_hS (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R) :
     sec7_cExp3 * sec7_hSum h₁ h₂ h₃ ≤ S.R := by
+  have _ := hW; have _ := hpad; have _ := hshift
   have hSv3 : (3:ℝ) ≤ sec7_hSum h₁ h₂ h₃ := sec7_hSum_ge3 hh₁ hh₂ hh₃
   calc sec7_cExp3 * sec7_hSum h₁ h₂ h₃ ≤ 10 ^ 149 * sec7_hSum h₁ h₂ h₃ := by
         apply mul_le_mul_of_nonneg_right _ (by linarith)
@@ -66,6 +65,7 @@ theorem sec7E_cExp3_hS (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R) :
 /-- `cExp3Lead·h_Σ ≤ R` from the envelope smallness. -/
 theorem sec7E_cExp3Lead_hS (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R) :
     sec7_cExp3Lead * sec7_hSum h₁ h₂ h₃ ≤ S.R := by
+  have _ := hW; have _ := hpad; have _ := hshift
   have hSv3 : (3:ℝ) ≤ sec7_hSum h₁ h₂ h₃ := sec7_hSum_ge3 hh₁ hh₂ hh₃
   calc sec7_cExp3Lead * sec7_hSum h₁ h₂ h₃ ≤ 10 ^ 149 * sec7_hSum h₁ h₂ h₃ := by
         apply mul_le_mul_of_nonneg_right _ (by linarith)
@@ -203,12 +203,12 @@ theorem sec7E_M1_bound3 (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R) :
   have hTR : 0 < S.T₁ / S.R := div_pos hT1 hR
   have habs1 : |ME.c₁ * S.T₁| ≤ 4 * S.T₁ := by
     rw [abs_mul, abs_of_pos hT1]
-    nlinarith
+    nlinarith only [hc1, hT1.le]
   have habs2 : |-(ME.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R))| ≤
       4 * (sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R)) := by
     rw [abs_neg, abs_mul, abs_mul, abs_of_nonneg (by linarith : (0:ℝ) ≤ sec7_hSum h₁ h₂ h₃),
       abs_of_pos hTR]
-    nlinarith [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc1
+    nlinarith only [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc1
       (by linarith : (0:ℝ) ≤ sec7_hSum h₁ h₂ h₃)) hTR.le]
   have hsmall : 4 * (sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R)) * 10 ^ 18 ≤ S.T₁ := by
     rw [show 4 * (sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R)) * 10 ^ 18
@@ -220,7 +220,7 @@ theorem sec7E_M1_bound3 (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R) :
             mul_le_mul_of_nonneg_right (by norm_num) (by linarith)
         _ = sec7_hSum h₁ h₂ h₃ * 10 ^ 149 := by ring
         _ ≤ S.R := hSR
-    nlinarith
+    nlinarith only [h1, hT1.le]
   have hnum : |ME.c₁ * S.T₁| * 10 ^ 14 +
       |-(ME.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R))| * 10 ^ 18 ≤ 10 ^ 15 * S.T₁ := by
     have p1 : |ME.c₁ * S.T₁| * 10 ^ 14 ≤ 4 * S.T₁ * 10 ^ 14 :=
@@ -228,7 +228,7 @@ theorem sec7E_M1_bound3 (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R) :
     have p2 : |-(ME.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R))| * 10 ^ 18 ≤
         4 * (sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R)) * 10 ^ 18 :=
       mul_le_mul_of_nonneg_right habs2 (by norm_num)
-    nlinarith
+    nlinarith only [p1, p2, hsmall, hT1.le]
   calc |sec7E_M1 ME k r|
       ≤ |sec7_powMonD S.R (ME.c₁ * S.T₁) (-(1:ℝ)) k r| +
         |sec7_powMonD S.R (-(ME.c₁ * sec7_hSum h₁ h₂ h₃ * (S.T₁ / S.R))) (-(2:ℝ)) k r| := by
@@ -260,7 +260,7 @@ theorem sec7E_N_bound3 {h : ℤ} (hh : 1 ≤ h) :
   have habs : |-(ME.c₁ * (h:ℝ) * (S.T₁ / S.R))| ≤ 4 * ((h:ℝ) * (S.T₁ / S.R)) := by
     rw [abs_neg, abs_mul, abs_mul, abs_of_nonneg (by linarith : (0:ℝ) ≤ (h:ℝ)),
       abs_of_pos hTR]
-    nlinarith [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc1
+    nlinarith only [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc1
       (by linarith : (0:ℝ) ≤ (h:ℝ))) hTR.le]
   calc |sec7E_N ME h k r| = |sec7_powMonD S.R (-(ME.c₁ * (h:ℝ) * (S.T₁ / S.R)))
         (-(2:ℝ)) k r| := by rw [sec7E_N]
@@ -283,8 +283,8 @@ theorem sec7E_M0_bound3 :
     have a2 : (1:ℝ) ≤ (h₂:ℝ) := by exact_mod_cast hh₂
     have a3 : (1:ℝ) ≤ (h₃:ℝ) := by exact_mod_cast hh₃
     unfold sec7_Pprod
-    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith
-    nlinarith [h12, a3]
+    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith only [a1, a2]
+    nlinarith only [h12, a3]
   have hTR : 0 < S.T₂ / S.R ^ 3 := by positivity
   have b := sec7_powMonD_val_bound (S := S)
     (c := (15/64) * ME.c₂ * sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3))
@@ -296,7 +296,7 @@ theorem sec7E_M0_bound3 :
     rw [abs_mul, abs_mul, abs_mul,
       abs_of_nonneg (by linarith : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃), abs_of_pos hTR,
       abs_of_nonneg (by norm_num : (0:ℝ) ≤ (15:ℝ)/64)]
-    nlinarith [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc2
+    nlinarith only [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc2
       (by linarith : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃)) hTR.le]
   calc |sec7E_M0 ME k r| = |sec7_powMonD S.R
         ((15/64) * ME.c₂ * sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) (-(9:ℝ)/4) k r| := by
@@ -307,7 +307,7 @@ theorem sec7E_M0_bound3 :
         gcongr
     _ ≤ 10 ^ 19 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) / S.R ^ k := by
         gcongr ?_ / _
-        nlinarith [mul_pos (lt_of_lt_of_le one_pos hPv) hTR,
+        nlinarith only [mul_pos (lt_of_lt_of_le one_pos hPv) hTR,
           mul_nonneg (by linarith : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃) hTR.le]
 
 omit hh₁ hh₂ hh₃ hshift in
@@ -334,7 +334,7 @@ theorem sec7E_L_bound3 {g h : ℤ} (hg : 1 ≤ g) (hh : 1 ≤ h) :
       abs_of_nonneg (by linarith : (0:ℝ) ≤ (g:ℝ)),
       abs_of_nonneg (by linarith : (0:ℝ) ≤ (h:ℝ)), abs_of_pos hTR,
       show |(-((3:ℝ)/16))| = (3:ℝ)/16 from by norm_num]
-    nlinarith [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
+    nlinarith only [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
       (mul_le_mul_of_nonneg_right hc2 (by linarith : (0:ℝ) ≤ (g:ℝ)))
       (by linarith : (0:ℝ) ≤ (h:ℝ))) hTR.le]
   calc |sec7E_L ME g h k r| = |sec7_powMonD S.R
@@ -345,7 +345,7 @@ theorem sec7E_L_bound3 {g h : ℤ} (hg : 1 ≤ g) (hh : 1 ≤ h) :
     _ ≤ (3/4) * ((g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) * (2 * 10 ^ 15) / S.R ^ k := by gcongr
     _ ≤ 2 * 10 ^ 15 * ((g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) / S.R ^ k := by
         gcongr ?_ / _
-        nlinarith [mul_nonneg (mul_nonneg (by linarith : (0:ℝ) ≤ (g:ℝ))
+        nlinarith only [mul_nonneg (mul_nonneg (by linarith : (0:ℝ) ≤ (g:ℝ))
           (by linarith : (0:ℝ) ≤ (h:ℝ))) hTR.le]
 
 omit hshift in
@@ -366,8 +366,8 @@ theorem sec7E_T6_bound3 :
     have a2 : (1:ℝ) ≤ (h₂:ℝ) := by exact_mod_cast hh₂
     have a3 : (1:ℝ) ≤ (h₃:ℝ) := by exact_mod_cast hh₃
     unfold sec7_Pprod
-    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith
-    nlinarith [h12, a3]
+    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith only [a1, a2]
+    nlinarith only [h12, a3]
   have hTR : 0 < S.T₁ * S.T₂ / S.R ^ 4 := by positivity
   have b := sec7_powMonD_val_bound (S := S)
     (c := -((15/64) * ME.c₁ * ME.c₂ * sec7_hSum h₁ h₂ h₃ * sec7_Pprod h₁ h₂ h₃ *
@@ -384,8 +384,8 @@ theorem sec7E_T6_bound3 :
       abs_of_nonneg (by linarith : (0:ℝ) ≤ sec7_hSum h₁ h₂ h₃),
       abs_of_nonneg (by linarith : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃), abs_of_pos hTR,
       abs_of_nonneg (by norm_num : (0:ℝ) ≤ (15:ℝ)/64)]
-    have hq : |ME.c₁| * |ME.c₂| ≤ 16 := by nlinarith
-    nlinarith [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
+    have hq : |ME.c₁| * |ME.c₂| ≤ 16 := by nlinarith only [hc1, hc2, hc10, hc20]
+    nlinarith only [mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
       (mul_le_mul_of_nonneg_right hq (by linarith : (0:ℝ) ≤ sec7_hSum h₁ h₂ h₃))
       (by linarith : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃)) hTR.le,
       mul_nonneg (mul_nonneg
@@ -419,11 +419,11 @@ theorem sec7E_gB_bound3 (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R)
     have a2 : (1:ℝ) ≤ (h₂:ℝ) := by exact_mod_cast hh₂
     have a3 : (1:ℝ) ≤ (h₃:ℝ) := by exact_mod_cast hh₃
     unfold sec7_Pprod
-    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith
-    nlinarith [h12, a3]
+    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith only [a1, a2]
+    nlinarith only [h12, a3]
   have hPT : (0:ℝ) < sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) := by
     have : (0:ℝ) < S.T₂ / S.R ^ 3 := by positivity
-    nlinarith
+    nlinarith only [hPv, this]
   have hcc : |(ρ₀:ℝ)| ≤ (if ρ₀ = 0 then 0 else 1) * sec7_cCarry := by
     by_cases h0 : ρ₀ = 0
     · subst h0; simp
@@ -436,7 +436,7 @@ theorem sec7E_gB_bound3 (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R)
       2 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) := by
     have p1 : sec7_cExp3 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) * sec7_relErr P S) ≤
         sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) := by
-      nlinarith [mul_le_mul_of_nonneg_right hcrel3 hPT.le]
+      nlinarith only [mul_le_mul_of_nonneg_right hcrel3 hPT.le]
     have p2 : sec7_cExp3 * (sec7_Pprod h₁ h₂ h₃ * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 4) ≤
         sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3) := by
       have hce := sec7E_cExp3_hS hh₁ hh₂ hh₃ hW hpad hshift hSR
@@ -447,9 +447,9 @@ theorem sec7E_gB_bound3 (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R)
           S.R * (sec7_Pprod h₁ h₂ h₃ * S.T₂) / S.R ^ 4 from by
             rw [pow_succ]
             field_simp]
-      have hPT2 : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃ * S.T₂ := by nlinarith
+      have hPT2 : (0:ℝ) ≤ sec7_Pprod h₁ h₂ h₃ * S.T₂ := by nlinarith only [hPv, hT2.le]
       gcongr
-    nlinarith
+    nlinarith only [p1, p2]
   have hsplit : sec7E_gB ME ρ₀ k r =
       (sec7E_eB0 ME k r + sec7E_M0 ME k r) + sec7_constF (ρ₀:ℝ) k r := by
     simp only [sec7E_gB, sec7E_eB0]
@@ -468,7 +468,7 @@ theorem sec7E_gB_bound3 (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R)
     _ ≤ (2 * 10 ^ 19 * (sec7_Pprod h₁ h₂ h₃ * (S.T₂ / S.R ^ 3)) +
         (if ρ₀ = 0 then 0 else 1) * sec7_cCarry) / S.R ^ k := by
         gcongr (?_ : ℝ) / _
-        nlinarith [hcoll, hPT]
+        nlinarith only [hcoll, hPT]
 
 theorem sec7E_gK_bound3 (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R)
     (hcrel3L : sec7_cExp3Lead * sec7_relErr P S ≤ 1) {g h : ℤ} (hg : 1 ≤ g) (hh : 1 ≤ h)
@@ -502,7 +502,7 @@ theorem sec7E_gK_bound3 (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R)
       2 * ((g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) := by
     have p1 : sec7_cExp3Lead * ((g:ℝ) * h * (S.T₂ / S.R ^ 2) * sec7_relErr P S) ≤
         (g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2) := by
-      nlinarith [mul_le_mul_of_nonneg_right hcrel3L hgT.le]
+      nlinarith only [mul_le_mul_of_nonneg_right hcrel3L hgT.le]
     have p2 : sec7_cExp3Lead * ((g:ℝ) * h * sec7_hSum h₁ h₂ h₃ * S.T₂ / S.R ^ 3) ≤
         (g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2) := by
       have hce := sec7E_cExp3Lead_hS hh₁ hh₂ hh₃ hW hpad hshift hSR
@@ -515,7 +515,7 @@ theorem sec7E_gK_bound3 (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R)
       have hgT2 : (0:ℝ) ≤ (g:ℝ) * h * S.T₂ :=
         mul_nonneg (mul_nonneg (by linarith) (by linarith)) hT2.le
       gcongr
-    nlinarith
+    nlinarith only [p1, p2]
   have hsplit : sec7E_gK ME g h ξ c k r =
       (sec7E_eK ME g h ξ k r + sec7E_L ME g h k r) + sec7_constF c k r := by
     simp only [sec7E_gK, sec7E_eK]
@@ -534,7 +534,7 @@ theorem sec7E_gK_bound3 (hSR : sec7_hSum h₁ h₂ h₃ * 10 ^ 149 ≤ S.R)
     _ ≤ (3 * 10 ^ 15 * ((g:ℝ) * (h:ℝ) * (S.T₂ / S.R ^ 2)) + sec7_cFib) / S.R ^ k := by
         gcongr (?_ : ℝ) / _
         have hFib : sec7_cFib = 10 ^ 10 := by norm_num [sec7_cFib]
-        nlinarith [hcoll, hgT]
+        nlinarith only [hcoll, hgT, hFib]
 
 end Chains
 

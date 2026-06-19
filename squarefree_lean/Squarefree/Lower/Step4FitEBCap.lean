@@ -10,8 +10,6 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 1600000
-
 /-- Key collapse: `(a/D)²·(Cref·(A/a)²) = Cref·A²/D² = 3ℓ₁ℓ₂(ℓ₂−ℓ₁)/D²`, so the flat
 `Ecap4a` summand is `a`-free. -/
 private theorem Ecap4a_collapse {a ℓ₁ ℓ₂ : ℝ} (ha : a ≠ 0) :
@@ -281,7 +279,7 @@ the `√L` of `dc` cancels `cEhyb`'s `1/√L`, and the three summands fit `2+1+3
 target blocks via `step4_fitEB_T1`/`_T2`/`_cap`. -/
 theorem step4_fit_cE_B
     (h1 : P.G*P.U^10 ≤ P.H/S.Δ^2)
-    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H)
+    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (_hH1 : 1 ≤ P.H)
     (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ)^33 ≤ P.U)
     (N : ℕ) (ℓ₁ ℓ₂ : ℝ) (hℓ1lo : 1 ≤ ℓ₁) (hℓ12 : ℓ₁+1 ≤ ℓ₂)
     (hℓ1W : ℓ₁ ≤ 130*(P.G*P.U^5)) (hℓ2W : ℓ₂ ≤ 130*(P.G*P.U^5))

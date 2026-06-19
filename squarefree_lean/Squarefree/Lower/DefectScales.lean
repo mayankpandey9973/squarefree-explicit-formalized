@@ -110,7 +110,7 @@ theorem U_mul_W_le_R
 theorem U_mul_W130_le_R
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
     (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4)
-    (hΩU : S.Ω ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hU1 : 1 ≤ P.U)
+    (_hΩU : S.Ω ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hU1 : 1 ≤ P.U)
     (hUbig : (10:ℝ) ^ 33 ≤ P.U) (hG1 : 1 ≤ P.G) :
     130 * (P.U * P.Wval) ≤ S.R := by
   have hH := P.H_pos; have hG := P.G_pos; have hΔ := S.Δ_pos; have hΩ := S.Ω_pos

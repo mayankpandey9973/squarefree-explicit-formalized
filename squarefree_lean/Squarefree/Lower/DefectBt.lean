@@ -16,14 +16,12 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 1600000
-
 /-- The §5 finite-difference `b̃ₐ(r) = (d̃ₐ(r+ℓ) − d̃ₐ(r))/ℓ` (writeup 690). -/
 noncomputable def bt (X a ℓ r : ℝ) : ℝ := (dtilde X (r + ℓ) a - dtilde X r a) / ℓ
 
 /-- `b̃ₐ` is differentiable, with derivative the finite difference of `d̃ₐ'`. -/
 theorem bt_hasDerivAt {X a ℓ r : ℝ} (hX : 0 < X) (ha : 0 < a) (hr : 0 < r)
-    (hrl : 0 < r + ℓ) (hℓ : ℓ ≠ 0) :
+    (hrl : 0 < r + ℓ) (_hℓ : ℓ ≠ 0) :
     HasDerivAt (fun s => bt X a ℓ s)
       ((deriv (fun s => dtilde X s a) (r + ℓ) - deriv (fun s => dtilde X s a) r) / ℓ) r := by
   -- `g1 s = d̃ₐ(s+ℓ)`, the composition with the shift `s ↦ s + ℓ`.

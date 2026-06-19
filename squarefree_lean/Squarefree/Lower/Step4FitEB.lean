@@ -12,12 +12,10 @@ namespace Squarefree
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 1600000
-
 /-- Common tail: `K·C·G⁸·U⁴⁵/Ωᵐ ≤ C·Δ·G¹⁵·U⁹⁰/Ω²⁷` once the scalar fits `K ≤ U²` and
 `11 ≤ m ≤ 27` (keep-net: pad `Ω^{27−m} ≤ U^{27−m} ≤ U¹⁶`; no `Ω ≥ 1` needed). -/
 private theorem fitEB_tail (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
-    (hΩU : S.Ω ≤ P.U) (C K : ℝ) (hC0 : 0 ≤ C) (hK0 : 0 ≤ K)
+    (hΩU : S.Ω ≤ P.U) (C K : ℝ) (hC0 : 0 ≤ C) (_hK0 : 0 ≤ K)
     (hK : K ≤ P.U ^ 2) (m : ℕ) (hm11 : 11 ≤ m) (hm27 : m ≤ 27) :
     K * C * P.G ^ 8 * P.U ^ 45 / S.Ω ^ m ≤ C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := by
   have hΩpos := S.Ω_pos
@@ -83,7 +81,7 @@ theorem step4_fitEB_T1
     (hℓ1W : ℓ₁ ≤ 130*(P.G*P.U^5)) (hℓ2W : ℓ₂ ≤ 130*(P.G*P.U^5))
     (n C : ℝ) (hC : 1 ≤ C)
     (hncap : n ≤ C*ℓ₁^2*(ℓ₁*ℓ₂*(ℓ₂-ℓ₁))*P.U^10/S.Ω^8) (hn0 : 0 ≤ n)
-    (a : ℝ) (ha0 : 0 < a) (ha_hi : a ≤ 11*S.A)
+    (a : ℝ) (_ha0 : 0 < a) (ha_hi : a ≤ 11*S.A)
     (gap : ℝ) (hgap0 : 0 ≤ gap)
     (hgap : gap ≤ 2*10^12*S.Δ/(P.G*S.Ω^3*ℓ₁) + 10^13*ℓ₁*S.Δ^3/(P.H*P.G^2*S.Ω^6)) :
     (10^10*a*P.G*S.Ω^3*gap/S.Δ^2) * (P.G^4*P.U^15/S.Ω^4) * n
@@ -169,7 +167,7 @@ theorem step4_fitEB_T2
     (hℓ1W : ℓ₁ ≤ 130*(P.G*P.U^5)) (hℓ2W : ℓ₂ ≤ 130*(P.G*P.U^5))
     (n C : ℝ) (hC : 1 ≤ C)
     (hncap : n ≤ C*ℓ₁^2*(ℓ₁*ℓ₂*(ℓ₂-ℓ₁))*P.U^10/S.Ω^8) (hn0 : 0 ≤ n)
-    (a : ℝ) (ha0 : 0 < a) (ha_hi : a ≤ 11*S.A) :
+    (a : ℝ) (_ha0 : 0 < a) (ha_hi : a ≤ 11*S.A) :
     (10^35*a*P.G*S.Ω^3*ℓ₂*S.B^2/(S.Δ^2*S.D)) * (P.G^4*P.U^15/S.Ω^4) * n
       ≤ C * (P.H/S.Δ) * (S.Δ^2*P.G^15*P.U^90/(P.H*S.Ω^27)) := by
   have hGpos := P.G_pos

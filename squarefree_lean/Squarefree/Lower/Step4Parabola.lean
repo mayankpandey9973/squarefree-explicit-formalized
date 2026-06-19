@@ -43,8 +43,6 @@ open Real Squarefree.Counting
 
 variable {P : Globals} {S : Scale P}
 
-set_option maxHeartbeats 1600000
-
 /-- **§5 Step-4 large-defect tight parabola** (writeup 1052–1058).  The closed cubic/quartic
 `Σ_closed` agrees with its leading `v²` term `C_r·(ℓ₁v)²` (`C_r := −12Xab₀ℓ₁ℓ₂(ℓ₂−ℓ₁)/d⁵`) up to
 an error that is a strict fraction `105/122` of `|s|`.  This is the parabola input for the
@@ -52,12 +50,12 @@ an error that is a strict fraction `105/122` of `|s|`.  This is the parabola inp
 set (the large-defect regime + `|v|≍V_s` pin), minus the near-int packaging not needed here. -/
 theorem Sigma_closed_parabola_tight
     {a b₀ v d ℓ₁ ℓ₂ : ℝ} {s : ℤ}
-    (ha0 : 0 < a) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (ha0 : 0 < a) (_ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ12' : ℓ₁ + 1 ≤ ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hb0lo : S.B / 2000000 ≤ |b₀|)
     (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
     (hvlo : 10 * (ℓ₂ * (ℓ₂ - ℓ₁) * b₀ ^ 2 / d) ≤ |v|)
-    (hdD : S.D * (1 - 1/10 ^ 9) ≤ d) (hd2D : d ≤ 2 * S.D * (1 + 1/10 ^ 9))
+    (hdD : S.D * (1 - 1/10 ^ 9) ≤ d) (_hd2D : d ≤ 2 * S.D * (1 + 1/10 ^ 9))
     (hReg : S.Δ ^ 2 * P.U ^ 5 ≤ P.H * S.Ω ^ 3)
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
@@ -143,7 +141,7 @@ theorem Sigma_closed_parabola_tight
     rw [hround]; exact abs_sub_round (Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂)
   have hSle : |Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂| ≤ (3 / 2) * |(s : ℝ)| := by
     have h := abs_sub_abs_le_abs_sub (Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂) (s : ℝ)
-    nlinarith [h, hhalf, hs1, hsnn]
+    linarith only [h, hhalf, hs1, hsnn]
   -- Triangle inequality on  Σ_closed = leading + residual :
   --   12·Q·T = |leading| ≤ |Σ_closed| + |residual| ≤ (3/2)|s| + (35/8)·Q·T.
   have hQT : Q * T ≤ (12 / 61) * |(s : ℝ)| := by
@@ -158,7 +156,9 @@ theorem Sigma_closed_parabola_tight
         ((-12 * P.X * a * b₀ * ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁) / d ^ 5) * (ℓ₁ * v) ^ 2)] at h
       linarith [h]
     -- 12·Q·T ≤ (3/2)|s| + (35/8)·Q·T  ⟹  (61/8)·Q·T ≤ (3/2)|s|  ⟹  Q·T ≤ (12/61)|s|.
-    nlinarith [htri, hSle, hresid_le, mul_nonneg hQpos.le hTnn]
+    have e1 : Q * (12 * T) = 12 * (Q * T) := by ring
+    have e2 : Q * (35 / 8 * T) = 35 / 8 * (Q * T) := by ring
+    linarith only [htri, hSle, hresid_le, e1, e2]
   -- Assemble:  |residual| ≤ (35/8)·Q·T ≤ (35/8)·(12/61)|s| = (105/122)|s|.
   calc |Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂
         - (-12 * P.X * a * b₀ * ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁) / d ^ 5) * (ℓ₁ * v) ^ 2|
@@ -180,7 +180,7 @@ private theorem sigma_closed_resid_sharp
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hb0lo : S.B / 2000000 ≤ |b₀|)
     (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
     (hVcut : V₂ P S ≤ |v|)
-    (hdD : S.D * (1 - 1/10 ^ 9) ≤ d) (hd2D : d ≤ 2 * S.D * (1 + 1/10 ^ 9))
+    (hdD : S.D * (1 - 1/10 ^ 9) ≤ d) (_hd2D : d ≤ 2 * S.D * (1 + 1/10 ^ 9))
     (hReg : S.Δ ^ 2 * P.U ^ 5 ≤ P.H * S.Ω ^ 3)
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
@@ -236,7 +236,7 @@ the `|s|`-conversion `Q·T ≤ (12/61)|s|` is the same triangle/round argument a
 lemma.  `c = 48/(61·10⁵⁰) ≤ 1/10²⁹`. -/
 theorem Sigma_closed_parabola_sharp
     {a b₀ v d ℓ₁ ℓ₂ : ℝ} {s : ℤ}
-    (ha0 : 0 < a) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (ha0 : 0 < a) (_ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ12' : ℓ₁ + 1 ≤ ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hb0lo : S.B / 2000000 ≤ |b₀|)
     (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
@@ -332,7 +332,7 @@ theorem Sigma_closed_parabola_sharp
     rw [hround]; exact abs_sub_round (Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂)
   have hSle : |Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂| ≤ (3 / 2) * |(s : ℝ)| := by
     have h := abs_sub_abs_le_abs_sub (Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂) (s : ℝ)
-    nlinarith [h, hhalf, hs1, hsnn]
+    linarith only [h, hhalf, hs1, hsnn]
   have hQT : Q * T ≤ (12 / 61) * |(s : ℝ)| := by
     have htri : Q * (12 * T) ≤ |Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂|
         + |Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂
@@ -344,7 +344,9 @@ theorem Sigma_closed_parabola_sharp
       rw [abs_sub_comm
         ((-12 * P.X * a * b₀ * ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁) / d ^ 5) * (ℓ₁ * v) ^ 2)] at h
       linarith [h]
-    nlinarith [htri, hSle, hresidv_le, hQTnn]
+    have e1 : Q * (12 * T) = 12 * (Q * T) := by ring
+    have e2 : Q * (35 / 8 * T) = 35 / 8 * (Q * T) := by ring
+    linarith only [htri, hSle, hresidv_le, e1, e2, hQTnn]
   -- assemble :  |residual| ≤ 4·(1/10⁵⁰)·Q·T ≤ 4·(1/10⁵⁰)·(12/61)|s| ≤ (1/10²⁹)|s|.
   calc |Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂
         - (P.X * a / d ^ 5) * (-4 + 10 * a / d) * (3 * ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁) * b₀) * (ℓ₁ * v) ^ 2|

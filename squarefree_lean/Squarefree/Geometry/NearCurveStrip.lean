@@ -165,6 +165,7 @@ the convexified residual fixes it.
 Total (default `N/2` when no minimizer exists), via classical choice. -/
 noncomputable def lineSplit' (f : ℝ → ℝ) (N δ : ℝ) (D : MajorLine) : ℝ := by
   classical
+  have _ := δ
   exact
     if h : ∃ c ∈ Set.Icc (N / 2) (5 * N / 2),
         IsMinOn (fun x => lineSign' f N D * lineRes f D x)
@@ -202,6 +203,8 @@ theorem lineSplit'_isMinOn {D : MajorLine}
       IsMinOn (fun x => lineSign' f N D * lineRes f D x)
         (Set.Icc (N / 2) (5 * N / 2)) (lineSplit' f N δ D) := by
   classical
+  have _ := hlam
+  have _ := hlower
   set I := Set.Icc (N / 2) (5 * N / 2) with hIdef
   have hIne : I.Nonempty := ⟨N / 2, by rw [hIdef]; exact ⟨le_rfl, by linarith⟩⟩
   -- the convexified residual is continuous, hence attains a min on compact `I`.
@@ -455,6 +458,7 @@ private theorem properArc'_side_monotone {D : MajorLine}
     MonotoneOn (lineRes f D) (Set.Icc (n : ℝ) (m : ℝ)) ∨
       AntitoneOn (lineRes f D) (Set.Icc (n : ℝ) (m : ℝ)) := by
   classical
+  have _ := hnm
   set I := Set.Icc (N / 2) (5 * N / 2) with hIdef
   set c := lineSplit' f N δ D with hc
   set sgn := lineSign' f N D with hsgn

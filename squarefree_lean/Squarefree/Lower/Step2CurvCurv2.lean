@@ -19,14 +19,12 @@ namespace Squarefree
 
 open Real
 
-set_option maxHeartbeats 1600000
-
 /-- **f-elimination Wronskian identity** (sympy-verified).  With `ψ'' = (12d²d1²+4d³d2)/(6Xa)`,
 `ψ' = 4d³d1/(6Xa)`, the actual derivatives `D1 = ψ'(f+φ)+ψ·φ1`,
 `D2 = ψ''(f+φ)+2ψ'·φ1+ψ·φ2` (with `φ1,φ2` the **closed forms** `K·b·br/d⁶`, `K·G/d⁶`),
 the Wronskian `ψ''·D1 − ψ'·D2` is `f`-free and equals `(4K/(6Xa)²)·Ñ_act`. -/
 lemma welim_poly (X a d d1 d2 b bp bd φ φ1 φ2 f K : ℝ)
-    (hg : (6 : ℝ) * X * a ≠ 0) (hd6 : d ^ 6 ≠ 0) (hd : d ≠ 0)
+    (_hg : (6 : ℝ) * X * a ≠ 0) (_hd6 : d ^ 6 ≠ 0) (hd : d ≠ 0)
     (hφ1 : φ1 = K * b * (2 * bp * d - 5 * b * d1) / d ^ 6)
     (hφ2 : φ2 = K * (bp * (2 * bp * d - 5 * b * d1)
         + b * (2 * bd * d - 3 * bp * d1 - 5 * b * d2)
@@ -114,11 +112,11 @@ lemma correction_abstract {d d1 d2 s4 e1 e2 e3 B R l1 : ℝ}
         - 2 * d ^ 2 * d1 ^ 2 * e3)|
       ≤ B ^ 5 / (2 * 10 ^ 29) := by
   have hRne : R ≠ 0 := ne_of_gt hR
-  have hl1R : l1 ≤ R := by nlinarith [hsmall, hl1]
+  have hl1R : l1 ≤ R := by linarith only [hsmall, hl1]
   -- folding fact `ℓ₁²B⁵/R² ≤ ℓ₁B⁵/R`
   have hsq : l1 ^ 2 * B ^ 5 / R ^ 2 ≤ l1 * B ^ 5 / R := by
     rw [div_le_div_iff₀ (by positivity) (by positivity)]
-    nlinarith [mul_nonneg (mul_nonneg (mul_nonneg hl1.le (pow_nonneg hB.le 5)) hR.le)
+    nlinarith only [mul_nonneg (mul_nonneg (mul_nonneg hl1.le (pow_nonneg hB.le 5)) hR.le)
       (sub_nonneg.mpr hl1R)]
   -- inner sum bounds
   have hc2 : |d * d2 + 5 * d1 ^ 2| ≤ 2 * 10 ^ 14 * B ^ 2 := by
@@ -126,21 +124,21 @@ lemma correction_abstract {d d1 d2 s4 e1 e2 e3 B R l1 : ℝ}
       rw [abs_mul]; exact mul_le_mul hd_hi hd2 (abs_nonneg _) (by positivity)
     have h2 : |5 * d1 ^ 2| ≤ 5 * (10 ^ 6 * B) ^ 2 := by
       rw [abs_mul, abs_pow, show |(5:ℝ)| = 5 from by norm_num]; gcongr
-    have h1' : 18 * (B * R) * (10 ^ 13 * (B / R)) = 18 * 10 ^ 13 * B ^ 2 := by field_simp <;> ring
+    have h1' : 18 * (B * R) * (10 ^ 13 * (B / R)) = 18 * 10 ^ 13 * B ^ 2 := by field_simp
     have h2' : 5 * (10 ^ 6 * B) ^ 2 = 5 * 10 ^ 12 * B ^ 2 := by ring
     calc |d * d2 + 5 * d1 ^ 2| ≤ |d * d2| + |5 * d1 ^ 2| := abs_add_le _ _
       _ ≤ 18 * 10 ^ 13 * B ^ 2 + 5 * 10 ^ 12 * B ^ 2 := by rw [← h1', ← h2']; linarith
-      _ ≤ 2 * 10 ^ 14 * B ^ 2 := by nlinarith [sq_nonneg B, hB]
+      _ ≤ 2 * 10 ^ 14 * B ^ 2 := by linarith only [sq_nonneg B]
   have hc6 : |5 * d1 ^ 2 - d * d2| ≤ 2 * 10 ^ 14 * B ^ 2 := by
     have h1 : |d * d2| ≤ 18 * (B * R) * (10 ^ 13 * (B / R)) := by
       rw [abs_mul]; exact mul_le_mul hd_hi hd2 (abs_nonneg _) (by positivity)
     have h2 : |5 * d1 ^ 2| ≤ 5 * (10 ^ 6 * B) ^ 2 := by
       rw [abs_mul, abs_pow, show |(5:ℝ)| = 5 from by norm_num]; gcongr
-    have h1' : 18 * (B * R) * (10 ^ 13 * (B / R)) = 18 * 10 ^ 13 * B ^ 2 := by field_simp <;> ring
+    have h1' : 18 * (B * R) * (10 ^ 13 * (B / R)) = 18 * 10 ^ 13 * B ^ 2 := by field_simp
     have h2' : 5 * (10 ^ 6 * B) ^ 2 = 5 * 10 ^ 12 * B ^ 2 := by ring
     calc |5 * d1 ^ 2 - d * d2| ≤ |5 * d1 ^ 2| + |d * d2| := abs_sub _ _
       _ ≤ 5 * 10 ^ 12 * B ^ 2 + 18 * 10 ^ 13 * B ^ 2 := by rw [← h1', ← h2']; linarith
-      _ ≤ 2 * 10 ^ 14 * B ^ 2 := by nlinarith [sq_nonneg B, hB]
+      _ ≤ 2 * 10 ^ 14 * B ^ 2 := by linarith only [sq_nonneg B]
   have hc4 : |d ^ 2 * d1 * s4 - d ^ 2 * d2 ^ 2 - 5 * d * d1 ^ 2 * d2 + 5 * d1 ^ 4|
       ≤ 4 * 10 ^ 28 * B ^ 4 := by
     have hA : |d ^ 2 * d1 * s4| ≤ (18 * (B * R)) ^ 2 * (10 ^ 6 * B) * (10 ^ 19 * (B / R ^ 2)) := by
@@ -156,11 +154,11 @@ lemma correction_abstract {d d1 d2 s4 e1 e2 e3 B R l1 : ℝ}
     have hDd : |5 * d1 ^ 4| ≤ 5 * (10 ^ 6 * B) ^ 4 := by
       rw [abs_mul, abs_pow, show |(5:ℝ)| = 5 from by norm_num]; gcongr
     have eA : (18 * (B * R)) ^ 2 * (10 ^ 6 * B) * (10 ^ 19 * (B / R ^ 2))
-        = 324 * 10 ^ 25 * B ^ 4 := by field_simp <;> ring
+        = 324 * 10 ^ 25 * B ^ 4 := by field_simp; ring
     have eB : (18 * (B * R)) ^ 2 * (10 ^ 13 * (B / R)) ^ 2 = 324 * 10 ^ 26 * B ^ 4 := by
-      field_simp <;> ring
+      field_simp; ring
     have eC : 5 * (18 * (B * R)) * (10 ^ 6 * B) ^ 2 * (10 ^ 13 * (B / R)) = 90 * 10 ^ 25 * B ^ 4 := by
-      field_simp <;> ring
+      field_simp; ring
     have eD : 5 * (10 ^ 6 * B) ^ 4 = 5 * 10 ^ 24 * B ^ 4 := by ring
     rw [eA] at hA; rw [eB] at hBb; rw [eC] at hCc; rw [eD] at hDd
     have hsplit : |d ^ 2 * d1 * s4 - d ^ 2 * d2 ^ 2 - 5 * d * d1 ^ 2 * d2 + 5 * d1 ^ 4|
@@ -180,7 +178,7 @@ lemma correction_abstract {d d1 d2 s4 e1 e2 e3 B R l1 : ℝ}
     calc _ ≤ _ := hsplit
       _ ≤ 324 * 10 ^ 25 * B ^ 4 + 324 * 10 ^ 26 * B ^ 4 + 90 * 10 ^ 25 * B ^ 4 + 5 * 10 ^ 24 * B ^ 4 := by
             linarith [hA, hBb, hCc, hDd]
-      _ ≤ 4 * 10 ^ 28 * B ^ 4 := by nlinarith [pow_nonneg hB.le 4]
+      _ ≤ 4 * 10 ^ 28 * B ^ 4 := by linarith only [pow_nonneg hB.le 4]
   -- name the 7 signed terms
   set T1 := -5 * d1 ^ 3 * e1 ^ 2 with hT1
   set T2 := 2 * d * (d * d2 + 5 * d1 ^ 2) * e1 * e2 with hT2
@@ -195,7 +193,7 @@ lemma correction_abstract {d d1 d2 s4 e1 e2 e3 B R l1 : ℝ}
     calc |(-5 * d1 ^ 3 * e1 ^ 2 : ℝ)|
         ≤ 5 * (10 ^ 6 * B) ^ 3 * (l1 * (10 ^ 13 * (B / R))) ^ 2 := by
           rw [abs_mul, abs_mul, abs_pow, abs_pow, show |(-5 : ℝ)| = 5 from by norm_num]; gcongr
-      _ = (5 * 10 ^ 44) * (l1 ^ 2 * B ^ 5 / R ^ 2) := by field_simp <;> ring
+      _ = (5 * 10 ^ 44) * (l1 ^ 2 * B ^ 5 / R ^ 2) := by field_simp
       _ ≤ (5 * 10 ^ 44) * (l1 * B ^ 5 / R) := by exact mul_le_mul_of_nonneg_left hsq (by norm_num)
   have hT2bd : |T2| ≤ (72 * 10 ^ 46) * (l1 * B ^ 5 / R) := by
     rw [hT2]
@@ -203,7 +201,7 @@ lemma correction_abstract {d d1 d2 s4 e1 e2 e3 B R l1 : ℝ}
         ≤ 2 * (18 * (B * R)) * (2 * 10 ^ 14 * B ^ 2) * (l1 * (10 ^ 13 * (B / R)))
             * (l1 * (10 ^ 19 * (B / R ^ 2))) := by
           rw [abs_mul, abs_mul, abs_mul, abs_mul, show |(2 : ℝ)| = 2 from by norm_num]; gcongr
-      _ = (72 * 10 ^ 46) * (l1 ^ 2 * B ^ 5 / R ^ 2) := by field_simp <;> ring
+      _ = (72 * 10 ^ 46) * (l1 ^ 2 * B ^ 5 / R ^ 2) := by field_simp; ring
       _ ≤ (72 * 10 ^ 46) * (l1 * B ^ 5 / R) := by exact mul_le_mul_of_nonneg_left hsq (by norm_num)
   have hT3bd : |T3| ≤ (1296 * 10 ^ 44) * (l1 * B ^ 5 / R) := by
     rw [hT3]
@@ -212,7 +210,7 @@ lemma correction_abstract {d d1 d2 s4 e1 e2 e3 B R l1 : ℝ}
             * (l1 * (2 * 10 ^ 25 * (B / R ^ 3))) := by
           rw [abs_mul, abs_mul, abs_mul, abs_mul, abs_pow, show |(2 : ℝ)| = 2 from by norm_num]
           gcongr
-      _ = (1296 * 10 ^ 44) * (l1 ^ 2 * B ^ 5 / R ^ 2) := by field_simp <;> ring
+      _ = (1296 * 10 ^ 44) * (l1 ^ 2 * B ^ 5 / R ^ 2) := by field_simp; ring
       _ ≤ (1296 * 10 ^ 44) * (l1 * B ^ 5 / R) := by
             exact mul_le_mul_of_nonneg_left hsq (by norm_num)
   have hT4bd : |T4| ≤ (8 * 10 ^ 41) * (l1 * B ^ 5 / R) := by
@@ -220,14 +218,14 @@ lemma correction_abstract {d d1 d2 s4 e1 e2 e3 B R l1 : ℝ}
     calc |2 * (d ^ 2 * d1 * s4 - d ^ 2 * d2 ^ 2 - 5 * d * d1 ^ 2 * d2 + 5 * d1 ^ 4) * e1|
         ≤ 2 * (4 * 10 ^ 28 * B ^ 4) * (l1 * (10 ^ 13 * (B / R))) := by
           rw [abs_mul, abs_mul, show |(2 : ℝ)| = 2 from by norm_num]; gcongr
-      _ = (8 * 10 ^ 41) * (l1 * B ^ 5 / R) := by field_simp <;> ring
+      _ = (8 * 10 ^ 41) * (l1 * B ^ 5 / R) := by field_simp; ring
   have hT5bd : |T5| ≤ (648 * 10 ^ 44) * (l1 * B ^ 5 / R) := by
     rw [hT5]
     calc |2 * d ^ 2 * d1 * e2 ^ 2|
         ≤ 2 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) * (l1 * (10 ^ 19 * (B / R ^ 2))) ^ 2 := by
           rw [abs_mul, abs_mul, abs_mul, abs_pow, abs_pow, show |(2 : ℝ)| = 2 from by norm_num]
           gcongr
-      _ = (648 * 10 ^ 44) * (l1 ^ 2 * B ^ 5 / R ^ 2) := by field_simp <;> ring
+      _ = (648 * 10 ^ 44) * (l1 ^ 2 * B ^ 5 / R ^ 2) := by field_simp; ring
       _ ≤ (648 * 10 ^ 44) * (l1 * B ^ 5 / R) := by
             exact mul_le_mul_of_nonneg_left hsq (by norm_num)
   have hT6bd : |T6| ≤ (72 * 10 ^ 39) * (l1 * B ^ 5 / R) := by
@@ -236,14 +234,14 @@ lemma correction_abstract {d d1 d2 s4 e1 e2 e3 B R l1 : ℝ}
         ≤ 2 * (18 * (B * R)) * (10 ^ 6 * B) * (2 * 10 ^ 14 * B ^ 2)
             * (l1 * (10 ^ 19 * (B / R ^ 2))) := by
           rw [abs_mul, abs_mul, abs_mul, abs_mul, show |(2 : ℝ)| = 2 from by norm_num]; gcongr
-      _ = (72 * 10 ^ 39) * (l1 * B ^ 5 / R) := by field_simp <;> ring
+      _ = (72 * 10 ^ 39) * (l1 * B ^ 5 / R) := by field_simp; ring
   have hT7bd : |T7| ≤ (1296 * 10 ^ 37) * (l1 * B ^ 5 / R) := by
     rw [hT7]
     calc |2 * d ^ 2 * d1 ^ 2 * e3|
         ≤ 2 * (18 * (B * R)) ^ 2 * (10 ^ 6 * B) ^ 2 * (l1 * (2 * 10 ^ 25 * (B / R ^ 3))) := by
           rw [abs_mul, abs_mul, abs_mul, abs_pow, abs_pow, show |(2 : ℝ)| = 2 from by norm_num]
           gcongr
-      _ = (1296 * 10 ^ 37) * (l1 * B ^ 5 / R) := by field_simp <;> ring
+      _ = (1296 * 10 ^ 37) * (l1 * B ^ 5 / R) := by field_simp; ring
   -- triangle inequality on the 7 signed terms
   have htri : |T1 + T2 - T3 - T4 - T5 + T6 - T7|
       ≤ |T1| + |T2| + |T3| + |T4| + |T5| + |T6| + |T7| := by
@@ -256,18 +254,16 @@ lemma correction_abstract {d d1 d2 s4 e1 e2 e3 B R l1 : ℝ}
     linarith [s1, s2, s3, s4', s5, s6]
   -- final numeric combine
   have hXnn : (0:ℝ) ≤ l1 * B ^ 5 / R := by positivity
-  have h2l1 : 2 * 10 ^ 77 * l1 ≤ R := by nlinarith [hsmall, hl1]
+  have h2l1 : 2 * 10 ^ 77 * l1 ≤ R := by linarith only [hsmall, hl1]
   have hfin : (10 : ℝ) ^ 48 * (l1 * B ^ 5 / R) ≤ B ^ 5 / (2 * 10 ^ 29) := by
     rw [show (10 : ℝ) ^ 48 * (l1 * B ^ 5 / R) = (10 ^ 48 * (l1 * B ^ 5)) / R from by ring,
         div_le_div_iff₀ hR (by positivity)]
-    nlinarith [mul_nonneg (pow_pos hB 5).le (sub_nonneg.mpr h2l1), pow_pos hB 5]
+    nlinarith only [mul_nonneg (pow_pos hB 5).le (sub_nonneg.mpr h2l1), pow_pos hB 5]
   calc |T1 + T2 - T3 - T4 - T5 + T6 - T7|
       ≤ |T1| + |T2| + |T3| + |T4| + |T5| + |T6| + |T7| := htri
     _ ≤ ((5 * 10 ^ 44) + (72 * 10 ^ 46) + (1296 * 10 ^ 44) + (8 * 10 ^ 41) + (648 * 10 ^ 44)
           + (72 * 10 ^ 39) + (1296 * 10 ^ 37)) * (l1 * B ^ 5 / R) := by
-        have := hT1bd; have := hT2bd; have := hT3bd; have := hT4bd
-        have := hT5bd; have := hT6bd; have := hT7bd
-        nlinarith [hT1bd, hT2bd, hT3bd, hT4bd, hT5bd, hT6bd, hT7bd, hXnn]
+        linarith only [hT1bd, hT2bd, hT3bd, hT4bd, hT5bd, hT6bd, hT7bd]
     _ ≤ (10 : ℝ) ^ 48 * (l1 * B ^ 5 / R) := by
         apply mul_le_mul_of_nonneg_right _ hXnn; norm_num
     _ ≤ B ^ 5 / (2 * 10 ^ 29) := hfin

@@ -20,8 +20,6 @@ open Classical Finset Set Real Squarefree.FiniteDiff
 
 namespace Squarefree
 
-set_option maxHeartbeats 1600000
-
 /-- **N11 numeric assembly** (abstract scalar form; ledger-banked).  The ten group
 numerators against the four `errScale` slots at `cErr = 10⁴²`. -/
 private theorem sec7E_num_final {T1 T2 T3 R hS Pv relF rel ind a b c : ℝ}
@@ -103,7 +101,7 @@ private theorem sec7E_num_final {T1 T2 T3 R hS Pv relF rel ind a b c : ℝ}
         4 * 10 ^ 31 * (ind * T1 * relF) := by
       ring
     have hindS3 : ind * (hS ^ 2 * T1 / R ^ 2) ≤ hS ^ 2 * T1 / R ^ 2 := by
-      nlinarith [mul_nonneg (sub_nonneg.mpr hind1) hs3nn]
+      nlinarith only [mul_nonneg (sub_nonneg.mpr hind1) hs3nn]
     linarith [bt1, key, hindS3]
   have HG3 : 4 * ((10 ^ 11 * T1) *
       (10 ^ 25 * (a * b * c * (T2 / R ^ 3) * rel + a * b * c * hS * T2 / R ^ 4))) =
@@ -126,9 +124,9 @@ private theorem sec7E_num_final {T1 T2 T3 R hS Pv relF rel ind a b c : ℝ}
     rw [huvw] at key
     have b1 : u * hS * T1 / R ^ 2 ≤ hS ^ 2 * T1 / R ^ 2 := by
       rw [div_le_div_iff_of_pos_right (by positivity)]
-      nlinarith [mul_nonneg (mul_nonneg (sub_nonneg.mpr hule) hhS0) hT1.le]
+      nlinarith only [mul_nonneg (mul_nonneg (sub_nonneg.mpr hule) hhS0) hT1.le]
     have b2 : u * (T1 / R) * relF ≤ hS * (T1 / R) * relF := by
-      nlinarith [mul_nonneg (mul_nonneg (sub_nonneg.mpr hule) hT1R) hrelF]
+      nlinarith only [mul_nonneg (mul_nonneg (sub_nonneg.mpr hule) hT1R) hrelF]
     linarith [key, b1, b2]
   have HG5 : ∀ u v w : ℝ, u * (v * w) = a * b * c →
       4 * ((4 * 10 ^ 14 * (u * (T1 / R))) *
@@ -175,19 +173,19 @@ the absorption hypothesis `habs` is DROPPED — the Taylor term is explicit in `
 theorem sec7_err_deriv_bound {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
     {Ph : Sec7Phase P S W a}
     {j h₁ h₂ h₃ : ℤ} {ξ₁ ξ₂ ξ₃ : ℝ} (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
-    (Env : Sec7Envelope P S W) (hj : sec7_jBand P S j)
+    (Env : Sec7Envelope P S W) (_hj : sec7_jBand P S j)
     (hbox : sec7_shiftBox W h₁ h₂ h₃)
     (hW : 0 < W)
     (hpad : 6 * (W + W ^ 2 + W ^ 4) ≤ S.R / 288)
     (hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4))
     (hrel143 : sec7_relErr P S * 10 ^ 143 ≤ 1)
-    (hrelF143 : sec7_relErrF P S * 10 ^ 143 ≤ 1)
+    (_hrelF143 : sec7_relErrF P S * 10 ^ 143 ≤ 1)
     (hξ₁ : |ξ₁| ≤ sec7_hSum h₁ h₂ h₃) (hξ₂ : |ξ₂| ≤ sec7_hSum h₁ h₂ h₃)
     (hξ₃ : |ξ₃| ≤ sec7_hSum h₁ h₂ h₃)
     (ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ)
     (hρ₀ : |(ρ₀ : ℝ)| ≤ sec7_cCarry)
-    (hρ₁ : |(ρ₁ : ℝ)| ≤ sec7_cCarry) (hρ₂ : |(ρ₂ : ℝ)| ≤ sec7_cCarry)
-    (hρ₃ : |(ρ₃ : ℝ)| ≤ sec7_cCarry)
+    (_hρ₁ : |(ρ₁ : ℝ)| ≤ sec7_cCarry) (_hρ₂ : |(ρ₂ : ℝ)| ≤ sec7_cCarry)
+    (_hρ₃ : |(ρ₃ : ℝ)| ≤ sec7_cCarry)
     (hu₁ : |(u₁ : ℝ) - ρ₁| ≤ sec7_cFib * (1 + (h₂ : ℝ) * h₃ * (S.T₂ / S.R ^ 2)))
     (hu₂ : |(u₂ : ℝ) - ρ₂| ≤ sec7_cFib * (1 + (h₁ : ℝ) * h₃ * (S.T₂ / S.R ^ 2)))
     (hu₃ : |(u₃ : ℝ) - ρ₃| ≤ sec7_cFib * (1 + (h₁ : ℝ) * h₂ * (S.T₂ / S.R ^ 2))) :
@@ -462,8 +460,8 @@ theorem sec7_err_deriv_bound {P : Globals} {S : Scale P} {W : ℝ} {a : ℤ}
   have hcErr : sec7_cErr = (10:ℝ) ^ 42 := by norm_num [sec7_cErr]
   have hPv1 : (1:ℝ) ≤ sec7_Pprod h₁ h₂ h₃ := by
     unfold sec7_Pprod
-    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith
-    nlinarith [h12, a3]
+    have h12 : (1:ℝ) ≤ (h₁:ℝ) * h₂ := by nlinarith only [a1, a2]
+    nlinarith only [h12, a3]
   have hnum := sec7E_num_final (T1 := S.T₁) (T2 := S.T₂) (T3 := S.T₃) (R := S.R)
     (hS := sec7_hSum h₁ h₂ h₃) (Pv := sec7_Pprod h₁ h₂ h₃)
     (relF := sec7_relErrF P S) (rel := sec7_relErr P S)

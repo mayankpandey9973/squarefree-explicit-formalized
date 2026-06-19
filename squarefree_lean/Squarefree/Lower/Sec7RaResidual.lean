@@ -12,7 +12,7 @@ namespace Squarefree
 
 open Set
 
-set_option maxHeartbeats 4000000
+set_option maxHeartbeats 2000000
 
 private noncomputable def sec7_ra_hCoeff : ℕ → ℝ
   | 0 => 1
@@ -135,7 +135,7 @@ private theorem sec7_ra_A1Qpoly_eval (a t : ℝ) :
 
 private theorem sec7_ra_A1Ppoly_eval {k : ℕ} (hk : k ≤ 5) (a t : ℝ) :
     (sec7_ra_A1Ppoly k a).eval t = sec7_ra_A1P k a t := by
-  interval_cases k <;> simp [sec7_ra_A1Ppoly, sec7_ra_A1P] <;> ring_nf
+  interval_cases k <;> simp [sec7_ra_A1Ppoly, sec7_ra_A1P]
 
 private theorem sec7_ra_A1E_hasDerivAt {X a r : ℝ} {m : ℕ}
     (hX : 0 < X) (ha : 0 < a) (hr : 0 < r) (hm : m < 5) :
@@ -352,7 +352,7 @@ private theorem sec7_ra_Ffun_deriv2_upper_sharp_close {X a d z : ℝ}
   have haz : a * z ≤ (d / 2) * ((101 / 100 : ℝ) * d) := by
     exact mul_le_mul ha2 hzhi hzpos.le (by positivity)
   have hquad : a ^ 2 + 2 * a * z + 2 * z ^ 2 ≤ 4 * d ^ 2 := by
-    nlinarith [ha_sq, hz_sq, haz]
+    nlinarith only [ha_sq, hz_sq, haz]
   have hlin : a + 2 * z ≤ 3 * d := by nlinarith
   have hnum_core :
       6 * X * a * (a + 2 * z) * (a ^ 2 + 2 * a * z + 2 * z ^ 2)
@@ -376,7 +376,7 @@ private theorem sec7_ra_Ffun_deriv2_upper_sharp_close {X a d z : ℝ}
         rw [show (((99 / 100 : ℝ) * d) ^ 4) * (((99 / 100 : ℝ) * d) ^ 4) =
             (99 / 100 : ℝ) ^ 8 * d ^ 8 by ring]
         have hd8_nonneg : 0 ≤ d ^ 8 := by positivity
-        nlinarith [hd8_nonneg]
+        nlinarith only [hd8_nonneg]
       _ ≤ 2 * (z ^ 4 * (z + a) ^ 4) := by gcongr
   have hden_pos : 0 < z ^ 4 * (z + a) ^ 4 := by positivity
   rw [div_le_div_iff₀ hden_pos (pow_pos hd 5)]
@@ -554,13 +554,13 @@ private theorem sec7_ra_Ffun_deriv1_lower_25 {X a z : ℝ}
         3 * (51 / 100 : ℝ) + 11 * (51 / 100 : ℝ) ^ 2 +
             5 * (51 / 100 : ℝ) ^ 3 ≤ 7 := by
       norm_num
-    nlinarith [ha_z2, ha2_z, ha3', hconst, hz3_nonneg]
+    nlinarith only [ha_z2, ha2_z, ha3', hconst, hz3_nonneg]
   have hpoly :
       5 * (z + a) ^ 3 ≤ 4 * z * (a ^ 2 + 3 * a * z + 3 * z ^ 2) := by
     have hnon : 0 ≤
         4 * z * (a ^ 2 + 3 * a * z + 3 * z ^ 2) - 5 * (z + a) ^ 3 := by
       ring_nf
-      nlinarith [hbad]
+      nlinarith only [hbad]
     linarith
   rw [div_le_div_iff₀ (pow_pos hz 4) (by positivity : 0 < z ^ 3 * (z + a) ^ 3)]
   calc
@@ -1085,7 +1085,7 @@ private theorem sec7_ra_B3q_hasDerivAt {P : Globals} {S : Scale P} {a d j : ℝ}
         deriv (fun t => Ffun P.X a t) d /
           deriv (fun t => Ffun P.X a t) qd := by
     field_simp [hFq_ne]
-    nlinarith [heq]
+    nlinarith only [heq]
   rw [hqd_def] at hval
   simpa [hval]
     using hraw
@@ -1478,7 +1478,7 @@ private theorem sec7_ra_dBreve_deriv3_image_sharp_close {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = (51 / 100 : ℝ) * z ^ 6 := by ring
     rw [hP_def]
-    linarith [h1, h2, h3, h4, h5, h6, pow_nonneg hz.le 6]
+    linarith only [h1, h2, h3, h4, h5, h6, pow_nonneg hz.le 6]
   have hza_bound : (z + a) ^ 2 ≤ ((151 / 100 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (151 / 100 : ℝ) * z := by nlinarith
     exact pow_le_pow_left₀ (by positivity : 0 ≤ z + a) hza 2
@@ -1627,7 +1627,7 @@ private theorem sec7_ra_dBreve_deriv4_image_sharp_close {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = (51 / 100 : ℝ) * z ^ 8 := by ring
     rw [hP_def]
-    linarith [h1, h2, h3, h4, h5, h6, h7, h8, pow_nonneg hz.le 8]
+    linarith only [h1, h2, h3, h4, h5, h6, h7, h8, pow_nonneg hz.le 8]
   have hza_bound : (z + a) ^ 2 ≤ ((151 / 100 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (151 / 100 : ℝ) * z := by nlinarith
     exact pow_le_pow_left₀ (by positivity : 0 ≤ z + a) hza 2
@@ -1801,7 +1801,7 @@ private theorem sec7_ra_dBreve_deriv5_image_sharp_close {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = (51 / 100 : ℝ) * z ^ 12 := by ring
     rw [hP_def]
-    linarith [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12,
+    linarith only [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12,
       pow_nonneg hz.le 12]
   have hza_bound : (z + a) ^ 2 ≤ ((151 / 100 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (151 / 100 : ℝ) * z := by nlinarith
@@ -1946,7 +1946,7 @@ private theorem sec7_ra_dBreve_deriv6_image_sharp_close {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = (51 / 100 : ℝ) * z ^ 14 := by ring
     rw [hP_def]
-    linarith [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14,
+    linarith only [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14,
       pow_nonneg hz.le 14]
   have hza_bound : (z + a) ^ 2 ≤ ((151 / 100 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (151 / 100 : ℝ) * z := by nlinarith
@@ -2488,9 +2488,11 @@ private theorem sec7_ra_A1E_bound {X a d : ℝ} {k : ℕ}
         a ^ 4 * 24 * d ^ 2 *
             (a * (a * (a * (a + 15 * d) + d ^ 2 * 60) + d ^ 3 * 90) +
               d ^ 4 * 45) ≤ 5064 * d ^ 10 := by
-      convert hPscaled using 1 <;> ring
+      convert hPscaled using 1
+      ring
     have hQpow5' : 243 * d ^ 10 ≤ (sec7_ra_A1Q a d) ^ 5 := by
-      convert hQpow5 using 1 <;> ring
+      convert hQpow5 using 1
+      ring
     change
       a *
           |24 * a ^ 4 *
@@ -2532,9 +2534,11 @@ private theorem sec7_ra_A1E_bound {X a d : ℝ} {k : ℕ}
     have hPscaled' :
         a ^ 4 * 1080 * d ^ 4 * (a + d) * (a + d * 2) *
             (a + d * 3) * (a * 2 + d * 3) ≤ 129600 * d ^ 12 := by
-      convert hPscaled using 1 <;> ring
+      convert hPscaled using 1
+      ring
     have hQpow6' : 729 * d ^ 12 ≤ (sec7_ra_A1Q a d) ^ 6 := by
-      convert hQpow6 using 1 <;> ring
+      convert hQpow6 using 1
+      ring
     change
       a *
           |-1080 * a ^ 4 * d * (a + d) * (a + 2 * d) *
@@ -4121,7 +4125,7 @@ private theorem sec7_ra_dBreve_deriv3_image_sharp_close_aled {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = 2 * z ^ 6 := by ring
     rw [hP_def]
-    linarith [h1, h2, h3, h4, h5, h6, pow_nonneg hz.le 6]
+    linarith only [h1, h2, h3, h4, h5, h6, pow_nonneg hz.le 6]
   have hza_bound : (z + a) ^ 2 ≤ ((3 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (3 : ℝ) * z := by nlinarith
     exact pow_le_pow_left₀ (by positivity : 0 ≤ z + a) hza 2
@@ -4318,7 +4322,7 @@ private theorem sec7_ra_dBreve_deriv4_image_sharp_close_aled {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = 2 * z ^ 8 := by ring
     rw [hP_def]
-    linarith [h1, h2, h3, h4, h5, h6, h7, h8, pow_nonneg hz.le 8]
+    linarith only [h1, h2, h3, h4, h5, h6, h7, h8, pow_nonneg hz.le 8]
   have hza_bound : (z + a) ^ 2 ≤ ((3 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (3 : ℝ) * z := by nlinarith
     exact pow_le_pow_left₀ (by positivity : 0 ≤ z + a) hza 2
@@ -4555,7 +4559,7 @@ private theorem sec7_ra_dBreve_deriv5_image_sharp_close_aled {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = 2 * z ^ 12 := by ring
     rw [hP_def]
-    linarith [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12,
+    linarith only [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12,
       pow_nonneg hz.le 12]
   have hza_bound : (z + a) ^ 2 ≤ ((3 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (3 : ℝ) * z := by nlinarith
@@ -4844,7 +4848,7 @@ private theorem sec7_ra_dBreve_deriv6_image_sharp_close_aled {X a d z : ℝ}
           mul_le_mul_of_nonneg_right haz (by positivity)
         _ = 2 * z ^ 14 := by ring
     rw [hP_def]
-    linarith [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14,
+    linarith only [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14,
       pow_nonneg hz.le 14]
   have hza_bound : (z + a) ^ 2 ≤ ((3 : ℝ) * z) ^ 2 := by
     have hza : z + a ≤ (3 : ℝ) * z := by nlinarith
@@ -4981,7 +4985,6 @@ private theorem sec7_ra_dBreve6ImagePoly_bound_aled {a d z : ℝ}
         532728 * (((102 / 100 : ℝ) * z) ^ 2) * z ^ 12 +
         157248 * (((102 / 100 : ℝ) * z)) * z ^ 13 + 22464 * z ^ 14 := by
           gcongr
-          all_goals first | exact hpow _ | positivity
     _ ≤ 12000000 * z ^ 14 := by
           rw [show
             33 * (((102 / 100 : ℝ) * z) ^ 14) +
@@ -5050,7 +5053,6 @@ private theorem sec7_ra_dBreve6ImagePolyDeriv_bound_aled {a d z : ℝ}
         13 * 157248 * (((102 / 100 : ℝ) * z)) * z ^ 12 +
         14 * 22464 * z ^ 13 := by
           gcongr
-          all_goals first | exact hpow _ | positivity
     _ ≤ 100000000 * z ^ 13 := by
           rw [show
             594 * (((102 / 100 : ℝ) * z) ^ 13) +
