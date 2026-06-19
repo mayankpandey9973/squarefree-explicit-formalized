@@ -452,8 +452,7 @@ private theorem sec7_zero_hGΩ5F {P : Globals} {S : Scale P} (c₀ Cu : ℝ)
           rw [← Real.rpow_add P.X_pos,
             show (-(18 : ℝ) / 100) + (18 / 100 : ℝ) = 0 by norm_num, Real.rpow_zero]
 
-private theorem sec7_dyadic_cover_sum (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t : ℝ)
-    (_ht : 0 < t) :
+private theorem sec7_dyadic_cover_sum (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t : ℝ) :
     ∀ K : ℕ,
       ∑ a ∈ Finset.Icc ⌈t⌉ ⌊t * 2 ^ (K + 1)⌋, f a ≤
         ∑ k ∈ Finset.range (K + 1),
@@ -506,7 +505,7 @@ private theorem sec7_card_filter_eq_sum_indicator (s : Finset ℤ) (P : ℤ → 
   rw [Finset.card_filter, Nat.cast_sum]
   exact Finset.sum_congr rfl (fun n hn => by by_cases h : P n <;> simp [h])
 
-private theorem sec7_wide_filter_dyadic_bound {R B : ℝ} (hR : 0 < R) (_hB : 0 ≤ B)
+private theorem sec7_wide_filter_dyadic_bound {R B : ℝ}
     (P : ℤ → Prop) [DecidablePred P]
     (hblock : ∀ k ∈ Finset.range 10,
       (((Finset.Icc ⌈(R / 72) * 2 ^ k⌉ ⌊(R / 72) * 2 ^ (k + 1)⌋).filter P).card : ℝ) ≤ B)
@@ -515,7 +514,6 @@ private theorem sec7_wide_filter_dyadic_bound {R B : ℝ} (hR : 0 < R) (_hB : 0 
     (((Finset.Icc ⌈R / 72⌉ ⌊16 * R⌋).filter P).card : ℝ) ≤ 11 * B := by
   classical
   set t : ℝ := R / 72 with htdef
-  have ht : 0 < t := by rw [htdef]; positivity
   let f : ℤ → ℝ := fun n => if P n then (1 : ℝ) else 0
   have hf : ∀ n, 0 ≤ f n := by intro n; dsimp [f]; split <;> norm_num
   have hwide_sum :
@@ -527,7 +525,7 @@ private theorem sec7_wide_filter_dyadic_bound {R B : ℝ} (hR : 0 < R) (_hB : 0 
       ∑ n ∈ Finset.Icc ⌈t⌉ ⌊t * 2 ^ (10 : ℕ)⌋, f n ≤
         ∑ k ∈ Finset.range 10,
           ∑ n ∈ Finset.Icc ⌈t * 2 ^ k⌉ ⌊t * 2 ^ (k + 1)⌋, f n := by
-    simpa using sec7_dyadic_cover_sum f hf t ht 9
+    simpa using sec7_dyadic_cover_sum f hf t 9
   have hcover :
       Finset.Icc ⌈t⌉ ⌊16 * R⌋ ⊆
         Finset.Icc ⌈t⌉ ⌊t * 2 ^ (10 : ℕ)⌋ ∪
@@ -607,7 +605,7 @@ private theorem sec7_dyadic_block_subset_wide {P : Globals} {S : Scale P}
     have hfloorxu : ((⌊xu⌋ : ℤ) : ℝ) ≤ xu := Int.floor_le xu
     linarith
 
-private theorem sec7_dyadic_block_dyad {xl xu : ℝ} (_hxl0 : 0 ≤ xl) (hxu0 : 0 ≤ xu)
+private theorem sec7_dyadic_block_dyad {xl xu : ℝ} (hxu0 : 0 ≤ xu)
     (hxu : xu ≤ 2 * xl) :
     ⌊xu⌋₊ ≤ 2 * ⌈xl⌉₊ := by
   have hq : (⌊xu⌋₊ : ℝ) ≤ xu := Nat.floor_le hxu0
@@ -649,63 +647,6 @@ private theorem sec7_zero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a : 
           sec7_hSum h₁ h₂ h₃ / (S.x ^ 2 * P.G ^ 2 * S.Ω ^ 4) +
           sec7_Pprod h₁ h₂ h₃ / (S.x ^ 2 * P.G ^ 3 * S.Ω ^ 9) +
           1) with hBdef
-  have hB0 : 0 ≤ B := by
-    rw [hBdef]
-    have hHpos : 0 < P.H := P.H_pos
-    have hGpos : 0 < P.G := P.G_pos
-    have hΩpos : 0 < S.Ω := S.Ω_pos
-    have hxpos : 0 < S.x := OnStripAux.x_pos P S
-    have hh₁0 : (0 : ℝ) ≤ (h₁ : ℝ) := by exact_mod_cast (le_trans (by norm_num) Hyp.hbox.1.1)
-    have hh₂0 : (0 : ℝ) ≤ (h₂ : ℝ) := by exact_mod_cast (le_trans (by norm_num) Hyp.hbox.2.1.1)
-    have hh₃0 : (0 : ℝ) ≤ (h₃ : ℝ) := by exact_mod_cast (le_trans (by norm_num) Hyp.hbox.2.2.1)
-    have hh₁pos : (0 : ℝ) < (h₁ : ℝ) := by
-      exact_mod_cast (lt_of_lt_of_le Int.zero_lt_one Hyp.hbox.1.1)
-    have hh₂pos : (0 : ℝ) < (h₂ : ℝ) := by
-      exact_mod_cast (lt_of_lt_of_le Int.zero_lt_one Hyp.hbox.2.1.1)
-    have hh₃pos : (0 : ℝ) < (h₃ : ℝ) := by
-      exact_mod_cast (lt_of_lt_of_le Int.zero_lt_one Hyp.hbox.2.2.1)
-    have hPPpos : 0 < sec7_Pprod h₁ h₂ h₃ := by
-      simp only [sec7_Pprod]
-      exact mul_pos (mul_pos hh₁pos hh₂pos) hh₃pos
-    have hSsym0 : 0 ≤ sec7_Ssym h₁ h₂ h₃ := by
-      simp only [sec7_Ssym]
-      linarith [mul_nonneg hh₁0 hh₂0, mul_nonneg hh₁0 hh₃0, mul_nonneg hh₂0 hh₃0]
-    have hHsum0 : 0 ≤ sec7_hSum h₁ h₂ h₃ := by
-      simp only [sec7_hSum]
-      linarith
-    have hratio0 : 0 ≤ sec7_Ssym h₁ h₂ h₃ / sec7_Pprod h₁ h₂ h₃ :=
-      div_nonneg hSsym0 hPPpos.le
-    have hden3 : 0 ≤ S.x ^ 2 * P.G ^ 2 * S.Ω ^ 4 := by positivity
-    have hA1 : 0 ≤ P.G * S.Ω / S.x ^ 2 :=
-      div_nonneg (mul_nonneg hGpos.le hΩpos.le) (sq_nonneg S.x)
-    have hA2 : 0 ≤ S.Ω ^ 2 / P.H :=
-      div_nonneg (sq_nonneg S.Ω) hHpos.le
-    have hA3 : 0 ≤ sec7_Ssym h₁ h₂ h₃ / (S.x ^ 2 * P.G ^ 2 * S.Ω ^ 4) := by
-      exact div_nonneg hSsym0 hden3
-    have hA4 : 0 ≤
-        P.H ^ ((1:ℝ)/4) * S.x ^ ((1:ℝ)/4) * P.G ^ ((5:ℝ)/2) *
-          S.Ω ^ ((13:ℝ)/2) / Real.sqrt (sec7_Pprod h₁ h₂ h₃) := by
-      exact div_nonneg (by positivity) (Real.sqrt_nonneg _)
-    have hA5 : 0 ≤
-        P.H ^ ((1:ℝ)/4) * S.x ^ ((1:ℝ)/4) * P.G * S.Ω ^ 4 *
-          Real.sqrt (sec7_Ssym h₁ h₂ h₃ / sec7_Pprod h₁ h₂ h₃) := by
-      exact mul_nonneg (by positivity) (Real.sqrt_nonneg _)
-    have hA6 : 0 ≤ sec7_hSum h₁ h₂ h₃ / (S.x ^ 2 * P.G ^ 2 * S.Ω ^ 4) := by
-      exact div_nonneg hHsum0 hden3
-    have hA7 : 0 ≤ sec7_Pprod h₁ h₂ h₃ / (S.x ^ 2 * P.G ^ 3 * S.Ω ^ 9) := by
-      exact div_nonneg hPPpos.le (by positivity)
-    have hbody : 0 ≤
-        (P.G * S.Ω / S.x ^ 2 + S.Ω ^ 2 / P.H +
-          sec7_Ssym h₁ h₂ h₃ / (S.x ^ 2 * P.G ^ 2 * S.Ω ^ 4) +
-          P.H ^ ((1:ℝ)/4) * S.x ^ ((1:ℝ)/4) * P.G ^ ((5:ℝ)/2) *
-            S.Ω ^ ((13:ℝ)/2) / Real.sqrt (sec7_Pprod h₁ h₂ h₃) +
-          P.H ^ ((1:ℝ)/4) * S.x ^ ((1:ℝ)/4) * P.G * S.Ω ^ 4 *
-            Real.sqrt (sec7_Ssym h₁ h₂ h₃ / sec7_Pprod h₁ h₂ h₃) +
-          sec7_hSum h₁ h₂ h₃ / (S.x ^ 2 * P.G ^ 2 * S.Ω ^ 4) +
-          sec7_Pprod h₁ h₂ h₃ / (S.x ^ 2 * P.G ^ 3 * S.Ω ^ 9) +
-          1) := by
-      linarith
-    exact mul_nonneg (by norm_num [sec7_cN13]) hbody
   have htarget :
       11 * B = 11 * sec7_cN13 *
         (P.G * S.Ω / S.x ^ 2 + S.Ω ^ 2 / P.H +
@@ -720,7 +661,7 @@ private theorem sec7_zero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a : 
     rw [hBdef]
     ring
   rw [← htarget]
-  apply sec7_wide_filter_dyadic_bound (R := S.R) hR hB0
+  apply sec7_wide_filter_dyadic_bound (R := S.R)
   · intro k hk
     set xl : ℝ := (S.R / 72) * 2 ^ k with hxl
     set xu : ℝ := (S.R / 72) * 2 ^ (k + 1) with hxu
@@ -742,7 +683,7 @@ private theorem sec7_zero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a : 
           ≤ (S.R / 72) * 2 ^ (10 : ℕ) := by gcongr
         _ ≤ 16 * S.R := by norm_num; nlinarith only [hR]
     have hdy : ⌊xu⌋₊ ≤ 2 * ⌈xl⌉₊ := by
-      apply sec7_dyadic_block_dyad hxl0 hxu0
+      apply sec7_dyadic_block_dyad hxu0
       rw [hxl, hxu]
       ring_nf
       exact le_rfl
@@ -768,7 +709,7 @@ private theorem sec7_zero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a : 
       exact le_mul_of_one_le_right (by positivity) hpow
     have hhi : xu ≤ 16 * S.R := by rw [hxu]
     have hdy : ⌊xu⌋₊ ≤ 2 * ⌈xl⌉₊ := by
-      apply sec7_dyadic_block_dyad hxl0 hxu0
+      apply sec7_dyadic_block_dyad hxu0
       rw [hxl, hxu]
       norm_num
       nlinarith only [hR]
@@ -1134,19 +1075,6 @@ private theorem sec7_nonzero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a
   set B : ℝ := sec7_cN19 * (1 + Real.log P.X) *
         ((S.R * S.T₁) ^ ((1:ℝ)/3) + S.R * δ +
           S.R * Real.sqrt (δ / S.T₁) + 1) with hBdef
-  have hB0 : 0 ≤ B := by
-    rw [hBdef]
-    have hlogfac : 0 ≤ 1 + Real.log P.X := by
-      have hlog : 0 ≤ Real.log P.X := Real.log_nonneg hsd.hX
-      linarith
-    have hbr : 0 ≤ (S.R * S.T₁) ^ ((1:ℝ)/3) + S.R * δ +
-        S.R * Real.sqrt (δ / S.T₁) + 1 := by
-      have hRT0 : 0 ≤ S.R * S.T₁ := mul_nonneg hR.le (sec7_T₁_pos S).le
-      have h1 : 0 ≤ (S.R * S.T₁) ^ ((1:ℝ)/3) := Real.rpow_nonneg hRT0 _
-      have h2 : 0 ≤ S.R * δ := mul_nonneg hR.le (by rw [hδdef]; exact hδpos.le)
-      have h3 : 0 ≤ S.R * Real.sqrt (δ / S.T₁) := mul_nonneg hR.le (Real.sqrt_nonneg _)
-      linarith
-    exact mul_nonneg (mul_nonneg (by norm_num [sec7_cN19]) hlogfac) hbr
   have htarget :
       11 * B = 11 * sec7_cN19 * (1 + Real.log P.X) *
         ((S.R * S.T₁) ^ ((1:ℝ)/3) +
@@ -1155,7 +1083,7 @@ private theorem sec7_nonzero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a
     rw [hBdef, hδdef]
     ring
   rw [← htarget]
-  apply sec7_wide_filter_dyadic_bound (R := S.R) hR hB0
+  apply sec7_wide_filter_dyadic_bound (R := S.R)
   · intro k hk
     set xl : ℝ := (S.R / 72) * 2 ^ k with hxl
     set xu : ℝ := (S.R / 72) * 2 ^ (k + 1) with hxu
@@ -1177,7 +1105,7 @@ private theorem sec7_nonzero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a
           ≤ (S.R / 72) * 2 ^ (10 : ℕ) := by gcongr
         _ ≤ 16 * S.R := by norm_num; nlinarith only [hR]
     have hdy : ⌊xu⌋₊ ≤ 2 * ⌈xl⌉₊ := by
-      apply sec7_dyadic_block_dyad hxl0 hxu0
+      apply sec7_dyadic_block_dyad hxu0
       rw [hxl, hxu]
       ring_nf
       exact le_rfl
@@ -1205,7 +1133,7 @@ private theorem sec7_nonzero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a
       exact le_mul_of_one_le_right (by positivity) hpow
     have hhi : xu ≤ 16 * S.R := by rw [hxu]
     have hdy : ⌊xu⌋₊ ≤ 2 * ⌈xl⌉₊ := by
-      apply sec7_dyadic_block_dyad hxl0 hxu0
+      apply sec7_dyadic_block_dyad hxu0
       rw [hxl, hxu]
       norm_num
       nlinarith only [hR]
@@ -1433,7 +1361,7 @@ private theorem sec7_triple_split (P : Globals) (S : Scale P) (W : ℝ)
     (hg : ∀ (j : ℤ) (r : ℝ),
       gfun j r = Ph.dBreve (Ph.ftil r + j)
         - Ph.dBreve' (Ph.ftil r + j) * Int.fract (Ph.ftil r))
-    (δ₀ : ℝ) (_hδ0 : 0 < δ₀) (hδle : δ₀ ≤ sec7_cTay * sec7_delta0 P S)
+    (δ₀ : ℝ) (hδle : δ₀ ≤ sec7_cTay * sec7_delta0 P S)
     (j : ℤ) (hj : sec7_jBand P S j)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
@@ -2129,7 +2057,7 @@ theorem prop_7_1 : ∃ C : ℝ, 0 < C ∧
   -- sec7_harvM` (200 < 1000, slack 5): N5 forces `(R/W)/cCube ≤ Σ cubes`, the two harvests
   -- cap `Σ cubes ≤ 2·(R/W)/harvM` — impossible for `R/W > 0`.
   refine ⟨sec7_cCubeIn, sec7_cCubeIn_pos, ?_⟩
-  intro P S W Env c₀ Cu hsd hbud hg0 hu0 hX24 hUbig _hlog a Ph gfun hg δ₀ hδ0 hδle j hjB
+  intro P S W Env c₀ Cu hsd hbud hg0 hu0 hX24 hUbig _hlog a Ph gfun hg δ₀ _hδ0 hδle j hjB
   have hR1 : (1 : ℝ) < S.R := Env.R_gt_one
   have hW0 : (0 : ℝ) < W := Env.W_pos
   rcases le_or_gt W 1 with hW1 | hW1
@@ -2167,7 +2095,7 @@ theorem prop_7_1 : ∃ C : ℝ, 0 < C ∧
         (fun r : ℤ => distInt (gfun j (r : ℝ)) ≤ δ₀))
       (Finset.filter_subset _ _) hcon.le
     obtain ⟨cz, cn, hsplit, hzb, hnb⟩ := sec7_triple_split P S W Env hW1 a Ph gfun hg
-      δ₀ hδ0 hδle j hjB c₀ Cu hsd hbud hg0 hu0 hX24 hUbig
+      δ₀ hδle j hjB c₀ Cu hsd hbud hg0 hu0 hX24 hUbig
     have hZ := sec7_harvest_zero P S W Env hW1.le c₀ Cu hsd hbud hg0 hu0 hX24 cz hzb
     have hN := sec7_harvest_nonzero P S W Env hW1.le c₀ Cu hsd hbud hg0 hu0 hX24 cn hnb
     have hsum : (∑ p ∈ box W,

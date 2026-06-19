@@ -56,8 +56,8 @@ private theorem coeff1_nonneg {ℓ₁ ℓ₂ B : ℝ} (hℓ1 : 1 ≤ ℓ₁) (h�
   have hℓ2pos : 0 < ℓ₂ := lt_trans hℓ1pos hℓ12
   unfold P2HybCoeff1; positivity
 
-private theorem coeff2_nonneg {ℓ₁ ℓ₂ B : ℝ} (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
-    (_hB0 : 0 ≤ B) : 0 ≤ P2HybCoeff2 ℓ₁ ℓ₂ B := by
+private theorem coeff2_nonneg {ℓ₁ ℓ₂ B : ℝ} (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) :
+    0 ≤ P2HybCoeff2 ℓ₁ ℓ₂ B := by
   have hℓ1pos : 0 < ℓ₁ := lt_of_lt_of_le one_pos hℓ1
   have hℓ2pos : 0 < ℓ₂ := lt_trans hℓ1pos hℓ12
   have h21 : (0:ℝ) ≤ ℓ₂ - ℓ₁ := by linarith
@@ -202,7 +202,7 @@ theorem E0_p2_hyb_nonneg {ℓ₁ ℓ₂ V : ℝ} (hℓ1 : 1 ≤ ℓ₁) (hℓ12 
   have h1 : 0 ≤ P2HybCoeff1 ℓ₁ ℓ₂ (3000000000000 * S.B) * V :=
     mul_nonneg (coeff1_nonneg hℓ1 hℓ12 hB0) hV0
   have h2 : 0 ≤ P2HybCoeff2 ℓ₁ ℓ₂ (3000000000000 * S.B) * V ^ 2 :=
-    mul_nonneg (coeff2_nonneg hℓ1 hℓ12 hB0) (by positivity)
+    mul_nonneg (coeff2_nonneg (B := 3000000000000 * S.B) hℓ1 hℓ12) (by positivity)
   have h3 : 0 ≤ P2CapRest ℓ₁ ℓ₂ (3000000000000 * S.B) (Vmax P S) :=
     caprest_nonneg hℓ1 hℓ12 hB0 Vmax_nonneg
   unfold E0_p2_hyb
@@ -221,7 +221,7 @@ theorem E0_p2_hyb_mono {ℓ₁ ℓ₂ V V' : ℝ} (hℓ1 : 1 ≤ ℓ₁) (hℓ12
   have hsc : (0:ℝ) ≤ 77 * (P.G * S.Ω / S.Δ ^ 4) := by positivity
   have h1 := mul_le_mul_of_nonneg_left hVV' (coeff1_nonneg (B := 3000000000000 * S.B) hℓ1 hℓ12 hB0)
   have h2 := mul_le_mul_of_nonneg_left (pow_le_pow_left₀ hV0 hVV' 2)
-    (coeff2_nonneg (B := 3000000000000 * S.B) hℓ1 hℓ12 hB0)
+    (coeff2_nonneg (B := 3000000000000 * S.B) hℓ1 hℓ12)
   have hnum : P2HybCoeff1 ℓ₁ ℓ₂ (3000000000000 * S.B) * V
       + P2HybCoeff2 ℓ₁ ℓ₂ (3000000000000 * S.B) * V ^ 2
       + P2CapRest ℓ₁ ℓ₂ (3000000000000 * S.B) (Vmax P S)

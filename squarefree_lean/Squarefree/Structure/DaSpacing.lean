@@ -81,7 +81,7 @@ private theorem lemma_3_1_core (X H Δ a b d : ℝ)
     (hX : 0 < X) (hH : 0 < H) (hΔ : (16777216 : ℝ) ≤ Δ)
     (ha : 0 < a) (hb : 0 < b) (hb2a : 2 * a ≤ b)
     (hd_lo : H * Δ ≤ d) (hd_hi : d ≤ 2 * (H * Δ))
-    (_hab_small : a + b ≤ H * Δ) (hbD : b ≤ H * Δ / 2)
+    (hbD : b ≤ H * Δ / 2)
     (ha_lo : (1/4 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ) ≤ a)
     (b_bound : b < (1 / 10 : ℝ) * a ^ (-1/3 : ℝ) * Δ ^ (5/3 : ℝ) * (H ^ 5 / X) ^ (1/3 : ℝ)) :
     |Sab X a b d| < 1 / 2 ∧
@@ -477,11 +477,10 @@ theorem lemma_3_1 : ∃ c : ℝ, 0 < c ∧
   -- range hypotheses in the `H*Δ` form the core expects
   have hd_lo' : H * Δ ≤ (d : ℝ) := by rw [← hDeq]; exact hd_lo
   have hd_hi' : (d : ℝ) ≤ 2 * (H * Δ) := by rw [← hDeq]; exact hd_hi
-  have hab_small' : (a : ℝ) + b ≤ H * Δ := by rw [← hDeq]; exact hab_small
   have hbD' : (b : ℝ) ≤ H * Δ / 2 := by rw [← hDeq]; exact hbD
   obtain ⟨hSlt, herr_dom, hSpos⟩ :=
     lemma_3_1_core X H Δ (a : ℝ) (b : ℝ) (d : ℝ) hXpos hHpos hΔ haR hbR hb2aR
-      hd_lo' hd_hi' hab_small' hbD' ha_lo hcon
+      hd_lo' hd_hi' hbD' ha_lo hcon
   -- `Sval = Sab X a b d`, `|errsum| ≤ 8 b H/(HΔ)²`
   have herr_dom' : |errsum| ≤ (1 / 2) * |Sval| := by
     have : (8 * (b : ℝ) * H / Dv ^ 2) = 8 * (b : ℝ) * H / (H * Δ) ^ 2 := by rw [hDeq]

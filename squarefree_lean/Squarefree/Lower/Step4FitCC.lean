@@ -58,7 +58,7 @@ private theorem step4_fit_cCM_E
     (hℓ1W : ℓ₁ ≤ 130 * (P.G * P.U ^ 5)) (hℓ2W : ℓ₂ ≤ 130 * (P.G * P.U ^ 5))
     (C : ℝ) (hC : 1 ≤ C)
     (hNcap : (N : ℝ) ≤ C * ℓ₁ ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * P.U ^ 10 / S.Ω ^ 8)
-    (a : ℝ) (_ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
+    (a : ℝ) (ha_hi : a ≤ 11 * S.A)
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     (10 ^ 44 * a * P.G * S.Ω ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * S.B ^ 3 / (S.Δ ^ 3 * S.D))
         * b * (N : ℝ)
@@ -171,7 +171,7 @@ private theorem step4_fit_cCM_F
     (hℓ1W : ℓ₁ ≤ 130 * (P.G * P.U ^ 5)) (hℓ2W : ℓ₂ ≤ 130 * (P.G * P.U ^ 5))
     (C : ℝ) (hC : 1 ≤ C) (hCcap : C ≤ (10:ℝ) ^ 120)
     (hNcap : (N : ℝ) ≤ C * ℓ₁ ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * P.U ^ 10 / S.Ω ^ 8)
-    (a : ℝ) (_ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
+    (a : ℝ) (ha_hi : a ≤ 11 * S.A)
     (dc : ℝ)
     (hdc : dc = P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4 * Real.sqrt (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁))) :
     (10 ^ 44 * a * P.G * S.Ω ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * S.B ^ 3 / (S.Δ ^ 3 * S.D))
@@ -348,7 +348,7 @@ theorem step4_fit_cC_E
     ring
   rw [hsplit]
   have hM := step4_fit_cCM_E (P := P) (S := S) hG1 hU1 hΔ1 hH1 hΩU hUbig N ℓ₁ ℓ₂
-    hℓ1lo hℓ12 hℓ1W hℓ2W C hC hNcap a ha0 ha_hi b hb
+    hℓ1lo hℓ12 hℓ1W hℓ2W C hC hNcap a ha_hi b hb
   have hQ := step4_fit_cCp3_E (P := P) (S := S) hG1 hU1 hΔ1 hH1 hΩU hUbig hDeW N ℓ₁ ℓ₂
     hℓ1lo hℓ12 hℓ1W hℓ2W C hC hNcap a ha0 ha_hi b hb
   linarith [hM, hQ]
@@ -379,7 +379,7 @@ theorem step4_fit_cC_F
     ring
   rw [hsplit]
   have hM := step4_fit_cCM_F (P := P) (S := S) h1 hG1 hU1 hΔ1 hH1 hΩU hUbig N ℓ₁ ℓ₂
-    hℓ1lo hℓ12 hℓ1W hℓ2W C hC hCcap hNcap a ha0 ha_hi dc hdc
+    hℓ1lo hℓ12 hℓ1W hℓ2W C hC hCcap hNcap a ha_hi dc hdc
   have hQ := step4_fit_cCp3_F (P := P) (S := S) h1 hG1 hU1 hΔ1 hH1 hΩU hUbig N ℓ₁ ℓ₂
     hℓ1lo hℓ12 hℓ1W hℓ2W C hC hCcap hNcap a ha0 ha_hi dc hdc
   linarith [hM, hQ]

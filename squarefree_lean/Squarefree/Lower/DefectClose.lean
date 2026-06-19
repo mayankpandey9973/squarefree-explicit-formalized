@@ -19,7 +19,7 @@ open Real
 
 /-- **MVT slope identity** for `R_a` on `[p,q]` (`0 < p < q`): there is an interior point `c`
 with `R_a(q) − R_a(p) = R_a'(c)·(q − p)`, where `R_a'(c) = −2 X a³ (2c+a)/(c³(c+a)³)`. -/
-private theorem Rfun_mvt_close {X a p q : ℝ} (_hX : 0 < X) (ha : 0 < a) (hp : 0 < p) (hpq : p < q) :
+private theorem Rfun_mvt_close {X a p q : ℝ} (ha : 0 < a) (hp : 0 < p) (hpq : p < q) :
     ∃ c, p < c ∧ c < q ∧
       Rfun X a q - Rfun X a p
         = (-2 * X * a ^ 3 * (2 * c + a) / (c ^ 3 * (c + a) ^ 3)) * (q - p) := by
@@ -118,7 +118,7 @@ theorem dtilde_close {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : ℝ}
   have hbound : |d - dt| ≤ 210000000000 * P.H / S.R := by
     rcases lt_trichotomy d dt with hlt | heq | hgt
     · -- d < dt
-      obtain ⟨c, hc1, hc2, hslope⟩ := Rfun_mvt_close hX haR (by linarith [hDpos] : 0 < d) hlt
+      obtain ⟨c, hc1, hc2, hslope⟩ := Rfun_mvt_close (X := P.X) haR (by linarith [hDpos] : 0 < d) hlt
       have hclo : S.D / 10 ≤ c := by linarith [hdD, hc1, hDpos]
       have hchi : c ≤ 18 * S.D := by linarith [hwhi, hc2]
       have hc0 : 0 < c := by linarith [hDpos, hclo]
@@ -151,7 +151,7 @@ theorem dtilde_close {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : ℝ}
       linarith [hmul, hsimp.le, hsimp.ge]
     · rw [heq, sub_self, abs_zero]; positivity
     · -- dt < d
-      obtain ⟨c, hc1, hc2, hslope⟩ := Rfun_mvt_close hX haR hdtpos hgt
+      obtain ⟨c, hc1, hc2, hslope⟩ := Rfun_mvt_close (X := P.X) haR hdtpos hgt
       have hclo : S.D / 10 ≤ c := by linarith [hwlo, hc1]
       have hchi : c ≤ 18 * S.D := by linarith [hd2D, hc2, hDpos]
       have hc0 : 0 < c := by linarith [hDpos, hclo]

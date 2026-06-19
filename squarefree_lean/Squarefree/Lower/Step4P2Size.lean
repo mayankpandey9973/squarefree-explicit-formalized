@@ -58,7 +58,7 @@ quartic `P₂`: triangle inequality across the four monomials, then monotonicity
 private theorem abs_Ptwo_le_maj {b₀ v ℓ₁ ℓ₂ Bx Vx : ℝ}
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
     (hb : |b₀| ≤ Bx) (hBx0 : 0 ≤ Bx)
-    (hvx : |v| ≤ Vx) (_hVx0 : 0 ≤ Vx) :
+    (hvx : |v| ≤ Vx) :
     |Ptwo b₀ v ℓ₁ ℓ₂| ≤ P2AbsMaj ℓ₁ ℓ₂ Bx Vx := by
   have hℓ1pos : 0 < ℓ₁ := lt_of_lt_of_le one_pos hℓ1
   have hℓ2pos : 0 < ℓ₂ := lt_trans hℓ1pos hℓ12
@@ -138,7 +138,7 @@ theorem abs_pref_mul_Ptwo_div_le_p2PointBudget
     (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
     (hb : |b₀| ≤ Bx) (hBx0 : 0 ≤ Bx)
-    (hvx : |v| ≤ Vx) (hVx0 : 0 ≤ Vx)
+    (hvx : |v| ≤ Vx) (_hVx0 : 0 ≤ Vx)
     (hdD : S.D * (1 - 1/10 ^ 9) ≤ d)
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
@@ -160,7 +160,7 @@ theorem abs_pref_mul_Ptwo_div_le_p2PointBudget
   have hbr : |(-4 + 10 * a / d)| ≤ 4 := by rw [abs_le]; constructor <;> linarith
   -- |Ptwo| ≤ P2AbsMaj
   have hP2 : |Ptwo b₀ v ℓ₁ ℓ₂| ≤ P2AbsMaj ℓ₁ ℓ₂ Bx Vx :=
-    abs_Ptwo_le_maj hℓ1 hℓ12 hb hBx0 hvx hVx0
+    abs_Ptwo_le_maj hℓ1 hℓ12 hb hBx0 hvx
   have hMnn : 0 ≤ P2AbsMaj ℓ₁ ℓ₂ Bx Vx := le_trans (abs_nonneg _) hP2
   -- scale collapse  X·A/D⁵ = GΩ/Δ⁴
   have hXAD : P.X * S.A / S.D ^ 5 = P.G * S.Ω / S.Δ ^ 4 := by

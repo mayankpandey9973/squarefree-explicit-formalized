@@ -56,12 +56,12 @@ private theorem continuous_deriv_lineRes_pub {D₀ : MajorLine} (hf : ContDiff �
 
 /-- The **signed residual** `H = sign·g` of the reference line `D₀`, the function fed to the
 generic convex-arc lemma. -/
-private noncomputable def signedRes (f : ℝ → ℝ) (N _δ : ℝ) (D₀ : MajorLine) : ℝ → ℝ :=
+private noncomputable def signedRes (f : ℝ → ℝ) (N : ℝ) (D₀ : MajorLine) : ℝ → ℝ :=
   fun x => lineSign' f N D₀ * lineRes f D₀ x
 
 /-- `H` has derivative `sign·(f'(x) − p/q)` everywhere. -/
 private theorem hasDerivAt_signedRes {D₀ : MajorLine} (hf : ContDiff ℝ 2 f) (x : ℝ) :
-    HasDerivAt (signedRes f N δ D₀)
+    HasDerivAt (signedRes f N D₀)
       (lineSign' f N D₀ * (deriv f x - (D₀.slope.num : ℝ) / (D₀.denom : ℝ))) x := by
   have h := (hasDerivAt_lineRes (D := D₀) (hasDerivAt_self_of_contDiff hf x)).const_mul
     (lineSign' f N D₀)
@@ -69,14 +69,14 @@ private theorem hasDerivAt_signedRes {D₀ : MajorLine} (hf : ContDiff ℝ 2 f) 
 
 /-- `deriv H = fun x => sign·(f'(x) − p/q)`. -/
 private theorem deriv_signedRes {D₀ : MajorLine} (hf : ContDiff ℝ 2 f) :
-    deriv (signedRes f N δ D₀)
+    deriv (signedRes f N D₀)
       = fun x => lineSign' f N D₀ * (deriv f x - (D₀.slope.num : ℝ) / (D₀.denom : ℝ)) :=
   funext fun x => (hasDerivAt_signedRes hf x).deriv
 
 /-- `deriv (deriv H) x = sign·f''(x)` everywhere. -/
 private theorem deriv_deriv_signedRes {D₀ : MajorLine} (hf : ContDiff ℝ 2 f) (x : ℝ) :
-    deriv (deriv (signedRes f N δ D₀)) x = lineSign' f N D₀ * iteratedDeriv 2 f x := by
-  rw [deriv_signedRes (δ := δ) hf]
+    deriv (deriv (signedRes f N D₀)) x = lineSign' f N D₀ * iteratedDeriv 2 f x := by
+  rw [deriv_signedRes hf]
   have h : HasDerivAt (fun x => lineSign' f N D₀ * (deriv f x - (D₀.slope.num : ℝ)
       / (D₀.denom : ℝ))) (lineSign' f N D₀ * iteratedDeriv 2 f x) x := by
     have := ((hasDerivAt_deriv_of_contDiff hf x).sub_const
@@ -86,13 +86,13 @@ private theorem deriv_deriv_signedRes {D₀ : MajorLine} (hf : ContDiff ℝ 2 f)
 
 /-- `H` is differentiable everywhere. -/
 private theorem differentiable_signedRes {D₀ : MajorLine} (hf : ContDiff ℝ 2 f) :
-    Differentiable ℝ (signedRes f N δ D₀) :=
+    Differentiable ℝ (signedRes f N D₀) :=
   fun x => (hasDerivAt_signedRes hf x).differentiableAt
 
 /-- `deriv H` is continuous everywhere (`f ∈ C²`). -/
 private theorem continuous_deriv_signedRes {D₀ : MajorLine} (hf : ContDiff ℝ 2 f) :
-    Continuous (deriv (signedRes f N δ D₀)) := by
-  rw [deriv_signedRes (δ := δ) hf]
+    Continuous (deriv (signedRes f N D₀)) := by
+  rw [deriv_signedRes hf]
   have hf' : Continuous (deriv f) := by
     have h1 : ContDiff ℝ 1 (deriv f) := (contDiff_succ_iff_deriv.mp hf).2.2
     exact h1.continuous
@@ -141,9 +141,9 @@ private theorem signedRes_deriv2_eq_abs {D₀ : MajorLine} (hf : ContDiff ℝ 2 
     (hlam : 0 < lam) (hN2 : 2 ≤ N)
     (hlower : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), lam ≤ |iteratedDeriv 2 f x|)
     {x : ℝ} (hx : x ∈ Set.Icc (N / 2) (5 * N / 2)) :
-    deriv (deriv (signedRes f N δ D₀)) x = |iteratedDeriv 2 f x| := by
+    deriv (deriv (signedRes f N D₀)) x = |iteratedDeriv 2 f x| := by
   classical
-  rw [deriv_deriv_signedRes (δ := δ) hf]
+  rw [deriv_deriv_signedRes hf]
   set I := Set.Icc (N / 2) (5 * N / 2) with hI
   have hIab : (N / 2 : ℝ) < 5 * N / 2 := by linarith
   rcases deriv2_const_sign (f := f) (N := N) (lam := lam) (hf := hf) hlam hlower with
@@ -212,7 +212,6 @@ which the `≤ 6` count is pure integer-interval arithmetic. -/
 private theorem typeII_shift_loc (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
     (hδ : 0 < δ) (hN2 : 2 ≤ N)
     (hlower : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), lam ≤ |iteratedDeriv 2 f x|)
-    (_hupper : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), |iteratedDeriv 2 f x| ≤ 256 * lam)
     (q : ℤ) (D₀ : MajorLine) :
     ∃ c : ℝ, ∀ D ∈ (typeIILines f N lam δ).filter
         (fun D => D.denom = q ∧ D.slope = D₀.slope),
@@ -221,7 +220,7 @@ private theorem typeII_shift_loc (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
   set A : ℝ := N / 2 with hAdef
   set B : ℝ := 5 * N / 2 with hBdef
   set sgn : ℝ := lineSign' f N D₀ with hsgndef
-  set H : ℝ → ℝ := signedRes f N δ D₀ with hHdef
+  set H : ℝ → ℝ := signedRes f N D₀ with hHdef
   set x₀ : ℝ := lineSplit' f N δ D₀ with hx₀def
   set M : ℝ := H x₀ with hMdef
   -- `sgn = ±1`, in particular `sgn² = 1`.
@@ -237,7 +236,7 @@ private theorem typeII_shift_loc (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
   have hHc' : ContinuousOn (deriv H) (Set.Icc A B) := by
     rw [hHdef]; exact (continuous_deriv_signedRes hf).continuousOn
   have hHd' : DifferentiableOn ℝ (deriv H) (Set.Ioo A B) := by
-    rw [hHdef, deriv_signedRes (δ := δ) hf]
+    rw [hHdef, deriv_signedRes hf]
     have hf' : Differentiable ℝ (deriv f) :=
       fun y => (hasDerivAt_deriv_of_contDiff hf y).differentiableAt
     exact (fun y _ => ((hf' y).sub_const _).const_mul sgn |>.differentiableWithinAt)
@@ -360,7 +359,7 @@ contains `≤ 6` integers. -/
 theorem typeII_b_count_per_slope (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
     (hδ : 0 < δ) (hN2 : 2 ≤ N)
     (hlower : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), lam ≤ |iteratedDeriv 2 f x|)
-    (hupper : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), |iteratedDeriv 2 f x| ≤ 256 * lam)
+    (_hupper : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), |iteratedDeriv 2 f x| ≤ 256 * lam)
     (q : ℤ) (D₀ : MajorLine) :
     ((typeIILines f N lam δ).filter
         (fun D => D.denom = q ∧ D.slope = D₀.slope)).card ≤ 1025 := by
@@ -392,7 +391,7 @@ theorem typeII_b_count_per_slope (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
       mul_le_mul_of_nonneg_right hqcut hδ.le
     rwa [div_mul_cancel₀ _ (ne_of_gt hδ)] at hstep
   -- The localization center.
-  obtain ⟨c, hloc⟩ := typeII_shift_loc hf hlam hδ hN2 hlower hupper q D₀
+  obtain ⟨c, hloc⟩ := typeII_shift_loc hf hlam hδ hN2 hlower q D₀
   rw [← hSdef] at hloc
   -- Inject `D ↦ D.shift` into the integer interval of admissible shifts.
   set bLo : ℤ := ⌈(q : ℝ) * c - ((q : ℝ) * δ + 512)⌉ with hbLo

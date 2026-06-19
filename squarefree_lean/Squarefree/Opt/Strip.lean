@@ -30,7 +30,7 @@ namespace Squarefree
 /-- In the §6 range, `10U ≤ H`: with `H = X^{(1-g)/5}`, `U = X^u`, the exponent gap
 `(1-g)/5 - u ≥ 1/100` and `X^{1/100} ≥ 16777216 ≥ 10`. -/
 private theorem five_U_le_H (P : Globals) (hX : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ))
-    (hg : P.g < 2 / 18977) (hu : P.u ≤ 1 / 100) (_hg0 : 0 ≤ P.g) : 10 * P.U ≤ P.H := by
+    (hg : P.g < 2 / 18977) (hu : P.u ≤ 1 / 100) : 10 * P.U ≤ P.H := by
   have hX0 : 0 < P.X := P.X_pos
   -- X > 1 (else X^{1/100} ≤ 1 < 16777216)
   have hX1 : (1:ℝ) ≤ P.X := by
@@ -194,7 +194,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   -- regime hyp for Prop 6.1: 10A ≤ D, i.e. 10·(ΔΩ) ≤ H·Δ, from 10Ω ≤ 10U ≤ H
   have hAD5 : 10 * S.A ≤ S.D := by
     have h5UH : 10 * P.U ≤ P.H :=
-      five_U_le_H P hX0big (by rw [hg]; exact hg1) (by rw [hu]; exact hu2) hg0'
+      five_U_le_H P hX0big (by rw [hg]; exact hg1) (by rw [hu]; exact hu2)
     have h5ΩH : 10 * S.Ω ≤ P.H := le_trans (by linarith [hΩU]) h5UH
     unfold Scale.A Scale.D
     linarith [mul_le_mul_of_nonneg_left h5ΩH hΔ.le]

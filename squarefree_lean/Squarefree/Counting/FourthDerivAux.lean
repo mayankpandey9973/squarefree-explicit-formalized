@@ -150,7 +150,7 @@ theorem final_combine {M N Λ δ P Ñ K : ℝ}
   apply mul_le_mul_of_nonneg_left hprod hÑ7nn
 
 /-- `M^k ≤ B ⇒ M ≤ B^(1/k)` (nonnegative reals, `k ≠ 0`). -/
-private theorem root_bound {M B : ℝ} {k : ℕ} (hM : 0 ≤ M) (_hB : 0 ≤ B) (hk : k ≠ 0)
+private theorem root_bound {M B : ℝ} {k : ℕ} (hM : 0 ≤ M) (hk : k ≠ 0)
     (h : M ^ k ≤ B) : M ≤ B ^ ((k : ℝ)⁻¹) := by
   have hMk : (0:ℝ) ≤ M ^ k := by positivity
   calc M = (M ^ k) ^ ((k:ℝ)⁻¹) := (pow_rpow_inv_natCast hM hk).symm
@@ -190,7 +190,7 @@ theorem four_case_bound (K : ℝ) (hK : 1 ≤ K) :
   set C := (4*K) ^ (1/8 : ℝ) + (4*K) ^ (1/15 : ℝ) with hC
   have hCpos : 0 < C := by positivity
   rcases four with hcase | hcase | hcase | hcase
-  · have hb := root_bound (le_of_lt hM) (by positivity) (k := 8) (by norm_num)
+  · have hb := root_bound (le_of_lt hM) (k := 8) (by norm_num)
       (show M ^ 8 ≤ 4 * K * N ^ 7 from hcase)
     rw [show (((8:ℕ):ℝ)⁻¹) = (1/8 : ℝ) by norm_num] at hb
     have heq : (4 * K * N ^ 7) ^ (1/8 : ℝ) = (4*K) ^ (1/8 : ℝ) * N ^ (7/8 : ℝ) := by
@@ -211,7 +211,7 @@ theorem four_case_bound (K : ℝ) (hK : 1 ≤ K) :
       have hrw : 4 * K * (Λ * N ^ 15 / M ^ 7) * M ^ 7 = 4 * K * Λ * N ^ 15 := by field_simp
       have hrw2 : M ^ 8 * M ^ 7 = M ^ 15 := by ring
       rw [hrw, hrw2] at this; exact this
-    have hb := root_bound (le_of_lt hM) (by positivity) (k := 15) (by norm_num) hclear
+    have hb := root_bound (le_of_lt hM) (k := 15) (by norm_num) hclear
     rw [show (((15:ℕ):ℝ)⁻¹) = (1/15 : ℝ) by norm_num] at hb
     have heq : (4 * K * Λ * N ^ 15) ^ (1/15 : ℝ)
         = (4*K) ^ (1/15 : ℝ) * (Λ ^ (1/15 : ℝ) * N) := by
@@ -228,7 +228,7 @@ theorem four_case_bound (K : ℝ) (hK : 1 ≤ K) :
           have h1 : (4*K) ^ (1/15 : ℝ) ≤ C := by rw [hC]; linarith
           refine le_trans (mul_le_mul_of_nonneg_right h1 t4) ?_
           apply mul_le_mul_of_nonneg_left _ (le_of_lt hCpos); nlinarith [t1, t2, t3, t4]
-  · have hb := root_bound (le_of_lt hM) (by positivity) (k := 8) (by norm_num)
+  · have hb := root_bound (le_of_lt hM) (k := 8) (by norm_num)
       (show M ^ 8 ≤ 4 * K * (N ^ 8 * δ) from hcase)
     rw [show (((8:ℕ):ℝ)⁻¹) = (1/8 : ℝ) by norm_num] at hb
     have heq : (4 * K * (N ^ 8 * δ)) ^ (1/8 : ℝ)
@@ -245,7 +245,7 @@ theorem four_case_bound (K : ℝ) (hK : 1 ≤ K) :
           have h1 : (4*K) ^ (1/8 : ℝ) ≤ C := by rw [hC]; linarith
           refine le_trans (mul_le_mul_of_nonneg_right h1 t2) ?_
           apply mul_le_mul_of_nonneg_left _ (le_of_lt hCpos); nlinarith [t1, t2, t3, t4]
-  · have hb := root_bound (le_of_lt hM) (by positivity) (k := 8) (by norm_num)
+  · have hb := root_bound (le_of_lt hM) (k := 8) (by norm_num)
       (show M ^ 8 ≤ 4 * K * (N ^ 7 * δ / Λ) from hcase)
     rw [show (((8:ℕ):ℝ)⁻¹) = (1/8 : ℝ) by norm_num] at hb
     have heq : (4 * K * (N ^ 7 * δ / Λ)) ^ (1/8 : ℝ)

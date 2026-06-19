@@ -70,7 +70,7 @@ derivative of `Σ_closed` obeys `|dΣ/dd| ≤ 7·|Σ|/d`.  Same `Dval = −5Σ/d
 `|correction| ≤ 2|Σ|/d` split as the lower bound, but assembled by the (forward) triangle
 inequality `|Dval| ≤ 5|Σ|/d + 2|Σ|/d`. -/
 private theorem sigma_d_deriv_ub {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
-    (ha0 : 0 < a) (_ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ12' : ℓ₁ + 1 ≤ ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hdwin : S.D * (1 - 1/10 ^ 9) ≤ d ∧ d ≤ 2 * S.D * (1 + 1/10 ^ 9))
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hb0lo : S.B / 2000000 ≤ |b₀|)
@@ -282,7 +282,7 @@ theorem Sigma_closed_d_smoothing {a : ℝ} {ℓ₁ ℓ₂ b₀ v d₁ d₂ : ℝ
     obtain ⟨htlo, hthi⟩ := ht
     have htpos : 0 < t := S.D_pos_of_eps htlo
     have hub := sigma_d_deriv_ub (P := P) (S := S) (a := a) (ℓ₁ := ℓ₁) (ℓ₂ := ℓ₂)
-      (b₀ := b₀) (v := v) (d := t) ha0 ha_lo ha_hi hℓ1 hℓ12 hℓ12' hℓ2W ⟨htlo, hthi⟩
+      (b₀ := b₀) (v := v) (d := t) ha0 ha_hi hℓ1 hℓ12 hℓ12' hℓ2W ⟨htlo, hthi⟩
       hb0 hb0lo hv h1 hband hG1 hU1 hΩU hUbig hΩH hDeW hVcut
     have hMbd := leading_abs_le (P := P) (S := S) (a := a) (ℓ₁ := ℓ₁) (ℓ₂ := ℓ₂)
       (b₀ := b₀) (v := v) (d := t) hAD ha0 ha_lo ha_hi (lt_of_lt_of_le one_pos hℓ1) hℓ12 hℓ2W

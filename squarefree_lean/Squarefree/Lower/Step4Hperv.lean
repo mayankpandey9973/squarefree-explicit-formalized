@@ -48,7 +48,6 @@ private theorem perv_countR {P : Globals} {S : Scale P} {ℓ₁ Lr W δ len n : 
     (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H) (hΩU : S.Ω ≤ P.U)
     (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4) (hδhalf : δ ≤ 1 / 2)
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
-    (_hDeW : 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) ≤ S.Δ)
     (hℓ1lo : 1 ≤ ℓ₁) (hℓ1W : ℓ₁ ≤ 130 * (P.G * P.U ^ 5))
     (hLrlo : 1 ≤ Lr)
     (hδ : δ = 10 ^ 70 * ((1 / S.Δ) * P.G ^ 4 * P.U ^ 15 / S.Ω ^ 5))
@@ -298,7 +297,7 @@ theorem step4_hperv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ w r₀ r₁ δ 
     (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H) (hΩU : S.Ω ≤ P.U)
     (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4) (hδhalf : δ ≤ 1 / 2)
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
-    (hDeW : 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) ≤ S.Δ)
+    (_hDeW : 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) ≤ S.Δ)
     (hAD : 10 * S.A ≤ S.D) (ha0 : 0 < a) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1lo : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ1W : ℓ₁ ≤ 130 * (P.G * P.U ^ 5))
     (hvlarge : (10:ℝ) ^ 47 * (ℓ₂ * (ℓ₂ - ℓ₁) / (P.G * S.Ω ^ 5)) * (S.D ^ 4 / (P.X * a)) ≤ |w|)
@@ -344,7 +343,7 @@ theorem step4_hperv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ w r₀ r₁ δ 
       = (ℓ₁ * P.X * a * |w| / (S.D ^ 4 * S.R)) / 10 ^ 50 from by rw [div_div]]
   exact perv_countR (P := P) (S := S) (ℓ₁ := ℓ₁) (Lr := Lr)
     (W := ℓ₁ * P.X * a * |w| / (S.D ^ 4 * S.R)) (δ := δ) (len := r₁ - r₀) (n := n)
-    hG1 hU1 hUbig hΔ1 hH1 hΩU hband hδhalf h1 hDeW hℓ1lo hℓ1W hLrlo hδ hn1 hnN hWpos hWhi
+    hG1 hU1 hUbig hΔ1 hH1 hΩU hband hδhalf h1 hℓ1lo hℓ1W hLrlo hδ hn1 hnN hWpos hWhi
     hWlo hlen0 hlenR
 
 end Squarefree

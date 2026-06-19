@@ -20,7 +20,7 @@ private theorem w6_le_u10 {w u : ℝ} (hw0 : 0 < w) (hu1 : 1 ≤ u) (hwu : w ≤
   le_trans (pow_le_pow_left₀ hw0.le hwu 6) (pow_le_pow_right₀ hu1 (by norm_num))
 
 /-- `2n+1 ≤ 3·(10⁹⁸·g²u¹⁵/w⁵)` from the `N`-cap and `n ≥ 1`. -/
-private theorem cap3 {g u w n : ℝ} (_hg : 0 < g) (_hu : 0 < u) (_hw : 0 < w)
+private theorem cap3 {g u w n : ℝ}
     (hn1 : 1 ≤ n) (hncap : n ≤ 10 ^ 98 * (g ^ 2 * u ^ 15 / w ^ 5)) :
     2 * n + 1 ≤ 3 * (10 ^ 98 * (g ^ 2 * u ^ 15 / w ^ 5)) := by linarith [hncap, hn1]
 
@@ -32,7 +32,7 @@ private theorem mon_t1 {g u d w n : ℝ} (hg : 0 < g) (hu : 0 < u) (hd : 0 < d) 
   have hbase : 0 ≤ 4 * g ^ 3 * d * u ^ 20 / w ^ 3 := by positivity
   have hstep : (2 * n + 1) * (4 * g ^ 3 * d * u ^ 20 / w ^ 3)
       ≤ 3 * (10 ^ 98 * (g ^ 2 * u ^ 15 / w ^ 5)) * (4 * g ^ 3 * d * u ^ 20 / w ^ 3) :=
-    mul_le_mul_of_nonneg_right (cap3 hg hu hw hn1 hncap) hbase
+    mul_le_mul_of_nonneg_right (cap3 hn1 hncap) hbase
   refine le_trans hstep ?_
   rw [show 3 * (10 ^ 98 * (g ^ 2 * u ^ 15 / w ^ 5)) * (4 * g ^ 3 * d * u ^ 20 / w ^ 3)
       = 12 * 10 ^ 98 * (g ^ 5 * d * u ^ 35 / w ^ 8) by field_simp; ring]
@@ -53,7 +53,7 @@ private theorem mon_t3 {g u d w h Tc n : ℝ} (hg : 0 < g) (hu : 0 < u) (hd : 0 
       ≤ 3 * (10 ^ 98 * (g ^ 2 * u ^ 15 / w ^ 5))
           * (10 ^ 7 * (g * u ^ 15 * d ^ 3 / (w ^ 6 * h))) := by
     calc (2 * n + 1) * Tc ≤ 3 * (10 ^ 98 * (g ^ 2 * u ^ 15 / w ^ 5)) * Tc :=
-          mul_le_mul_of_nonneg_right (cap3 hg hu hw hn1 hncap) hTcnn
+          mul_le_mul_of_nonneg_right (cap3 hn1 hncap) hTcnn
       _ ≤ 3 * (10 ^ 98 * (g ^ 2 * u ^ 15 / w ^ 5))
             * (10 ^ 7 * (g * u ^ 15 * d ^ 3 / (w ^ 6 * h))) :=
           mul_le_mul_of_nonneg_left hTchi (by positivity)
@@ -119,7 +119,7 @@ private theorem mon_t5 {g u d w h n : ℝ} (hg : 0 < g) (hu : 0 < u) (hd : 0 < d
 
 /-- term 2 (half-power): `(2n+1)·(2h·sg⁶·w³·u¹⁰/sd³) ≤ 6·10⁹⁸·(h·sg¹⁰·u³⁵/(sd³·w⁸))`. -/
 private theorem mon_t2 {sg sd u w h n : ℝ} (hsg : 0 < sg) (hsd : 0 < sd) (hu : 0 < u) (hw : 0 < w)
-    (hh : 0 < h) (_hsg1 : 1 ≤ sg) (hu1 : 1 ≤ u) (hwu : w ≤ u) (hn1 : 1 ≤ n)
+    (hh : 0 < h) (hu1 : 1 ≤ u) (hwu : w ≤ u) (hn1 : 1 ≤ n)
     (hncap : n ≤ 10 ^ 98 * (sg ^ 4 * u ^ 15 / w ^ 5)) :
     (2 * n + 1) * (2 * h * sg ^ 6 * w ^ 3 * u ^ 10 / sd ^ 3)
       ≤ 6 * 10 ^ 98 * (h * sg ^ 10 * u ^ 35 / (sd ^ 3 * w ^ 8)) := by
@@ -255,7 +255,7 @@ theorem step2_fsum_curv_le_t2t3 {P : Globals} {S : Scale P}
     rw [hBDval]; field_simp
   -- the five terms
   have ht1 := mon_t1 hGpos hUpos hΔpos hΩpos hU1 hΩU hN1 hNcap
-  have ht2 := mon_t2 hsG0 hsD0 hUpos hΩpos hHpos hsG1 hU1 hΩU hN1 hncapG
+  have ht2 := mon_t2 hsG0 hsD0 hUpos hΩpos hHpos hU1 hΩU hN1 hncapG
   have ht3 := mon_t3 hGpos hUpos hΔpos hΩpos hHpos hG1 hU1 hΩU hN1 hHbig hNcap hTcnn hTchi'
   have ht4 := mon_t4 hsG0 hsD0 hUpos hΩpos hHpos hsG1 hsD1 hU1 hΩU hN1 hHbigsd hncapG
   have ht5 := mon_t5 hGpos hUpos hΔpos hΩpos hHpos hG1 hU1 hΩU hN1 hHbig hNcap

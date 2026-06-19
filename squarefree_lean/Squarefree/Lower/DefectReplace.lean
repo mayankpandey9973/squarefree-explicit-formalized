@@ -51,7 +51,7 @@ raising to the 4th power so the band/`h1` integer-power bounds apply.
 private theorem absorb_UH_aux {G U Ω Δ H : ℝ}
     (hG : 0 < G) (hU : 0 < U) (hΩ : 0 < Ω) (hΔ : 0 < Δ) (hH : 0 < H)
     (h1 : G * U ^ 10 ≤ H / Δ ^ 2) (hband : 1 ≤ G * U ^ 3 * Ω ^ 4)
-    (_hG1 : 1 ≤ G) (_hU1 : 1 ≤ U) (_hH1 : 1 ≤ H) (hUH : U ^ 9 ≤ G ^ 7 * H ^ 2) :
+    (_hH1 : 1 ≤ H) (hUH : U ^ 9 ≤ G ^ 7 * H ^ 2) :
     U ^ 5 * Δ ≤ G ^ 2 * Ω ^ 3 * H := by
   -- It suffices to compare 4th powers (both sides nonneg).
   have hLnn : 0 ≤ U ^ 5 * Δ := by positivity
@@ -136,7 +136,7 @@ private theorem pow5_diff_aux {x y M : ℝ} (hx : 0 ≤ x) (hy : 0 ≤ y)
 
 /-- Term2 δ-comparison core: `G³U¹⁵·(11/(G²Ω⁸H)) ≤ 11·δ`, using `U⁵Δ ≤ G²Ω³H`. -/
 private theorem delta_compare2_aux {G U Ω Δ H δ : ℝ}
-    (hG : 0 < G) (_hU : 0 < U) (hΩ : 0 < Ω) (hΔ : 0 < Δ) (_hH : 0 < H)
+    (hG : 0 < G) (hΩ : 0 < Ω) (hΔ : 0 < Δ) (_hH : 0 < H)
     (hδeq : δ = G ^ 3 * U ^ 10 / (Δ * Ω ^ 5))
     (habsorb : U ^ 5 * Δ ≤ G ^ 2 * Ω ^ 3 * H) :
     (G ^ 3 * U ^ 15) * (11 / (G ^ 2 * Ω ^ 8 * H)) ≤ 11 * δ := by
@@ -163,7 +163,7 @@ private theorem term2_scalar_close_aux {δ : ℝ} (hδ : 0 ≤ δ) :
   nlinarith [hδ]
 
 /-- `1 ≤ H` from `1 ≤ G·U¹⁰ ≤ H/Δ²` and `1 ≤ Δ`. -/
-private theorem one_le_H_aux {G U Δ H : ℝ} (hG : 0 < G) (_hU : 0 < U) (hΔ : 0 < Δ) (_hH : 0 < H)
+private theorem one_le_H_aux {G U Δ H : ℝ} (hG : 0 < G) (hΔ : 0 < Δ)
     (h1 : G * U ^ 10 ≤ H / Δ ^ 2) (hG1 : 1 ≤ G) (hU1 : 1 ≤ U) (hΔ1 : 1 ≤ Δ) : 1 ≤ H := by
   have hb : (1:ℝ) ≤ G * U ^ 10 := by
     have hUp : (1:ℝ) ≤ U ^ 10 := one_le_pow₀ hU1
@@ -466,7 +466,7 @@ theorem phi_d_replace {P : Globals} {S : Scale P} {a : ℤ} {r ℓ₁ ℓ₂ d d
       _ ≤ (10:ℝ) ^ 45 / 2 * δ := hfin
   -- ===== Term2 bound =====
   -- 1 ≤ H  (from h1, G,U,Δ ≥ 1)
-  have hH1 : 1 ≤ P.H := one_le_H_aux hGpos hUpos hΔpos hHpos h1 hG1 hU1 hΔ1
+  have hH1 : 1 ≤ P.H := one_le_H_aux hGpos hΔpos h1 hG1 hU1 hΔ1
   have hTerm2 : |K * bb ^ 2 * (1 / d ^ 5 - 1 / dt ^ 5)| ≤ (10:ℝ) ^ 45 / 2 * δ := by
     have hd18 : d ≤ 18 * S.D := by linarith
     -- |1/d⁵ − 1/dt⁵| ≤ (5·18⁴·10¹⁷)·δ'/D⁶
@@ -500,8 +500,8 @@ theorem phi_d_replace {P : Globals} {S : Scale P} {a : ℤ} {r ℓ₁ ℓ₂ d d
           ≤ (2197000 * (P.G ^ 3 * P.U ^ 15)) * (11 / (P.G ^ 2 * S.Ω ^ 8 * P.H)) :=
         mul_le_mul_of_nonneg_right hℓ123 (by positivity)
       have hs2 : (P.G ^ 3 * P.U ^ 15) * (11 / (P.G ^ 2 * S.Ω ^ 8 * P.H)) ≤ 11 * δ :=
-        delta_compare2_aux hGpos hUpos hΩpos hΔpos hHpos hδeq
-          (absorb_UH_aux hGpos hUpos hΩpos hΔpos hHpos h1 hband hG1 hU1 hH1 hUH)
+        delta_compare2_aux hGpos hΩpos hΔpos hHpos hδeq
+          (absorb_UH_aux hGpos hUpos hΩpos hΔpos hHpos h1 hband hH1 hUH)
       have hs2' : (2197000 * (P.G ^ 3 * P.U ^ 15)) * (11 / (P.G ^ 2 * S.Ω ^ 8 * P.H))
           ≤ 2197000 * (11 * δ) := by
         have := mul_le_mul_of_nonneg_left hs2 (by norm_num : (0:ℝ) ≤ 2197000)

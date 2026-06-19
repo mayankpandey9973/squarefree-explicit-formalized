@@ -180,7 +180,7 @@ private theorem sigma_closed_resid_sharp
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hb0lo : S.B / 2000000 ≤ |b₀|)
     (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
     (hVcut : V₂ P S ≤ |v|)
-    (hdD : S.D * (1 - 1/10 ^ 9) ≤ d) (_hd2D : d ≤ 2 * S.D * (1 + 1/10 ^ 9))
+    (hdD : S.D * (1 - 1/10 ^ 9) ≤ d)
     (hReg : S.Δ ^ 2 * P.U ^ 5 ≤ P.H * S.Ω ^ 3)
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
@@ -242,7 +242,7 @@ theorem Sigma_closed_parabola_sharp
     (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
     (hvlo : 10 * (ℓ₂ * (ℓ₂ - ℓ₁) * b₀ ^ 2 / d) ≤ |v|)
     (hVcut : V₂ P S ≤ |v|)
-    (hdD : S.D * (1 - 1/10 ^ 9) ≤ d) (hd2D : d ≤ 2 * S.D * (1 + 1/10 ^ 9))
+    (hdD : S.D * (1 - 1/10 ^ 9) ≤ d) (_hd2D : d ≤ 2 * S.D * (1 + 1/10 ^ 9))
     (hReg : S.Δ ^ 2 * P.U ^ 5 ≤ P.H * S.Ω ^ 3)
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
@@ -278,7 +278,7 @@ theorem Sigma_closed_parabola_sharp
         - (P.X * a / d ^ 5) * (-4 + 10 * a / d) * (3 * ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁) * b₀) * (ℓ₁ * v) ^ 2|
       ≤ Q * (4 * ((1 / 10 ^ 50) * T)) := by
     rw [hTdef, hQdef]
-    exact sigma_closed_resid_sharp ha0 ha_hi hℓ1 hℓ12 hℓ12' hℓ2W hb0 hb0lo hv hVcut hdD hd2D
+    exact sigma_closed_resid_sharp ha0 ha_hi hℓ1 hℓ12 hℓ12' hℓ2W hb0 hb0lo hv hVcut hdD
       hReg h1 hG1 hU1 hΔ1 hΩU hUbig hDeW
   -- the `|s|`-conversion `Q·T ≤ (12/61)|s|` : identical triangle/round argument as the tight
   -- lemma, here re-derived through the (weaker) `psum_resid_le_v2` residual control.

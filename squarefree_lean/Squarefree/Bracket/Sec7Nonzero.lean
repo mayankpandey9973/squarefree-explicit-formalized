@@ -102,8 +102,8 @@ private theorem sec7_div_le_inv {N D s : ℝ} (hD : 0 < D) (hs : 0 < s)
   exact h
 
 /-- `a² ≤ b²` with `a, b ≥ 0` gives `a ≤ b`. -/
-private theorem sec7_le_of_sq {a b : ℝ} (_ha : 0 ≤ a) (hb : 0 ≤ b)
-    (h : a ^ 2 ≤ b ^ 2) : a ≤ b := by nlinarith
+private theorem sec7_le_of_sq {a b : ℝ} (hb : 0 ≤ b)
+    (h : a ^ 2 ≤ b ^ 2) : a ≤ b := by nlinarith [sq_nonneg (a - b), sq_nonneg (a + b)]
 
 /-- `X^{1/50} ≤ R` on the strip: `R·X^{-1/50} = H^{2/5}x^{1/2}G^{49/50}Ω³` has worst-corner
 `X`-exponent `2/25 − 13g/80 − Cu·u/2 − 3u/16 > 0` on the budget (sympy-banked, ≈ 0.078). -/
@@ -222,7 +222,7 @@ theorem sec7_nonzero_smallness :
       mul_nonneg (mul_nonneg (sub_nonneg.mpr henvC) hWp) (le_trans zero_le_one hlog)]
   refine ⟨?_, ?_, ?_⟩
   · have hg1 : W ^ 4 * P.X ^ sec7_cSmall ≤ S.R := by
-      refine sec7_le_of_sq (by positivity) hRpos.le ?_
+      refine sec7_le_of_sq hRpos.le ?_
       rw [show (W ^ 4 * P.X ^ sec7_cSmall) ^ 2 = W ^ 8 * (P.X ^ sec7_cSmall) ^ 2
             from by ring, hs2]
       calc W ^ 8 * P.X ^ ((1:ℝ)/50) ≤ S.R * S.R :=
@@ -250,7 +250,7 @@ theorem sec7_nonzero_smallness :
       field_simp
     have hW7s : W ^ 7 * P.X ^ sec7_cSmall
         ≤ P.H ^ ((1:ℝ)/2) * S.x ^ ((1:ℝ)/2) * P.G ^ 2 * S.Ω ^ 8 := by
-      refine sec7_le_of_sq (by positivity) hMpos.le ?_
+      refine sec7_le_of_sq hMpos.le ?_
       rw [show (W ^ 7 * P.X ^ sec7_cSmall) ^ 2 = W ^ 14 * (P.X ^ sec7_cSmall) ^ 2
             from by ring, hs2]
       calc W ^ 14 * P.X ^ ((1:ℝ)/50)
@@ -2447,7 +2447,6 @@ theorem sec7_nonzero_sqrt_evals :
   have hG := P.G_pos
   have hΩ := S.Ω_pos
   have hx := OnStripAux.x_pos P S
-  have hR : 0 < S.R := sec7_R_pos S
   have hstrip := sec7_N20_delta0_strip_piece P S c₀ Cu D hbud hg hu hX24
   have hHge1 : (1:ℝ) ≤ P.H := sec7_N20_one_le_H (S := S) D hbud hu
   have hGΩ0 : 0 ≤ P.G ^ 3 * S.Ω ^ 5 := by positivity
@@ -2460,12 +2459,10 @@ theorem sec7_nonzero_sqrt_evals :
       positivity
     nlinarith
   · let B : ℝ := P.G ^ ((3:ℝ)/2) * S.Ω ^ ((5:ℝ)/2)
-    have hleft0 : 0 ≤ S.R * Real.sqrt (sec7_delta0 P S / S.T₁) :=
-      mul_nonneg hR.le (Real.sqrt_nonneg _)
     have hB0 : 0 ≤ B := by
       dsimp [B]
       positivity
-    refine le_trans (sec7_le_of_sq hleft0 (by positivity : 0 ≤ 2 * B) ?_) ?_
+    refine le_trans (sec7_le_of_sq (by positivity : 0 ≤ 2 * B) ?_) ?_
     · calc
         (S.R * Real.sqrt (sec7_delta0 P S / S.T₁)) ^ 2
             = P.G ^ 3 * S.Ω ^ 5 + S.x ^ 2 * P.G ^ 2 * S.Ω ^ 6 / P.H :=
@@ -2479,10 +2476,8 @@ theorem sec7_nonzero_sqrt_evals :
           rw [show (2 * B) ^ 2 = 4 * B ^ 2 by ring, hBsq]
           nlinarith [hGΩ0]
     · nlinarith
-  · have hleft0 : 0 ≤ S.R * Real.sqrt ((S.Ω ^ 2 / (S.R * P.H)) / S.T₁) :=
-      mul_nonneg hR.le (Real.sqrt_nonneg _)
-    have hright0 : 0 ≤ S.x * P.G * S.Ω ^ 3 := by positivity
-    refine le_trans (sec7_le_of_sq hleft0 hright0 ?_) ?_
+  · have hright0 : 0 ≤ S.x * P.G * S.Ω ^ 3 := by positivity
+    refine le_trans (sec7_le_of_sq hright0 ?_) ?_
     · calc
         (S.R * Real.sqrt ((S.Ω ^ 2 / (S.R * P.H)) / S.T₁)) ^ 2
             = S.x ^ 2 * P.G ^ 2 * S.Ω ^ 6 / P.H := sec7_N20_third_sq_eval P S
@@ -2494,11 +2489,8 @@ theorem sec7_nonzero_sqrt_evals :
     · have hbase0 : 0 ≤ S.x * P.G * S.Ω ^ 3 := by positivity
       nlinarith
   · intro Sv hSv
-    have hleft0 :
-        0 ≤ S.R * Real.sqrt ((Sv / (S.R * S.x ^ 2 * P.G ^ 2 * S.Ω ^ 4)) / S.T₁) :=
-      mul_nonneg hR.le (Real.sqrt_nonneg _)
     have hright0 : 0 ≤ Real.sqrt Sv := Real.sqrt_nonneg Sv
-    refine le_trans (sec7_le_of_sq hleft0 hright0 ?_) ?_
+    refine le_trans (sec7_le_of_sq hright0 ?_) ?_
     · rw [sec7_N20_Sv_sq_eval P S hSv, Real.sq_sqrt hSv]
     · nlinarith
 

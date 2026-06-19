@@ -693,7 +693,7 @@ monotone proper side, where `P = lineVal D`.  But `OnLine f D lo` makes the line
 the carrier; and lying between the proper-arc points `lo` and `hi`, it is on the proper
 side (`mem_properArc'_of_between`). -/
 private theorem second_point_mem_properArc'
-    (hN2 : 2 ≤ N) (hlam : 0 < lam) (_hδ : 0 < δ) (hδhalf : δ < 1/2) (hf : ContDiff ℝ 2 f)
+    (hN2 : 2 ≤ N) (hlam : 0 < lam) (hδhalf : δ < 1/2) (hf : ContDiff ℝ 2 f)
     (hlower : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), lam ≤ |iteratedDeriv 2 f x|)
     {g : ℤ} (hg : g ∈ typeISet f N lam δ) :
     (properLo' f N δ (witnessLine f N lam δ g) + (witnessLine f N lam δ g).denom)
@@ -891,7 +891,7 @@ private theorem properArc_directed_gap
     exact Finset.card_pos.mp (by omega)
   have hlokArc : lok ∈ properArc' f N δ D' := by rw [hlok]; exact properLo'_mem hne'
   have hsndArc : lok + qk ∈ properArc' f N δ D' := by
-    have := second_point_mem_properArc' (lam := lam) hN2 hlam hδ hδhalf hf hlower hg'
+    have := second_point_mem_properArc' (lam := lam) hN2 hlam hδhalf hf hlower hg'
     simpa only [← hD', ← hqk, ← hlok] using this
   obtain ⟨hlokNear, hlokOn', _, _⟩ := mem_properArc'_facts hlokArc
   obtain ⟨hsndNear, hsndOn', _, _⟩ := mem_properArc'_facts hsndArc
@@ -1098,7 +1098,7 @@ private theorem lineSet_subset_lineCarrier' {g : ℤ} :
 /-- **≤2-components-per-line** (writeup 532), FULLY PROVEN.  On each selected rep `g`,
 the proper arc `windowResidueSet g = properArc' D_g` dominates *half* the line's Type I
 points: `#lineSet g ≤ 2·#windowResidueSet g`. -/
-private theorem line_two_components {g : ℤ} (_hg : g ∈ greedySelSet f N lam δ) :
+private theorem line_two_components {g : ℤ} :
     (lineSet f N lam δ g).card
       ≤ 2 * (windowResidueSet f N lam δ g).card := by
   calc (lineSet f N lam δ g).card
@@ -1163,8 +1163,8 @@ private theorem greedySel_geometry
     · have hgG : g ∈ greedySelSet f N lam δ := by
         rw [greedySelSet, List.mem_toFinset]; exact hg
       exact Finset.mem_biUnion.mpr ⟨g, hgG, mem_lineSet.mpr ⟨hn, hline.symm⟩⟩
-  · intro g hg
-    exact line_two_components hg
+  · intro g _
+    exact line_two_components
 
 /-- **Every Type I configuration admits a greedy selection** (writeup 599–604). -/
 theorem exists_greedySel

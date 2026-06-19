@@ -15,7 +15,7 @@ variable {P : Globals} {S : Scale P}
 /-- Common tail: `K·C·G⁸·U⁴⁵/Ωᵐ ≤ C·Δ·G¹⁵·U⁹⁰/Ω²⁷` once the scalar fits `K ≤ U²` and
 `11 ≤ m ≤ 27` (keep-net: pad `Ω^{27−m} ≤ U^{27−m} ≤ U¹⁶`; no `Ω ≥ 1` needed). -/
 private theorem fitEB_tail (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
-    (hΩU : S.Ω ≤ P.U) (C K : ℝ) (hC0 : 0 ≤ C) (_hK0 : 0 ≤ K)
+    (hΩU : S.Ω ≤ P.U) (C K : ℝ) (hC0 : 0 ≤ C)
     (hK : K ≤ P.U ^ 2) (m : ℕ) (hm11 : 11 ≤ m) (hm27 : m ≤ 27) :
     K * C * P.G ^ 8 * P.U ^ 45 / S.Ω ^ m ≤ C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := by
   have hΩpos := S.Ω_pos
@@ -69,7 +69,7 @@ private theorem fitEB_pieceH (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
     _ = (130 ^ 6 * K) * C * P.G ^ 8 * P.U ^ 45 / S.Ω ^ 14 := mul_one _
     _ ≤ C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 :=
         fitEB_tail hG1 hU1 hΔ1 hΩU C (130 ^ 6 * K) hC0
-          (mul_nonneg (by norm_num) hK0) hK 14 (by norm_num) (by norm_num)
+          hK 14 (by norm_num) (by norm_num)
 
 /-- **Hybrid E-fit, T1 (gap block).** The gap-summand of `cEhyb·dc·N` (with `√L` already
 cancelled) fits twice the `t7'`-shaped target block; the factor 2 covers both gap pieces. -/
@@ -136,7 +136,7 @@ theorem step4_fitEB_T1
           gcongr 22*10^22*C*P.G^4*P.U^25*?_/S.Ω^11
       _ = (130^4*(22*10^22))*C*P.G^8*P.U^45/S.Ω^11 := by ring
       _ ≤ C*S.Δ*P.G^15*P.U^90/S.Ω^27 :=
-          fitEB_tail hG1 hU1 hΔ1 hΩU C (130^4*(22*10^22)) hC0.le (by positivity) hK1 11
+          fitEB_tail hG1 hU1 hΔ1 hΩU C (130^4*(22*10^22)) hC0.le hK1 11
             (by norm_num) (by norm_num)
   -- step 4: gap₂ piece — 6-factor window then H-collapse + tail
   have hK2 : (130:ℝ)^6*(11*10^23) ≤ P.U^2 := by

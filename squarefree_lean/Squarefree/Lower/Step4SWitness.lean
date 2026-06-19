@@ -59,8 +59,8 @@ set_option maxHeartbeats 400000
 the slope cap (so `(ℓ:ℝ) ≤ W` covers `ℓ₂`, `ℓ₂−ℓ₁`).  Same scale arithmetic as
 `step1_window_bound` with the extra `4|v|` absorbed via `|v| ≤ 10²⁰·ΔU⁵/Ω³`. -/
 private theorem window_with_v {Wc b₀ v dd : ℝ}
-    (_ha_hi : (0:ℝ) ≤ 11 * S.A) (_haA : ∃ a : ℝ, a ≤ 11 * S.A ∧ 0 ≤ a) (hWc : Wc ≤ 130 * P.Wval)
-    (_hWcnn : 0 ≤ Wc) (hb0 : |b₀| ≤ 3000000000000 * S.B)
+    (hWc : Wc ≤ 130 * P.Wval)
+    (hb0 : |b₀| ≤ 3000000000000 * S.B)
     (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
     (hdD : S.D ≤ dd) (hRUW : P.U * P.Wval ≤ S.R)
     (hΩU : S.Ω ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hU1 : 1 ≤ P.U) (hUbig : (10:ℝ)^33 ≤ P.U) :
@@ -194,13 +194,11 @@ theorem sigma_s_extract_from_witness {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : 
   have hℓ1_loR : (1 : ℝ) ≤ ((ℓ₁ : ℤ) : ℝ) := by exact_mod_cast hℓ1_loZ
   have hℓ2_lo : (1 : ℤ) ≤ (ℓ₂ : ℤ) := le_of_lt (lt_of_le_of_lt hℓ1_loZ hℓ12Z)
   have hℓ1nn : (0 : ℝ) ≤ ((ℓ₁ : ℤ) : ℝ) := le_of_lt hℓ1R
-  have hℓ2nn : (0 : ℝ) ≤ ((ℓ₂ : ℤ) : ℝ) := le_of_lt hℓ2R
   have hℓ1W : ((ℓ₁ : ℤ) : ℝ) ≤ 130 * P.Wval := le_trans (le_of_lt hℓ12R) hℓ2W
   have hr_hi16 : (r : ℝ) ≤ 16 * S.R := le_trans (by linarith) hr1_hi
   have hr1_lo : (1/72) * S.R ≤ (r : ℝ) + ((ℓ₁ : ℤ) : ℝ) := by linarith
   have hr2_lo : (1/72) * S.R ≤ (r : ℝ) + ((ℓ₂ : ℤ) : ℝ) := by linarith
   have ha_nn : (0:ℝ) ≤ (a:ℝ) := le_of_lt ha0R
-  have h11Ann : (0:ℝ) ≤ 11 * S.A := by have := S.Δ_pos; have := S.Ω_pos; rw [Scale.A]; positivity
   -- ===== closeness ×3 =====
   have hd_close : |(d : ℝ) - dtilde P.X (r : ℝ) (a : ℝ)|
       ≤ 1000000000000 * (S.Δ / (P.G * S.Ω ^ 3)) :=
@@ -247,12 +245,12 @@ theorem sigma_s_extract_from_witness {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : 
   have hwinv : ∀ a' : ℝ, a' ≤ 11 * S.A → 0 ≤ a'
       → 4 * (a' + ((ℓ₂ : ℤ) : ℝ) * |b₀| + |v|) ≤ (d : ℝ) :=
     window_with_v (S := S) (Wc := ((ℓ₂ : ℤ) : ℝ)) (b₀ := b₀) (v := v) (dd := (d : ℝ))
-      h11Ann ⟨(a:ℝ), ha_hi, ha_nn⟩ hℓ2W hℓ2nn hb0 hv hdwin.1 hRUW hΩU hΔ1 hU1 hUbig
+      hℓ2W hb0 hv hdwin.1 hRUW hΩU hΔ1 hU1 hUbig
   have hwin : 4 * ((a : ℝ) + ((ℓ₂ : ℤ) : ℝ) * |b₀| + |v|) ≤ (d : ℝ) := hwinv (a:ℝ) ha_hi ha_nn
   have hwin3v : ∀ a' : ℝ, a' ≤ 11 * S.A → 0 ≤ a'
       → 4 * (a' + ((ℓ₂ : ℤ) : ℝ) * |b₀| + |v|) ≤ (d₁ : ℝ) :=
     window_with_v (S := S) (Wc := ((ℓ₂ : ℤ) : ℝ)) (b₀ := b₀) (v := v) (dd := (d₁ : ℝ))
-      h11Ann ⟨(a:ℝ), ha_hi, ha_nn⟩ hℓ2W hℓ2nn hb0 hv hd1win.1 hRUW hΩU hΔ1 hU1 hUbig
+      hℓ2W hb0 hv hd1win.1 hRUW hΩU hΔ1 hU1 hUbig
   have hwin3 : 4 * ((a : ℝ) + |(((ℓ₂ : ℤ) : ℝ) - ((ℓ₁ : ℤ) : ℝ)) * b₀ + v|)
       ≤ (d : ℝ) + ((ℓ₁ : ℤ) : ℝ) * b₀ := by
     rw [hd'def]

@@ -1933,8 +1933,7 @@ private theorem sec7_zero_deriv_few {P : Globals} {S : Scale P} {a : ℤ} {W : �
     {Ph : Sec7Phase P S W a} {j h₁ h₂ h₃ : ℤ} {ξ₁ ξ₂ ξ₃ : ℝ} {ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ}
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (Hyp : Sec7ZeroHyp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃)
-    (p q : ℕ) (hwin : Finset.Icc (p : ℤ) (q : ℤ) ⊆ Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋)
-    (_hdyad : q ≤ 2 * p) :
+    (p q : ℕ) (hwin : Finset.Icc (p : ℤ) (q : ℤ) ⊆ Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋) :
     (Set.Icc (p : ℝ) (q : ℝ) ∩
         {r | deriv (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r = 0}).Finite ∧
       (Set.Icc (p : ℝ) (q : ℝ) ∩
@@ -2169,7 +2168,6 @@ kept against `P·T₃/R³` rather than collapsed to `T_{ρ,u}`; content `6.0·10
 private theorem sec7_zero_errScale_m3_le_Cbase {P : Globals} {S : Scale P} {a : ℤ}
     {W : ℝ} {Ph : Sec7Phase P S W a} {j h₁ h₂ h₃ : ℤ} {ξ₁ ξ₂ ξ₃ : ℝ}
     {ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ}
-    (_ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (Hyp : Sec7ZeroHyp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) :
     sec7_cErr3Lead * sec7_errScale_LEAD P S h₁ h₂ h₃
         + sec7_cErr3Res * sec7_errScale_RES P S h₁ h₂ h₃ ≤
@@ -2324,8 +2322,7 @@ private theorem sec7_zero_deriv2_few {P : Globals} {S : Scale P} {a : ℤ} {W : 
     {Ph : Sec7Phase P S W a} {j h₁ h₂ h₃ : ℤ} {ξ₁ ξ₂ ξ₃ : ℝ} {ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ : ℤ}
     (ME : Sec7MonExp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃)
     (Hyp : Sec7ZeroHyp P S W a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃)
-    (p q : ℕ) (hwin : Finset.Icc (p : ℤ) (q : ℤ) ⊆ Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋)
-    (_hdyad : q ≤ 2 * p) :
+    (p q : ℕ) (hwin : Finset.Icc (p : ℤ) (q : ℤ) ⊆ Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋) :
     (Set.Icc (p : ℝ) (q : ℝ) ∩
         {r | iteratedDeriv 2
           (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r = 0}).Finite ∧
@@ -2360,7 +2357,7 @@ private theorem sec7_zero_deriv2_few {P : Globals} {S : Scale P} {a : ℤ} {W : 
       (mul_nonneg (mul_nonneg hPPpos.le (div_nonneg hT3pos.le (pow_nonneg hR.le 3))) hrel0))
       (mul_nonneg (mul_nonneg hPPpos.le hS0) (div_nonneg hT3pos.le (pow_nonneg hR.le 4)))
   have hsubC := sec7_zero_errScale_le_Cbase ME Hyp
-  have hsubC3 := sec7_zero_errScale_m3_le_Cbase ME Hyp
+  have hsubC3 := sec7_zero_errScale_m3_le_Cbase Hyp
   have hE0nn0 : 0 ≤ sec7_cErr * sec7_errScale P S h₁ h₂ h₃ ρ₀ := by
     have : 0 ≤ sec7_errScale P S h₁ h₂ h₃ ρ₀ := by unfold sec7_errScale; positivity
     exact mul_nonneg sec7_cErr_pos.le this
@@ -2605,9 +2602,9 @@ theorem sec7_zero_few_critical {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ}
         {r | iteratedDeriv 2
           (sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃) r = 0}).ncard ≤
         sec7_KZero) := by
-  intro p q hwin hdyad
-  refine ⟨sec7_zero_deriv_few ME Hyp p q hwin hdyad, ?_⟩
-  exact sec7_zero_deriv2_few ME Hyp p q hwin hdyad
+  intro p q hwin _hdyad
+  refine ⟨sec7_zero_deriv_few ME Hyp p q hwin, ?_⟩
+  exact sec7_zero_deriv2_few ME Hyp p q hwin
 
 /- N12 (md 1739–52): "Since C* ≠ 0,  T_{ρ,u} ≫ P(T₃/R³) ≍ P/(x²G³Ω⁹),  while
    T_{ρ,u} ≪ h_Σ/(x²G²Ω⁴) + P/(x²G³Ω⁹)"  (monomial identities `T₁/R = 1/(x²G²Ω⁴)`,

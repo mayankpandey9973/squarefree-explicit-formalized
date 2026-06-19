@@ -244,7 +244,7 @@ private theorem Dfun_factor (X a b d : ℝ)
   unfold Dfun; field_simp; ring
 
 /-- Two-sided bound on `Δ₀` for `D ≤ d ≤ 2D`, `a+b ≤ d`, `a,b>0`. -/
-private theorem Dfun_bounds (X _H D a b d : ℝ)
+private theorem Dfun_bounds (X D a b d : ℝ)
     (hX : 0 < X) (hD : 0 < D) (ha : 0 < a) (hb : 0 < b)
     (hDd : D ≤ d) (hd2D : d ≤ 2 * D) (hab : a + b ≤ d) :
     (3 / 256 : ℝ) * X * (a * b * (a + b)) / D ^ 4 ≤ Dfun X a b d ∧
@@ -390,7 +390,7 @@ theorem no_two_small_gaps (X H D : ℝ) (a b d : ℤ) (T0 : ℝ)
         unfold Dfun; rw [hp0, hp1, hp2]]
     rw [herr, hm0e, hm1e, hm2e]; ring
   -- determinant bounds
-  obtain ⟨hD0_lb, hD0_ub⟩ := Dfun_bounds X H D (a:ℝ) (b:ℝ) (d:ℝ) hX hD haR hbR hDd hd2D hab_d
+  obtain ⟨hD0_lb, hD0_ub⟩ := Dfun_bounds X D (a:ℝ) (b:ℝ) (d:ℝ) hX hD haR hbR hDd hd2D hab_d
   -- |errsum| ≤ 2(a+b) H / D²
   have hHD2 : ∀ p : ℝ, D ≤ p → H / p ^ 2 ≤ H / D ^ 2 := by
     intro p hp

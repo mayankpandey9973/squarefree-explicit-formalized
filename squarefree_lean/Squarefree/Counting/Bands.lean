@@ -310,7 +310,7 @@ private theorem mono_low_length (N T F₀ s t : ℝ) (φ : ℝ → ℝ)
 `2δ/|φ'| ≤ 1/2` makes `band_count_uniform` give `count ≤ (3/2)·(T/N·(v-u) + 2δ + 1)`.  No blow-up:
 the `2δ/F` factor is `≤ 1/2`. -/
 private theorem bands_count_mono_high (N T δ u v : ℝ) (φ : ℝ → ℝ)
-    (_hN : 0 < N) (hδ : 0 < δ) (hdiff : Differentiable ℝ φ) (huv : u ≤ v)
+    (hδ : 0 < δ) (hdiff : Differentiable ℝ φ) (huv : u ≤ v)
     (hlb : ∀ z ∈ Set.Icc u v, 4 * δ ≤ |deriv φ z|)
     (hub : ∀ z ∈ Set.Icc u v, |deriv φ z| ≤ T / N) :
     (((Finset.Icc ⌈u⌉ ⌊v⌋).filter (fun (n : ℤ) => distInt (φ (n : ℝ)) ≤ δ)).card : ℝ)
@@ -884,7 +884,7 @@ middle length degrades by exactly `cl⁻¹`, so `count ≤ cl⁻¹·(4N√(δ/T)
 hypothesis must be strengthened to `4δ < cl²·T` (needed for `√(δT) ≤ cl·T/2` in the curvature step,
 since the threshold is unmoved). -/
 private theorem bands_count_mono_low_slack (N T δ cl u v : ℝ) (φ : ℝ → ℝ)
-    (hN : 0 < N) (hT : 0 < T) (hδ : 0 < δ) (hcl : 0 < cl) (_hcl1 : cl ≤ 1)
+    (hN : 0 < N) (hT : 0 < T) (hδ : 0 < δ) (hcl : 0 < cl)
     (hactive : 4 * δ < cl ^ 2 * T) (huv : u ≤ v)
     (hcd : ContDiff ℝ 2 φ)
     (hsmall : ∀ z ∈ Set.Icc u v, |deriv φ z| ≤ Real.sqrt (δ * T) / N)
@@ -977,7 +977,7 @@ private theorem bands_count_mono_band_slack (N T δ cu u v : ℝ) (φ : ℝ → 
       intro a b hua hab hbv hlbH
       have hsubab : Set.Icc a b ⊆ Set.Icc u v := Set.Icc_subset_Icc hua hbv
       have hubH : ∀ z ∈ Set.Icc a b, |deriv φ z| ≤ cu * T / N := fun z hz => hub z (hsubab hz)
-      have hbase := bands_count_mono_high N (cu * T) δ a b φ hN hδ hdiff hab hlbH hubH
+      have hbase := bands_count_mono_high N (cu * T) δ a b φ hδ hdiff hab hlbH hubH
       have hmono_len : cu * T / N * (b - a) ≤ cu * T / N * (v - u) :=
         mul_le_mul_of_nonneg_left (by linarith) hcoefnn
       have : (3 / 2) * (cu * T / N * (b - a) + 2 * δ + 1)
@@ -1168,7 +1168,7 @@ theorem bands_count_mono_slack (N T δ a b p q cu cl : ℝ) (φ : ℝ → ℝ)
       rw [this] at hc; linarith [hc, hlow_ge1]
     · have hlowlower : ∀ z ∈ Set.Icc c₁ c₂, cl * (T / N) ≤ |deriv φ z| + N * |iteratedDeriv 2 φ z| :=
         fun z hz => hlower z (hsubM hz)
-      exact bands_count_mono_low_slack N T δ cl c₁ c₂ φ hN hT hδ hcl hcl1 hactive hc12 hcd hsmall
+      exact bands_count_mono_low_slack N T δ cl c₁ c₂ φ hN hT hδ hcl hactive hc12 hcd hsmall
         hlowlower
   have hLeftBound :
       (((Finset.Icc ⌈p⌉ ⌊c₁⌋).filter (fun (n : ℤ) => distInt (φ (n : ℝ)) ≤ δ)).card : ℝ)
@@ -1383,9 +1383,9 @@ nonzero, so (being continuous, `ContDiff ℝ 2 φ`) of one sign by IVT, giving `
 
 The finiteness of the zero set is carried explicitly (`hz2fin`): `ncard ≤ K` alone does not
 imply finiteness (an infinite set has `ncard = 0`), and the math intends finitely many zeros. -/
-private theorem exists_mono_piece_breakpoints (N T δ a b : ℝ) (K : ℕ) (φ : ℝ → ℝ)
-    (_hN : 0 < N) (_hT : 0 < T) (_hδ : 0 < δ) (hab : a ≤ b)
-    (_hsub : Set.Icc a b ⊆ Set.Icc N (3 * N)) (hcd : ContDiff ℝ 2 φ)
+private theorem exists_mono_piece_breakpoints (a b : ℝ) (K : ℕ) (φ : ℝ → ℝ)
+    (hab : a ≤ b)
+    (hcd : ContDiff ℝ 2 φ)
     (hz2fin : (Set.Icc a b ∩ {x | iteratedDeriv 2 φ x = 0}).Finite)
     (hz2 : (Set.Icc a b ∩ {x | iteratedDeriv 2 φ x = 0}).ncard ≤ K) :
     ∃ L : List ℝ, L.length ≤ K ∧
@@ -1470,7 +1470,7 @@ private theorem bands_count_active_split (N T δ a b : ℝ) (K : ℕ) (φ : ℝ 
     nlinarith [mul_nonneg hK1 hRHS]
   -- Get the sorted monotone-piece breakpoints.
   obtain ⟨L, hLlen, hLchain⟩ :=
-    exists_mono_piece_breakpoints N T δ a b K φ hN hT hδ hab hsub hcd hz2fin hz2
+    exists_mono_piece_breakpoints a b K φ hab hcd hz2fin hz2
   -- Each consecutive piece `[p,q]` is monotone, so `bands_count_mono` gives `count[p,q] ≤ B`.
   have hcountchain :
       List.IsChain (fun p q =>

@@ -42,7 +42,7 @@ theorem x_pos (P : Globals) (S : Scale P) : 0 < S.x := by
 
 /-- Lower bound a power `v^δ` of a positive `v` by its worst edge (`v ≥ vlo` for `δ ≥ 0`,
 `v ≤ vhi` for `δ ≤ 0`); the result is a power of `X` once the edge is an `X`-power. -/
-private theorem rpow_ge_edge_pos {v vlo : ℝ} (_hv : 0 < v) (hvlo : 0 < vlo) {δ : ℝ}
+private theorem rpow_ge_edge_pos {v vlo : ℝ} (hvlo : 0 < vlo) {δ : ℝ}
     (hδ : 0 ≤ δ) (hedge : vlo ≤ v) : vlo ^ δ ≤ v ^ δ :=
   Real.rpow_le_rpow hvlo.le hedge hδ
 

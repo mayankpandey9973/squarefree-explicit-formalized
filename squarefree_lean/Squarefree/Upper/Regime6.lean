@@ -275,7 +275,7 @@ theorem ftil_dtilde_window {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : 
 
 /-- **MVT slope identity** for `R_a` on `[p,q]` (`0 < p < q`): there is an interior point `c`
 with `R_a(q) − R_a(p) = R_a'(c)·(q − p)`, where `R_a'(c) = −2 X a³ (2c+a)/(c³(c+a)³)`. -/
-private theorem Rfun_mvt {X a p q : ℝ} (_hX : 0 < X) (ha : 0 < a) (hp : 0 < p) (hpq : p < q) :
+private theorem Rfun_mvt {X a p q : ℝ} (ha : 0 < a) (hp : 0 < p) (hpq : p < q) :
     ∃ c, p < c ∧ c < q ∧
       Rfun X a q - Rfun X a p
         = (-2 * X * a ^ 3 * (2 * c + a) / (c ^ 3 * (c + a) ^ 3)) * (q - p) := by
@@ -365,7 +365,7 @@ theorem ftil_dtilde_close {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : �
   rw [htgt]
   rcases lt_trichotomy d dt with hlt | heq | hgt
   · -- d < dt
-    obtain ⟨c, hc1, hc2, hslope⟩ := Rfun_mvt hX haR (by linarith [hDpos] : 0 < d) hlt
+    obtain ⟨c, hc1, hc2, hslope⟩ := Rfun_mvt (X := P.X) haR (by linarith [hDpos] : 0 < d) hlt
     have hclo : S.D / 2 ≤ c := by linarith [hdD, hc1]
     have hchi : c ≤ 3 * S.D := by linarith [hwhi, hc2]
     -- |R_a(d) - r| = |R_a(d) - R_a(dt)| = |R_a'(c)|·(dt-d)
@@ -406,7 +406,7 @@ theorem ftil_dtilde_close {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : �
     linarith [hfin]
   · rw [heq, sub_self, abs_zero]; positivity
   · -- dt < d
-    obtain ⟨c, hc1, hc2, hslope⟩ := Rfun_mvt hX haR hdtpos hgt
+    obtain ⟨c, hc1, hc2, hslope⟩ := Rfun_mvt (X := P.X) haR hdtpos hgt
     have hclo : S.D / 2 ≤ c := by linarith [hwlo, hc1]
     have hchi : c ≤ 3 * S.D := by linarith [hd2D, hc2, hDpos]
     have hRdtval : Rfun P.X (a:ℝ) dt = r := hRdt

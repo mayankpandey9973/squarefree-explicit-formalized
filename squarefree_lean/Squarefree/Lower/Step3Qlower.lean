@@ -61,7 +61,7 @@ private theorem reg_U5Δ_le (S : Scale P)
 `ℓ₂(ℓ₂−ℓ₁) ≤ (G·U⁵)²`, the target `10⁵⁵·L + 1/2` is below `(3/80·10⁶⁵)·L₀`. -/
 private theorem vterm_numeric (S : Scale P) {l1 l2 : ℝ}
     (hℓ1R : (1:ℝ) ≤ l1) (hℓ12R : l1 < l2) (hℓ2W' : l2 ≤ 130 * (P.G * P.U ^ 5))
-    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΩU : S.Ω ≤ P.U) (_hUbig : (10:ℝ) ^ 33 ≤ P.U) :
+    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΩU : S.Ω ≤ P.U) :
     10 ^ 55 * (l1 * l2 * (l2 - l1) / (P.G * S.Ω ^ 5)) + 1 / 2
       ≤ (3 / 80 * 10 ^ 65) * (l1 * (P.G * P.U ^ 10 / S.Ω ^ 5)) := by
   have hGpos := P.G_pos; have hUpos := P.U_pos; have hΩpos := S.Ω_pos
@@ -434,7 +434,7 @@ theorem Qval_abs_ge {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ 
       field_simp; ring
     rw [hcollapse]
     have hℓ1geR : (1:ℝ) ≤ (ℓ₁ : ℝ) := by exact_mod_cast hℓ1
-    exact vterm_numeric S hℓ1geR hℓ12R hℓ2W' hG1 hU1 hΩU hUbig
+    exact vterm_numeric S hℓ1geR hℓ12R hℓ2W' hG1 hU1 hΩU
   linarith [hQge, hVlb]
 
 end Squarefree

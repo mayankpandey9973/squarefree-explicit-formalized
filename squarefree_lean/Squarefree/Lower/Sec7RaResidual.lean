@@ -3910,7 +3910,7 @@ private theorem sec7_ra_B3_bound_sharp_aled_k0 {P : Globals} {S : Scale P} {a d 
 
 private theorem sec7_ra_Ffun_deriv2_upper_sharp_close_aled {X a d z : ℝ}
     (hX : 0 < X) (ha : 0 < a) (hd : 0 < d)
-    (hzlo : (99 / 100 : ℝ) * d ≤ z) (_hzhi : z ≤ (101 / 100 : ℝ) * d) :
+    (hzlo : (99 / 100 : ℝ) * d ≤ z) :
     |iteratedDeriv 2 (fun t => Ffun X a t) z| ≤ 30 * X * a / d ^ 5 := by
   have hzpos : 0 < z := lt_of_lt_of_le (by positivity : 0 < (99 / 100 : ℝ) * d) hzlo
   have hF2 := (sec7_ra_Ffun_upper_base_sharp (X := X) (a := a) (d := z)
@@ -3967,10 +3967,9 @@ private theorem sec7_ra_B3_bound_sharp_aled_k1 {P : Globals} {S : Scale P} {a d 
     · obtain ⟨c, hc_lo, hc_hi, hc_mvt⟩ :=
         sec7_ra_Ffun_deriv_mvt_local (X := P.X) (a := a) (p := qd) (q := d) ha0 hqpos hlt
       have hc_win_lo : (99 / 100 : ℝ) * d ≤ c := le_trans hqwin.1 (le_of_lt hc_lo)
-      have hc_win_hi : c ≤ (101 / 100 : ℝ) * d := le_trans (le_of_lt hc_hi) (by nlinarith)
       have hF2 :=
         sec7_ra_Ffun_deriv2_upper_sharp_close_aled (X := P.X) (a := a) (d := d)
-          (z := c) P.X_pos ha0 hd hc_win_lo hc_win_hi
+          (z := c) P.X_pos ha0 hd hc_win_lo
       have hmvt_abs : |F1d - F1q| =
           |iteratedDeriv 2 (fun t => Ffun P.X a t) c| * |qd - d| := by
         have hm : F1d - F1q =
@@ -3982,10 +3981,9 @@ private theorem sec7_ra_B3_bound_sharp_aled_k1 {P : Globals} {S : Scale P} {a d 
     · obtain ⟨c, hc_lo, hc_hi, hc_mvt⟩ :=
         sec7_ra_Ffun_deriv_mvt_local (X := P.X) (a := a) (p := d) (q := qd) ha0 hd hlt
       have hc_win_lo : (99 / 100 : ℝ) * d ≤ c := by nlinarith
-      have hc_win_hi : c ≤ (101 / 100 : ℝ) * d := le_trans (le_of_lt hc_hi) hqwin.2
       have hF2 :=
         sec7_ra_Ffun_deriv2_upper_sharp_close_aled (X := P.X) (a := a) (d := d)
-          (z := c) P.X_pos ha0 hd hc_win_lo hc_win_hi
+          (z := c) P.X_pos ha0 hd hc_win_lo
       have hmvt_abs : |F1d - F1q| =
           |iteratedDeriv 2 (fun t => Ffun P.X a t) c| * |qd - d| := by
         have hm : F1q - F1d =
@@ -4047,7 +4045,7 @@ private theorem sec7_ra_dBreve_deriv2_image_sharp_close_aled {X a d z : ℝ}
   have hz : 0 < z := lt_of_lt_of_le (by positivity : 0 < (99 / 100 : ℝ) * d) hzlo
   have hF2 :=
     sec7_ra_Ffun_deriv2_upper_sharp_close_aled (X := X) (a := a) (d := d)
-      (z := z) hX ha hd hzlo hzhi
+      (z := z) hX ha hd hzlo
   have hF1lo :=
     sec7_ra_Ffun_deriv1_lower_sharp_close_aled (X := X) (a := a) (d := d)
       (z := z) hX ha hd ha2 hzlo hzhi

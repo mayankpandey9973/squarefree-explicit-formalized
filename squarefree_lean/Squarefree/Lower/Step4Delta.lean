@@ -32,8 +32,7 @@ variable {P : Globals} {S : Scale P}
 /-- **§5 Step-4 per-`r` reduction (algebraic core).** Pref-free analogue of `phif_dist_le`. -/
 private theorem phiv_dist_le {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ b₀ v 𝒬 : ℝ} {d : ℝ} {f : ℤ}
     (ha : 0 < (a : ℝ)) (hd : 0 < d) (hℓ1 : 0 < ℓ₁)
-    (hdt : 0 < dtilde P.X r (a : ℝ))
-    (_h𝒬 : 𝒬 = ℓ₁ * Fab P.X (a : ℝ) (ℓ₂ * b₀ + v) d - ℓ₂ * Fab P.X (a : ℝ) (ℓ₁ * b₀) d) :
+    (hdt : 0 < dtilde P.X r (a : ℝ)) :
     distInt (phiv P.X (a : ℝ) ℓ₁ ℓ₂ v r)
       ≤ |(f : ℝ) - 𝒬|
         + |𝒬 - (6 * ℓ₁ * P.X * (a : ℝ) * v / d ^ 4
@@ -137,7 +136,7 @@ theorem phiv_delta_le {a : ℤ} {r : ℝ}
   have hdt_pos : 0 < dtilde P.X r (a:ℝ) := dtilde_pos hXpos haR hr0
   -- ===== STEP A : algebraic reduction =====
   have hreduce := phiv_dist_le (P := P) (a := a) (r := r) (ℓ₁ := ℓ₁) (ℓ₂ := ℓ₂)
-    (b₀ := b₀) (v := v) (𝒬 := 𝒬) (f := f) (d := d) haR hd_pos hℓ1pos hdt_pos h𝒬
+    (b₀ := b₀) (v := v) (𝒬 := 𝒬) (f := f) (d := d) haR hd_pos hℓ1pos hdt_pos
   refine le_trans hreduce ?_
   set PHID : ℝ := 12 * ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁) * P.X * (a:ℝ) * b₀ ^ 2 / d ^ 5 with hPHID_def
   set LEAD : ℝ := 6 * ℓ₁ * P.X * (a:ℝ) * v / d ^ 4 - PHID with hLEAD_def
