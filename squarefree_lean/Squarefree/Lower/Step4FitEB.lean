@@ -81,7 +81,7 @@ theorem step4_fitEB_T1
     (hℓ1W : ℓ₁ ≤ 130*(P.G*P.U^5)) (hℓ2W : ℓ₂ ≤ 130*(P.G*P.U^5))
     (n C : ℝ) (hC : 1 ≤ C)
     (hncap : n ≤ C*ℓ₁^2*(ℓ₁*ℓ₂*(ℓ₂-ℓ₁))*P.U^10/S.Ω^8) (hn0 : 0 ≤ n)
-    (a : ℝ) (_ha0 : 0 < a) (ha_hi : a ≤ 11*S.A)
+    (a : ℝ) (ha_hi : a ≤ 11*S.A)
     (gap : ℝ) (hgap0 : 0 ≤ gap)
     (hgap : gap ≤ 2*10^12*S.Δ/(P.G*S.Ω^3*ℓ₁) + 10^13*ℓ₁*S.Δ^3/(P.H*P.G^2*S.Ω^6)) :
     (10^10*a*P.G*S.Ω^3*gap/S.Δ^2) * (P.G^4*P.U^15/S.Ω^4) * n
@@ -167,7 +167,7 @@ theorem step4_fitEB_T2
     (hℓ1W : ℓ₁ ≤ 130*(P.G*P.U^5)) (hℓ2W : ℓ₂ ≤ 130*(P.G*P.U^5))
     (n C : ℝ) (hC : 1 ≤ C)
     (hncap : n ≤ C*ℓ₁^2*(ℓ₁*ℓ₂*(ℓ₂-ℓ₁))*P.U^10/S.Ω^8) (hn0 : 0 ≤ n)
-    (a : ℝ) (_ha0 : 0 < a) (ha_hi : a ≤ 11*S.A) :
+    (a : ℝ) (ha_hi : a ≤ 11*S.A) :
     (10^35*a*P.G*S.Ω^3*ℓ₂*S.B^2/(S.Δ^2*S.D)) * (P.G^4*P.U^15/S.Ω^4) * n
       ≤ C * (P.H/S.Δ) * (S.Δ^2*P.G^15*P.U^90/(P.H*S.Ω^27)) := by
   have hGpos := P.G_pos

@@ -227,7 +227,6 @@ private theorem typeII_shift_loc (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
   have hsgnsq : sgn * sgn = 1 := by
     rw [hsgndef, lineSign']; split_ifs <;> ring
   -- The common analytic hypotheses for the generic convex-arc lemma.
-  have hAB : A ≤ B := by rw [hAdef, hBdef]; linarith
   have hHc : ContinuousOn H (Set.Icc A B) := by
     simp only [hHdef]
     exact (continuousOn_const.mul (differentiable_lineRes_pub hf).continuous.continuousOn)
@@ -305,7 +304,7 @@ private theorem typeII_shift_loc (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
   -- `w ≤ M + δ + 4·(256λ/λ)/q = M + δ + 1024/q`.
   have hupper_w : w ≤ M + δ + 1024 / (q : ℝ) := by
     have h := convex_arc_height_le_min (mu := 256 * lam)
-      hAB hHc hHd hHc' hHd' hconv hH'' hx₀mem hx₀min hMdef
+      hHc hHd hHc' hHd' hconv hH'' hx₀mem hx₀min hMdef
       hloIcc hhiIcc hlohiR hstrip hlong hqR hlam (by linarith [hlam]) hδ
     have hratio : (256 : ℝ) * lam / lam = 256 := by
       field_simp
@@ -359,7 +358,6 @@ contains `≤ 6` integers. -/
 theorem typeII_b_count_per_slope (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
     (hδ : 0 < δ) (hN2 : 2 ≤ N)
     (hlower : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), lam ≤ |iteratedDeriv 2 f x|)
-    (_hupper : ∀ x ∈ Set.Icc (N / 2) (5 * N / 2), |iteratedDeriv 2 f x| ≤ 256 * lam)
     (q : ℤ) (D₀ : MajorLine) :
     ((typeIILines f N lam δ).filter
         (fun D => D.denom = q ∧ D.slope = D₀.slope)).card ≤ 1025 := by

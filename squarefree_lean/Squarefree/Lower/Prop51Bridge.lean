@@ -109,7 +109,7 @@ theorem Qval_abs_ge_from_witness {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ 
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2) (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H)
     (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
-    (hΔreg : P.G ^ 2 * P.U ^ 5 ≤ S.Δ) :
+    (_hΔreg : P.G ^ 2 * P.U ^ 5 ≤ S.Δ) :
     10 ^ 55 * (((ℓ₁ : ℤ) : ℝ) * ((ℓ₂ : ℤ) : ℝ) * (((ℓ₂ : ℤ) : ℝ) - ((ℓ₁ : ℤ) : ℝ))
         / (P.G * S.Ω ^ 5)) + 1 / 2 ≤ |Qval P a dStar ℓ₁ ℓ₂ r| := by
   set d : ℤ := dStar r with hd_def
@@ -191,10 +191,10 @@ theorem Qval_abs_ge_from_witness {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ 
   exact Qval_abs_ge (P := P) (S := S) (a := a) (r := (r : ℝ))
     (ℓ₁ := (ℓ₁ : ℤ)) (ℓ₂ := (ℓ₂ : ℤ)) (d := d) (d₁ := d₁) (d₂ := d₂)
     (b₀ := b₀) (v := v)
-    hAD ha0 ha_lo ha_hi hℓ1Z hℓ12Z hℓ2W hr_lo hr_hi16 hdwin
+    ha0 ha_lo ha_hi hℓ1Z hℓ12Z hℓ2W hr_lo hdwin
     hb0def hvdef hb0 hv hv1' hd1ned hd2ned hwin2 hwin1
     (𝒬 := Qval P a dStar ℓ₁ ℓ₂ r) h𝒬
-    h1 hband hG1 hU1 hΔ1 hH1 hΩU hUbig hΔreg
+    h1 hband hG1 hU1 hΔ1 hH1 hΩU hUbig
 
 /-- **§5 `v → f` bridge, HARD half (the Step-3 entry).**  In the monotone range `V₁ < |v(r)|`,
 the `v`-term dominates `𝒬`, giving the geometric lower bound `10⁵⁵·L ≤ |round (Qval r)|`. -/

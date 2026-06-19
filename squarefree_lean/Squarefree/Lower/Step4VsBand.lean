@@ -255,7 +255,7 @@ theorem Vbox_cube_div_sqrt_le {ℓ₁ ℓ₂ n : ℝ} (hn : 0 ≤ n) (hℓ1 : 1 
   ring
 
 /-- Monotonicity of the v-box in the fibre variable `n`. -/
-theorem Vbox_mono {ℓ₁ ℓ₂ n m : ℝ} (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (_hn : 0 ≤ n) (hnm : n ≤ m) :
+theorem Vbox_mono {ℓ₁ ℓ₂ n m : ℝ} (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hnm : n ≤ m) :
     Vbox S ℓ₁ ℓ₂ n ≤ Vbox S ℓ₁ ℓ₂ m := by
   have hΔ := S.Δ_pos
   have hΩ := S.Ω_pos

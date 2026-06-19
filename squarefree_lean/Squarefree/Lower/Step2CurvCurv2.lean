@@ -24,7 +24,7 @@ open Real
 `D2 = ψ''(f+φ)+2ψ'·φ1+ψ·φ2` (with `φ1,φ2` the **closed forms** `K·b·br/d⁶`, `K·G/d⁶`),
 the Wronskian `ψ''·D1 − ψ'·D2` is `f`-free and equals `(4K/(6Xa)²)·Ñ_act`. -/
 lemma welim_poly (X a d d1 d2 b bp bd φ φ1 φ2 f K : ℝ)
-    (_hg : (6 : ℝ) * X * a ≠ 0) (_hd6 : d ^ 6 ≠ 0) (hd : d ≠ 0)
+    (hd : d ≠ 0)
     (hφ1 : φ1 = K * b * (2 * bp * d - 5 * b * d1) / d ^ 6)
     (hφ2 : φ2 = K * (bp * (2 * bp * d - 5 * b * d1)
         + b * (2 * bd * d - 3 * bp * d1 - 5 * b * d2)

@@ -359,7 +359,7 @@ theorem phif_curvature_lower_band {a ℓ₁ ℓ₂ f r N : ℝ}
     (hℓ1 : 0 < ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
     (hr_lo : (1 / 72) * S.R ≤ r) (hrl_hi : r + ℓ₁ ≤ 16 * S.R)
     (hsmall : (10 : ℝ) ^ 78 * ℓ₁ ≤ S.R)
-    (_hNpos : 0 < N) (hRN : S.R ≤ 72 * N) :
+    (hRN : S.R ≤ 72 * N) :
     (1 / (5184 * 10 ^ 72)) * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁) * S.B ^ 2 / S.D) / N
       ≤ |deriv (fun s => phif P.X a ℓ₁ ℓ₂ f s) r|
         + N * |iteratedDeriv 2 (fun s => phif P.X a ℓ₁ ℓ₂ f s) r| := by

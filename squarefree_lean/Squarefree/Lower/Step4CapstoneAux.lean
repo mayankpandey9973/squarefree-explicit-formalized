@@ -39,7 +39,7 @@ theorem step4ErrU_nonneg : 0 ≤ step4ErrU P S := by
 band slot `(G⁴U²⁰/Δ + Δ⁴G⁵U⁴⁵/(H²Ω¹⁴))·ΔΩ/√L` that `ra_step4_range_add5` consumes (the
 post-sweep `errU` carries `10¹¹⁹·UpsT`, so `88·10¹¹⁹ ≤ 10¹²²`). -/
 theorem step4_ev_bridge {a L : ℝ}
-    (_ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
+    (ha_hi : a ≤ 11 * S.A)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (_hΩU : S.Ω ≤ P.U)
     (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
     (hReg : S.Δ ^ 2 * P.U ^ 5 ≤ P.H * S.Ω ^ 3)

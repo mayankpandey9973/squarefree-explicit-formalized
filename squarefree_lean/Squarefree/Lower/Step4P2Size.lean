@@ -138,7 +138,7 @@ theorem abs_pref_mul_Ptwo_div_le_p2PointBudget
     (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
     (hb : |b₀| ≤ Bx) (hBx0 : 0 ≤ Bx)
-    (hvx : |v| ≤ Vx) (_hVx0 : 0 ≤ Vx)
+    (hvx : |v| ≤ Vx)
     (hdD : S.D * (1 - 1/10 ^ 9) ≤ d)
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)

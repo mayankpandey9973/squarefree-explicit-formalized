@@ -202,7 +202,7 @@ theorem Sigma_closed_near_int_neg
     (hdwin : S.D ≤ d ∧ d ≤ 2 * S.D)
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hv : |v| ≤ 390000000000000 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
     (hshift2 : d / 2 ≤ d + ℓ₁ * b₀)
-    (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2) (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4)
+    (_h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2) (_hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H)
     (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
     -- integer-witness coherence (Upsilon_near_int_neg)
@@ -261,7 +261,7 @@ theorem Sigma_closed_near_int_neg
   -- ===== (C) ERR ≤ 10¹¹⁰·UpsT via upsilon_err_le =====
   have herr := upsilon_err_le_sharp (P := P) (S := S) (a := a) (b₀ := b₀) (v := v) (d := d)
     (ℓ₁ := ℓ₁) (ℓ₂ := ℓ₂) ha ha_hi hℓ1 hℓ12 hℓ2W hdwin hb0 hv hshift2
-    h1 hband hG1 hU1 hΔ1 hH1 hΩU hUbig
+    hG1 hU1 hΔ1 hH1 hΩU hUbig
   have hexp' : |UpsShat - Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂| ≤ 10 ^ 111 * UpsT P S :=
     le_trans hexp herr
   -- ===== assemble =====

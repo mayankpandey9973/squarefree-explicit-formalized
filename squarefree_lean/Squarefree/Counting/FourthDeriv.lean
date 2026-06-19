@@ -295,7 +295,7 @@ theorem fourthDeriv_count : ∀ (K : ℝ), 1 ≤ K → ∃ C : ℝ, 0 < C ∧
     have hFpos : (0:ℝ) < P * Λ := by positivity
     obtain ⟨hexp, hvar⟩ := expanding_and_variation (N := N) (Λ := Λ) (K := K)
       (h₁ := (h₁:ℝ)) (h₂ := (h₂:ℝ)) (h₃ := (h₃:ℝ)) (f := f)
-      hN hΛ hK1 hh1r hh2r hh3r hsumle hf hlb hub
+      hΛ hK1 hh1r hh2r hh3r hsumle hf hlb hub
     -- ===== Apply preimage_count to g on [N,2N], tolerance 8δ =====
     have hVnn : (0:ℝ) ≤ K * (P * Λ) * N := by
       have hK0 : (0:ℝ) ≤ K := by linarith

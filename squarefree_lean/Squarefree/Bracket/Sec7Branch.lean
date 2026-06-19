@@ -414,7 +414,7 @@ each `ρᵢ` over ≤7 values): a cover of the count range `[⌈R/72⌉,⌊16R�
 each with carries `|ρᵢ| ≤ sec7_cCarry`, fiber sizes `|uᵢ − ρᵢ| ≤ sec7_cPh·(1 + h_jh_k·T₂/R²)`,
 interval `[p,q] ⊆ [R/72,16R]`, and the fixed-integer-data branch identities on the piece. -/
 theorem sec7_carry_fiber_cover {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ} (Ph : Sec7Phase P S W a)
-    (Env : Sec7Envelope P S W) {j : ℤ} (hj : sec7_jBand P S j)
+    (Env : Sec7Envelope P S W) {j : ℤ} (_hj : sec7_jBand P S j)
     {h₁ h₂ h₃ : ℤ} (hbox : sec7_shiftBox W h₁ h₂ h₃) {ξ₁ ξ₂ ξ₃ : ℝ}
     (hξ₁ : |ξ₁| ≤ sec7_hSum h₁ h₂ h₃) (hξ₂ : |ξ₂| ≤ sec7_hSum h₁ h₂ h₃)
     (hξ₃ : |ξ₃| ≤ sec7_hSum h₁ h₂ h₃)
@@ -444,13 +444,13 @@ theorem sec7_carry_fiber_cover {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ} (
         diff1 (h₁ : ℝ) (diff1 (h₂ : ℝ) (fun t => Int.fract (Ph.f2D 0 t))) ((r : ℝ) + ξ₃) =
           diff1 (h₁ : ℝ) (diff1 (h₂ : ℝ) (Ph.f2D 0)) ((r : ℝ) + ξ₃)
             - pc.2.1.2.2 + pc.1.2.2.2) :=
-  (sec7_carry_fiber_cover_core Ph Env hj hbox hξ₁ hξ₂ hξ₃ hM hwin).1
+  (sec7_carry_fiber_cover_core Ph Env hbox hξ₁ hξ₂ hξ₃ hM hwin).1
 
 /-- Sharp zero-top-carry subcover of N7.  This is the same carry/fiber cover restricted to
 the branch `ρ₀ = 0`; the top-carry factor `11` in the aggregate cover is replaced by the
 single top-carry value, giving the sharp `7^3 = 343` multiplicity. -/
 theorem sec7_carry_fiber_cover_zero {P : Globals} {S : Scale P} {a : ℤ} {W : ℝ} (Ph : Sec7Phase P S W a)
-    (Env : Sec7Envelope P S W) {j : ℤ} (hj : sec7_jBand P S j)
+    (Env : Sec7Envelope P S W) {j : ℤ} (_hj : sec7_jBand P S j)
     {h₁ h₂ h₃ : ℤ} (hbox : sec7_shiftBox W h₁ h₂ h₃) {ξ₁ ξ₂ ξ₃ : ℝ}
     (hξ₁ : |ξ₁| ≤ sec7_hSum h₁ h₂ h₃) (hξ₂ : |ξ₂| ≤ sec7_hSum h₁ h₂ h₃)
     (hξ₃ : |ξ₃| ≤ sec7_hSum h₁ h₂ h₃)
@@ -485,7 +485,7 @@ theorem sec7_carry_fiber_cover_zero {P : Globals} {S : Scale P} {a : ℤ} {W : �
           diff1 (h₁ : ℝ) (diff1 (h₂ : ℝ) (fun t => Int.fract (Ph.f2D 0 t))) ((r : ℝ) + ξ₃) =
             diff1 (h₁ : ℝ) (diff1 (h₂ : ℝ) (Ph.f2D 0)) ((r : ℝ) + ξ₃)
               - pc.2.1.2.2 + pc.1.2.2.2) :=
-  (sec7_carry_fiber_cover_core Ph Env hj hbox hξ₁ hξ₂ hξ₃ hM hwin).2
+  (sec7_carry_fiber_cover_core Ph Env hbox hξ₁ hξ₂ hξ₃ hM hwin).2
 
 /- N8 (md 1572–1587, eq 7.3/7.4): "Thus, on a fixed carry branch and a fixed fiber u,
      ‖Φ_{ρ,u}(r)‖ ≪ δ₁(h) := δ₀ + ST₁/R² = δ₀ + S/(Rx²G²Ω⁴),   (7.3)

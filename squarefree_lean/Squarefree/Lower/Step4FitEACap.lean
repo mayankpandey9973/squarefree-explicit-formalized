@@ -184,7 +184,7 @@ theorem step4_fitEA_cap
     (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
     (ℓ₁ ℓ₂ : ℝ) (hℓ1lo : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ + 1 ≤ ℓ₂)
     (hℓ1W : ℓ₁ ≤ 130 * (P.G * P.U ^ 5)) (hℓ2W : ℓ₂ ≤ 130 * (P.G * P.U ^ 5))
-    (m C : ℝ) (hC : 1 ≤ C) (_hCcap : C ≤ (10:ℝ) ^ 120)
+    (m C : ℝ) (hC : 1 ≤ C)
     (hm : m ≤ 10 ^ 60 * C * ℓ₁ ^ 3 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * P.U ^ 15 / S.Ω ^ 12)
     (hm0 : 0 ≤ m)
     (a : ℝ) (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
@@ -321,7 +321,7 @@ theorem step4_fit_cE_A
   have hT2 := step4_fitEA_T2' h1 hG1 hΩU hUbig ℓ₁ ℓ₂ hℓ1lo hℓ12 hℓ1W hℓ2W m C hC
     hmpad hm0 a ha_hi b hb
   have hCap := step4_fitEA_cap h1 hDeW hG1 hU1 hΩU hband hUbig ℓ₁ ℓ₂ hℓ1lo hℓ12 hℓ1W
-    hℓ2W m C hC hCcap hm hm0 a ha0 ha_hi b hb
+    hℓ2W m C hC hm hm0 a ha0 ha_hi b hb
   have hblock0 : 0 ≤ C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
     have := P.H_pos; have := S.Δ_pos; have := P.G_pos; have := P.U_pos
     positivity

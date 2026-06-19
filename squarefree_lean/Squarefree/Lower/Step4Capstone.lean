@@ -295,14 +295,11 @@ theorem ra_step4_range_complete
         exact hbudget.trans hrest)
       (fun r hr => hmem r (hsub hr))
     -- freeze the band slot: ev' = 8a·errU/√L ≤ 10¹¹²·evF, then scale out the 10¹¹²
-    have hbev := step4_ev_bridge (P := P) (S := S) ha0R ha_hi hG1 hU1 hΩU hband hUbig hReg
+    have hbev := step4_ev_bridge (P := P) (S := S) ha_hi hG1 hU1 hΩU hband hUbig hReg
       hDeW hL1
     have hb0' : (0:ℝ) ≤ P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2) := by positivity
     have hdc0 : (0:ℝ) ≤ P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4
         * Real.sqrt ((ℓ₁:ℝ) * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ))) := by positivity
-    have hevF0 : (0:ℝ) ≤ (P.G ^ 4 * P.U ^ 20 / S.Δ
-          + S.Δ ^ 4 * P.G ^ 5 * P.U ^ 45 / (P.H ^ 2 * S.Ω ^ 14))
-        * (S.Δ * S.Ω) / Real.sqrt ((ℓ₁:ℝ) * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ))) := by positivity
     have hcE0 := cEhyb_nonneg' (P := P) (S := S) ha0R hℓ1R hℓ12R hgap0
     have hcE20 := cE2hyb_nonneg' (P := P) (S := S) ha0R hℓ1R hℓ12R
     have hcC0 := cChyb_nonneg' (P := P) (S := S) ha0R hℓ1R hℓ12R
@@ -311,7 +308,7 @@ theorem ra_step4_range_complete
       (dc := P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4
         * Real.sqrt ((ℓ₁:ℝ) * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ))))
       (cE := cEhyb P S (a:ℝ) (ℓ₁:ℝ) (ℓ₂:ℝ) gap) (cE₂ := cE2hyb P S (a:ℝ) (ℓ₁:ℝ) (ℓ₂:ℝ))
-      (cC := cChyb P S (a:ℝ) (ℓ₁:ℝ) (ℓ₂:ℝ)) (n := (n:ℝ)) hb0' hdc0 hn0R hbev
+      (cC := cChyb P S (a:ℝ) (ℓ₁:ℝ) (ℓ₂:ℝ)) (n := (n:ℝ)) hb0' hdc0 hbev
     have hw2 := weight5_ev_scale (k := (10:ℝ) ^ 122)
       (b := P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2))
       (ev := (P.G ^ 4 * P.U ^ 20 / S.Δ
@@ -321,7 +318,7 @@ theorem ra_step4_range_complete
         * Real.sqrt ((ℓ₁:ℝ) * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ))))
       (cE := cEhyb P S (a:ℝ) (ℓ₁:ℝ) (ℓ₂:ℝ) gap) (cE₂ := cE2hyb P S (a:ℝ) (ℓ₁:ℝ) (ℓ₂:ℝ))
       (cC := cChyb P S (a:ℝ) (ℓ₁:ℝ) (ℓ₂:ℝ)) (n := (n:ℝ))
-      (by norm_num) hb0' hdc0 hevF0 hcE0 hcE20 hcC0 hn0R
+      (by norm_num) hb0' hdc0 hcE0 hcE20 hcC0 hn0R
     refine hcnt.trans ?_
     have hchain := hw1.trans hw2
     calc 2 * 10 ^ 200 * weight5 (P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2))
@@ -355,19 +352,19 @@ theorem ra_step4_range_complete
   have hcE0 := cEhyb_nonneg' (P := P) (S := S) ha0R hℓ1R hℓ12R hgap0
   have hcE20 := cE2hyb_nonneg' (P := P) (S := S) ha0R hℓ1R hℓ12R
   have hcC0 := cChyb_nonneg' (P := P) (S := S) ha0R hℓ1R hℓ12R
-  have hcE2maj := cE2hyb_le_majorant (P := P) (S := S) ha0R ha_hi hℓ1R hℓ12R
+  have hcE2maj := cE2hyb_le_majorant (P := P) (S := S) ha_hi hℓ1R hℓ12R
   have hEA := step4_fit_cE_A (P := P) (S := S) h1 hDeW hG1 hU1 hΔ1 hH1 hΩU hband hUbig N
     (ℓ₁:ℝ) (ℓ₂:ℝ) hℓ1R hℓ12R hℓ1GU hℓ2GU C hC1 hCcap hNcapC (a:ℝ) gap ha0R ha_hi hgap0
     hgapW _ rfl
-  have hEB := step4_fit_cE_B (P := P) (S := S) h1 hG1 hU1 hΔ1 hH1 hΩU hUbig N
+  have hEB := step4_fit_cE_B (P := P) (S := S) h1 hG1 hU1 hΔ1 hΩU hUbig N
     (ℓ₁:ℝ) (ℓ₂:ℝ) hℓ1R hℓ12R hℓ1GU hℓ2GU C hC1 hNcapC (a:ℝ) gap ha0R ha_hi hgap0
     hgapW _ rfl
-  have hEC := step4_fit_cubic_A (P := P) (S := S) h1 hΔreg hG1 hU1 hΔ1 hH1 hΩU hUbig N
+  have hEC := step4_fit_cubic_A (P := P) (S := S) hG1 hU1 hΔ1 hH1 hUbig N
     (ℓ₁:ℝ) ((ℓ₁:ℝ) * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ))) hℓ1R hL1 hℓ1GU hLW3 C hC1 hCcap hNcapC
-    _ (cE2hyb P S (a:ℝ) (ℓ₁:ℝ) (ℓ₂:ℝ)) rfl hcE2maj hcE20
-  have hED := step4_fit_cubic_B (P := P) (S := S) h1 hΔreg hG1 hU1 hΔ1 hH1 hΩU hUbig N
+    _ (cE2hyb P S (a:ℝ) (ℓ₁:ℝ) (ℓ₂:ℝ)) rfl hcE2maj
+  have hED := step4_fit_cubic_B (P := P) (S := S) hG1 hU1 hΔ1 hΩU hUbig N
     (ℓ₁:ℝ) ((ℓ₁:ℝ) * (ℓ₂:ℝ) * ((ℓ₂:ℝ) - (ℓ₁:ℝ))) hℓ1R hL1 hℓ1GU hLW3 C hC1 hCcap hNcapC
-    _ (cE2hyb P S (a:ℝ) (ℓ₁:ℝ) (ℓ₂:ℝ)) rfl hcE2maj hcE20
+    _ (cE2hyb P S (a:ℝ) (ℓ₁:ℝ) (ℓ₂:ℝ)) rfl hcE2maj
   have hEE := step4_fit_cC_E (P := P) (S := S) hG1 hU1 hΔ1 hH1 hΩU hUbig hDeW N
     (ℓ₁:ℝ) (ℓ₂:ℝ) hℓ1R hℓ12R hℓ1GU hℓ2GU C hC1 hNcapC (a:ℝ) ha0R ha_hi _ rfl
   have hEF := step4_fit_cC_F (P := P) (S := S) h1 hG1 hU1 hΔ1 hH1 hΩU hUbig N

@@ -33,7 +33,7 @@ open Real
 `q = d̃'' = d(d+a)(3a²+10a d+10 d²)/(4r²(a+2d)³)`,
 `s4 = d̃''' = −3 d(d+a)(5a⁴+34a³d+94a²d²+120a d³+60 d⁴)/(8r³(a+2d)⁵)`, the *smooth* Wronskian
 numerator `p·(5p⁴ − 10 p² q d + 2 p s4 d²)` has the closed product form. (sympy-verified.) -/
-theorem smooth_wronskian_numerator_eq (a d r : ℝ) (hr : r ≠ 0) (_had2 : a + 2 * d ≠ 0) :
+theorem smooth_wronskian_numerator_eq (a d r : ℝ) (hr : r ≠ 0) :
     (-d * (d + a) / (2 * r * (a + 2 * d)))
         * (5 * (-d * (d + a) / (2 * r * (a + 2 * d))) ^ 4
            - 10 * (-d * (d + a) / (2 * r * (a + 2 * d))) ^ 2
@@ -69,9 +69,8 @@ theorem smooth_wronskian_numerator_neg {a d r : ℝ} (ha : 0 < a) (hd : 0 < d) (
           * (5 * a ^ 4 + 44 * a ^ 3 * d + 169 * a ^ 2 * d ^ 2 + 280 * a * d ^ 3 + 180 * d ^ 4)
         / (32 * r ^ 5 * (a + 2 * d) ^ 7) := by
   have hr' : r ≠ 0 := ne_of_gt hr
-  have had2 : a + 2 * d ≠ 0 := by positivity
   refine ⟨?_, by positivity⟩
-  rw [smooth_wronskian_numerator_eq a d r hr' had2]
+  rw [smooth_wronskian_numerator_eq a d r hr']
   ring
 
 /-- **Piece (C), core: LP-duality.**  Let `𝒲 = ψ''·D1 − ψ'·D2` (with `D1 = φ_f'`, `D2 = φ_f''`
@@ -79,7 +78,7 @@ the actual derivatives).  Given `R ≥ 0`, `C ≥ 1`, and the derivative-ratio b
 `|ψ'| ≤ C·R·|ψ''|`, the LP-dual estimate `|𝒲| ≤ C·|ψ''|·(|D1| + R·|D2|)` holds.  Dividing by
 `C·|ψ''|` yields `|φ_f'| + R·|φ_f''| ≥ |𝒲|/(C|ψ''|)`, the curvature lower bound's engine. -/
 theorem lp_duality_lower {W ψ' ψ'' D1 D2 C R : ℝ}
-    (_hR : 0 ≤ R) (hC : 1 ≤ C) (hWdef : W = ψ'' * D1 - ψ' * D2)
+    (hC : 1 ≤ C) (hWdef : W = ψ'' * D1 - ψ' * D2)
     (hψ' : |ψ'| ≤ C * R * |ψ''|) :
     |W| ≤ C * |ψ''| * (|D1| + R * |D2|) := by
   have habs : |W| ≤ |ψ''| * |D1| + |ψ'| * |D2| := by

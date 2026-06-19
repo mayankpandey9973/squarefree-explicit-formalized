@@ -91,7 +91,7 @@ cannot exceed the minimum by more than `δ + 4·(μ/λ)/q`.  The genuine lower b
 (used in the Taylor/argmin step), while the long-arc scale uses `μ` (the §4.3 upper
 curvature `256λ`); they are decoupled so that `μ > λ` costs only the constant `μ/λ`. -/
 theorem convex_arc_height_le_min {H : ℝ → ℝ} {A B x₀ M w lo hi δ lam mu q : ℝ}
-    (_hAB : A ≤ B) (hHc : ContinuousOn H (Set.Icc A B))
+    (hHc : ContinuousOn H (Set.Icc A B))
     (hHd : ∀ x ∈ Set.Icc A B, DifferentiableAt ℝ H x)
     (hHc' : ContinuousOn (deriv H) (Set.Icc A B))
     (hHd' : DifferentiableOn ℝ (deriv H) (Set.Ioo A B))

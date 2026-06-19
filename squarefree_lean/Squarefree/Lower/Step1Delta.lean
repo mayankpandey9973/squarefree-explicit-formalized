@@ -293,7 +293,7 @@ private theorem term2_le {a ℓ₁ ℓ₂ d b₀ : ℝ}
 /-- The per-`r` effective defect (the `phi_norm_le_v0` RHS) is bounded by the clean
 uniform scale `δ_unif := 10^60·(1/Δ)·G³·U¹⁵/Ω⁵`.  Constant loose by design. -/
 theorem delta_eff_le {a : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ b₀ : ℝ}
-    (_hAD : 10 * S.A ≤ S.D) (_ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A) (ha0 : 0 < a)
+    (ha_hi : a ≤ 11 * S.A) (ha0 : 0 < a)
     (hℓ1 : 0 < ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * (P.G * P.U ^ 5))
     (hdwin : S.D ≤ d ∧ d ≤ 2*S.D) (hd1pos : S.D ≤ d₁) (hd2pos : S.D ≤ d₂)
     (hb0 : |b₀| ≤ 3000000000000 * S.B)

@@ -35,7 +35,7 @@ noncomputable def Lval (X a d b₀ v ℓ₁ ℓ₂ : ℝ) : ℝ :=
 /-- **§5 Step-4 leading-term upper bound** (writeup 1035). -/
 theorem leading_abs_le {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     (hAD : 10 * S.A ≤ S.D) (ha0 : 0 < a)
-    (_ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (ha_hi : a ≤ 11 * S.A)
     (hℓ1pos : 0 < ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hdwin : S.D * (1 - 1/10 ^ 9) ≤ d ∧ d ≤ 2 * S.D * (1 + 1/10 ^ 9))
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
@@ -612,7 +612,7 @@ private theorem leading_scale_chain {v : ℝ}
 range.  Factored out of `leading_abs_ge` so the term-by-term scale arithmetic gets its own
 heartbeat budget.  The threshold `hv2`, the upper window `hv`, and the X-large fact `hDeW`
 calibrate the four `P₂`-monomials against `(HΔ/16)|v|³`. -/
-theorem ptwo_div_quarter {_a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
+theorem ptwo_div_quarter {ℓ₁ ℓ₂ b₀ v d : ℝ}
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hb0 : |b₀| ≤ 3000000000000 * S.B)
     (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
@@ -923,7 +923,7 @@ theorem ptwo_div_quarter {_a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
 /-- **`|P₁ + P₂/d| ≥ |v|³/4`** (the cubic dominance of `Upsilon_expand`'s polynomial core,
 writeup 1029–1033).  Factored out of `leading_abs_ge` so the §5 Step-4 derivative lower bound
 (`Sigma_closed_deriv_lb`) can reuse it.  Requires `S.D ≤ d` (lower window only). -/
-theorem psum_abs_ge {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
+theorem psum_abs_ge {_a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
     (hdD : S.D ≤ d) (hd_pos : 0 < d)
@@ -1014,7 +1014,7 @@ theorem psum_abs_ge {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     linarith [hb, hc]
   -- |P₂|/d ≤ |v|³/4
   have hP2d : |Ptwo b₀ v ℓ₁ ℓ₂| / d ≤ |v| ^ 3 / 4 :=
-    ptwo_div_quarter (_a := a) hℓ1 hℓ12 hℓ2W hb0 hv hdD hd_pos hReg hG1 hU1 hDeW hv2
+    ptwo_div_quarter hℓ1 hℓ12 hℓ2W hb0 hv hdD hd_pos hReg hG1 hU1 hDeW hv2
   -- assemble
   have htri : |Pone b₀ v ℓ₁ ℓ₂| - |Ptwo b₀ v ℓ₁ ℓ₂ / d|
       ≤ |Pone b₀ v ℓ₁ ℓ₂ + Ptwo b₀ v ℓ₁ ℓ₂ / d| := by
@@ -1108,7 +1108,7 @@ theorem leading_abs_ge {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
     linarith [hle, hstep]
   -- ============= |P₁ + P₂/d| ≥ |v|³/4  (factored: psum_abs_ge) =============
   have hPsum_ge : |v| ^ 3 / 4 ≤ |Pone b₀ v ℓ₁ ℓ₂ + Ptwo b₀ v ℓ₁ ℓ₂ / d| :=
-    psum_abs_ge (a := a) hℓ1 hℓ12 hℓ2W hb0 hv hdD hd_pos hReg hG1 hU1 hDeW hv2
+    psum_abs_ge (_a := a) hℓ1 hℓ12 hℓ2W hb0 hv hdD hd_pos hReg hG1 hU1 hDeW hv2
   -- bracket lower:  |−4+10a/d| ≥ 2   (from 55Ω ≤ H ⟹ a/d ≤ 1/5 ⟹ 10a/d ≤ 2)
   have hbracket : 2 ≤ |(-4 + 10 * a / d)| := by
     have h10ad : 10 * a / d = 10 * (a / d) := by ring

@@ -221,7 +221,7 @@ theorem ra_step4_ssum_collapse5
       ≤ cE₂ * b * (N : ℝ) ^ 2 + cE₂ * dc * ((N : ℝ) * Real.sqrt (N : ℝ)) + cC * b * (N : ℝ)
         + cC * dc * (2 * Real.sqrt (N : ℝ)) :=
     step4_ssum (cE₂ * b) (cE₂ * dc) (cC * b) (cC * dc)
-      (mul_nonneg hcE₂nn hbnn) (mul_nonneg hcE₂nn hdcnn) (mul_nonneg hcCnn hbnn)
+      (mul_nonneg hcE₂nn hbnn) (mul_nonneg hcE₂nn hdcnn)
       (mul_nonneg hcCnn hdcnn) N
   -- nonnegativity of the two faithful monomial blocks
   have hm75 : 0 ≤ C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by positivity

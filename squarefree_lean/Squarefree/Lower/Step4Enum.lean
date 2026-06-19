@@ -147,12 +147,12 @@ theorem sigma_v2_lower
 `|Σ_closed| ≤ 10¹⁵·(ℓ₁³ℓ₂(ℓ₂−ℓ₁)·v²)/(Δ²Ω²)`.  No `s`, no pin. -/
 theorem sigma_v2_upper
     {a : ℝ} {ℓ₁ ℓ₂ b₀ v d : ℝ}
-    (ha0 : 0 < a) (_ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ12' : ℓ₁ + 1 ≤ ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hb0lo : S.B / 2000000 ≤ |b₀|)
     (hv : |v| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
     (hvlo : 10 * (ℓ₂ * (ℓ₂ - ℓ₁) * b₀ ^ 2 / d) ≤ |v|)
-    (hdD : S.D * (1 - 1/10 ^ 9) ≤ d) (_hd2D : d ≤ 2 * S.D * (1 + 1/10 ^ 9))
+    (hdD : S.D * (1 - 1/10 ^ 9) ≤ d)
     (hReg : S.Δ ^ 2 * P.U ^ 5 ≤ P.H * S.Ω ^ 3)
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
@@ -324,8 +324,8 @@ theorem v_inversion
   -- raw magnitude bounds
   have hlow := sigma_v2_lower (P := P) (S := S) (a := a) ha0 ha_lo ha_hi hℓ1 hℓ12 hℓ12' hℓ2W
     hb0 hb0lo hv hvlo (S.D_eps_lo hdD) (S.D_eps_hi hd2D) hReg h1 hG1 hU1 hΔ1 hΩU hUbig hDeW
-  have hupp := sigma_v2_upper (P := P) (S := S) (a := a) ha0 ha_lo ha_hi hℓ1 hℓ12 hℓ12' hℓ2W
-    hb0 hb0lo hv hvlo (S.D_eps_lo hdD) (S.D_eps_hi hd2D) hReg h1 hG1 hU1 hΔ1 hΩU hUbig hDeW
+  have hupp := sigma_v2_upper (P := P) (S := S) (a := a) ha0 ha_hi hℓ1 hℓ12 hℓ12' hℓ2W
+    hb0 hb0lo hv hvlo (S.D_eps_lo hdD) hReg h1 hG1 hU1 hΔ1 hΩU hUbig hDeW
   rw [← hLdef] at hlow hupp
   constructor
   · -- LOWER: (1/(2·10¹⁵))·V_s² ≤ v².
@@ -362,7 +362,7 @@ theorem v_inversion
 `v ∈ ℓ₁⁻¹ℤ` with `|v| ≤ C·V_s` number `≤ 1 + 2C·ℓ₁·V_s`.  Pure lattice count, specialising
 `step4_v_count` to the `V_s`-confinement window. -/
 theorem vlattice_count (C : ℝ) (s : ℤ) (ℓ₁ ℓ₂ : ℝ)
-    (hℓ1 : 0 < ℓ₁) (_hℓ12 : ℓ₁ < ℓ₂) (hC : 0 ≤ C)
+    (hℓ1 : 0 < ℓ₁) (hC : 0 ≤ C)
     (Vset : Finset ℝ) (mOf : ℝ → ℤ)
     (hlat : ∀ v ∈ Vset, (mOf v : ℝ) = ℓ₁ * v)
     (hconf : ∀ v ∈ Vset, |v| ≤ C * V_s S s ℓ₁ ℓ₂) :

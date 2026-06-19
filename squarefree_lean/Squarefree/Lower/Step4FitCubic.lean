@@ -19,17 +19,15 @@ set_option maxHeartbeats 1600000
 /-- **Cubic E-part fit, A-block.** `c_E·b·N² ≤ 8·C·(H/Δ)·t6'` for the cubic confinement
 coefficient cap, the Step-4 range cap on `N`, and the TRUE-ℓ windows. -/
 theorem step4_fit_cubic_A
-    (_h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
-    (_hΔreg : P.G ^ 2 * P.U ^ 5 ≤ S.Δ)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H)
-    (_hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
+    (hUbig : (10:ℝ) ^ 33 ≤ P.U)
     (N : ℕ) (ℓ₁ L : ℝ) (hℓ1lo : 1 ≤ ℓ₁) (hLlo : 1 ≤ L)
     (hℓ1W : ℓ₁ ≤ 130 * (P.G * P.U ^ 5)) (hLW3 : L ≤ 130 ^ 3 * (P.G * P.U ^ 5) ^ 3)
     (C : ℝ) (hC : 1 ≤ C) (hCcap : C ≤ (10:ℝ) ^ 120)
     (hNcap : (N : ℝ) ≤ C * ℓ₁ ^ 2 * L * P.U ^ 10 / S.Ω ^ 8)
     (b cE₂ : ℝ)
     (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2))
-    (hcE₂ : cE₂ ≤ 10 ^ 18 * P.G * S.Ω ^ 5 / (ℓ₁ * L)) (_hcE₂nn : 0 ≤ cE₂) :
+    (hcE₂ : cE₂ ≤ 10 ^ 18 * P.G * S.Ω ^ 5 / (ℓ₁ * L)) :
     cE₂ * b * (N : ℝ) ^ 2
       ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
   have hGpos := P.G_pos
@@ -117,9 +115,7 @@ theorem step4_fit_cubic_A
 /-- **Cubic E-part fit, B-block.** `c_E·dc·N√N ≤ 8·C·(H/Δ)·t7'` for the cubic confinement
 coefficient cap, the Step-4 range cap on `N`, and the TRUE-ℓ windows. -/
 theorem step4_fit_cubic_B
-    (_h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
-    (_hΔreg : P.G ^ 2 * P.U ^ 5 ≤ S.Δ)
-    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (_hH1 : 1 ≤ P.H)
+    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
     (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
     (N : ℕ) (ℓ₁ L : ℝ) (hℓ1lo : 1 ≤ ℓ₁) (hLlo : 1 ≤ L)
     (hℓ1W : ℓ₁ ≤ 130 * (P.G * P.U ^ 5)) (hLW3 : L ≤ 130 ^ 3 * (P.G * P.U ^ 5) ^ 3)
@@ -127,7 +123,7 @@ theorem step4_fit_cubic_B
     (hNcap : (N : ℝ) ≤ C * ℓ₁ ^ 2 * L * P.U ^ 10 / S.Ω ^ 8)
     (dc cE₂ : ℝ)
     (hdc : dc = P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4 * Real.sqrt L)
-    (hcE₂ : cE₂ ≤ 10 ^ 18 * P.G * S.Ω ^ 5 / (ℓ₁ * L)) (_hcE₂nn : 0 ≤ cE₂) :
+    (hcE₂ : cE₂ ≤ 10 ^ 18 * P.G * S.Ω ^ 5 / (ℓ₁ * L)) :
     cE₂ * dc * ((N : ℝ) * Real.sqrt (N : ℝ))
       ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
   have hGpos := P.G_pos

@@ -249,7 +249,7 @@ Lipschitz in `d` with constant `7·M/D`:
 MVT in `d` (`exists_hasDerivAt_eq_slope`) over the convex segment `[min d₁ d₂, max d₁ d₂] ⊆ [D,2D]`,
 the derivative cap `|dΣ/dd| ≤ 7|Σ|/d ≤ 7M/D` (`sigma_d_deriv_ub` + `leading_abs_le` + `d ≥ D`). -/
 theorem Sigma_closed_d_smoothing {a : ℝ} {ℓ₁ ℓ₂ b₀ v d₁ d₂ : ℝ}
-    (ha0 : 0 < a) (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
+    (ha0 : 0 < a) (_ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ12' : ℓ₁ + 1 ≤ ℓ₂) (hℓ2W : ℓ₂ ≤ 130 * P.Wval)
     (hdwin1 : S.D * (1 - 1/10 ^ 9) ≤ d₁ ∧ d₁ ≤ 2 * S.D * (1 + 1/10 ^ 9))
     (hdwin2 : S.D * (1 - 1/10 ^ 9) ≤ d₂ ∧ d₂ ≤ 2 * S.D * (1 + 1/10 ^ 9))
@@ -285,7 +285,7 @@ theorem Sigma_closed_d_smoothing {a : ℝ} {ℓ₁ ℓ₂ b₀ v d₁ d₂ : ℝ
       (b₀ := b₀) (v := v) (d := t) ha0 ha_hi hℓ1 hℓ12 hℓ12' hℓ2W ⟨htlo, hthi⟩
       hb0 hb0lo hv h1 hband hG1 hU1 hΩU hUbig hΩH hDeW hVcut
     have hMbd := leading_abs_le (P := P) (S := S) (a := a) (ℓ₁ := ℓ₁) (ℓ₂ := ℓ₂)
-      (b₀ := b₀) (v := v) (d := t) hAD ha0 ha_lo ha_hi (lt_of_lt_of_le one_pos hℓ1) hℓ12 hℓ2W
+      (b₀ := b₀) (v := v) (d := t) hAD ha0 ha_hi (lt_of_lt_of_le one_pos hℓ1) hℓ12 hℓ2W
       ⟨htlo, hthi⟩ hb0 hv h1 hband hG1 hU1 hΔ1 hH1 hΩU hUbig
     -- `|Φ'(t)| ≤ 7|Lval|/t ≤ 7M/D = L`
     rw [Real.norm_eq_abs]

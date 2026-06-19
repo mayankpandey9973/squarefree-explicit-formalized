@@ -26,7 +26,6 @@ theorem upsilon_err_le_sharp {a : ℝ} {b₀ v d ℓ₁ ℓ₂ : ℝ}
     (hb0 : |b₀| ≤ 3000000000000 * S.B) (hv : |v| ≤ 390000000000000 * (S.Δ * P.U ^ 5 / S.Ω ^ 3))
     (hshift : d / 2 ≤ d + ℓ₁ * b₀)
     -- regime
-    (_h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2) (_hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H)
     (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U) :
     ℓ₂ ^ 2 * (ℓ₂ - ℓ₁) ^ 2

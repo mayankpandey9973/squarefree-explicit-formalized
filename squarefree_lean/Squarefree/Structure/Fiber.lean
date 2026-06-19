@@ -66,7 +66,7 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
     rw [show (P.H * S.Δ) ^ 4 = S.Δ ^ 4 * P.H ^ 4 by ring]
   -- lowered threshold: a³ ≥ 262144 Δ³ H⁴/X (one power of Δ traded against the floor Δ ≥ 2²⁴)
   have ha3 : (262144 : ℝ) * S.Δ ^ (3:ℕ) * (P.H ^ 4 / P.X) ≤ (a:ℝ) ^ 3 :=
-    a_cubed_lb_quarter P.X P.H S.Δ a hXpos hΔpos haRpos (by linarith [hΔ]) ha_lo
+    a_cubed_lb_quarter P.X P.H S.Δ a hXpos hΔpos (by linarith [hΔ]) ha_lo
   -- with the lowered threshold the band lower bound degrades to `R ≥ 32768/Δ`
   have hRlb : (32768 : ℝ) / S.Δ ≤ S.R := by
     have hAge : (a:ℝ) / 2 ≤ S.A := by linarith [haA]
@@ -125,7 +125,7 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
     have hrcast : (rStar d : ℝ)
         = -(2 * (d:ℝ) - a) * (getm d : ℝ) + (2 * (d:ℝ) + 3 * a) * (getm (d + a) : ℝ) := by
       rw [hrStar]; push_cast; ring
-    exact Rfun_near_int P.X P.H (a:ℝ) (d:ℝ) S.D hXpos hHpos hDSpos haRpos
+    exact Rfun_near_int P.X P.H (a:ℝ) (d:ℝ) S.D hHpos hDSpos haRpos
       (by rw [← hDeq]; exact haD) hdlo hdhi (getm d) (getm (d + a))
       e1lo e1hi e2lo e2hi (rStar d) hrcast
   -- R_a(d) ≍ R on [D,2D]
@@ -532,7 +532,7 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
   have hRval : S.R = P.X * S.A ^ 3 / S.D ^ 4 := by
     rw [S.R_eq_orig, hDSeq]; rw [show (P.H * S.Δ) ^ 4 = S.Δ ^ 4 * P.H ^ 4 by ring]
   have ha3 : (262144 : ℝ) * S.Δ ^ (3:ℕ) * (P.H ^ 4 / P.X) ≤ (a:ℝ) ^ 3 :=
-    a_cubed_lb_quarter P.X P.H S.Δ a hXpos hΔpos haRpos (by linarith [hΔ]) ha_lo
+    a_cubed_lb_quarter P.X P.H S.Δ a hXpos hΔpos (by linarith [hΔ]) ha_lo
   -- with the lowered threshold the band lower bound degrades to `R ≥ 32768/Δ`
   have hRlb : (32768 : ℝ) / S.Δ ≤ S.R := by
     have hAge : (a:ℝ) / 2 ≤ S.A := by linarith [haA]
@@ -586,7 +586,7 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
     have hrcast : (rStar d : ℝ)
         = -(2 * (d:ℝ) - a) * (getm d : ℝ) + (2 * (d:ℝ) + 3 * a) * (getm (d + a) : ℝ) := by
       rw [hrStar]; push_cast; ring
-    exact Rfun_near_int P.X P.H (a:ℝ) (d:ℝ) S.D hXpos hHpos hDSpos haRpos
+    exact Rfun_near_int P.X P.H (a:ℝ) (d:ℝ) S.D hHpos hDSpos haRpos
       (by rw [← hDeq]; exact haD) hdlo hdhi (getm d) (getm (d + a))
       e1lo e1hi e2lo e2hi (rStar d) hrcast
   have hRfun_bds : ∀ d : ℤ, S.D ≤ (d:ℝ) → (d:ℝ) ≤ 2 * S.D →
@@ -888,7 +888,7 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
   have hRval : S.R = P.X * S.A ^ 3 / S.D ^ 4 := by
     rw [S.R_eq_orig, hDSeq]; rw [show (P.H * S.Δ) ^ 4 = S.Δ ^ 4 * P.H ^ 4 by ring]
   have ha3 : (262144 : ℝ) * S.Δ ^ (3:ℕ) * (P.H ^ 4 / P.X) ≤ (a:ℝ) ^ 3 :=
-    a_cubed_lb_quarter P.X P.H S.Δ a hXpos hΔpos haRpos (by linarith [hΔ]) ha_lo
+    a_cubed_lb_quarter P.X P.H S.Δ a hXpos hΔpos (by linarith [hΔ]) ha_lo
   -- with the lowered threshold the band lower bound degrades to `R ≥ 32768/Δ`
   have hRlb : (32768 : ℝ) / S.Δ ≤ S.R := by
     have hAge : (a:ℝ) / 2 ≤ S.A := by linarith [haA]
@@ -942,7 +942,7 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
     have hrcast : (rStar d : ℝ)
         = -(2 * (d:ℝ) - a) * (getm d : ℝ) + (2 * (d:ℝ) + 3 * a) * (getm (d + a) : ℝ) := by
       rw [hrStar]; push_cast; ring
-    exact Rfun_near_int P.X P.H (a:ℝ) (d:ℝ) S.D hXpos hHpos hDSpos haRpos
+    exact Rfun_near_int P.X P.H (a:ℝ) (d:ℝ) S.D hHpos hDSpos haRpos
       (by rw [← hDeq]; exact haD) hdlo hdhi (getm d) (getm (d + a))
       e1lo e1hi e2lo e2hi (rStar d) hrcast
   have hRfun_bds : ∀ d : ℤ, S.D ≤ (d:ℝ) → (d:ℝ) ≤ 2 * S.D →

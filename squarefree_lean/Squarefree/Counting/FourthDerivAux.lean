@@ -430,7 +430,7 @@ difference `g = Δ_{h₁,h₂,h₃} f` is `(h₁h₂h₃·Λ)`-expanding on `[N,
 `≤ K·(h₁h₂h₃·Λ)·N`. -/
 theorem expanding_and_variation
     {N Λ K h₁ h₂ h₃ : ℝ} {f : ℝ → ℝ}
-    (_hN : 2 ≤ N) (hΛ : 0 < Λ) (_hK : 1 ≤ K)
+    (hΛ : 0 < Λ) (_hK : 1 ≤ K)
     (hh1 : 1 ≤ h₁) (hh2 : 1 ≤ h₂) (hh3 : 1 ≤ h₃) (hsum : h₁ + h₂ + h₃ ≤ N)
     (hf : ContDiffOn ℝ 4 f (Ioo 0 (4 * N)))
     (hlb : ∀ x ∈ Icc N (3 * N), Λ ≤ |iteratedDeriv 4 f x|)

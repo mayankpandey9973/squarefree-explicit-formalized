@@ -26,7 +26,7 @@ Using `Shat_reflect` (`Ŝ_{a,b}(d) = −Ŝ_{a,−b}(d+b)`) and `distInt_neg`, we
 `b ≥ 0` brick at `(a, −b, d+b)`; the four spacing points `{d+b, (d+b)+a, d, d+a}` are the same
 set `{d, d+a, d+b, d+a+b}`.  The conclusion bound becomes `15·H/(d+b)` (the new base point). -/
 theorem inD_distInt_Shat_neg {X H : ℝ} {a b d : ℤ}
-    (hX : 0 < X) (hd : 0 < ((d + b : ℤ) : ℝ)) (ha : 0 ≤ a) (_hb : b ≤ 0)
+    (_hX : 0 < X) (hd : 0 < ((d + b : ℤ) : ℝ)) (ha : 0 ≤ a) (_hb : b ≤ 0)
     (hab : (a : ℝ) + ((-b : ℤ) : ℝ) ≤ ((d + b : ℤ) : ℝ))
     (hin0 : inD X H d) (hin1 : inD X H (d + a))
     (hin2 : inD X H (d + b)) (hin3 : inD X H (d + a + b)) :
@@ -42,7 +42,7 @@ theorem inD_distInt_Shat_neg {X H : ℝ} {a b d : ℤ}
     rw [show (d + b) + a + (-b) = d + a by ring]; exact hin1
   have hin2' : inD X H ((d + b) + a) := by
     rw [show (d + b) + a = d + a + b by ring]; exact hin3
-  exact inD_distInt_Shat (a := a) (b := -b) (d := d + b) hX hd ha
+  exact inD_distInt_Shat (a := a) (b := -b) (d := d + b) hd ha
     (by linarith : (0:ℤ) ≤ -b) hab hin2 hin2' hin0' hin1'
 
 /-- **§5 Step-4 near-integer of `Υ`, `b ≤ 0` form** (writeup 996–998).  Mirror of

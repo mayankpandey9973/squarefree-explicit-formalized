@@ -96,10 +96,10 @@ private theorem vterm_numeric (S : Scale P) {l1 l2 : ℝ}
 set_option maxHeartbeats 800000 in
 /-- **§5 Step-3 per-`r` lower bound on `|𝒬|`** in the monotone range `V₁ < |v|`. -/
 theorem Qval_abs_ge {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ v : ℝ}
-    (_hAD : 10 * S.A ≤ S.D) (ha0 : 0 < a)
+    (ha0 : 0 < a)
     (ha_lo : S.A / 5 ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 11 * S.A)
     (hℓ1 : 0 < ℓ₁) (hℓ12 : ℓ₁ < ℓ₂) (hℓ2W : (ℓ₂ : ℝ) ≤ 130 * P.Wval)
-    (hr_lo : (1/72) * S.R ≤ r) (_hr_hi : r ≤ 16 * S.R)
+    (hr_lo : (1/72) * S.R ≤ r)
     (hdwin : S.D ≤ (d : ℝ) ∧ (d : ℝ) ≤ 2 * S.D)
     (hb0def : (ℓ₁ : ℝ) * b₀ = (d₁ : ℝ) - (d : ℝ))
     (hvdef : (ℓ₂ : ℝ) * b₀ + v = (d₂ : ℝ) - (d : ℝ))
@@ -113,8 +113,7 @@ theorem Qval_abs_ge {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ} {b₀ 
               - (ℓ₂ : ℝ) * Fab P.X (a : ℝ) ((ℓ₁ : ℝ) * b₀) (d : ℝ))
     (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2) (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4)
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (hH1 : 1 ≤ P.H)
-    (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
-    (_hΔreg : P.G ^ 2 * P.U ^ 5 ≤ S.Δ) :
+    (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U) :
     10 ^ 55 * ((ℓ₁ : ℝ) * (ℓ₂ : ℝ) * ((ℓ₂ : ℝ) - (ℓ₁ : ℝ)) / (P.G * S.Ω ^ 5)) + 1 / 2 ≤ |𝒬| := by
   -- ===== positivity =====
   have hHpos : 0 < P.H := P.H_pos

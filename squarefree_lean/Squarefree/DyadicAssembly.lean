@@ -27,7 +27,7 @@ namespace DyadicAssembly
 over `[⌈t⌉, ⌊t·2^{K+1}⌋]` is at most the sum of the `K+1` dyadic blocks `[⌈t·2^k⌉, ⌊t·2^{k+1}⌋]`.
 The blocks adjoin with no integer gap because `2·(t·2^k) = t·2^{k+1}` and
 `⌈y⌉ ≤ ⌊y⌋ + 1`. -/
-theorem dyadic_cover_sum (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t : ℝ) (_ht : 0 < t) :
+theorem dyadic_cover_sum (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t : ℝ) :
     ∀ K : ℕ,
       ∑ a ∈ Finset.Icc ⌈t⌉ ⌊t * 2 ^ (K + 1)⌋, f a ≤
         ∑ k ∈ Finset.range (K + 1),
@@ -133,8 +133,8 @@ private theorem two_bb_le_sq_t {H X U D : ℝ} (hH : 1 ≤ H) (hX : 0 < X) (hD :
 
 /-- Cover-and-count: if the dyadic blocks of `f` are each `≤ B ≥ 0` and `[⌈t⌉,⌊bb⌋]` is covered by
 the first `n+1` blocks, then `∑_{[⌈t⌉,⌊bb⌋]} f ≤ (n+1)·B`. -/
-theorem cover_sum_le (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t bb B : ℝ) (ht : 0 < t)
-    (n : ℕ) (hcov : bb ≤ t * 2 ^ (n + 1)) (_hB : 0 ≤ B)
+theorem cover_sum_le (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t bb B : ℝ) (_ht : 0 < t)
+    (n : ℕ) (hcov : bb ≤ t * 2 ^ (n + 1))
     (hblock : ∀ k ∈ Finset.range (n + 1),
         ∑ a ∈ Finset.Icc ⌈t * 2 ^ k⌉ ⌊t * 2 ^ (k + 1)⌋, f a ≤ B) :
     ∑ a ∈ Finset.Icc ⌈t⌉ ⌊bb⌋, f a ≤ ((n : ℝ) + 1) * B := by
@@ -144,7 +144,7 @@ theorem cover_sum_le (f : ℤ → ℝ) (hf : ∀ a, 0 ≤ f a) (t bb B : ℝ) (h
       ≤ ∑ a ∈ Finset.Icc ⌈t⌉ ⌊t * 2 ^ (n + 1)⌋, f a :=
         Finset.sum_le_sum_of_subset_of_nonneg hsub (fun a _ _ => hf a)
     _ ≤ ∑ k ∈ Finset.range (n + 1),
-          ∑ a ∈ Finset.Icc ⌈t * 2 ^ k⌉ ⌊t * 2 ^ (k + 1)⌋, f a := dyadic_cover_sum f hf t ht n
+          ∑ a ∈ Finset.Icc ⌈t * 2 ^ k⌉ ⌊t * 2 ^ (k + 1)⌋, f a := dyadic_cover_sum f hf t n
     _ ≤ ∑ _k ∈ Finset.range (n + 1), B := Finset.sum_le_sum hblock
     _ = ((n : ℝ) + 1) * B := by
         rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul]; push_cast; ring
@@ -500,7 +500,7 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
         have hStep : Ssum ≤ ((n : ℝ) + 1) * (C_blk * P.H / P.U) := by
           rw [hSsumdef]
           exact cover_sum_le (fun b => (DaCard P.X P.H b D : ℝ)) (fun b => hDaC_nonneg b)
-            t bb (C_blk * P.H / P.U) htpos n hcov1 (by positivity) hblk_all
+            t bb (C_blk * P.H / P.U) htpos n hcov1 hblk_all
         -- N = n+1 ≤ X^{u_b/2}
         have hlog2pos : 0 < Real.log 2 := Real.log_pos (by norm_num)
         -- 2·bb ≤ X²·t  (i.e. 2bb/t ≤ X²); reduces to 8·U ≤ X^{5/3} (H, D^{1/3} ≥ 1)

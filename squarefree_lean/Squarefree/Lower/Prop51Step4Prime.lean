@@ -100,7 +100,7 @@ theorem ra_step4_ssum_collapse'
     field_simp
     ring
   rw [Finset.sum_congr rfl hint]
-  refine le_trans (step4_ssum_inv b (dc + ev * b) (ev * dc) hbnn hcmnn hcpnn N) ?_
+  refine le_trans (step4_ssum_inv b (dc + ev * b) (ev * dc) hcmnn hcpnn N) ?_
   -- ============ Phase 2: collapse the cap into the sharp monomials ============
   set sL : ℝ := Real.sqrt L with hsL
   have hsLpos : 0 < sL := by rw [hsL]; exact Real.sqrt_pos.mpr hLpos

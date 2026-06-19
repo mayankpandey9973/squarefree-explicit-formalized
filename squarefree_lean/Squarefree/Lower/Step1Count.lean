@@ -18,7 +18,7 @@ theorem step1_smooth_count {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ r₀ r�
     (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1 : 0 < ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
     (hsmall : (10:ℝ) ^ 33 * ℓ₁ ≤ S.R)
-    (hr0_lo : (1/72) * S.R ≤ r₀) (_hr01 : r₀ ≤ r₁) (hr1_hi : r₁ + ℓ₁ ≤ 16 * S.R)
+    (hr0_lo : (1/72) * S.R ≤ r₀) (hr1_hi : r₁ + ℓ₁ ≤ 16 * S.R)
     (hδ : 0 ≤ δ) :
     (((Finset.Icc ⌈r₀⌉ ⌊r₁⌋).filter
         (fun (n : ℤ) => Counting.distInt (phi P.X a ℓ₁ ℓ₂ (n : ℝ)) ≤ δ)).card : ℝ)

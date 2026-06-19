@@ -107,7 +107,7 @@ theorem Rfun_diff_lb (X a d₁ dk D : ℝ) (hX : 0 < X) (hD : 0 < D)
         exact mul_le_mul_of_nonneg_left hflb hXa3
 
 /-- Cube of the regime bound on `a`:  `a ≥ 64 Δ^{4/3}(H⁴/X)^{1/3}  ⇒  a³ ≥ 64³ Δ⁴ H⁴/X`. -/
-theorem a_cubed_lb (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ) (_ha : 0 < a)
+theorem a_cubed_lb (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ)
     (ha_lo : (64 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ) ≤ a) :
     (262144 : ℝ) * Δ ^ (4:ℕ) * (H ^ 4 / X) ≤ a ^ 3 := by
   have hcube : ((64 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ)) ^ 3
@@ -134,7 +134,7 @@ theorem a_cubed_lb (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ) (_ha : 0 < a)
 From `a ≥ (1/4)·Δ^{4/3}(H⁴/X)^{1/3}` we only get `a³ ≥ (1/64)·Δ⁴·H⁴/X`; trading one power of
 `Δ` against the floor `Δ ≥ 2²⁴` recovers the same `262144·Δ³·(H⁴/X) ≤ a³` shape the fiber
 proofs consume (now with `Δ³` rather than `Δ⁴`).  Used by `prop_3_2_fiber(_dStar)`. -/
-theorem a_cubed_lb_quarter (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ) (_ha : 0 < a)
+theorem a_cubed_lb_quarter (X H Δ a : ℝ) (hX : 0 < X) (hΔ : 0 < Δ)
     (hΔlb : (16777216 : ℝ) ≤ Δ)
     (ha_lo : (1/4 : ℝ) * Δ ^ (4/3 : ℝ) * (H ^ 4 / X) ^ (1/3 : ℝ) ≤ a) :
     (262144 : ℝ) * Δ ^ (3:ℕ) * (H ^ 4 / X) ≤ a ^ 3 := by
@@ -324,7 +324,7 @@ theorem Rfun_diff_lb_abs (X a d₁ d₂ D : ℝ) (hX : 0 < X) (hD : 0 < D)
 
 /-- **Near-integer property** (writeup line 363): `R_a(d) = (integer) + O(H/D)`.
 With `D ≤ d ≤ 2D`, `0 < a ≤ D`, there is `J ∈ ℤ` with `|R_a(d) − J| ≤ 14·H/D`. -/
-theorem Rfun_near_int (X H a d D : ℝ) (_hX : 0 < X) (hH : 0 < H) (hD : 0 < D)
+theorem Rfun_near_int (X H a d D : ℝ) (hH : 0 < H) (hD : 0 < D)
     (ha : 0 < a) (haD : a ≤ D) (hd_lo : D ≤ d) (hd_hi : d ≤ 2 * D)
     (m₁ m₂ : ℤ)
     (he1 : 0 ≤ (m₁:ℝ) - X / d ^ 2) (he1' : (m₁:ℝ) - X / d ^ 2 ≤ H / d ^ 2)

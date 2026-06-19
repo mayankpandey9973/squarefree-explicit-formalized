@@ -340,8 +340,7 @@ theorem sec7_hSum_R_small {P : Globals} {S : Scale P} {W : ℝ} {h₁ h₂ h₃ 
 /-- **N11 smallness 2**: the faithful relErr scale is small on the strip.  The
 `10^143` level is a clean strip-derived level needed by the current `cErr = 10^42`
 absorptions under the `X ≥ 2^2400` floor after the `U^3` enlargement. -/
-theorem sec7_relErr_le {P : Globals} {S : Scale P} {W : ℝ}
-    (_Env : Sec7Envelope P S W) (_hW : 1 ≤ W)
+theorem sec7_relErr_le {P : Globals} {S : Scale P}
     {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ)) :

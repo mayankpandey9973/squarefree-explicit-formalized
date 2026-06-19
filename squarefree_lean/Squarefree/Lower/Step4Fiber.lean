@@ -454,8 +454,8 @@ theorem step4_fiber_extract {a : ℤ} {ℓ₁ ℓ₂ r : ℕ} {dStar : ℕ → �
     ha0R ha_lo ha_hi hℓ1_loR hℓ12R hℓ12'R hℓ2W hb0 hb0lo hv hvlo'
     hdtwin.1 hdtwin.2 hReg h1 hG1 hU1 hΔ1 hΩU hUbig hDeW
   have hupp := sigma_v2_upper (P := P) (S := S) (a := (a : ℝ)) (b₀ := b₀) (v := v) (d := dt)
-    ha0R ha_lo ha_hi hℓ1_loR hℓ12R hℓ12'R hℓ2W hb0 hb0lo hv hvlo'
-    hdtwin.1 hdtwin.2 hReg h1 hG1 hU1 hΔ1 hΩU hUbig hDeW
+    ha0R ha_hi hℓ1_loR hℓ12R hℓ12'R hℓ2W hb0 hb0lo hv hvlo'
+    hdtwin.1 hReg h1 hG1 hU1 hΔ1 hΩU hUbig hDeW
   rw [← hSgT_def] at hlow hupp
   -- abbreviate `A := (ℓ₁³ℓ₂(ℓ₂−ℓ₁)·v²)/(Δ²Ω²) ≥ 0`, so `hlow : (1/(2·10⁸))·A ≤ |SgT|`,
   -- `hupp : |SgT| ≤ 10¹⁵·A`.

@@ -8098,7 +8098,7 @@ private theorem sec7_ra_rho_model_bound {a d d_lo : ℝ} {k : ℕ}
 
 theorem sec7_ra_rho_tower {X a d d_lo : ℝ} {k : ℕ}
     (hk : k ≤ 6) (hX : 0 < X) (ha : 0 < a) (hdlo : 0 < d_lo)
-    (hlo : d_lo ≤ d) (_had : a ≤ d) :
+    (hlo : d_lo ≤ d) :
     |iteratedDeriv k
         (fun t => Ffun X a t
           - 2 * X * a / (t ^ ((3 : ℝ) / 2) * (t + a) ^ ((3 : ℝ) / 2))) d|

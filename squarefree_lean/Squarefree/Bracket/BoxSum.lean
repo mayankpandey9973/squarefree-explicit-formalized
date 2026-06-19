@@ -303,13 +303,12 @@ private theorem sec7_zero_hsub1 {P : Globals} {S : Scale P} {W : ℝ}
           _ = sec7_envC2 * (W ^ 30 * S.Ω ^ 4) := by ring
     _ ≤ P.H * S.x := Env.n6
 
-private theorem sec7_zero_hrel {P : Globals} {S : Scale P} {W : ℝ} {h₁ h₂ h₃ : ℤ}
-    (Env : Sec7Envelope P S W) (hbox : sec7_shiftBox W h₁ h₂ h₃)
+private theorem sec7_zero_hrel {P : Globals} {S : Scale P}
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ)) :
     sec7_relErr P S * 10 ^ 143 ≤ 1 :=
-  sec7_relErr_le Env (sec7_W_ge_one hbox) hsd hbud hg0 hu0 hX24
+  sec7_relErr_le hsd hbud hg0 hu0 hX24
 
 private theorem sec7_zero_hsub2 {P : Globals} {S : Scale P} (c₀ Cu : ℝ)
     (hsd : OnStripAux.StripData P S c₀ Cu) (hbud : OnStripAux.Budget P.g P.u Cu)
@@ -1060,7 +1059,7 @@ private theorem sec7_nonzero_wide_count {P : Globals} {S : Scale P} {W : ℝ} {a
   have hshift : 3 * sec7_hSum h₁ h₂ h₃ ≤ 3 * (W + W ^ 2 + W ^ 4) := by
     linarith
   have hrel143 : sec7_relErr P S * 10 ^ 143 ≤ 1 :=
-    sec7_relErr_le Env hW.le hsd hbud hg0 hu0 hX24
+    sec7_relErr_le hsd hbud hg0 hu0 hX24
   have hrelF143 : sec7_relErrF P S * 10 ^ 143 ≤ 1 :=
     sec7_relErrF_le Env hW.le hsd hbud hg0 hu0 hX24 hUbig
   have hcover : ∀ y : ℝ, S.R / 144 ≤ y → y ≤ 40 * S.R → y ∈ sec7_rWin S W := by
@@ -1593,7 +1592,7 @@ private theorem sec7_triple_split (P : Globals) (S : Scale P) (W : ℝ)
             hsub1 := sec7_zero_hsub1 Env hW.le
             hsub2 := sec7_zero_hsub2 c₀ Cu hsd hbud hg0 hu0 hX24
             hGΩ5F := sec7_zero_hGΩ5F c₀ Cu hsd hbud hg0 hu0 hX24
-            hrel := sec7_zero_hrel Env hbox c₀ Cu hsd hbud hg0 hu0 hX24
+            hrel := sec7_zero_hrel c₀ Cu hsd hbud hg0 hu0 hX24
             hrelF := sec7_relErrF_le Env (sec7_W_ge_one hbox) hsd hbud hg0 hu0 hX24 hUbig }
         have hcnt := sec7_zero_wide_count (ME := ME) Hyp hxsmall hδNpos le_rfl
         simpa [Tpiece, Bz, wide] using hcnt

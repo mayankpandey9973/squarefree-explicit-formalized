@@ -125,7 +125,7 @@ theorem phi_distInt_le_unif {a : ℤ} {r : ℝ} {ℓ₁ ℓ₂ d d₁ d₂ : ℤ
     (phi_norm_le_v0 hAD ha0 ha_lo ha_hi hℓ1 hℓ1_lo hℓ12 hℓ2W hr_lo hr1_hi
       hin hin1 hin2 hdpos hd1pos hd2pos hdwin hd1win hv0 hb0ne hwin
       hd_close hd1_close h1 hband hG1 hU1 hΔ1 hUH)
-    (delta_eff_le (b₀ := b₀) hAD ha_lo ha_hi haR hℓ1R
+    (delta_eff_le (b₀ := b₀) ha_hi haR hℓ1R
       (by exact_mod_cast hℓ12) hℓ2W hdwin hd1win.1 hd2win.1 hb0
       h1 hband hG1 hU1 hΔ1 hΩU)
 

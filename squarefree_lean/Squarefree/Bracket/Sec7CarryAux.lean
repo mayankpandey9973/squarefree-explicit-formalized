@@ -202,8 +202,8 @@ set_option exponentiation.threshold 700 in
 zero-top-carry subcover.  `sec7_carry_fiber_cover` (Bracket/Sec7Branch.lean) delegates to
 the first projection; the zero-branch cover delegates to the second. -/
 theorem sec7_carry_fiber_cover_core {P : Globals} {S : Scale P} {a : ℤ}
-    {W : ℝ} (Ph : Sec7Phase P S W a) (Env : Sec7Envelope P S W) {j : ℤ}
-    (_hj : sec7_jBand P S j) {h₁ h₂ h₃ : ℤ} (hbox : sec7_shiftBox W h₁ h₂ h₃) {ξ₁ ξ₂ ξ₃ : ℝ}
+    {W : ℝ} (Ph : Sec7Phase P S W a) (Env : Sec7Envelope P S W)
+    {h₁ h₂ h₃ : ℤ} (hbox : sec7_shiftBox W h₁ h₂ h₃) {ξ₁ ξ₂ ξ₃ : ℝ}
     (hξ₁ : |ξ₁| ≤ sec7_hSum h₁ h₂ h₃) (hξ₂ : |ξ₂| ≤ sec7_hSum h₁ h₂ h₃)
     (hξ₃ : |ξ₃| ≤ sec7_hSum h₁ h₂ h₃)
     {M : ℝ} (hM : 2 * (W + W ^ 2 + W ^ 4) ≤ M)

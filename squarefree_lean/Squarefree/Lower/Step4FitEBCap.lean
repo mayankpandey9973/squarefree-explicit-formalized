@@ -279,7 +279,7 @@ the `√L` of `dc` cancels `cEhyb`'s `1/√L`, and the three summands fit `2+1+3
 target blocks via `step4_fitEB_T1`/`_T2`/`_cap`. -/
 theorem step4_fit_cE_B
     (h1 : P.G*P.U^10 ≤ P.H/S.Δ^2)
-    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ) (_hH1 : 1 ≤ P.H)
+    (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
     (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ)^33 ≤ P.U)
     (N : ℕ) (ℓ₁ ℓ₂ : ℝ) (hℓ1lo : 1 ≤ ℓ₁) (hℓ12 : ℓ₁+1 ≤ ℓ₂)
     (hℓ1W : ℓ₁ ≤ 130*(P.G*P.U^5)) (hℓ2W : ℓ₂ ≤ 130*(P.G*P.U^5))
@@ -296,9 +296,9 @@ theorem step4_fit_cE_B
   have hL : (0:ℝ) < ℓ₁*ℓ₂*(ℓ₂-ℓ₁) := mul_pos (mul_pos hℓ1pos hℓ2pos) hd
   have hn0 : (0:ℝ) ≤ (N:ℝ) := Nat.cast_nonneg N
   have hT1 := step4_fitEB_T1 h1 hG1 hU1 hΔ1 hΩU hUbig ℓ₁ ℓ₂ hℓ1lo hℓ12 hℓ1W hℓ2W
-    (N:ℝ) C hC hNcap hn0 a ha0 ha_hi gap hgap0 hgap
+    (N:ℝ) C hC hNcap hn0 a ha_hi gap hgap0 hgap
   have hT2 := step4_fitEB_T2 h1 hG1 hU1 hΔ1 hΩU hUbig ℓ₁ ℓ₂ hℓ1lo hℓ12 hℓ1W hℓ2W
-    (N:ℝ) C hC hNcap hn0 a ha0 ha_hi
+    (N:ℝ) C hC hNcap hn0 a ha_hi
   have hcap := step4_fitEB_cap h1 hG1 hU1 hΔ1 hΩU hUbig ℓ₁ ℓ₂ hℓ1lo hℓ12 hℓ1W hℓ2W
     (N:ℝ) C hC hNcap hn0 a ha0 ha_hi
   have hblock : (0:ℝ) ≤ C*(P.H/S.Δ)*(S.Δ^2*P.G^15*P.U^90/(P.H*S.Ω^27)) :=

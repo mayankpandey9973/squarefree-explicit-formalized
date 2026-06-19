@@ -534,15 +534,14 @@ private theorem sec7_nonzero_hSum_div_R_small {P : Globals} {S : Scale P} {W : �
     _ ≤ S.R / S.R := hdiv
     _ = 1 := by field_simp [hR.ne']
 
-private theorem sec7_nonzero_relErr_small {P : Globals} {S : Scale P} {W : ℝ}
-    {h₁ h₂ h₃ : ℤ} (Env : Sec7Envelope P S W) (hbox : sec7_shiftBox W h₁ h₂ h₃)
+private theorem sec7_nonzero_relErr_small {P : Globals} {S : Scale P}
     (c₀ Cu : ℝ) (D : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg : 0 ≤ P.g) (hu : 0 < P.u)
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ)) :
     sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 143 := by
   have hpow : 0 < (10 : ℝ) ^ 143 := by positivity
   rw [le_div_iff₀ hpow]
-  exact sec7_relErr_le Env (sec7_W_ge_one hbox) D hbud hg hu hX24
+  exact sec7_relErr_le D hbud hg hu hX24
 
 private theorem sec7_nonzero_relErrF_small {P : Globals} {S : Scale P} {W : ℝ}
     {h₁ h₂ h₃ : ℤ} (Env : Sec7Envelope P S W) (hbox : sec7_shiftBox W h₁ h₂ h₃)
@@ -1405,7 +1404,7 @@ theorem sec7_nonzero_pieces :
     have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
     linarith
   have hX1 : 1 ≤ P.X := hXgt.le
-  have hrel := sec7_nonzero_relErr_small Env hbox c₀ Cu D hbud hg hu hX24
+  have hrel := sec7_nonzero_relErr_small c₀ Cu D hbud hg hu hX24
   have hrelF := sec7_nonzero_relErrF_small Env hbox c₀ Cu D hbud hg hu hX24 hUbig
   let K : ℕ := 100
   let pt : ℕ → ℝ := fun i => (p : ℝ) + (i : ℝ) * (((q : ℝ) - (p : ℝ)) / 100)
@@ -2058,7 +2057,7 @@ theorem sec7_nonzero_count_78 :
             * ((S.R * S.T₁) ^ ((1:ℝ)/3) + S.R * δ₁
                 + S.R * Real.sqrt (δ₁ / S.T₁) + 1) := by
   intro P S W Env _hW c₀ Cu D hbud hg hu hX24 hUbig a Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ME _hj hbox hpad hshift hξ₁ hξ₂ hξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃ hρ₀ne hρ₀abs _hρ₁ _hρ₂ _hρ₃ hu₁ hu₂ hu₃ hErr hcd p q hwin hdyad hcover δ₁ hδpos hδlt
-  have hrel := sec7_nonzero_relErr_small Env hbox c₀ Cu D hbud hg hu hX24
+  have hrel := sec7_nonzero_relErr_small c₀ Cu D hbud hg hu hX24
   have hrelF := sec7_nonzero_relErrF_small Env hbox c₀ Cu D hbud hg hu hX24 hUbig
   let f : ℝ → ℝ :=
     sec7_Phi Ph j h₁ h₂ h₃ ξ₁ ξ₂ ξ₃ ρ₀ ρ₁ ρ₂ ρ₃ u₁ u₂ u₃

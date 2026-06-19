@@ -111,7 +111,7 @@ theorem step4_fibre_count_le
     (hvmax : ∀ r ∈ Fib, |vval P a dStar ℓ₁ ℓ₂ r| ≤ Vmax P S)
     (hVcut : ∀ r ∈ Fib, V₂ P S ≤ |vval P a dStar ℓ₁ ℓ₂ r|)
     (hdD : ∀ r ∈ Fib, S.D * (1 - 1/10 ^ 9) ≤ dOf r)
-    (hd2D : ∀ r ∈ Fib, dOf r ≤ 2 * S.D * (1 + 1/10 ^ 9))
+    (_hd2D : ∀ r ∈ Fib, dOf r ≤ 2 * S.D * (1 + 1/10 ^ 9))
     (hb0gap : ∀ r ∈ Fib, |b₀Of r - b1Model P.X (a:ℝ) (dOf r)| ≤ gap)
     (hni : ∀ r ∈ Fib,
       |Sigma_closed P.X (a:ℝ) (b₀Of r) (vval P a dStar ℓ₁ ℓ₂ r) (dOf r) (ℓ₁:ℝ) (ℓ₂:ℝ)
@@ -137,7 +137,7 @@ theorem step4_fibre_count_le
     have hvm : |vval P a dStar ℓ₁ ℓ₂ r| ≤ 10 ^ 20 * (S.Δ * P.U ^ 5 / S.Ω ^ 3) :=
       hvmax r hr
     have h := step4_pack_sqlo (P := P) (S := S) ha0 ha_lo ha_hi hℓ1R hℓ12R hℓ12R' hℓ2W
-      (hb0box r hr) (hb0lo r hr) hvm (hVcut r hr) (hdD r hr) (hd2D r hr)
+      (hb0box r hr) (hb0lo r hr) hvm (hVcut r hr) (hdD r hr)
       hReg h1 hG1 hU1 hΔ1 hΩU hUbig hDeW hgap0 hgap (hb0gap r hr) rfl (hni r hr)
       (by rw [hcast2]; exact herr_small)
     refine ⟨?_, ?_⟩

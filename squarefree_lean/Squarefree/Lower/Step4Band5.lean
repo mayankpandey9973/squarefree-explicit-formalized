@@ -88,7 +88,7 @@ theorem band_master {ℓ₁ a Lv Ĉ Vlo n T : ℝ} (ha : 0 < a) (hL : 1 ≤ Lv) 
 
 /-- `cE2hyb` majorant: with `a ≤ 11A` and `ℓ₂ ≥ ℓ₁ + 1`, the `n`-linear coefficient is at most
 `10¹⁸·G·Ω⁵/(ℓ₁·ℓ₁ℓ₂(ℓ₂−ℓ₁))`. -/
-theorem cE2hyb_le_majorant {a ℓ₁ ℓ₂ : ℝ} (_ha0 : 0 < a) (ha_hi : a ≤ 11*S.A)
+theorem cE2hyb_le_majorant {a ℓ₁ ℓ₂ : ℝ} (ha_hi : a ≤ 11*S.A)
     (hℓ1 : 1 ≤ ℓ₁) (hℓ12 : ℓ₁ + 1 ≤ ℓ₂) :
     cE2hyb P S a ℓ₁ ℓ₂ ≤ 10^18 * P.G * S.Ω^5 / (ℓ₁ * (ℓ₁*ℓ₂*(ℓ₂-ℓ₁))) := by
   have hΔ := S.Δ_pos
@@ -118,7 +118,7 @@ theorem cE2hyb_le_majorant {a ℓ₁ ℓ₂ : ℝ} (_ha0 : 0 < a) (ha_hi : a ≤
 gives the per-`s`-fibre five-slot count `vc·Cv ≤ K_C·weight5 b ev dc cE cE₂ cC n`. -/
 theorem vsum_le_weight5 {K_C vc Cv b ev dc cE cE₂ cC n : ℝ}
     (hKC : 0 ≤ K_C) (hb : 0 ≤ b) (hdc : 0 ≤ dc)
-    (hvc_nn : 0 ≤ vc) (_hcE₂ : 0 ≤ cE₂) (_hcC : 0 ≤ cC) (_hn : 0 ≤ n)
+    (hvc_nn : 0 ≤ vc)
     (hvc : vc ≤ 2 + ev / Real.sqrt n + cE * Real.sqrt n + cE₂ * n + cC)
     (hCcol : Cv ≤ K_C * (b + dc / Real.sqrt n)) :
     vc * Cv ≤ K_C * weight5 b ev dc cE cE₂ cC n := by

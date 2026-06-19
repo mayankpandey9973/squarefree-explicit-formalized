@@ -115,7 +115,7 @@ theorem log_absorb (N : ℝ) (hN : 1 ≤ N) : Real.log N + 1 ≤ 2 * N := by
 `(N:ℝ) ≤ envelope + 1`; this exposes the `N ≤ envelope + 1` shape as a named lemma for the
 assembly, where `envelope = 10³⁰·ℓ₁·(H·G·Ω/Δ³)·V₊ + 10³⁰·(G²·U¹⁵/Ω⁵)` is the
 `Qval_abs_le_from_witness` bound. -/
-theorem step3_N_bound {ℓ₁ : ℕ} (Vplus : ℝ) (_hV : 0 ≤ Vplus) (Mbound : ℝ)
+theorem step3_N_bound {ℓ₁ : ℕ} (Vplus : ℝ) (Mbound : ℝ)
     (hM : Mbound ≤ 10 ^ 34 * ((ℓ₁ : ℝ)) * (P.H * P.G * S.Ω / S.Δ ^ 3) * Vplus
       + 10 ^ 34 * (P.G ^ 2 * P.U ^ 15 / S.Ω ^ 5)) :
     Mbound + 1 ≤ 10 ^ 34 * (ℓ₁ : ℝ) * (P.H * P.G * S.Ω / S.Δ ^ 3) * Vplus

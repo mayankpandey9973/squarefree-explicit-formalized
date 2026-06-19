@@ -105,7 +105,7 @@ points are collinear (each `collinearDet f n₀ n₁ nᵢ = 0`) lie on a common 
 (ℓ_{n₁}−ℓ_{n₀})/(n₁−n₀)` reduced (gcd factor `c`); collinearity through the first
 two points forces all five onto the cleared-denominator line. -/
 theorem collinear_five_on_majorLine {f : ℝ → ℝ} {n₀ n₁ n₂ n₃ n₄ : ℤ}
-    (h01 : n₀ < n₁) (_h12 : n₁ < n₂) (_h23 : n₂ < n₃) (_h34 : n₃ < n₄)
+    (h01 : n₀ < n₁)
     (hc012 : collinearDet f n₀ n₁ n₂ = 0)
     (hc013 : collinearDet f n₀ n₁ n₃ = 0)
     (hc014 : collinearDet f n₀ n₁ n₄ = 0) :
@@ -193,7 +193,7 @@ theorem residual_five_span {f : ℝ → ℝ} {N lam δ : ℝ}
   · -- All collinear: get a common MajorLine.
     obtain ⟨hc012, hc013, hc014⟩ := hcol
     obtain ⟨D, hD0, hD1, hD2, hD3, hD4⟩ :=
-      collinear_five_on_majorLine h01 h12 h23 h34 hc012 hc013 hc014
+      collinear_five_on_majorLine h01 hc012 hc013 hc014
     -- denominator dichotomy: q > c/δ  or  q ≤ c/δ.
     by_cases hq : (D.denom : ℝ) ≤ denomCutoff / δ
     · -- Small denominator: middle point `n₂` is OnMajorArc, contradicting residual.

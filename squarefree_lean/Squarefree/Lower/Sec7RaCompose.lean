@@ -78,7 +78,7 @@ theorem sec7_ra_R_mono_nat {P : Globals} (S : Scale P) :
     show S.Ω ^ (3:ℝ) = S.Ω ^ 3 by
       rw [show (3:ℝ) = ((3:ℕ):ℝ) by norm_num, Real.rpow_natCast]]
 
-theorem sec7_ra_le_of_fourth {a b : ℝ} (_ha : 0 ≤ a) (hb : 0 ≤ b)
+theorem sec7_ra_le_of_fourth {a b : ℝ} (hb : 0 ≤ b)
     (h : a ^ 4 ≤ b ^ 4) : a ≤ b := by
   exact le_of_pow_le_pow_left₀ (n := 4) (by norm_num) hb h
 
@@ -148,7 +148,7 @@ theorem sec7_ra_F_large_const {P : Globals} {S : Scale P} {W : ℝ}
     norm_num [sec7_cJ, sec7_envC2]
   have hK4 : ((10:ℝ) ^ 100 * (sec7_cJ + 1)) ^ 4 ≤ S.F ^ 4 :=
     le_trans (pow_le_pow_left₀ hK0 hKleC 4) hF4
-  exact sec7_ra_le_of_fourth hK0 hF.le hK4
+  exact sec7_ra_le_of_fourth hF.le hK4
 
 theorem sec7_ra_HA2_large {P : Globals} {S : Scale P} {W : ℝ}
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W) (c₀ Cu : ℝ)
@@ -637,7 +637,7 @@ theorem sec7_ra_ftil_scale {P : Globals} {S : Scale P} {r : ℝ} {a : ℤ}
     le_trans hscale_low hclosed_low
   have hlow :
       S.F / 500 ≤ Ffun P.X (a : ℝ) (dtilde P.X r (a : ℝ)) :=
-    sec7_ra_le_of_fourth (by positivity) hftil_nonneg hlow4
+    sec7_ra_le_of_fourth hftil_nonneg hlow4
   have hΩH : 10 * S.Ω ≤ P.H := sec7_dtilde_wide_AD_omega_le hAD
   have hΩle : S.Ω ≤ P.H / 10 := by nlinarith
   have hΩ4 : S.Ω ^ 4 ≤ (P.H / 10) ^ 4 :=
@@ -747,7 +747,7 @@ theorem sec7_ra_ftil_scale {P : Globals} {S : Scale P} {r : ℝ} {a : ℤ}
     le_trans hclosed_hi hscale_hi
   have hhi :
       Ffun P.X (a : ℝ) (dtilde P.X r (a : ℝ)) ≤ 300 * S.F :=
-    sec7_ra_le_of_fourth hftil_nonneg (by positivity) hhi4
+    sec7_ra_le_of_fourth (by positivity) hhi4
   exact ⟨hlow, hhi⟩
 
 /-- The normalized wide image lies in the `ρ₃` target interval. -/

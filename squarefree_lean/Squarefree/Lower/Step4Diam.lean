@@ -74,9 +74,8 @@ theorem Sigma_closed_diff_Cref_le
     (hDeW : 10 ^ 27 * (P.G ^ 4 * P.U ^ 20) ≤ S.Δ)
     (hvpin_hi : ℓ₁ ^ 3 * ℓ₂ * (ℓ₂ - ℓ₁) * v ^ 2
         ≤ 1000000 * (S.Δ ^ 2 * S.Ω ^ 2 * |(s : ℝ)|))
-    (hb : |b₀| ≤ Bx) (hBx0 : 0 ≤ Bx) (hvx : |v| ≤ Vx) (hVx0 : 0 ≤ Vx)
-    (hb0gap : |b₀ - b1Model P.X a d| ≤ gap)
-    (_hb0neg : b₀ < 0) :
+    (hb : |b₀| ≤ Bx) (hBx0 : 0 ≤ Bx) (hvx : |v| ≤ Vx) (_hVx0 : 0 ≤ Vx)
+    (hb0gap : |b₀ - b1Model P.X a d| ≤ gap) :
     |Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂ - (Cref P S ℓ₁ ℓ₂ * (S.A / a) ^ 2 * ℓ₁ ^ 2) * v ^ 2|
       ≤ (P.X * a / d ^ 5) * (3 * ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * |(-4 + 10 * a / d)| * gap * (ℓ₁ * v) ^ 2
         + 20 * (a / d) ^ 2 * (Cref P S ℓ₁ ℓ₂ * (S.A / a) ^ 2) * (ℓ₁ * v) ^ 2
@@ -132,7 +131,7 @@ theorem Sigma_closed_diff_Cref_le
   -- E_p2: the quartic p₂-contribution
   have hbP2 : |(P.X * a / d ^ 5) * ((-4 + 10 * a / d) * (Ptwo b₀ v ℓ₁ ℓ₂ / d))|
       ≤ 77 * (P.G * S.Ω / S.Δ ^ 4) * (P2AbsMaj ℓ₁ ℓ₂ Bx Vx / S.D) :=
-    abs_pref_mul_Ptwo_div_le_p2PointBudget ha0 ha_hi hℓ1 hℓ12 hb hBx0 hvx hVx0 (S.D_eps_lo hdD) h1 hG1 hU1 hΔ1
+    abs_pref_mul_Ptwo_div_le_p2PointBudget ha0 ha_hi hℓ1 hℓ12 hb hBx0 hvx (S.D_eps_lo hdD) h1 hG1 hU1 hΔ1
       hΩU hUbig
   -- assemble: triangle inequality across the four pieces
   rw [hdiff]
@@ -153,7 +152,6 @@ perturbed-quadratic shell with `E0 = 2·E_max`, producing exactly the `hpair` sh
 theorem step4_sqdiff_diam
     {a v v' d d' b₀ b₀' err E_max : ℝ} {ℓ₁ ℓ₂ : ℝ} {s : ℤ}
     (ha : 0 < a) (hℓ1 : 0 < ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
-    (_hb0neg : b₀ < 0) (_hb0neg' : b₀' < 0)
     (hx_ni : |Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂ - (s : ℝ)| ≤ err)
     (hy_ni : |Sigma_closed P.X a b₀' v' d' ℓ₁ ℓ₂ - (s : ℝ)| ≤ err)
     (hEx : |Sigma_closed P.X a b₀ v d ℓ₁ ℓ₂

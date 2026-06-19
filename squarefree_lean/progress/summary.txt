@@ -9,8 +9,20 @@ PERF (2026-06-18): full clean project build 48m17s → 22m29s (~53% faster), sti
   huge-rpow-context anti-pattern); ~60 maxHeartbeats bumps removed/lowered (incl. 25.6M, 10M, 6.4M).
   WARNINGS 406 → 0 (all cleared: deprecated APIs, unused vars _-prefixed, no-op/dead tactics, <;>→;).
   Use LEAN_NUM_THREADS=10 (no -j flag); never `lake clean`. Parallelize chain passes via `lake env lean`.
-  See CLAUDE.md §1a. Residual cost floor = simp/typeclass/bignum + the linarith certificate oracle
-  (intrinsic). NEXT (planned): map & CUT vestigial unused hypotheses (statement-level, with caller updates).
+  See CLAUDE.md §1a. Residual cost floor = simp/typeclass/bignum + the linarith certificate oracle (intrinsic).
+
+HYPOTHESIS STRIP (2026-06-19): ~147 vestigial unused hypotheses removed, statement-level, with all
+  caller updates threaded tree-wide (cascade to fixpoint). Still GREEN (full build 22m21s, 8548 jobs,
+  0 warnings) + axiom-clean [propext, Classical.choice, Quot.sound]. Breakdown:
+    - Stage 1 (private decls): ~67 binders (commit 02b67a0).
+    - Stage 2 (public lemmas, theorem/lemma only — def API-symmetry params left intact): ~80 binders.
+      Candidate signal = `_`-prefixed binders in public sigs (the warning sweep already flagged them);
+      37 owner files / 7 file-disjoint waves, parallel agents, per-file `lake env lean` verify.
+  Method: delete the `_`-binder, drop the matching positional arg at every caller, `_`-prefix orphaned
+  PUBLIC caller binders / strip orphaned PRIVATE ones (cascade up). REVERT when the "unused" binder is
+  silently consumed by a tactic context-search (`positivity`/`linarith`/`field_simp` side-goal) — 3 such
+  skips in Stage 2 (welim hB0, expanding_and_variation _hK, inD_distInt_Shat_neg _hb). Faithfulness
+  firewall: never strip from `prop_*`/`lemma_<digits>`/`theorem_*` or frontier/structure interfaces.
 
   ✅ §7 Φ″ ENDGAME CLOSED (2026-06-17, commit 589b8df): the last sorry
      (sec7_zero_few_critical Φ″ branch) filled by two new lemmas in Sec7ZeroScale:

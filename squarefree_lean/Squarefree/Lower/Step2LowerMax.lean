@@ -121,7 +121,7 @@ theorem phif_lower_max {a ℓ₁ ℓ₂ f r N : ℝ}
     push Not at hfl
     have hband := phif_curvature_lower_band (P := P) (S := S) (a := a) (ℓ₁ := ℓ₁) (ℓ₂ := ℓ₂)
       (f := f) (r := r) (N := N)
-      hAD ha0 ha_lo ha_hi hℓ1 hℓ12 hr_lo hrl_hi hsmall hNpos hRN
+      hAD ha0 ha_lo ha_hi hℓ1 hℓ12 hr_lo hrl_hi hsmall hRN
     -- `phif_curvature_lower_band`'s LHS is `(1/(5184·10⁷²))·Tc/N`
     have hband' : (1 / (5184 * 10 ^ 72)) * (Tc / N) ≤ A + Bv := by
       rw [hA_def, hBv_def, hTc_def]

@@ -2096,8 +2096,7 @@ private theorem sec7_phase_ra_e₃_base_contDiffAt6 {P : Globals} {S : Scale P} 
 
 /-- Budget absorption for the `f₂` residual tower after the cancellation has produced an
 `(Ω/H)^2` pointwise scale. -/
-private theorem sec7_phase_ra_e₂D_budget_absorb {P : Globals} {S : Scale P} {W : ℝ}
-    (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
+private theorem sec7_phase_ra_e₂D_budget_absorb {P : Globals} {S : Scale P}
     {c₀ Cu : ℝ} (hsd : OnStripAux.StripData P S c₀ Cu)
     (hbud : OnStripAux.Budget P.g P.u Cu) (hg0 : 0 ≤ P.g) (hu0 : 0 < P.u)
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1 / 100 : ℝ)) (m : ℕ) :
@@ -2119,7 +2118,7 @@ private theorem sec7_phase_ra_e₂D_budget_absorb {P : Globals} {S : Scale P} {W
       _ ≤ (S.Ω / P.H) * P.U ^ 3 := mul_le_mul_of_nonneg_left hU3 hΩH0
       _ = (S.Ω / P.H) * P.U ^ 3 := rfl
   have hrel143 : sec7_relErr P S * 10 ^ 143 ≤ 1 :=
-    sec7_relErr_le Env hW hsd hbud hg0 hu0 hX24
+    sec7_relErr_le hsd hbud hg0 hu0 hX24
   have hrel_small : sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 143 := by
     rw [le_div_iff₀ (by positivity : (0 : ℝ) < (10 : ℝ) ^ 143)]
     simpa [mul_comm] using hrel143
@@ -3410,7 +3409,7 @@ private theorem sec7_ra_rho_rescaled_FDeriv_bound {P : Globals} {S : Scale P} {W
       ≤ (10 ^ 20 : ℝ) * (P.X * (a : ℝ) ^ 3 / S.D ^ 5) := by
   have hDpos : 0 < S.D := S.D_pos
   have haR : 0 < (a : ℝ) := by exact_mod_cast ha
-  obtain ⟨hd_lo, hd_ge_a, _hd_hi⟩ :=
+  obtain ⟨hd_lo, _hd_ge_a, _hd_hi⟩ :=
     sec7_ra_dtilde_wide_image (P := P) (S := S) (W := W) (a := a) (r := r)
       ha hAD ha_lo ha_hi Env hW hsd hr
   set d : ℝ := dtilde P.X r (a : ℝ) with hd_def
@@ -3445,7 +3444,6 @@ private theorem sec7_ra_rho_rescaled_FDeriv_bound {P : Globals} {S : Scale P} {W
       sec7_ra_rho_tower (X := P.X) (a := (a : ℝ)) (d := S.D * u)
         (d_lo := S.D / 20) hi P.X_pos haR (by positivity)
         (by simpa [hSDu, d] using hd_lo)
-        (by simpa [hSDu, d] using hd_ge_a)
   have hcancel :
       S.D ^ i * (S.D * u) ^ ((-5 : ℝ) - i) ≤ 20 ^ (5 + i) / S.D ^ 5 := by
     simpa [hSDu, d] using
@@ -3992,7 +3990,7 @@ private theorem sec7_ra_rho1_A_rescaled_bound {P : Globals} {S : Scale P} {W : �
       _ ≤ (S.Ω / P.H) * P.U ^ 3 := mul_le_mul_of_nonneg_left hU3 hΩH0
       _ = (S.Ω / P.H) * P.U ^ 3 := rfl
   have hrel143 : sec7_relErr P S * 10 ^ 143 ≤ 1 :=
-    sec7_relErr_le Env hW hsd hbud hg0 hu0 hX24
+    sec7_relErr_le hsd hbud hg0 hu0 hX24
   have hrel_small : sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 143 := by
     rw [le_div_iff₀ (by positivity : (0 : ℝ) < (10 : ℝ) ^ 143)]
     simpa [mul_comm] using hrel143
@@ -5762,7 +5760,7 @@ Native progress below the stub has established the pointwise bridge
 composition estimate for the `ρ ∘ dtilde` tower on the full `sec7_rWinWide` aperture, followed
 by the `(Ω/H)^2` scale absorption through `sec7_phase_ra_e₂D_budget_absorb`. -/
 theorem sec7_ra_e₂D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
-    (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (_hG1 : 1 ≤ P.G)
+    (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
@@ -5869,11 +5867,11 @@ theorem sec7_ra_e₂D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
     sec7_ra_e₂D_comp_scale_absorb (P := P) (S := S) (a := (a : ℝ)) (m := m)
       hm haR ha_hi
   exact le_trans hnative (le_trans hscale
-    (sec7_phase_ra_e₂D_budget_absorb (P := P) (S := S) (W := W)
-      Env hW hsd hbud hg0 hu0 hX24 m))
+    (sec7_phase_ra_e₂D_budget_absorb (P := P) (S := S)
+      hsd hbud hg0 hu0 hX24 m))
 
 theorem sec7_ra_e₂D_core6 (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
-    (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (_hG1 : 1 ≤ P.G)
+    (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
@@ -5992,8 +5990,8 @@ theorem sec7_ra_e₂D_core6 (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
           mul_le_mul_of_nonneg_right hcE hpos
       _ = sec7_cExpIn6 * (S.T₂ / S.R ^ m) * sec7_relErr P S := by ring
   exact le_trans hnative (le_trans hscale (le_trans
-    (sec7_phase_ra_e₂D_budget_absorb (P := P) (S := S) (W := W)
-      Env hW hsd hbud hg0 hu0 hX24 m) hwiden))
+    (sec7_phase_ra_e₂D_budget_absorb (P := P) (S := S)
+      hsd hbud hg0 hu0 hX24 m) hwiden))
 
 theorem sec7_ra_e₃D_core (P : Globals) (S : Scale P) (W : ℝ) (a : ℤ)
     (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
@@ -6388,7 +6386,7 @@ private theorem sec7_phase_ra_e₃D_tiny {P : Globals} {S : Scale P} {W : ℝ}
         mul_le_mul_of_nonneg_right hsmall hB0
 
 private theorem sec7_phase_ra_e₂D_tiny {P : Globals} {S : Scale P} {W : ℝ}
-    {a : ℤ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D) (hG1 : 1 ≤ P.G)
+    {a : ℤ} (ha : 0 < a) (hAD : 10 * S.A ≤ S.D)
     (ha_lo : S.A ≤ (a : ℝ)) (ha_hi : (a : ℝ) ≤ 2 * S.A)
     (Env : Sec7Envelope P S W) (hW : 1 ≤ W)
     (c₀ Cu : ℝ) (hsd : OnStripAux.StripData P S c₀ Cu)
@@ -6405,10 +6403,10 @@ private theorem sec7_phase_ra_e₂D_tiny {P : Globals} {S : Scale P} {W : ℝ}
     simpa using (mul_nonneg (by norm_num [sec7_cJ])
       (add_nonneg zero_le_one (div_nonneg P.H_pos.le (pow_nonneg hApos.le 2)))
       : (0 : ℝ) ≤ sec7_cJ * (1 + P.H / S.A ^ 2))
-  have hcore := sec7_ra_e₂D_core P S W a ha hAD hG1 ha_lo ha_hi
+  have hcore := sec7_ra_e₂D_core P S W a ha hAD ha_lo ha_hi
     Env hW c₀ Cu hsd hbud hg0 hu0 hX24 0 hj0 m hm r hr
   have hrel143 : sec7_relErr P S * 10 ^ 143 ≤ 1 :=
-    sec7_relErr_le Env hW hsd hbud hg0 hu0 hX24
+    sec7_relErr_le hsd hbud hg0 hu0 hX24
   have hrel_le : sec7_relErr P S ≤ 1 / (10 : ℝ) ^ 143 := by
     rw [le_div_iff₀ (by positivity : (0 : ℝ) < (10 : ℝ) ^ 143)]
     simpa [mul_comm] using hrel143
@@ -6697,7 +6695,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
     have hmono := (sec7_phase_f2D_monomial_scale (P := P) (S := S) (W := W)
       (a := a) (m := m) (r := r) ha_lo ha_hi Env hW c₀ Cu hsd hm hr).1
     have hres := sec7_phase_ra_e₂D_tiny (P := P) (S := S) (W := W) (a := a)
-      ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd hbud hg0 hu0 hX24
+      ha hAD ha_lo ha_hi Env hW c₀ Cu hsd hbud hg0 hu0 hX24
       (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
     have hB0 : 0 ≤ S.T₂ / S.R ^ m :=
       div_nonneg (sec7_T₂_pos S).le (pow_nonneg (sec7_R_pos S).le m)
@@ -6749,7 +6747,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
     have hmono := (sec7_phase_f2D_monomial_scale (P := P) (S := S) (W := W)
       (a := a) (m := m) (r := r) ha_lo ha_hi Env hW c₀ Cu hsd hm hr).2
     have hres := sec7_phase_ra_e₂D_tiny (P := P) (S := S) (W := W) (a := a)
-      ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd hbud hg0 hu0 hX24
+      ha hAD ha_lo ha_hi Env hW c₀ Cu hsd hbud hg0 hu0 hX24
       (m := m) (r := r) (le_trans hm (by norm_num)) hrwide
     have hB0 : 0 ≤ S.T₂ / S.R ^ m :=
       div_nonneg (sec7_T₂_pos S).le (pow_nonneg (sec7_R_pos S).le m)
@@ -6959,7 +6957,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
       hbud hg0 hu0 hX24 hUbig j hj m hm r hr
   ra_e₂D_bound := by
     intro j hj m hm r hr
-    exact sec7_ra_e₂D_core P S W a ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd
+    exact sec7_ra_e₂D_core P S W a ha hAD ha_lo ha_hi Env hW c₀ Cu hsd
       hbud hg0 hu0 hX24 j hj m hm r hr
   ra_e₃D_bound := by
     intro j hj m hm r hr
@@ -6967,7 +6965,7 @@ noncomputable def sec7_phase_concrete (P : Globals) (S : Scale P) (W : ℝ) (a :
       hbud hg0 hu0 hUbig j hj m hm r hr
   ra_e₂D_bound6 := by
     intro j hj m hm r hr
-    exact sec7_ra_e₂D_core6 P S W a ha hAD _hG1 ha_lo ha_hi Env hW c₀ Cu hsd
+    exact sec7_ra_e₂D_core6 P S W a ha hAD ha_lo ha_hi Env hW c₀ Cu hsd
       hbud hg0 hu0 hX24 j hj m hm r hr
   ra_e₃D_bound6 := by
     intro j hj m hm r hr

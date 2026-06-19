@@ -43,7 +43,7 @@ With the `phif_iteratedDeriv{2,3}_eq` atom expansions at `f = 0`
 (`χ″ = ψ″φ + 2ψ'φ' + ψφ''`, `χ‴ = ψ‴φ + 3ψ″φ' + 3ψ'φ'' + ψφ'''`, ψ-tower in `d̃`-atoms), the
 `φ`-coefficient cancels and `W₂` equals `(3ψ″²−2ψ'ψ‴)φ' + (3ψ'ψ″−ψψ‴)φ'' + ψψ″φ'''`, keeping the
 `φ`-tower `φ',φ'',φ'''` symbolic (exactly as `phif_iteratedDeriv3_eq` keeps `φ'''` symbolic). -/
-lemma welim2_poly (X a d d1 d2 s4 φ φ1 φ2 φ3 : ℝ) (_hg : (6 : ℝ) * X * a ≠ 0) :
+lemma welim2_poly (X a d d1 d2 s4 φ φ1 φ2 φ3 : ℝ) :
     ((24 * d * d1 ^ 3 + 36 * d ^ 2 * d1 * d2 + 4 * d ^ 3 * s4) / (6 * X * a) * φ
           + (36 * d ^ 2 * d1 ^ 2 + 12 * d ^ 3 * d2) / (6 * X * a) * φ1
           + (12 * d ^ 3 * d1) / (6 * X * a) * φ2
@@ -73,7 +73,7 @@ analogue of `chi2_poly`).  Substituting the closed `φ`-tower forms `φ' = K b(2
 `− 120 b b'' d² d̃'³ + 16 b b' d³ d̃' s4 − 24 b b' d³ d̃''² + 120 b b' d² d̃'² d̃'' + 240 b b' d d̃'⁴`
 `+ 8 b b''' d⁴ d̃'' + 24 b b''' d³ d̃'² + 24 b'' b' d⁴ d̃'' + 72 b'' b' d³ d̃'² − 8 b'² d⁴ s4`
 `− 96 b'² d³ d̃' d̃'' − 120 b'² d² d̃'³` (sympy-verified). -/
-lemma w2_poly (X a d d1 d2 s4 b bp bd bt3 K : ℝ) (hd : d ≠ 0) (_h6 : (6 : ℝ) * X * a ≠ 0) :
+lemma w2_poly (X a d d1 d2 s4 b bp bd bt3 K : ℝ) (hd : d ≠ 0) :
     (3 * ((12 * d ^ 2 * d1 ^ 2 + 4 * d ^ 3 * d2) / (6 * X * a)) ^ 2
           - 2 * (4 * d ^ 3 * d1 / (6 * X * a))
               * ((24 * d * d1 ^ 3 + 36 * d ^ 2 * d1 * d2 + 4 * d ^ 3 * s4) / (6 * X * a)))

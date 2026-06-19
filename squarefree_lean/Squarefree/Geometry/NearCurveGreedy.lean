@@ -145,7 +145,7 @@ private theorem densArc'_nonneg {D : MajorLine} (hδ : 0 < δ) :
   positivity
 
 /-- `densAt` is nonnegative for a Type I point. -/
-theorem densAt_nonneg {n : ℤ} (hδ : 0 < δ) (_hn : n ∈ typeISet f N lam δ) :
+theorem densAt_nonneg {n : ℤ} (hδ : 0 < δ) :
     0 ≤ densAt f N lam δ n :=
   densArc'_nonneg hδ
 
@@ -357,7 +357,7 @@ noncomputable def greedyPacking_of_greedySel
   dens := fun g => densAt f N lam δ g
   nu := fun g => ((windowResidueSet f N lam δ g).card : ℝ)
   densCap := 24 * N
-  dens_nonneg := fun g hg => densAt_nonneg hδ (S.mem g hg)
+  dens_nonneg := fun g _hg => densAt_nonneg hδ
   nu_le := fun g hg => windowResidueSet_card_le hδ (S.mem g hg)
   dens_le_cap := S.dens_le
   cap_le := by linarith only [hN2]
@@ -627,7 +627,7 @@ point `n`, the un-windowed proper strip-arc of its witness line `D := witnessLin
 satisfies the **Type I** sharp bound `properHi' − properLo' ≤ δ·√(q/λ)`, `q := D.denom`.
 This is exactly the `OnTypeIArc` filter condition, recovered through `witness_spec`. -/
 theorem properArc_span_typeI {f : ℝ → ℝ} {N lam δ : ℝ}
-    (_hlam : 0 < lam) {n : ℤ} (hn : n ∈ typeISet f N lam δ) :
+    {n : ℤ} (hn : n ∈ typeISet f N lam δ) :
     (properHi' f N δ (witnessLine f N lam δ n) : ℝ)
         - (properLo' f N δ (witnessLine f N lam δ n) : ℝ)
       ≤ δ * Real.sqrt ((witnessLine f N lam δ n).denom / (256 * lam)) :=
@@ -647,7 +647,7 @@ theorem densAt_le_floor {f : ℝ → ℝ} {N lam δ : ℝ}
   have hNpos : 0 < N := by linarith
   have hspan : (properHi' f N δ D : ℝ) - (properLo' f N δ D : ℝ)
       ≤ δ * Real.sqrt (q / lam) := by
-    have hsp := properArc_span_typeI (f := f) (N := N) (δ := δ) hlam hn
+    have hsp := properArc_span_typeI (f := f) (N := N) (δ := δ) hn
     rw [← hD] at hsp
     -- weaken the tightened split `δ√(q/(256λ))` to the original `δ√(q/λ)`.
     have hmono : Real.sqrt (q / (256 * lam)) ≤ Real.sqrt (q / lam) :=
@@ -881,7 +881,7 @@ private theorem properArc_directed_gap
       apply div_le_div_of_nonneg_left (by norm_num) (by positivity) (by linarith only [hδ])
     linarith [hqcut64]
   have hspan : ((pHi : ℝ) - (pLo : ℝ)) ≤ δ * Real.sqrt ((D.denom : ℝ) / (256 * lam)) :=
-    properArc_span_typeI hlam hg
+    properArc_span_typeI hg
   -- `g'`'s proper arc has `≥ 2` points; `lo_k = repArc g'` and `lo_k + q_k` are BOTH on `D'`.
   set qk : ℤ := D'.denom with hqk
   set lok : ℤ := properLo' f N δ D' with hlok

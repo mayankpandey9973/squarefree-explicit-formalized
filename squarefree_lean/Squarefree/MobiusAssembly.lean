@@ -384,7 +384,7 @@ private lemma large_part_A (a b : ℕ) (X H B : ℝ) (D₁ : ℕ)
         _ ≤ B := by
             have := hcov k (by rw [htdef] at hDk_le ⊢; rw [hbbdef] at hDk_le; exact hDk_le)
             rw [htdef] at this ⊢; exact this
-    have hcover := cover_sum_le f hf0 t bb B htpos J hJ1 hB0 hblock
+    have hcover := cover_sum_le f hf0 t bb B htpos J hJ1 hblock
     -- bridge: ∑_{ℤ.Icc ⌈t⌉ ⌊bb⌋} f = ∑_{Nat.Icc (D₁+1) ⌊bb⌋.toNat} count
     have hceilt : ⌈t⌉ = (D₁ : ℤ) + 1 := by
       rw [htdef]; rw [show ((D₁ : ℝ) + 1) = ((D₁ + 1 : ℤ) : ℝ) from by push_cast; ring]

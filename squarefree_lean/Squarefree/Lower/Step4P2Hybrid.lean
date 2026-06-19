@@ -250,7 +250,7 @@ theorem p2_hybrid_additive_le
       ≤ E0_p2_hyb P S ℓ₁ ℓ₂ V := by
   have hB0 : (0:ℝ) ≤ 3000000000000 * S.B := Bcorner_nonneg
   have hbudget := abs_pref_mul_Ptwo_div_le_p2PointBudget
-    (S := S) ha0 ha_hi hℓ1 hℓ12 hb0 hB0 hv hV0 hdD h1 hG1 hU1 hΔ1 hΩU hUbig
+    (S := S) ha0 ha_hi hℓ1 hℓ12 hb0 hB0 hv hdD h1 hG1 hU1 hΔ1 hΩU hUbig
   refine hbudget.trans ?_
   have hmaj := maj_le_hybrid (Bx := 3000000000000 * S.B) (Vc := Vmax P S)
     hℓ1 hℓ12 hB0 hV0 hVcap

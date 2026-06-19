@@ -66,7 +66,7 @@ theorem monκ_Na {g v d ω H : ℝ} (hg0 : 0 < g) (hv0 : 0 < v) (hd0 : 0 < d) (h
 /-- **κ·Nb ≤ ρ** (in √-variables): `(d⁶/(H g²ω))·(H g⁸ ω² v³⁰/d⁵) ≤ d²g⁶v⁴⁰/ω³`.
 Needs `ω ≤ v²`, `v ≥ 1`, `d ≥ 1`. -/
 theorem monκ_Nb {g v d ω H : ℝ} (hg0 : 0 < g) (hv0 : 0 < v) (hd0 : 0 < d) (hω0 : 0 < ω)
-    (hH0 : 0 < H) (_hg1 : 1 ≤ g) (hv1 : 1 ≤ v) (hd1 : 1 ≤ d) (hωv2 : ω ≤ v ^ 2) :
+    (hH0 : 0 < H) (hv1 : 1 ≤ v) (hd1 : 1 ≤ d) (hωv2 : ω ≤ v ^ 2) :
     (d ^ 6 / (H * g ^ 2 * ω)) * (H * g ^ 8 * ω ^ 2 * v ^ 30 / d ^ 5)
       ≤ d ^ 2 * g ^ 6 * v ^ 40 / ω ^ 3 := by
   rw [div_mul_div_comm, div_le_div_iff₀ (by positivity) (by positivity)]

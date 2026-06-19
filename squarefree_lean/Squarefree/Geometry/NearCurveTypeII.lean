@@ -101,7 +101,7 @@ theorem typeII_lines_count_per_denom (hf : ContDiff ℝ 2 f) (hlam : 0 < lam)
               ≤ ((typeIILines f N lam δ).filter
                   (fun D => D.denom = q ∧ D.slope = D₀.slope)).card :=
                 Finset.card_le_card hsubF
-            _ ≤ 1025 := typeII_b_count_per_slope hf hlam hδ hN2 hlower hupper q D₀
+            _ ≤ 1025 := typeII_b_count_per_slope hf hlam hδ hN2 hlower q D₀
       _ = (Fq.image (fun D => D.slope.num)).card * 1025 := by
           rw [Finset.sum_const, smul_eq_mul]
   -- (2) `#image ≤ q·(2R) + 1` by the fraction count over the slope window.

@@ -304,7 +304,7 @@ expression in `a + 2 d̃ₐ(r)`, which in turn equals a nested square root in `a
 the curvature stage (the `a`-derivatives of `f̃ₐ`). -/
 
 /-- **`a + 2 d̃ₐ(r) = √(a² + 4√(X a³/r))`.**  Immediate from the definition of `d̃ₐ(r)`. -/
-theorem dtilde_two_plus {X r a : ℝ} (_hX : 0 < X) (_ha : 0 < a) (_hr : 0 < r) :
+theorem dtilde_two_plus {X r a : ℝ} :
     a + 2 * dtilde X r a = Real.sqrt (a ^ 2 + 4 * Real.sqrt (X * a ^ 3 / r)) := by
   unfold dtilde; ring
 
@@ -332,7 +332,7 @@ theorem ftil_eq_aff {X r a : ℝ} (hX : 0 < X) (ha : 0 < a) (hr : 0 < r) :
 theorem ftil_closed {X r a : ℝ} (hX : 0 < X) (ha : 0 < a) (hr : 0 < r) :
     Ffun X a (dtilde X r a)
       = r * Real.sqrt (a ^ 2 + 4 * Real.sqrt (X * a ^ 3 / r)) / a ^ 2 := by
-  rw [ftil_eq_aff hX ha hr, dtilde_two_plus hX ha hr]
+  rw [ftil_eq_aff hX ha hr, dtilde_two_plus]
 
 /-- The §6 phase as a clean handle: `f̃ₐ(r) = r·√(a² + 4√(X a³/r))/a²`
 (`= F_a(d̃ₐ(r))` for `0 < X, a, r` by `ftil_closed`). -/

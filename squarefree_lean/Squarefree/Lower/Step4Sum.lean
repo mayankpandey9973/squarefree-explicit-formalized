@@ -98,7 +98,7 @@ theorem sum_inv_le (N : ℕ) :
 
 /-- Step-4 **FAITHFUL** s-sum bound: the `c₀ + cm/√n + cp/n` weight summed over `1 ≤ n ≤ N`
 is controlled by `c₀ N + cm·2√N + cp N` (`Σ1 = N`, `Σ1/√n ≤ 2√N`, `Σ1/n ≤ N`). -/
-theorem step4_ssum_inv (c₀ cm cp : ℝ) (_h0 : 0 ≤ c₀) (hm : 0 ≤ cm) (hp : 0 ≤ cp) (N : ℕ) :
+theorem step4_ssum_inv (c₀ cm cp : ℝ) (hm : 0 ≤ cm) (hp : 0 ≤ cp) (N : ℕ) :
     (∑ n ∈ Finset.Icc 1 N, (c₀ + cm / Real.sqrt (n:ℝ) + cp / (n:ℝ)))
       ≤ c₀ * (N:ℝ) + cm * (2 * Real.sqrt (N:ℝ)) + cp * (N:ℝ) := by
   rw [Finset.sum_add_distrib, Finset.sum_add_distrib]
@@ -118,7 +118,7 @@ theorem step4_ssum_inv (c₀ cm cp : ℝ) (_h0 : 0 ≤ c₀) (hm : 0 ≤ cm) (hp
 
 /-- Step-4 s-sum bound: the affine-plus-√-plus-reciprocal-√ weight summed over `1 ≤ n ≤ N`
 is controlled by `c₃ N² + c₁ (N·√N) + c₀ N + cm · 2√N`. -/
-theorem step4_ssum (c₃ c₁ c₀ cm : ℝ) (h3 : 0 ≤ c₃) (h1 : 0 ≤ c₁) (_h0 : 0 ≤ c₀)
+theorem step4_ssum (c₃ c₁ c₀ cm : ℝ) (h3 : 0 ≤ c₃) (h1 : 0 ≤ c₁)
     (hm : 0 ≤ cm) (N : ℕ) :
     (∑ n ∈ Finset.Icc 1 N, (c₃ * (n:ℝ) + c₁ * Real.sqrt (n:ℝ) + c₀ + cm / Real.sqrt (n:ℝ)))
       ≤ c₃ * (N:ℝ)^2 + c₁ * ((N:ℝ) * Real.sqrt (N:ℝ)) + c₀ * (N:ℝ)

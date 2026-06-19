@@ -17,7 +17,7 @@ theorem step1_subset_count {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ r₀ r�
     (ha_lo : S.A / 5 ≤ a) (ha_hi : a ≤ 11 * S.A)
     (hℓ1 : 0 < ℓ₁) (hℓ12 : ℓ₁ < ℓ₂)
     (hsmall : (10:ℝ) ^ 33 * ℓ₁ ≤ S.R)
-    (hr0_lo : (1/72) * S.R ≤ r₀) (hr01 : r₀ ≤ r₁) (hr1_hi : r₁ + ℓ₁ ≤ 16 * S.R)
+    (hr0_lo : (1/72) * S.R ≤ r₀) (_hr01 : r₀ ≤ r₁) (hr1_hi : r₁ + ℓ₁ ≤ 16 * S.R)
     (hδ : 0 ≤ δ)
     (T : Finset ℕ)
     (hT : ∀ r ∈ T, r₀ ≤ (r : ℝ) ∧ (r : ℝ) ≤ r₁ ∧
@@ -51,6 +51,6 @@ theorem step1_subset_count {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ r₀ r�
           (Finset.card_image_of_injective T hinj).symm
       _ ≤ Q.card := Finset.card_le_card hsubset
   calc (T.card : ℝ) ≤ (Q.card : ℝ) := by exact_mod_cast hcard
-    _ ≤ _ := step1_smooth_count hAD ha0 ha_lo ha_hi hℓ1 hℓ12 hsmall hr0_lo hr01 hr1_hi hδ
+    _ ≤ _ := step1_smooth_count hAD ha0 ha_lo ha_hi hℓ1 hℓ12 hsmall hr0_lo hr1_hi hδ
 
 end Squarefree

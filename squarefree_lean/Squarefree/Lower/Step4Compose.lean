@@ -101,7 +101,6 @@ theorem step4_fibre_branch_le {a ℓ₁ ℓ₂ gap err K_C b dc : ℝ} {n : ℕ}
   have hq0 : 0 ≤ 2*ℓ₁*(T/Ĉ)/Vlo :=
     div_nonneg (mul_nonneg (by positivity) (div_nonneg hT0 hĈ0.le)) hVlo0.le
   exact h4.trans (vsum_le_weight5 hKC hb hdc (by linarith)
-    (cE2hyb_nonneg' ha0 hℓ1 hℓ12) (cChyb_nonneg' ha0 hℓ1 hℓ12) (Nat.cast_nonneg n)
     (by linarith [h5]) (le_refl _))
 
 end Squarefree

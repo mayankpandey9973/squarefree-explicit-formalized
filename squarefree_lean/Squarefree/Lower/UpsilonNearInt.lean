@@ -32,7 +32,7 @@ set_option maxHeartbeats 1600000
 `0 ≤ eᵢ ≤ H/rᵢ²`, so `Ŝ = (integer) − Σcᵢeᵢ` is within `(Σ|cᵢ|)·H/d² ≤ 15·H/d` of an
 integer (using `rᵢ ≥ d` and `4a+7b+8d ≤ 15d` from `a+b ≤ d`). -/
 theorem inD_distInt_Shat {X H : ℝ} {a b d : ℤ}
-    (_hX : 0 < X) (hd : 0 < (d : ℝ)) (ha : 0 ≤ a) (hb : 0 ≤ b)
+    (hd : 0 < (d : ℝ)) (ha : 0 ≤ a) (hb : 0 ≤ b)
     (hab : (a : ℝ) + (b : ℝ) ≤ (d : ℝ))
     (hin0 : inD X H d) (hin1 : inD X H (d + a))
     (hin2 : inD X H (d + b)) (hin3 : inD X H (d + a + b)) :
@@ -231,7 +231,6 @@ theorem Upsilon_near_int {P : Globals} (S : Scale P)
         - (((ℓ₁ ^ 2 * (ℓ₂ - ℓ₁) ^ 2 : ℤ)) : ℝ) * Shat P.X (a : ℝ) (b₂ : ℝ) (d : ℝ)
         + (((ℓ₁ ^ 2 * ℓ₂ ^ 2 : ℤ)) : ℝ) * Shat P.X (a : ℝ) (b₃ : ℝ) (d' : ℝ))
       ≤ 10 ^ 11 * P.Wval ^ 4 * P.H / S.D := by
-  have hXpos : 0 < P.X := P.X_pos
   have hHpos : 0 < P.H := P.H_pos
   have hΔpos : 0 < S.Δ := S.Δ_pos
   have hDpos : 0 < S.D := by unfold Scale.D; positivity
@@ -247,11 +246,11 @@ theorem Upsilon_near_int {P : Globals} (S : Scale P)
   have hℓ1W : (ℓ₁ : ℝ) ≤ 130 * P.Wval := le_trans hℓ12R hℓ2W
   -- the three per-Ŝ near-integer bounds
   have hB1 : distInt (Shat P.X (a : ℝ) (b₁ : ℝ) (d : ℝ)) ≤ 15 * P.H / (d : ℝ) :=
-    inD_distInt_Shat hXpos hdpos ha hb1 hab1 hS1_0 hS1_1 hS1_2 hS1_3
+    inD_distInt_Shat hdpos ha hb1 hab1 hS1_0 hS1_1 hS1_2 hS1_3
   have hB2 : distInt (Shat P.X (a : ℝ) (b₂ : ℝ) (d : ℝ)) ≤ 15 * P.H / (d : ℝ) :=
-    inD_distInt_Shat hXpos hdpos ha hb2 hab2 hS1_0 hS1_1 hS2_2 hS2_3
+    inD_distInt_Shat hdpos ha hb2 hab2 hS1_0 hS1_1 hS2_2 hS2_3
   have hB3 : distInt (Shat P.X (a : ℝ) (b₃ : ℝ) (d' : ℝ)) ≤ 15 * P.H / (d' : ℝ) :=
-    inD_distInt_Shat hXpos hd'pos ha hb3 hab3 hS3_0 hS3_1 hS3_2 hS3_3
+    inD_distInt_Shat hd'pos ha hb3 hab3 hS3_0 hS3_1 hS3_2 hS3_3
   -- each `15 H/dᵢ ≤ 15 H/D`
   have hHdD : ∀ {dd : ℤ}, S.D ≤ (dd : ℝ) → 0 < (dd : ℝ) →
       (15 : ℝ) * P.H / (dd : ℝ) ≤ 15 * P.H / S.D := by

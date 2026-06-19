@@ -109,7 +109,6 @@ theorem phif_curvature_lower_curv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f
   have hBpos : 0 < S.B := by unfold Scale.B; have := S.Δ_pos; positivity
   have hApos : 0 < S.A := by unfold Scale.A; have := S.Δ_pos; have := S.Ω_pos; positivity
   have hRne : S.R ≠ 0 := ne_of_gt hRpos
-  have h6Xa : (6 : ℝ) * P.X * a ≠ 0 := by positivity
   have hBR : S.B = S.D / S.R := Scale.B_eq_D_div_R S
   -- window facts
   have hr0 : 0 < r := by linarith [hr_lo, hRpos]
@@ -201,7 +200,6 @@ theorem phif_curvature_lower_curv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f
   set D1 := deriv (fun s => phif P.X a ℓ₁ ℓ₂ f s) r with hD1_def
   set D2 := iteratedDeriv 2 (fun s => phif P.X a ℓ₁ ℓ₂ f s) r with hD2_def
   have hdne : d ≠ 0 := ne_of_gt hd_pos
-  have hd6ne : d ^ 6 ≠ 0 := pow_ne_zero 6 hdne
   -- e := finite-difference errors
   set e1 := b - d1 with he1_def
   set e2 := bp - d2 with he2_def
@@ -218,7 +216,7 @@ theorem phif_curvature_lower_curv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f
   -- already in atom-form after the `set`s above)
   have hWval : E1 * D1 - ψ' * D2 = (4 * K / (6 * P.X * a) ^ 2) * Nact := by
     rw [hE1_def, hψ'_def, hD1eq, hD2eq, hNact_def]
-    exact welim_poly P.X a d d1 d2 b bp bd φ φ1 φ2 f K h6Xa hd6ne hdne hφ1eq hφ2eq
+    exact welim_poly P.X a d d1 d2 b bp bd φ φ1 φ2 f K hdne hφ1eq hφ2eq
   -- positivity of structural factors
   have hKpos : 0 < K := by rw [hK_def]; positivity
   have h4Kpos : 0 < 4 * K / (6 * P.X * a) ^ 2 := by rw [hK_def]; positivity
@@ -311,7 +309,7 @@ theorem phif_curvature_lower_curv {P : Globals} {S : Scale P} {a ℓ₁ ℓ₂ f
     gcongr
   -- lp-duality engine
   have hlp := lp_duality_lower (W := E1 * D1 - ψ' * D2) (ψ' := ψ') (ψ'' := E1) (D1 := D1) (D2 := D2)
-    (C := 10 ^ 24) (R := S.R) hRpos.le (by norm_num) rfl hψ'_bound
+    (C := 10 ^ 24) (R := S.R) (by norm_num) rfl hψ'_bound
   rw [abs_of_pos hE1pos] at hlp
   have hCEpos : (0:ℝ) < 10 ^ 24 * E1 := by positivity
   -- abbreviate the smooth Wronskian floor and the curvature ceiling

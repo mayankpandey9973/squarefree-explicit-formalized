@@ -265,7 +265,7 @@ theorem step3_fsum_le_t4t5
     exact monκ_Na hsG0 hsU0 hsD0 hΩpos hHpos hkey2'
   have hκNb : κc * Nb ≤ ρc := by
     rw [hκcdef, hNbdef, hρcdef]
-    exact monκ_Nb hsG0 hsU0 hsD0 hΩpos hHpos hsG1 hsU1 hsD1 hΩsU2
+    exact monκ_Nb hsG0 hsU0 hsD0 hΩpos hHpos hsU1 hsD1 hΩsU2
   have hκNc : κc * Nc ≤ ρc := by
     rw [hκcdef, hNcdef, hρcdef]
     exact monκ_Nc hsG0 hsU0 hsD0 hΩpos hHpos hsG1 hsU1 hpay hH_big'

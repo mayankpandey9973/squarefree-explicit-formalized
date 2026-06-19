@@ -86,9 +86,8 @@ theorem p2_capped_additive_le
   have hBx0 : (0:ℝ) ≤ 3000000000000 * S.B := by
     have := S.Δ_pos; have := P.G_pos; have := S.Ω_pos
     unfold Scale.B; positivity
-  have hVx0 : (0:ℝ) ≤ Vmax P S := Vmax_nonneg
   have hbudget := abs_pref_mul_Ptwo_div_le_p2PointBudget
-    (S := S) ha0 ha_hi hℓ1 hℓ12 hb0 hBx0 hv hVx0 (S.D_eps_lo hdD) h1 hG1 hU1 hΔ1 hΩU hUbig
+    (S := S) ha0 ha_hi hℓ1 hℓ12 hb0 hBx0 hv (S.D_eps_lo hdD) h1 hG1 hU1 hΔ1 hΩU hUbig
   simpa only [E0_p2] using hbudget
 
 end Squarefree

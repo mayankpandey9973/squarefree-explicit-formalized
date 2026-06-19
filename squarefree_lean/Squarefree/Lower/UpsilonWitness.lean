@@ -73,7 +73,7 @@ theorem Upsilon_s_extract_of_witness {a : ℝ} {ℓ₁ ℓ₂ b₀ v d Υval : �
     simpa only [UpsT] using this
   have hLhi0 : |Lval P.X a d b₀ v ℓ₁ ℓ₂| ≤ 10 ^ 94 * (P.G ^ 5 * P.U ^ 35 / S.Ω ^ 8) :=
     leading_abs_le (S := S) (a := a) (b₀ := b₀) (v := v) (d := d)
-      hAD ha0 ha_lo ha_hi (lt_of_lt_of_le one_pos hℓ1) hℓ12 hℓ2W
+      hAD ha0 ha_hi (lt_of_lt_of_le one_pos hℓ1) hℓ12 hℓ2W
       ⟨S.D_eps_lo hdwin.1, S.D_eps_hi hdwin.2⟩ hb0 hv
       h1 hband hG1 hU1 hΔ1 hH1 hΩU hUbig
   -- regime: Δ²U⁵ ≤ HΩ³  (same chain as in the scale lemmas)

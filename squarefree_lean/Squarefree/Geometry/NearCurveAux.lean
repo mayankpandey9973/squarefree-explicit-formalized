@@ -465,7 +465,7 @@ theorem residueClass_card_le {q : ℤ} (hq : 0 < q) (r : ℤ) (lo hi : ℝ)
 If at least two elements of a finite set `S ⊆ ℤ` lie in `[lo, hi]` and satisfy
 `q ∣ (n - r)`, then `q ≤ hi - lo`: two points in the same residue class mod `q`
 are at least `q` apart, so the span of `S` is at least `q`. -/
-theorem residueClass_denom_le {q : ℤ} (_hq : 0 < q) (r : ℤ) (lo hi : ℝ) (S : Finset ℤ)
+theorem residueClass_denom_le {q : ℤ} (r : ℤ) (lo hi : ℝ) (S : Finset ℤ)
     (h2 : 2 ≤ S.card)
     (hmem : ∀ n ∈ S, lo ≤ (n : ℝ) ∧ (n : ℝ) ≤ hi ∧ (q : ℤ) ∣ (n - r)) :
     (q : ℝ) ≤ hi - lo := by
