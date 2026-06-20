@@ -2022,19 +2022,12 @@ private theorem sec7_ra_card_le_17R {P : Globals} {S : Scale P} {a : ℤ} {Ra : 
     _ ≤ 16 * S.R + 1 := hIcc
     _ ≤ 17 * S.R := by linarith
 
-/-- **Prop 7.1** (writeup 1388–1419). Fixed `j` in the §7 band `|j| ≪ 1+H/A²` (md 1307–09,
-fixed absolute constant `sec7_cJ`): `#{r≍R : ‖g_j(r)‖ ≤ δ₀} ≪ R/W` under the admissibility
-envelope. The phase functions `f̃ₐ, d̆ₐ, d̆ₐ'` now come with the `Sec7Phase` regularity bundle
-(`Bracket/Sec7Defs.lean`: the md 1327–31 inverse-function scales `F·d̆'≍HΔ`, `F²·d̆''≍HΔ` on
-`t≍F`, and the md 1509–14 windows `f_i^{(m)}≍T_i/Rᵐ`), fixing the 2026-06-03 audit (bare
-∀-functions admit `count ≍ R`); the `j`-band constant is likewise pinned to `sec7_cJ` (a free
-per-`j` constant would quantify over all `j ∈ ℤ`, escaping the phase window). `g_j` keeps its
-defining equation (md 1313); `δ₀ ≤ sec7_cTay·sec7_delta0` is the md-1360 display (TRAP-1:
-the larger `Δ⁵/(H³Ω²)+Δ²/(H²GA)`, never the md-1352 `G²`-identity), renormalized by the
-AM-1 Taylor constant `sec7_cTay`. AM-2: the count runs over the WIDE `RaWitness` window
-`[⌈R/72⌉,⌊16R⌋]`. AM-8: carries the strip-regime pack (`StripData`, `Budget`, `0 ≤ g`,
-`0 < u`, X-largeness, `log X ≤ X^u`), mirrored verbatim from `dblock_on_strip`. -/
-theorem prop_7_1 : ∃ C : ℝ, 0 < C ∧
+/-- Explicit constant for **Prop 7.1**: the fixed literal `sec7_cCubeIn` (= `10^3`). -/
+def C_prop71 : ℝ := sec7_cCubeIn
+
+/-- Explicit-constant form of **Prop 7.1**: the count is `≤ C_prop71 · (R/W)`. The math is
+the original `prop_7_1` body; only the witnessed constant `C` is surfaced as `C_prop71`. -/
+theorem prop_7_1_explicit :
     ∀ (P : Globals) (S : Scale P) (W : ℝ), Sec7Envelope P S W →
       ∀ c₀ Cu : ℝ, OnStripAux.StripData P S c₀ Cu → OnStripAux.Budget P.g P.u Cu →
       0 ≤ P.g → 0 < P.u → (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
@@ -2046,16 +2039,14 @@ theorem prop_7_1 : ∃ C : ℝ, 0 < C ∧
             - Ph.dBreve' (Ph.ftil r + j) * Int.fract (Ph.ftil r)) →
         ∀ (δ₀ : ℝ), 0 < δ₀ → δ₀ ≤ sec7_cTay * sec7_delta0 P S →
           ∀ (j : ℤ), sec7_jBand P S j →
-            -- P1e elaboration fix: the count binder is pinned `r : ℤ` (md: #{r ≍ R}, an
-            -- integer count); the bare binder elaborated as a `Lean.Internal.coeM`-coerced
-            -- `Finset ℝ` filter (same cardinality, wrong interface for N5's `Finset ℤ`).
             (((Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋).filter
-                (fun r : ℤ => distInt (gfun j (r : ℝ)) ≤ δ₀)).card : ℝ) ≤ C * (S.R / W) := by
+                (fun r : ℤ => distInt (gfun j (r : ℝ)) ≤ δ₀)).card : ℝ)
+                  ≤ C_prop71 * (S.R / W) := by
   -- N23 (md 1453–61, 1973–75): contradiction assembly. `C := sec7_cCubeIn`; ledger chain
   -- (sympy-checked): trivial branch needs `C ≥ 2`; main branch needs `2·sec7_cCube <
   -- sec7_harvM` (200 < 1000, slack 5): N5 forces `(R/W)/cCube ≤ Σ cubes`, the two harvests
   -- cap `Σ cubes ≤ 2·(R/W)/harvM` — impossible for `R/W > 0`.
-  refine ⟨sec7_cCubeIn, sec7_cCubeIn_pos, ?_⟩
+  unfold C_prop71
   intro P S W Env c₀ Cu hsd hbud hg0 hu0 hX24 hUbig _hlog a Ph gfun hg δ₀ _hδ0 hδle j hjB
   have hR1 : (1 : ℝ) < S.R := Env.R_gt_one
   have hW0 : (0 : ℝ) < W := Env.W_pos
@@ -2108,11 +2099,45 @@ theorem prop_7_1 : ∃ C : ℝ, 0 < C ∧
     rw [show W * sec7_harvM = W * 1000 from by norm_num [sec7_harvM], ← div_div] at hZ hN
     linarith
 
-/-- **Prop 7.3** (writeup 1993–2000): `#ℛ_a ≪ (1+H/A²)·R/W`. `Ra` is the §3 set; each
-`r ∈ ℛ_a` carries the faithful r-side structural data `RaWitness` (a popular `d` at the
-`D`-scale with `r ≈ R_a(d)`), from which the proof builds the `g_j` phase and applies Prop 7.1.
-AM-8: carries the strip-regime pack, mirrored verbatim from `dblock_on_strip`. -/
-theorem prop_7_3 : ∃ C : ℝ, 0 < C ∧
+/-- **Prop 7.1** (writeup 1388–1419). Fixed `j` in the §7 band `|j| ≪ 1+H/A²` (md 1307–09,
+fixed absolute constant `sec7_cJ`): `#{r≍R : ‖g_j(r)‖ ≤ δ₀} ≪ R/W` under the admissibility
+envelope. The phase functions `f̃ₐ, d̆ₐ, d̆ₐ'` now come with the `Sec7Phase` regularity bundle
+(`Bracket/Sec7Defs.lean`: the md 1327–31 inverse-function scales `F·d̆'≍HΔ`, `F²·d̆''≍HΔ` on
+`t≍F`, and the md 1509–14 windows `f_i^{(m)}≍T_i/Rᵐ`), fixing the 2026-06-03 audit (bare
+∀-functions admit `count ≍ R`); the `j`-band constant is likewise pinned to `sec7_cJ` (a free
+per-`j` constant would quantify over all `j ∈ ℤ`, escaping the phase window). `g_j` keeps its
+defining equation (md 1313); `δ₀ ≤ sec7_cTay·sec7_delta0` is the md-1360 display (TRAP-1:
+the larger `Δ⁵/(H³Ω²)+Δ²/(H²GA)`, never the md-1352 `G²`-identity), renormalized by the
+AM-1 Taylor constant `sec7_cTay`. AM-2: the count runs over the WIDE `RaWitness` window
+`[⌈R/72⌉,⌊16R⌋]`. AM-8: carries the strip-regime pack (`StripData`, `Budget`, `0 ≤ g`,
+`0 < u`, X-largeness, `log X ≤ X^u`), mirrored verbatim from `dblock_on_strip`. The explicit
+constant is `C_prop71` (= `sec7_cCubeIn`); see `prop_7_1_explicit`. -/
+theorem prop_7_1 : ∃ C : ℝ, 0 < C ∧
+    ∀ (P : Globals) (S : Scale P) (W : ℝ), Sec7Envelope P S W →
+      ∀ c₀ Cu : ℝ, OnStripAux.StripData P S c₀ Cu → OnStripAux.Budget P.g P.u Cu →
+      0 ≤ P.g → 0 < P.u → (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+      (10 : ℝ) ^ 33 ≤ P.U →
+      Real.log P.X ≤ P.X ^ P.u →
+      ∀ (a : ℤ) (Ph : Sec7Phase P S W a) (gfun : ℤ → ℝ → ℝ),
+        (∀ (j : ℤ) (r : ℝ),
+          gfun j r = Ph.dBreve (Ph.ftil r + j)
+            - Ph.dBreve' (Ph.ftil r + j) * Int.fract (Ph.ftil r)) →
+        ∀ (δ₀ : ℝ), 0 < δ₀ → δ₀ ≤ sec7_cTay * sec7_delta0 P S →
+          ∀ (j : ℤ), sec7_jBand P S j →
+            -- P1e elaboration fix: the count binder is pinned `r : ℤ` (md: #{r ≍ R}, an
+            -- integer count); the bare binder elaborated as a `Lean.Internal.coeM`-coerced
+            -- `Finset ℝ` filter (same cardinality, wrong interface for N5's `Finset ℤ`).
+            (((Finset.Icc ⌈S.R / 72⌉ ⌊16 * S.R⌋).filter
+                (fun r : ℤ => distInt (gfun j (r : ℝ)) ≤ δ₀)).card : ℝ) ≤ C * (S.R / W) :=
+  ⟨C_prop71, by unfold C_prop71; exact sec7_cCubeIn_pos, prop_7_1_explicit⟩
+
+/-- Explicit constant for **Prop 7.3**: `3·sec7_cJ·C_prop71 + 1000`
+(= `3·10²⁰·10³ + 1000`); see `prop_7_3_explicit`. -/
+def C_prop73 : ℝ := 3 * sec7_cJ * C_prop71 + 1000
+
+/-- Explicit-constant form of **Prop 7.3** (writeup 1993–2000): `#ℛ_a ≤ C_prop73·(1+H/A²)·R/W`.
+The math is the original `prop_7_3` body; only the witnessed constant is surfaced as `C_prop73`. -/
+theorem prop_7_3_explicit :
     ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a → 10 * S.A ≤ S.D → 1 ≤ P.G →
       S.A ≤ (a : ℝ) → (a : ℝ) ≤ 2 * S.A →
       ∀ (W : ℝ), Sec7Envelope P S W →
@@ -2121,12 +2146,15 @@ theorem prop_7_3 : ∃ C : ℝ, 0 < C ∧
       (10 : ℝ) ^ 33 ≤ P.U →
       Real.log P.X ≤ P.X ^ P.u →
       ∀ (Ra : Finset ℕ), (∀ r ∈ Ra, RaWitness P S a r) →
-        (Ra.card : ℝ) ≤ C * ((1 + P.H / S.A ^ 2) * (S.R / W)) := by
+        (Ra.card : ℝ) ≤ C_prop73 * ((1 + P.H / S.A ^ 2) * (S.R / W)) := by
   -- N24 (md 1977–84): N3 (branch j) + N4 (reduction to the j-band sum, AM-1 threshold
   -- `cTay·δ₀`) + prop_7_1 per band value; the band has `2⌊z⌋+1 ≤ 3z` values,
   -- `z := sec7_cJ·(1+H/A²) ≥ sec7_cJ ≥ 1`, so `C := 3·sec7_cJ·C₇₁` (ledger U4: cJ = 10²⁰).
-  obtain ⟨C₁, hC₁, h71⟩ := prop_7_1
-  refine ⟨3 * sec7_cJ * C₁ + 1000, by have := sec7_cJ_pos; positivity, ?_⟩
+  have h71 := prop_7_1_explicit
+  unfold C_prop73
+  set C₁ : ℝ := C_prop71 with hC₁def
+  have hC₁ : 0 < C₁ := by rw [hC₁def]; unfold C_prop71; exact sec7_cCubeIn_pos
+  clear_value C₁
   intro P S a ha hAD hG1 ha_lo ha_hi W Env c₀ Cu hsd hbud hg0 hu0 hX24 hUbig hlog Ra hRa
   have hR1 : (1 : ℝ) < S.R := Env.R_gt_one
   have hW0 : (0 : ℝ) < W := Env.W_pos
@@ -2224,5 +2252,26 @@ theorem prop_7_3 : ∃ C : ℝ, 0 < C ∧
       _ ≤ 1000 * ((1 + P.H / S.A ^ 2) * (S.R / W)) := by nlinarith only [hfac_ge, hRpos]
       _ ≤ (3 * sec7_cJ * C₁ + 1000) * ((1 + P.H / S.A ^ 2) * (S.R / W)) := by
         nlinarith only [hfac_nonneg, hmain_nonneg]
+
+/-- **Prop 7.3** (writeup 1993–2000): `#ℛ_a ≪ (1+H/A²)·R/W`. `Ra` is the §3 set; each
+`r ∈ ℛ_a` carries the faithful r-side structural data `RaWitness` (a popular `d` at the
+`D`-scale with `r ≈ R_a(d)`), from which the proof builds the `g_j` phase and applies Prop 7.1.
+AM-8: carries the strip-regime pack, mirrored verbatim from `dblock_on_strip`. The explicit
+constant is `C_prop73`; see `prop_7_3_explicit`. -/
+theorem prop_7_3 : ∃ C : ℝ, 0 < C ∧
+    ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a → 10 * S.A ≤ S.D → 1 ≤ P.G →
+      S.A ≤ (a : ℝ) → (a : ℝ) ≤ 2 * S.A →
+      ∀ (W : ℝ), Sec7Envelope P S W →
+      ∀ c₀ Cu : ℝ, OnStripAux.StripData P S c₀ Cu → OnStripAux.Budget P.g P.u Cu →
+      0 ≤ P.g → 0 < P.u → (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+      (10 : ℝ) ^ 33 ≤ P.U →
+      Real.log P.X ≤ P.X ^ P.u →
+      ∀ (Ra : Finset ℕ), (∀ r ∈ Ra, RaWitness P S a r) →
+        (Ra.card : ℝ) ≤ C * ((1 + P.H / S.A ^ 2) * (S.R / W)) :=
+  ⟨C_prop73, by
+    unfold C_prop73
+    have h1 := sec7_cJ_pos
+    have h2 : (0 : ℝ) < C_prop71 := by unfold C_prop71; exact sec7_cCubeIn_pos
+    positivity, prop_7_3_explicit⟩
 
 end Squarefree

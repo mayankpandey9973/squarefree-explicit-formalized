@@ -297,6 +297,9 @@ private theorem lemma_3_1_core (X H Δ a b d : ℝ)
           apply mul_le_mul_of_nonneg_left hSlb (by norm_num)
   · rw [hSabs]; positivity
 
+/-- Explicit spacing constant for `lemma_3_1` (writeup 270–322): the `1/10` witness. -/
+noncomputable def lemma31_c : ℝ := (1 : ℝ) / 10
+
 /-- **Lemma 3.1**: spacing lower bound in `𝒟_a` (writeup 270–322).
 
 The faithful range hypotheses the writeup proof uses (auditor-flagged) are threaded
@@ -306,7 +309,7 @@ constant `1/4`, matching `a_dthr` exactly — together with the dyadic floor `Δ
 an absolute size floor `X^{1/100} ≥ 16777216` (so `Δ ≥ 16777216`).  Lowering the threshold
 constant from `64` to `1/4` only widens the implied constants; it needs `Δ` bounded below
 because the spacing/Nair–Roth contradiction quantity scales like `1/(Δλ³)`. -/
-theorem lemma_3_1 : ∃ c : ℝ, 0 < c ∧
+theorem lemma_3_1_explicit :
     ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a →
       ∀ d b : ℤ, 0 < b → inDa P.X P.H a d → inDa P.X P.H a (d + b) →
         (∃ d' : ℤ, d < d' ∧ d' < d + b ∧ inDa P.X P.H a d') →
@@ -315,8 +318,8 @@ theorem lemma_3_1 : ∃ c : ℝ, 0 < c ∧
         (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ (a : ℝ) →
         P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
-        c * (a : ℝ) ^ (-1/3 : ℝ) * S.Δ ^ (5/3 : ℝ) * (P.H ^ 5 / P.X) ^ (1/3 : ℝ) ≤ (b : ℝ) := by
-  refine ⟨(1 : ℝ) / 10, by norm_num, ?_⟩
+        lemma31_c * (a : ℝ) ^ (-1/3 : ℝ) * S.Δ ^ (5/3 : ℝ) * (P.H ^ 5 / P.X) ^ (1/3 : ℝ) ≤ (b : ℝ) := by
+  unfold lemma31_c
   intro P S a ha d b hb hDa_d hDa_db ⟨d', hdd', hd'db, hDa_d'⟩ hd hbD ha_lo hΔlo hX0
   have hΔ : (16777216 : ℝ) ≤ S.Δ := le_trans hX0 hΔlo
   -- abbreviations
@@ -513,6 +516,19 @@ theorem lemma_3_1 : ∃ c : ℝ, 0 < c ∧
     linarith [hJabs_lt]
   rw [hJzero] at hJabs_pos
   simp at hJabs_pos
+
+/-- **Lemma 3.1** (existential form), with the explicit `lemma31_c` witness. -/
+theorem lemma_3_1 : ∃ c : ℝ, 0 < c ∧
+    ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a →
+      ∀ d b : ℤ, 0 < b → inDa P.X P.H a d → inDa P.X P.H a (d + b) →
+        (∃ d' : ℤ, d < d' ∧ d' < d + b ∧ inDa P.X P.H a d') →
+        (S.D ≤ (d : ℝ) ∧ (d : ℝ) ≤ 2 * S.D) →
+        (b : ℝ) ≤ S.D / 2 →
+        (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ (a : ℝ) →
+        P.X ^ (1/100 : ℝ) ≤ S.Δ →
+        (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+        c * (a : ℝ) ^ (-1/3 : ℝ) * S.Δ ^ (5/3 : ℝ) * (P.H ^ 5 / P.X) ^ (1/3 : ℝ) ≤ (b : ℝ) :=
+  ⟨lemma31_c, by unfold lemma31_c; norm_num, lemma_3_1_explicit⟩
 
 /-- `𝐃(Ω) := ∑_{a∼A} #𝒟_a` (writeup line 2008), the dyadic `A`-block sum of `DaCard`. -/
 noncomputable def DBlock (P : Globals) (S : Scale P) (D : ℝ) : ℝ :=

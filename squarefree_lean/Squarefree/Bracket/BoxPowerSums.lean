@@ -205,9 +205,12 @@ private lemma box_rpow_monomial_le' (W : ℝ) (hW : 1 ≤ W) {sa sb sc k : ℝ}
   exact Real.rpow_le_rpow_of_exponent_le hW hk
 
 /-- `Σ_{box} 1 ≤ C·W^7`. -/
-theorem box_sum_one : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
-    ∀ W : ℝ, 1 ≤ W → (∑ _p ∈ box W, (1 : ℝ)) ≤ C * W ^ 7 := by
-  refine ⟨1, one_pos, by norm_num, fun W hW => ?_⟩
+noncomputable def C_boxOne : ℝ := 1
+
+theorem box_sum_one_explicit : 0 < C_boxOne ∧ C_boxOne ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W → (∑ _p ∈ box W, (1 : ℝ)) ≤ C_boxOne * W ^ 7 := by
+  unfold C_boxOne
+  refine ⟨one_pos, by norm_num, fun W hW => ?_⟩
   rw [one_mul]
   have hrw : (∑ _p ∈ box W, (1 : ℝ))
       = ∑ p ∈ box W, ((p.1 : ℝ) ^ 0 * (p.2.1 : ℝ) ^ 0 * (p.2.2 : ℝ) ^ 0) := by
@@ -215,10 +218,17 @@ theorem box_sum_one : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   rw [hrw]
   exact box_monomial_le' W hW 0 0 0 7 (by norm_num)
 
+theorem box_sum_one : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W → (∑ _p ∈ box W, (1 : ℝ)) ≤ C * W ^ 7 :=
+  ⟨C_boxOne, box_sum_one_explicit⟩
+
 /-- `Σ_{box} hΣ ≤ C·W^11`. -/
-theorem box_sum_HS : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
-    ∀ W : ℝ, 1 ≤ W → (∑ p ∈ box W, (HSbox p.1 p.2.1 p.2.2 : ℝ)) ≤ C * W ^ 11 := by
-  refine ⟨3, by norm_num, by norm_num, fun W hW => ?_⟩
+noncomputable def C_boxHS : ℝ := 3
+
+theorem box_sum_HS_explicit : 0 < C_boxHS ∧ C_boxHS ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W → (∑ p ∈ box W, (HSbox p.1 p.2.1 p.2.2 : ℝ)) ≤ C_boxHS * W ^ 11 := by
+  unfold C_boxHS
+  refine ⟨by norm_num, by norm_num, fun W hW => ?_⟩
   have hrw : (∑ p ∈ box W, (HSbox p.1 p.2.1 p.2.2 : ℝ))
       = (∑ p ∈ box W, ((p.1 : ℝ) ^ 1 * (p.2.1 : ℝ) ^ 0 * (p.2.2 : ℝ) ^ 0))
         + (∑ p ∈ box W, ((p.1 : ℝ) ^ 0 * (p.2.1 : ℝ) ^ 1 * (p.2.2 : ℝ) ^ 0))
@@ -233,10 +243,17 @@ theorem box_sum_HS : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   rw [this]
   exact add_le_add (add_le_add b1 b2) b3
 
+theorem box_sum_HS : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W → (∑ p ∈ box W, (HSbox p.1 p.2.1 p.2.2 : ℝ)) ≤ C * W ^ 11 :=
+  ⟨C_boxHS, box_sum_HS_explicit⟩
+
 /-- `Σ_{box} P ≤ C·W^14`. -/
-theorem box_sum_P : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
-    ∀ W : ℝ, 1 ≤ W → (∑ p ∈ box W, (Pbox p.1 p.2.1 p.2.2 : ℝ)) ≤ C * W ^ 14 := by
-  refine ⟨1, one_pos, by norm_num, fun W hW => ?_⟩
+noncomputable def C_boxP : ℝ := 1
+
+theorem box_sum_P_explicit : 0 < C_boxP ∧ C_boxP ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W → (∑ p ∈ box W, (Pbox p.1 p.2.1 p.2.2 : ℝ)) ≤ C_boxP * W ^ 14 := by
+  unfold C_boxP
+  refine ⟨one_pos, by norm_num, fun W hW => ?_⟩
   rw [one_mul]
   have hrw : (∑ p ∈ box W, (Pbox p.1 p.2.1 p.2.2 : ℝ))
       = ∑ p ∈ box W, ((p.1 : ℝ) ^ 1 * (p.2.1 : ℝ) ^ 1 * (p.2.2 : ℝ) ^ 1) := by
@@ -244,10 +261,17 @@ theorem box_sum_P : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   rw [hrw]
   exact box_monomial_le' W hW 1 1 1 14 (by norm_num)
 
+theorem box_sum_P : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W → (∑ p ∈ box W, (Pbox p.1 p.2.1 p.2.2 : ℝ)) ≤ C * W ^ 14 :=
+  ⟨C_boxP, box_sum_P_explicit⟩
+
 /-- `Σ_{box} S ≤ C·W^13`. -/
-theorem box_sum_S : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
-    ∀ W : ℝ, 1 ≤ W → (∑ p ∈ box W, (Sbox p.1 p.2.1 p.2.2 : ℝ)) ≤ C * W ^ 13 := by
-  refine ⟨3, by norm_num, by norm_num, fun W hW => ?_⟩
+noncomputable def C_boxS : ℝ := 3
+
+theorem box_sum_S_explicit : 0 < C_boxS ∧ C_boxS ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W → (∑ p ∈ box W, (Sbox p.1 p.2.1 p.2.2 : ℝ)) ≤ C_boxS * W ^ 13 := by
+  unfold C_boxS
+  refine ⟨by norm_num, by norm_num, fun W hW => ?_⟩
   have hrw : (∑ p ∈ box W, (Sbox p.1 p.2.1 p.2.2 : ℝ))
       = (∑ p ∈ box W, ((p.1 : ℝ) ^ 1 * (p.2.1 : ℝ) ^ 1 * (p.2.2 : ℝ) ^ 0))
         + (∑ p ∈ box W, ((p.1 : ℝ) ^ 1 * (p.2.1 : ℝ) ^ 0 * (p.2.2 : ℝ) ^ 1))
@@ -263,11 +287,18 @@ theorem box_sum_S : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   rw [this]
   exact add_le_add (add_le_add b1 b2) b3
 
+theorem box_sum_S : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W → (∑ p ∈ box W, (Sbox p.1 p.2.1 p.2.2 : ℝ)) ≤ C * W ^ 13 :=
+  ⟨C_boxS, box_sum_S_explicit⟩
+
 /-- `Σ_{box} S² ≤ C·W^19`. `S² = h₁²h₂²+h₁²h₃²+h₂²h₃²+2h₁²h₂h₃+2h₁h₂²h₃+2h₁h₂h₃²`,
 written as nine unit-coefficient monomials (the three cross terms counted twice). -/
-theorem box_sum_S_sq : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
-    ∀ W : ℝ, 1 ≤ W → (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) ^ 2)) ≤ C * W ^ 19 := by
-  refine ⟨9, by norm_num, by norm_num, fun W hW => ?_⟩
+noncomputable def C_boxSsq : ℝ := 9
+
+theorem box_sum_S_sq_explicit : 0 < C_boxSsq ∧ C_boxSsq ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W → (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) ^ 2)) ≤ C_boxSsq * W ^ 19 := by
+  unfold C_boxSsq
+  refine ⟨by norm_num, by norm_num, fun W hW => ?_⟩
   have hrw : (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) ^ 2))
       = (∑ p ∈ box W, ((p.1 : ℝ) ^ 2 * (p.2.1 : ℝ) ^ 2 * (p.2.2 : ℝ) ^ 0))
         + (∑ p ∈ box W, ((p.1 : ℝ) ^ 2 * (p.2.1 : ℝ) ^ 0 * (p.2.2 : ℝ) ^ 2))
@@ -295,12 +326,19 @@ theorem box_sum_S_sq : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   refine add_le_add (add_le_add (add_le_add (add_le_add (add_le_add (add_le_add
     (add_le_add (add_le_add b1 b2) b3) b4) b4) b5) b5) b6) b6
 
+theorem box_sum_S_sq : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W → (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) ^ 2)) ≤ C * W ^ 19 :=
+  ⟨C_boxSsq, box_sum_S_sq_explicit⟩
+
 /-- `Σ_{box} S·P ≤ C·W^20`. `SP = h₁²h₂²h₃ + h₁²h₂h₃² + h₁h₂²h₃²`. -/
-theorem box_sum_SP : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+noncomputable def C_boxSP : ℝ := 3
+
+theorem box_sum_SP_explicit : 0 < C_boxSP ∧ C_boxSP ≤ 100 ∧
     ∀ W : ℝ, 1 ≤ W →
       (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) * (Pbox p.1 p.2.1 p.2.2 : ℝ)))
-        ≤ C * W ^ 20 := by
-  refine ⟨3, by norm_num, by norm_num, fun W hW => ?_⟩
+        ≤ C_boxSP * W ^ 20 := by
+  unfold C_boxSP
+  refine ⟨by norm_num, by norm_num, fun W hW => ?_⟩
   have hrw : (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) * (Pbox p.1 p.2.1 p.2.2 : ℝ)))
       = (∑ p ∈ box W, ((p.1 : ℝ) ^ 2 * (p.2.1 : ℝ) ^ 2 * (p.2.2 : ℝ) ^ 1))
         + (∑ p ∈ box W, ((p.1 : ℝ) ^ 2 * (p.2.1 : ℝ) ^ 1 * (p.2.2 : ℝ) ^ 2))
@@ -316,13 +354,22 @@ theorem box_sum_SP : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   rw [this]
   exact add_le_add (add_le_add b1 b2) b3
 
+theorem box_sum_SP : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W →
+      (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) * (Pbox p.1 p.2.1 p.2.2 : ℝ)))
+        ≤ C * W ^ 20 :=
+  ⟨C_boxSP, box_sum_SP_explicit⟩
+
 /-- `Σ_{box} S·hΣ ≤ C·W^17`. Expanding `(h₁h₂+h₁h₃+h₂h₃)(h₁+h₂+h₃)` gives nine
 monomials (three of them the common term `h₁h₂h₃`). -/
-theorem box_sum_S_HS : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+noncomputable def C_boxSHS : ℝ := 9
+
+theorem box_sum_S_HS_explicit : 0 < C_boxSHS ∧ C_boxSHS ≤ 100 ∧
     ∀ W : ℝ, 1 ≤ W →
       (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) * (HSbox p.1 p.2.1 p.2.2 : ℝ)))
-        ≤ C * W ^ 17 := by
-  refine ⟨9, by norm_num, by norm_num, fun W hW => ?_⟩
+        ≤ C_boxSHS * W ^ 17 := by
+  unfold C_boxSHS
+  refine ⟨by norm_num, by norm_num, fun W hW => ?_⟩
   have hrw : (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) * (HSbox p.1 p.2.1 p.2.2 : ℝ)))
       = (∑ p ∈ box W, ((p.1 : ℝ) ^ 2 * (p.2.1 : ℝ) ^ 1 * (p.2.2 : ℝ) ^ 0))
         + (∑ p ∈ box W, ((p.1 : ℝ) ^ 1 * (p.2.1 : ℝ) ^ 2 * (p.2.2 : ℝ) ^ 0))
@@ -351,14 +398,23 @@ theorem box_sum_S_HS : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   refine add_le_add (add_le_add (add_le_add (add_le_add (add_le_add (add_le_add
     (add_le_add (add_le_add a1 a2) a3) a4) a5) a6) a7) a7) a7
 
+theorem box_sum_S_HS : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W →
+      (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) * (HSbox p.1 p.2.1 p.2.2 : ℝ)))
+        ≤ C * W ^ 17 :=
+  ⟨C_boxSHS, box_sum_S_HS_explicit⟩
+
 /-! ## Stretch: fractional-power box sums (writeup 1806–1811, 1955–1957) -/
 
 /-- `Σ_{box} S^(1/2) ≤ C·W^10` (writeup 1956). Uses subadditivity
 `(a+b+c)^(1/2) ≤ a^(1/2)+b^(1/2)+c^(1/2)` then factors each `(h_ih_j)^(1/2)`. -/
-theorem box_sum_S_sqrt : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+noncomputable def C_boxSsqrt : ℝ := 3
+
+theorem box_sum_S_sqrt_explicit : 0 < C_boxSsqrt ∧ C_boxSsqrt ≤ 100 ∧
     ∀ W : ℝ, 1 ≤ W →
-      (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) ^ (1/2 : ℝ))) ≤ C * W ^ (10 : ℝ) := by
-  refine ⟨3, by norm_num, by norm_num, fun W hW => ?_⟩
+      (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) ^ (1/2 : ℝ))) ≤ C_boxSsqrt * W ^ (10 : ℝ) := by
+  unfold C_boxSsqrt
+  refine ⟨by norm_num, by norm_num, fun W hW => ?_⟩
   -- termwise subadditivity bound
   have hpt : ∀ p ∈ box W,
       ((Sbox p.1 p.2.1 p.2.2 : ℝ) ^ (1/2 : ℝ))
@@ -400,12 +456,20 @@ theorem box_sum_S_sqrt : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   rw [hC]
   exact add_le_add (add_le_add b1 b2) b3
 
+theorem box_sum_S_sqrt : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W →
+      (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) ^ (1/2 : ℝ))) ≤ C * W ^ (10 : ℝ) :=
+  ⟨C_boxSsqrt, box_sum_S_sqrt_explicit⟩
+
 /-- `Σ_{box} S^(3/2) ≤ C·W^16` (writeup 1956). Bounds `S^(3/2) = S·S^(1/2) ≤
 (a+b+c)(√a+√b+√c)` with `a=h₁h₂, b=h₁h₃, c=h₂h₃`, expands into nine rpow monomials. -/
-theorem box_sum_S_thalf : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+noncomputable def C_boxSthalf : ℝ := 9
+
+theorem box_sum_S_thalf_explicit : 0 < C_boxSthalf ∧ C_boxSthalf ≤ 100 ∧
     ∀ W : ℝ, 1 ≤ W →
-      (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) ^ (3/2 : ℝ))) ≤ C * W ^ (16 : ℝ) := by
-  refine ⟨9, by norm_num, by norm_num, fun W hW => ?_⟩
+      (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) ^ (3/2 : ℝ))) ≤ C_boxSthalf * W ^ (16 : ℝ) := by
+  unfold C_boxSthalf
+  refine ⟨by norm_num, by norm_num, fun W hW => ?_⟩
   have hpt : ∀ p ∈ box W,
       ((Sbox p.1 p.2.1 p.2.2 : ℝ) ^ (3/2 : ℝ))
         ≤ ((p.1 : ℝ) ^ (3/2:ℝ) * (p.2.1 : ℝ) ^ (3/2:ℝ) * (p.2.2 : ℝ) ^ (0:ℝ))
@@ -530,6 +594,11 @@ theorem box_sum_S_thalf : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   rw [hC]
   refine add_le_add (add_le_add (add_le_add (add_le_add (add_le_add (add_le_add
     (add_le_add (add_le_add m1 m2) m3) m4) m5) m6) m7) m8) m9
+
+theorem box_sum_S_thalf : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W →
+      (∑ p ∈ box W, ((Sbox p.1 p.2.1 p.2.2 : ℝ) ^ (3/2 : ℝ))) ≤ C * W ^ (16 : ℝ) :=
+  ⟨C_boxSthalf, box_sum_S_thalf_explicit⟩
 
 /-! The four negative-power box sums (writeup 1806–1811: `Σ P^(-1/2)`, `Σ S·P^(-1/2)`,
 `Σ (S/P)^(1/2)`, `Σ S·(S/P)^(1/2)`) live in `Bracket/BoxNegPowerSums.lean`, which adds

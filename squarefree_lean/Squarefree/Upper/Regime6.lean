@@ -439,10 +439,10 @@ theorem ftil_dtilde_close {P : Globals} {S : Scale P} {a : ℤ} {r : ℝ} {d : �
 
 /-- The §6 small-ball constant `K₀ = C₀·12097` (with `C₀ = 832` the `nearcurve_membership`
 constant) and width `δ₀ = H/(Δ²Ω²)`. -/
-noncomputable def K0 : ℝ := nearcurve_membership.choose * 12097
+noncomputable def K0 : ℝ := C_ncmem * 12097
 
 theorem K0_pos : 0 < K0 := by
-  unfold K0; have := nearcurve_membership.choose_spec.1; positivity
+  unfold K0 C_ncmem; norm_num
 
 /-- **Near-integer transfer** (writeup ~1241–1248).  A `RaWitness` for `r` at `a ∈ [A,2A]`,
 under `10A ≤ D` and `500 ≤ GHΩ³`, makes the §6 phase `f̃ₐ(r) = F_a(d̃ₐ(r))` lie within
@@ -452,9 +452,9 @@ theorem ftil_near_integer {P : Globals} {S : Scale P} {a : ℤ} {r : ℕ}
     (ha0 : 0 < a) (haA : S.A ≤ (a : ℝ)) (haA2 : (a : ℝ) ≤ 2 * S.A)
     (hwit : RaWitness P S a r) :
     distInt (ftil P.X (r : ℝ) (a : ℝ)) ≤ K0 * (P.H / (S.Δ ^ 2 * S.Ω ^ 2)) := by
-  have hCpos := nearcurve_membership.choose_spec.1
-  have hmem := nearcurve_membership.choose_spec.2
-  set C := nearcurve_membership.choose with hCdef
+  have hCpos : (0:ℝ) < C_ncmem := by unfold C_ncmem; norm_num
+  have hmem := nearcurve_membership_explicit
+  set C := C_ncmem with hCdef
   obtain ⟨d, hinDa, hDd, hd2D, hrd, hrlo, hrhi⟩ := hwit
   have hX := P.X_pos
   have hH := P.H_pos

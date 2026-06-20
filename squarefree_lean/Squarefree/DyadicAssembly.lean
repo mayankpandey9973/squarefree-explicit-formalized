@@ -179,22 +179,80 @@ private theorem rpow_dominate {c α β : ℝ} (hc : 0 < c) (hαβ : α < β) {X 
 
 end DyadicAssembly
 
+/-- Explicit savings exponent of `key_dyadic_assembly`. -/
+noncomputable def keyDyadic_u (g : ℝ) : ℝ :=
+  min (dblockBound_u g / 2) u_prop24
+
+/-- Explicit constant of `key_dyadic_assembly`. -/
+noncomputable def keyDyadic_C (g : ℝ) : ℝ :=
+  6 * max (dblockBound_C g) (dblockSmallOmega_C dblockBound_c0) + 6 + C_prop24
+
+/-- Explicit threshold of `key_dyadic_assembly`: the `max` of `prop_2_4`'s threshold, the seven
+absolute `rpow_dominate` thresholds, and the `10³³ ≤ U` threshold. -/
+noncomputable def keyDyadic_X0 (g : ℝ) : ℝ :=
+  max
+    (max X0_prop24
+      (max (16777216 ^ ((1/100 : ℝ)⁻¹))
+        (max (8 ^ ((1 - ((1 - g) / 5 + 1/2))⁻¹))
+          (max (1025 ^ (((1:ℝ)/100)⁻¹))
+            (max (64 ^ ((1 + 1/50 - (1 - g) / 5)⁻¹))
+              (max (2 ^ (((1 - g) / 5 - dblockBound_u g)⁻¹))
+                (max ((8 / (dblockBound_u g * Real.log 2)) ^ ((dblockBound_u g / 4)⁻¹))
+                  8)))))))
+    (((10:ℝ) ^ 33) ^ ((dblockBound_u g)⁻¹))
+
+private theorem C_prop24_pos : 0 < C_prop24 := by
+  have h0 : (0:ℝ) < Counting.C_fourthDeriv 729 :=
+    lt_of_lt_of_le one_pos (by unfold Counting.C_fourthDeriv; exact le_max_right _ _)
+  have h1 : (0:ℝ) < 3 + 7 ^ (1/8 : ℝ) := by positivity
+  unfold C_prop24
+  linarith [mul_pos h0 h1]
+
+theorem keyDyadic_u_pos (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
+    0 < keyDyadic_u g := by
+  have hub : 0 < dblockBound_u g := (dblock_bound_explicit g hg hg').1
+  unfold keyDyadic_u
+  exact lt_min (by linarith) (by unfold u_prop24; norm_num)
+
+theorem keyDyadic_C_pos (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
+    0 < keyDyadic_C g := by
+  have hCb : 0 < dblockBound_C g := (dblock_bound_explicit g hg hg').2.2.1
+  unfold keyDyadic_C
+  have hmax : 0 < max (dblockBound_C g) (dblockSmallOmega_C dblockBound_c0) :=
+    lt_of_lt_of_le hCb (le_max_left _ _)
+  linarith [hmax, C_prop24_pos]
+
 open DyadicAssembly in
 set_option maxHeartbeats 1600000 in
-theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
-    ∃ u : ℝ, 0 < u ∧ ∃ C : ℝ, 0 < C ∧ ∃ X₀ : ℝ, ∀ X : ℝ, X₀ ≤ X →
-      ∀ D : ℝ, X ^ ((1 - g) / 5) / X ^ u ≤ D → D ≤ X ^ (1/2 : ℝ) →
-        (dCard X (X ^ ((1 - g) / 5)) D : ℝ) ≤ C * X ^ ((1 - g) / 5) / X ^ u := by
+/-- Explicit-constant form of `key_dyadic_assembly`: surfaces the witnesses `keyDyadic_u`,
+`keyDyadic_C`, `keyDyadic_X0`.  Math is the original `key_dyadic_assembly` body. -/
+theorem key_dyadic_assembly_explicit (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
+    ∀ X : ℝ, keyDyadic_X0 g ≤ X →
+      ∀ D : ℝ, X ^ ((1 - g) / 5) / X ^ (keyDyadic_u g) ≤ D → D ≤ X ^ (1/2 : ℝ) →
+        (dCard X (X ^ ((1 - g) / 5)) D : ℝ)
+          ≤ keyDyadic_C g * X ^ ((1 - g) / 5) / X ^ (keyDyadic_u g) := by
   classical
-  -- the per-block bound and its band constant
-  obtain ⟨u_b, hu_b, hopt, C_b, hC_b, c₀, hc₀, hbound⟩ := dblock_bound g hg hg'
-  obtain ⟨C_s, hC_s, hsmall⟩ := dblock_small_omega c₀ hc₀
-  obtain ⟨u_2, hu_2, C_2, hC_2, X_2, h2⟩ := prop_2_4 g hg hg'
+  -- the per-block bound and its band constant (redirected to the explicit-constant forms,
+  -- folding the witness defs into the body's names via `set` before `obtain`)
+  have eB := dblock_bound_explicit g hg hg'
+  set u_b := dblockBound_u g with hubdef
+  set C_b := dblockBound_C g with hCbdef
+  set c₀ := dblockBound_c0 with hc0def
+  obtain ⟨hu_b, hopt, hC_b, hc₀, hbound⟩ := eB
+  have eS := dblock_small_omega_explicit c₀ hc₀
+  set C_s := dblockSmallOmega_C c₀ with hCsdef
+  obtain ⟨hC_s, hsmall⟩ := eS
+  have h2 := prop_2_4_explicit g hg hg'
+  set u_2 := u_prop24 with hu2def
+  set C_2 := C_prop24 with hC2def
+  set X_2 := X0_prop24 with hX2def
+  have hu_2 : 0 < u_2 := by rw [hu2def]; unfold u_prop24; norm_num
+  have hC_2 : 0 < C_2 := by rw [hC2def]; exact C_prop24_pos
+  clear_value u_b C_b c₀ C_s u_2 C_2 X_2
   -- u_b < 1/100 < 1/200 from the optimization budget 18187 g + 15315 u_b < 2
   have hub100 : u_b < 1 / 100 := by linarith [hg, hopt]
   have hub200 : u_b < 1 / 200 := by linarith [hg, hopt]
   -- result exponent: below both u_b/2 (room for the O(log) shrink) and u_2 (prop_2_4 budget)
-  refine ⟨min (u_b / 2) u_2, lt_min (by linarith) hu_2, ?_⟩
   set u : ℝ := min (u_b / 2) u_2 with hudef
   have hu0 : 0 < u := lt_min (by linarith) hu_2
   have hu_half : u ≤ u_b / 2 := min_le_left _ _
@@ -204,7 +262,6 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
   -- the assembled constant
   set C_blk : ℝ := max C_b C_s with hCblkdef
   have hCblk_pos : 0 < C_blk := lt_of_lt_of_le hC_b (le_max_left _ _)
-  refine ⟨6 * C_blk + 6 + C_2, by positivity, ?_⟩
   -- abbreviation for the H-exponent
   set a : ℝ := (1 - g) / 5 with hadef
   have ha0 : 0 < a := by rw [hadef]; linarith
@@ -220,7 +277,16 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
   set tU : ℝ := ((10:ℝ) ^ 33) ^ (u_b⁻¹) with htUdef
   set X₀ : ℝ := max X_2 (max tbig (max t8 (max t1025
       (max t64 (max t2 (max Tlog 8)))))) with hX₀def
-  refine ⟨max X₀ tU, ?_⟩
+  -- bridge the explicit witness defs to the assembled forms, then rewrite the goal
+  have hKu : keyDyadic_u g = u := by
+    rw [hudef]; unfold keyDyadic_u; rw [hubdef, hu2def]
+  have hKC : keyDyadic_C g = 6 * C_blk + 6 + C_2 := by
+    rw [hCblkdef]; unfold keyDyadic_C; rw [hCbdef, hCsdef, hC2def, hc0def]
+  have hKX : keyDyadic_X0 g = max X₀ tU := by
+    unfold keyDyadic_X0
+    rw [hX₀def, htUdef, htbigdef, ht8def, ht1025def, ht64def, ht2def, hTlogdef,
+      hX2def, hadef, hubdef]
+  rw [hKu, hKC, hKX]
   intro X hXfull D hDlo hDhi
   have hXX₀ : X₀ ≤ X := le_trans (le_max_left _ _) hXfull
   have hXtU : tU ≤ X := le_trans (le_max_right _ _) hXfull
@@ -598,5 +664,14 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
           rw [hexp1, hexp2]
           apply mul_le_mul_of_nonneg_right _ hPHX
           linarith [hC_2]
+
+open DyadicAssembly in
+/-- §1 key estimate (existential wrapper around `key_dyadic_assembly_explicit`). -/
+theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
+    ∃ u : ℝ, 0 < u ∧ ∃ C : ℝ, 0 < C ∧ ∃ X₀ : ℝ, ∀ X : ℝ, X₀ ≤ X →
+      ∀ D : ℝ, X ^ ((1 - g) / 5) / X ^ u ≤ D → D ≤ X ^ (1/2 : ℝ) →
+        (dCard X (X ^ ((1 - g) / 5)) D : ℝ) ≤ C * X ^ ((1 - g) / 5) / X ^ u :=
+  ⟨keyDyadic_u g, keyDyadic_u_pos g hg hg', keyDyadic_C g, keyDyadic_C_pos g hg hg',
+    keyDyadic_X0 g, key_dyadic_assembly_explicit g hg hg'⟩
 
 end Squarefree

@@ -57,3 +57,6 @@ import Squarefree.DyadicAssembly
 
 -- Top of proof spine
 import Squarefree.Main
+
+-- Explicit/effective restatements (explicit constants + threshold)
+import Squarefree.Explicit

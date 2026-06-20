@@ -74,23 +74,25 @@ private theorem hasDerivAt_Ffun (X a s : ℝ) (hs : s ≠ 0) (hsa : s + a ≠ 0)
   convert h using 1
   ring
 
-/-- **§3 → §6 near-curve membership bridge.** A popular `d` (so `d` and `d+a` are consecutive
-`𝒟`-elements) whose curve approximant `d̃ = dtil(r)` is within `Capx·(Δ/G)(Δ³/A³)` makes
-`F_a(d̃)` lie within `832·(1+Capx)·H/(Δ²Ω²)` of an integer.  The approximant window is the
-widened dyadic band `[D/2, 3D]` (so the curve point may stray a constant factor outside
-`[D,2D]`); the derivative bound over `[D/2,3D]` inflates by `16` (`1/s⁴ ≤ 16/D⁴`), giving
-`C = 832 = 52·16`. -/
-theorem nearcurve_membership : ∃ C : ℝ, 0 < C ∧
-    ∀ (P : Globals) (S : Scale P) (a : ℤ) (dtil : ℝ → ℝ) (r : ℕ) (d : ℤ) (Capx : ℝ),
-      0 < a → S.A ≤ (a : ℝ) → (a : ℝ) ≤ 2 * S.A → S.Ω ≤ P.H → 0 ≤ Capx →
-      2 * S.A ≤ S.D →
-      inDa P.X P.H a d → S.D ≤ (d : ℝ) → (d : ℝ) ≤ 2 * S.D →
-      S.D / 2 ≤ dtil (r : ℝ) → dtil (r : ℝ) ≤ 3 * S.D →
-      |(d : ℝ) - dtil (r : ℝ)| ≤ Capx * (S.Δ / P.G) * (S.Δ ^ 3 / S.A ^ 3) →
-      distInt (Ffun P.X (a : ℝ) (dtil (r : ℝ)))
-        ≤ C * (1 + Capx) * (P.H / (S.Δ ^ 2 * S.Ω ^ 2)) := by
-  refine ⟨832, by norm_num, ?_⟩
-  intro P S a dtil r d Capx ha hAa haA hΩH hCapx h2AD hin hDd hd2D hDdt hdt2D hdist
+/-- Explicit constant for `nearcurve_membership`: the absolute constant `C = 832 = 52·16`. -/
+noncomputable def C_ncmem : ℝ := 832
+
+/-- **§3 → §6 near-curve membership bridge** (explicit-constant form). A popular `d` (so `d`
+and `d+a` are consecutive `𝒟`-elements) whose curve approximant `d̃ = dtil(r)` is within
+`Capx·(Δ/G)(Δ³/A³)` makes `F_a(d̃)` lie within `C_ncmem·(1+Capx)·H/(Δ²Ω²)` of an integer.  The
+approximant window is the widened dyadic band `[D/2, 3D]` (so the curve point may stray a
+constant factor outside `[D,2D]`); the derivative bound over `[D/2,3D]` inflates by `16`
+(`1/s⁴ ≤ 16/D⁴`), giving `C = 832 = 52·16`. -/
+theorem nearcurve_membership_explicit
+    (P : Globals) (S : Scale P) (a : ℤ) (dtil : ℝ → ℝ) (r : ℕ) (d : ℤ) (Capx : ℝ)
+    (ha : 0 < a) (_hAa : S.A ≤ (a : ℝ)) (haA : (a : ℝ) ≤ 2 * S.A) (hΩH : S.Ω ≤ P.H)
+    (hCapx : 0 ≤ Capx) (h2AD : 2 * S.A ≤ S.D)
+    (hin : inDa P.X P.H a d) (hDd : S.D ≤ (d : ℝ)) (hd2D : (d : ℝ) ≤ 2 * S.D)
+    (hDdt : S.D / 2 ≤ dtil (r : ℝ)) (hdt2D : dtil (r : ℝ) ≤ 3 * S.D)
+    (hdist : |(d : ℝ) - dtil (r : ℝ)| ≤ Capx * (S.Δ / P.G) * (S.Δ ^ 3 / S.A ^ 3)) :
+    distInt (Ffun P.X (a : ℝ) (dtil (r : ℝ)))
+      ≤ C_ncmem * (1 + Capx) * (P.H / (S.Δ ^ 2 * S.Ω ^ 2)) := by
+  unfold C_ncmem
   -- abbreviations and positivity
   have hX : 0 < P.X := P.X_pos
   have hH : 0 < P.H := P.H_pos
@@ -245,5 +247,18 @@ theorem nearcurve_membership : ∃ C : ℝ, 0 < C ∧
     have hδ6pos' : 0 < P.H / (S.Δ ^ 2 * S.Ω ^ 2) := by positivity
     nlinarith [hCapx, hδ6pos']
   exact this
+
+/-- **§3 → §6 near-curve membership bridge.** Existential-constant form (`C = C_ncmem = 832`);
+see `nearcurve_membership_explicit` for the named constant. -/
+theorem nearcurve_membership : ∃ C : ℝ, 0 < C ∧
+    ∀ (P : Globals) (S : Scale P) (a : ℤ) (dtil : ℝ → ℝ) (r : ℕ) (d : ℤ) (Capx : ℝ),
+      0 < a → S.A ≤ (a : ℝ) → (a : ℝ) ≤ 2 * S.A → S.Ω ≤ P.H → 0 ≤ Capx →
+      2 * S.A ≤ S.D →
+      inDa P.X P.H a d → S.D ≤ (d : ℝ) → (d : ℝ) ≤ 2 * S.D →
+      S.D / 2 ≤ dtil (r : ℝ) → dtil (r : ℝ) ≤ 3 * S.D →
+      |(d : ℝ) - dtil (r : ℝ)| ≤ Capx * (S.Δ / P.G) * (S.Δ ^ 3 / S.A ^ 3) →
+      distInt (Ffun P.X (a : ℝ) (dtil (r : ℝ)))
+        ≤ C * (1 + Capx) * (P.H / (S.Δ ^ 2 * S.Ω ^ 2)) :=
+  ⟨C_ncmem, by unfold C_ncmem; norm_num, nearcurve_membership_explicit⟩
 
 end Squarefree

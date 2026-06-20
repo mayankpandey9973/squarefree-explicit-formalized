@@ -338,10 +338,10 @@ private theorem ftil_curv_F_scale {P : Globals} {S : Scale P} {r : ℝ}
 
 /-- The uniform per-`r` count constant: `max (nearCurve_count constant) 2`, an absolute
 constant independent of `r`, so it can be pulled out of the sum over `r`. -/
-noncomputable def prop6CountConst : ℝ := max (Squarefree.Geometry.nearCurve_count.choose) 2
+noncomputable def prop6CountConst : ℝ := max Squarefree.Geometry.C_nearCurveCount 2
 
 theorem prop6CountConst_pos : 0 < prop6CountConst :=
-  lt_of_lt_of_le Squarefree.Geometry.nearCurve_count.choose_spec.1 (le_max_left _ _)
+  lt_of_lt_of_le (by norm_num) (le_max_right _ _)
 
 /-- **Per-`r` count** (writeup line 1265).  For `r ∈ [R/72, 16R]`, the number of `a ∈ (⌊A⌋, ⌊2A⌋]`
 with `distInt(f̃ₐ(r)) ≤ δ` is bounded by Prop 4.3 applied to the global `C²` extension
@@ -427,8 +427,8 @@ theorem prop6_count_per_r {P : Globals} {S : Scale P} {r : ℝ} {δ : ℝ}
     rw [div_mul_eq_mul_div, one_mul, div_le_iff₀ hlampos]
     linarith [hspec]
   -- apply nearCurve_count; the constant is the uniform `prop6CountConst = max C₀ 2`.
-  set C₀ : ℝ := Squarefree.Geometry.nearCurve_count.choose with hC₀def
-  have hcount := Squarefree.Geometry.nearCurve_count.choose_spec.2
+  set C₀ : ℝ := Squarefree.Geometry.C_nearCurveCount with hC₀def
+  have hcount := Squarefree.Geometry.nearCurve_count_explicit
   rw [← hC₀def] at hcount
   set C : ℝ := prop6CountConst with hCdef
   have hC : 0 < C := prop6CountConst_pos

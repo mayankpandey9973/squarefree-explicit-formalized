@@ -19,20 +19,23 @@ namespace Squarefree.Geometry
 
 open Squarefree.Counting
 
-/-- **Prop 4.3** (writeup 463–469): integer points near a curve, `|F''| ≍ 1` normalized to
-`1 ≤ |F''| ≤ 256` on `[1/2, 5/2]` (curvature ratio up to 256, faithful to `|F''| ≍ 1`);
-count over `(N,2N]`. -/
-theorem nearCurve_count : ∃ C : ℝ, 0 < C ∧
+/-- The pinned constant in `nearCurve_count` / `nearCurve_count_explicit`. -/
+noncomputable def C_nearCurveCount : ℝ := C_prop43local
+
+/-- **Prop 4.3** (writeup 463–469) with the pinned constant: integer points near a curve,
+`|F''| ≍ 1` normalized to `1 ≤ |F''| ≤ 256` on `[1/2, 5/2]` (curvature ratio up to 256,
+faithful to `|F''| ≍ 1`); count over `(N,2N]`. -/
+theorem nearCurve_count_explicit :
     ∀ (N T δ : ℝ) (F : ℝ → ℝ),
       1 < N → 1 < T → 0 < δ → δ < 1 → ContDiff ℝ 2 F →
       (∀ x ∈ Set.Icc (1/2 : ℝ) (5/2), 1 ≤ |iteratedDeriv 2 F x|) →
       (∀ x ∈ Set.Icc (1/2 : ℝ) (5/2), |iteratedDeriv 2 F x| ≤ 256) →
       (((Finset.Ioc ⌊N⌋ ⌊2 * N⌋).filter
           (fun n => distInt (T * F ((n : ℝ) / N)) ≤ δ)).card : ℝ)
-        ≤ C * ((N * T) ^ (1/3 : ℝ) + N * δ
+        ≤ C_nearCurveCount * ((N * T) ^ (1/3 : ℝ) + N * δ
                + N * Real.sqrt (δ / T) * Real.log (2 + N * Real.sqrt (δ / T)) + 1) := by
-  obtain ⟨C, hC, hloc⟩ := prop43_local
-  refine ⟨C, hC, ?_⟩
+  unfold C_nearCurveCount
+  have hloc := prop43_local_explicit
   intro N T δ F hN hT hδ hδ1 hF hF1 hF2
   -- Basic positivity.
   have hN0 : (0 : ℝ) < N := lt_trans one_pos hN
@@ -140,3 +143,17 @@ theorem nearCurve_count : ∃ C : ℝ, 0 < C ∧
   simp only [bind_pure_comp, Finset.fmap_def] at hcore ⊢
   -- The goal's predicate `distInt (T·F(·/N))` is defeq to `distInt (f ·)`; so `hcard_le` applies.
   exact le_trans hcard_le hcore
+
+/-- **Prop 4.3** (writeup 463–469): integer points near a curve, `|F''| ≍ 1` normalized to
+`1 ≤ |F''| ≤ 256` on `[1/2, 5/2]` (curvature ratio up to 256, faithful to `|F''| ≍ 1`);
+count over `(N,2N]`. -/
+theorem nearCurve_count : ∃ C : ℝ, 0 < C ∧
+    ∀ (N T δ : ℝ) (F : ℝ → ℝ),
+      1 < N → 1 < T → 0 < δ → δ < 1 → ContDiff ℝ 2 F →
+      (∀ x ∈ Set.Icc (1/2 : ℝ) (5/2), 1 ≤ |iteratedDeriv 2 F x|) →
+      (∀ x ∈ Set.Icc (1/2 : ℝ) (5/2), |iteratedDeriv 2 F x| ≤ 256) →
+      (((Finset.Ioc ⌊N⌋ ⌊2 * N⌋).filter
+          (fun n => distInt (T * F ((n : ℝ) / N)) ≤ δ)).card : ℝ)
+        ≤ C * ((N * T) ^ (1/3 : ℝ) + N * δ
+               + N * Real.sqrt (δ / T) * Real.log (2 + N * Real.sqrt (δ / T)) + 1) :=
+  ⟨C_nearCurveCount, by unfold C_nearCurveCount C_prop43local; norm_num, nearCurve_count_explicit⟩

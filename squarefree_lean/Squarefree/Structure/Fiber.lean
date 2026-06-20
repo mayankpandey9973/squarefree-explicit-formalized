@@ -499,6 +499,13 @@ theorem prop_3_2 : ∃ (c₁ C₁ C₂ C₃ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 
     nlinarith only [mul_le_mul_of_nonneg_left hAcube (by positivity : (0:ℝ) ≤ 4536 * (P.H ^ 4 * S.Δ ^ 4) * P.H * P.G),
       hApos.le, hGpos.le, hHpos.le, hΔpos.le]
 
+/-- Explicit `c₁` witness for `prop_3_2_fiber`. -/
+noncomputable def prop32fiber_c1 : ℝ := 1/72
+/-- Explicit `C₁` witness for `prop_3_2_fiber`. -/
+noncomputable def prop32fiber_C1 : ℝ := 16
+/-- Explicit `C₂` witness for `prop_3_2_fiber` (depends on the spacing constant `lemma31_c`). -/
+noncomputable def prop32fiber_C2 : ℝ := 18144 / lemma31_c + 2
+
 set_option maxHeartbeats 400000 in
 /-- **Prop 3.2 fiber bound only** (the `dtil`-free part of `prop_3_2`).
 
@@ -506,16 +513,20 @@ The fiber/spacing construction never uses the right-inverse `dtil`; this variant
 the `ℛ_a` band and the (stated weak) fiber bound `#𝒟_a ≪ #ℛ_a·(1+(Δ/A)^{8/3}G^{-2/3})`, which
 is all §8/§9 need.  Proof reuses the same `ℛ_a` construction as `prop_3_2`, dropping the two
 clauses (`dStar r ∈ 𝒟_a`, approximation) which are the only ones touching `dtil`. -/
-theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 < C₂ ∧
+theorem prop_3_2_fiber_explicit : 0 < prop32fiber_c1 ∧ 0 < prop32fiber_C1 ∧ 0 < prop32fiber_C2 ∧
     ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a → P.X ^ (1/100 : ℝ) ≤ S.Δ →
       (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
       (1/4:ℝ) * S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) ≤ (a:ℝ) →
       S.A ≤ (a:ℝ) → (a:ℝ) ≤ 2*S.A → 2*S.A ≤ S.D →
       ∀ (D : ℝ), 0 < D → D = S.D →
-        ∃ Ra : Finset ℕ, (∀ r ∈ Ra, c₁*S.R ≤ (r:ℝ) ∧ (r:ℝ) ≤ C₁*S.R) ∧
-          ((DaCard P.X P.H a D : ℝ) ≤ C₂ * (Ra.card:ℝ) * (1 + (S.Δ/S.A)^(8/3:ℝ) * P.G^(-2/3:ℝ))) := by
-  obtain ⟨c, hc_pos, hc⟩ := lemma_3_1
-  refine ⟨1/72, 16, 18144 / c + 2, by norm_num, by norm_num, by positivity, ?_⟩
+        ∃ Ra : Finset ℕ, (∀ r ∈ Ra, prop32fiber_c1*S.R ≤ (r:ℝ) ∧ (r:ℝ) ≤ prop32fiber_C1*S.R) ∧
+          ((DaCard P.X P.H a D : ℝ) ≤ prop32fiber_C2 * (Ra.card:ℝ) * (1 + (S.Δ/S.A)^(8/3:ℝ) * P.G^(-2/3:ℝ))) := by
+  unfold prop32fiber_c1 prop32fiber_C1 prop32fiber_C2
+  have hc := lemma_3_1_explicit
+  set c : ℝ := lemma31_c with hc_def
+  clear_value c
+  have hc_pos : 0 < c := by rw [hc_def]; unfold lemma31_c; norm_num
+  refine ⟨by norm_num, by norm_num, by positivity, ?_⟩
   intro P S a ha hΔlo hX0 ha_lo hAa haA hAD D hDpos hDeq
   have hΔ : (16777216 : ℝ) ≤ S.Δ := le_trans hX0 hΔlo
   have hXpos : 0 < P.X := P.X_pos
@@ -852,13 +863,32 @@ theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0
       _ = (Ra.card : ℝ) * (C₂ * (1 + tgt)) := by rw [Finset.sum_const, nsmul_eq_mul]
       _ = C₂ * (Ra.card : ℝ) * (1 + tgt) := by ring
 
+/-- **Prop 3.2 fiber bound only** — existential wrapper over `prop_3_2_fiber_explicit`. -/
+theorem prop_3_2_fiber : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 < C₂ ∧
+    ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a → P.X ^ (1/100 : ℝ) ≤ S.Δ →
+      (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+      (1/4:ℝ) * S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) ≤ (a:ℝ) →
+      S.A ≤ (a:ℝ) → (a:ℝ) ≤ 2*S.A → 2*S.A ≤ S.D →
+      ∀ (D : ℝ), 0 < D → D = S.D →
+        ∃ Ra : Finset ℕ, (∀ r ∈ Ra, c₁*S.R ≤ (r:ℝ) ∧ (r:ℝ) ≤ C₁*S.R) ∧
+          ((DaCard P.X P.H a D : ℝ) ≤ C₂ * (Ra.card:ℝ) * (1 + (S.Δ/S.A)^(8/3:ℝ) * P.G^(-2/3:ℝ))) :=
+  ⟨prop32fiber_c1, prop32fiber_C1, prop32fiber_C2, prop_3_2_fiber_explicit⟩
+
+/-- Explicit `c₁` witness for `prop_3_2_fiber_dStar`. -/
+noncomputable def prop32fiberD_c1 : ℝ := 1/72
+/-- Explicit `C₁` witness for `prop_3_2_fiber_dStar`. -/
+noncomputable def prop32fiberD_C1 : ℝ := 16
+/-- Explicit `C₂` witness for `prop_3_2_fiber_dStar` (depends on the spacing constant `lemma31_c`). -/
+noncomputable def prop32fiberD_C2 : ℝ := 18144 / lemma31_c + 2
+
 set_option maxHeartbeats 400000 in
 /-- **Prop 3.2 fiber bound + `dStar` localization** (the `dtil`-free part of `prop_3_2`, but also
 returning the `dStar : ℕ → ℤ` with `dStar r ∈ 𝒟_a`).  Same construction as `prop_3_2_fiber`, but
 additionally exposes the localization map `dStar`, which §7's `prop_7_3` needs (and which is built
 in `prop_3_2`'s proof independently of the `dtil` right-inverse — only the approximation conjunct
 touches `dtil`, and that is dropped here). -/
-theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 < C₂ ∧
+theorem prop_3_2_fiber_dStar_explicit :
+    0 < prop32fiberD_c1 ∧ 0 < prop32fiberD_C1 ∧ 0 < prop32fiberD_C2 ∧
     ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a → P.X ^ (1/100 : ℝ) ≤ S.Δ →
       (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
       (1/4:ℝ) * S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) ≤ (a:ℝ) →
@@ -866,12 +896,16 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
       ∀ (D : ℝ), 0 < D → D = S.D →
         ∃ (Ra : Finset ℕ) (dStar : ℕ → ℤ),
           (∀ r ∈ Ra, inDa P.X P.H a (dStar r)) ∧
-          (∀ r ∈ Ra, c₁*S.R ≤ (r:ℝ) ∧ (r:ℝ) ≤ C₁*S.R) ∧
+          (∀ r ∈ Ra, prop32fiberD_c1*S.R ≤ (r:ℝ) ∧ (r:ℝ) ≤ prop32fiberD_C1*S.R) ∧
           (∀ r ∈ Ra, |Rfun P.X (a:ℝ) ((dStar r : ℤ):ℝ) - (r:ℝ)| ≤ 14 * P.H / S.D) ∧
           (∀ r ∈ Ra, RaWitness P S a r) ∧
-          ((DaCard P.X P.H a D : ℝ) ≤ C₂ * (Ra.card:ℝ) * (1 + (S.Δ/S.A)^(8/3:ℝ) * P.G^(-2/3:ℝ))) := by
-  obtain ⟨c, hc_pos, hc⟩ := lemma_3_1
-  refine ⟨1/72, 16, 18144 / c + 2, by norm_num, by norm_num, by positivity, ?_⟩
+          ((DaCard P.X P.H a D : ℝ) ≤ prop32fiberD_C2 * (Ra.card:ℝ) * (1 + (S.Δ/S.A)^(8/3:ℝ) * P.G^(-2/3:ℝ))) := by
+  unfold prop32fiberD_c1 prop32fiberD_C1 prop32fiberD_C2
+  have hc := lemma_3_1_explicit
+  set c : ℝ := lemma31_c with hc_def
+  clear_value c
+  have hc_pos : 0 < c := by rw [hc_def]; unfold lemma31_c; norm_num
+  refine ⟨by norm_num, by norm_num, by positivity, ?_⟩
   intro P S a ha hΔlo hX0 ha_lo hAa haA hAD D hDpos hDeq
   have hΔ : (16777216 : ℝ) ≤ S.Δ := le_trans hX0 hΔlo
   have hXpos : 0 < P.X := P.X_pos
@@ -1239,5 +1273,21 @@ theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁
         ≤ ∑ _r ∈ Ra, C₂ * (1 + tgt) := Finset.sum_le_sum hfiber
       _ = (Ra.card : ℝ) * (C₂ * (1 + tgt)) := by rw [Finset.sum_const, nsmul_eq_mul]
       _ = C₂ * (Ra.card : ℝ) * (1 + tgt) := by ring
+
+/-- **Prop 3.2 fiber bound + `dStar` localization** — existential wrapper over
+`prop_3_2_fiber_dStar_explicit`. -/
+theorem prop_3_2_fiber_dStar : ∃ (c₁ C₁ C₂ : ℝ), 0 < c₁ ∧ 0 < C₁ ∧ 0 < C₂ ∧
+    ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a → P.X ^ (1/100 : ℝ) ≤ S.Δ →
+      (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+      (1/4:ℝ) * S.Δ^(4/3:ℝ) * (P.H^4/P.X)^(1/3:ℝ) ≤ (a:ℝ) →
+      S.A ≤ (a:ℝ) → (a:ℝ) ≤ 2*S.A → 2*S.A ≤ S.D →
+      ∀ (D : ℝ), 0 < D → D = S.D →
+        ∃ (Ra : Finset ℕ) (dStar : ℕ → ℤ),
+          (∀ r ∈ Ra, inDa P.X P.H a (dStar r)) ∧
+          (∀ r ∈ Ra, c₁*S.R ≤ (r:ℝ) ∧ (r:ℝ) ≤ C₁*S.R) ∧
+          (∀ r ∈ Ra, |Rfun P.X (a:ℝ) ((dStar r : ℤ):ℝ) - (r:ℝ)| ≤ 14 * P.H / S.D) ∧
+          (∀ r ∈ Ra, RaWitness P S a r) ∧
+          ((DaCard P.X P.H a D : ℝ) ≤ C₂ * (Ra.card:ℝ) * (1 + (S.Δ/S.A)^(8/3:ℝ) * P.G^(-2/3:ℝ))) :=
+  ⟨prop32fiberD_c1, prop32fiberD_C1, prop32fiberD_C2, prop_3_2_fiber_dStar_explicit⟩
 
 end Squarefree

@@ -130,11 +130,16 @@ private lemma box_mem_pos {W : ℝ} {p : ℕ × ℕ × ℕ} (hp : p ∈ box W) :
   have h3 := (Finset.mem_Icc.mp hmem2.2).1
   exact ⟨Nat.cast_pos.mpr h1, Nat.cast_pos.mpr h2, Nat.cast_pos.mpr h3⟩
 
-/-- `Σ_{box} P^(-1/2) ≤ C·W^(7/2)` (writeup 1806). -/
-theorem box_sum_P_neghalf : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+/-- The explicit constant in `box_sum_P_neghalf`. -/
+noncomputable def C_boxPneghalf : ℝ := 8
+
+/-- Explicit-constant form of `box_sum_P_neghalf` (writeup 1806). -/
+theorem box_sum_P_neghalf_explicit : 0 < C_boxPneghalf ∧ C_boxPneghalf ≤ 100 ∧
     ∀ W : ℝ, 1 ≤ W →
-      (∑ p ∈ box W, ((Pbox p.1 p.2.1 p.2.2 : ℝ) ^ (-1/2 : ℝ))) ≤ C * W ^ (7/2 : ℝ) := by
-  refine ⟨8, by norm_num, by norm_num, fun W hW => ?_⟩
+      (∑ p ∈ box W, ((Pbox p.1 p.2.1 p.2.2 : ℝ) ^ (-1/2 : ℝ)))
+        ≤ C_boxPneghalf * W ^ (7/2 : ℝ) := by
+  unfold C_boxPneghalf
+  refine ⟨by norm_num, by norm_num, fun W hW => ?_⟩
   have hrw : (∑ p ∈ box W, ((Pbox p.1 p.2.1 p.2.2 : ℝ) ^ (-1/2 : ℝ)))
       = ∑ p ∈ box W,
           ((p.1 : ℝ) ^ (-1/2 : ℝ) * (p.2.1 : ℝ) ^ (-1/2 : ℝ) * (p.2.2 : ℝ) ^ (-1/2 : ℝ)) := by
@@ -146,15 +151,25 @@ theorem box_sum_P_neghalf : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   rw [hrw]
   exact box_signed_monomial_le' W hW (Or.inl rfl) (Or.inl rfl) (Or.inl rfl) (by norm_num)
 
+/-- `Σ_{box} P^(-1/2) ≤ C·W^(7/2)` (writeup 1806). -/
+theorem box_sum_P_neghalf : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W →
+      (∑ p ∈ box W, ((Pbox p.1 p.2.1 p.2.2 : ℝ) ^ (-1/2 : ℝ))) ≤ C * W ^ (7/2 : ℝ) :=
+  ⟨C_boxPneghalf, box_sum_P_neghalf_explicit⟩
+
 /-- `Σ_{box} S·P^(-1/2) ≤ C·W^(19/2)` (writeup 1807). The three monomials
 `(1/2,1/2,-1/2)`, `(1/2,-1/2,1/2)`, `(-1/2,1/2,1/2)` have weighted degrees
 `13/2, 17/2, 19/2`. -/
-theorem box_sum_SP_neghalf : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+noncomputable def C_boxSPneghalf : ℝ := 24
+
+/-- Explicit-constant form of `box_sum_SP_neghalf` (writeup 1807). -/
+theorem box_sum_SP_neghalf_explicit : 0 < C_boxSPneghalf ∧ C_boxSPneghalf ≤ 100 ∧
     ∀ W : ℝ, 1 ≤ W →
       (∑ p ∈ box W,
           ((Sbox p.1 p.2.1 p.2.2 : ℝ) * (Pbox p.1 p.2.1 p.2.2 : ℝ) ^ (-1/2 : ℝ)))
-        ≤ C * W ^ (19/2 : ℝ) := by
-  refine ⟨24, by norm_num, by norm_num, fun W hW => ?_⟩
+        ≤ C_boxSPneghalf * W ^ (19/2 : ℝ) := by
+  unfold C_boxSPneghalf
+  refine ⟨by norm_num, by norm_num, fun W hW => ?_⟩
   have hrw : (∑ p ∈ box W,
         ((Sbox p.1 p.2.1 p.2.2 : ℝ) * (Pbox p.1 p.2.1 p.2.2 : ℝ) ^ (-1/2 : ℝ)))
       = (∑ p ∈ box W,
@@ -191,15 +206,29 @@ theorem box_sum_SP_neghalf : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   rw [hC]
   exact add_le_add (add_le_add b1 b2) b3
 
+/-- `Σ_{box} S·P^(-1/2) ≤ C·W^(19/2)` (writeup 1807). The three monomials
+`(1/2,1/2,-1/2)`, `(1/2,-1/2,1/2)`, `(-1/2,1/2,1/2)` have weighted degrees
+`13/2, 17/2, 19/2`. -/
+theorem box_sum_SP_neghalf : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W →
+      (∑ p ∈ box W,
+          ((Sbox p.1 p.2.1 p.2.2 : ℝ) * (Pbox p.1 p.2.1 p.2.2 : ℝ) ^ (-1/2 : ℝ)))
+        ≤ C * W ^ (19/2 : ℝ) :=
+  ⟨C_boxSPneghalf, box_sum_SP_neghalf_explicit⟩
+
 /-- `Σ_{box} (S/P)^(1/2) ≤ C·W^(13/2)` (writeup 1810). Pointwise
 `S/P = h₁⁻¹ + h₂⁻¹ + h₃⁻¹`, so by subadditivity
 `(S/P)^(1/2) ≤ h₁^(-1/2) + h₂^(-1/2) + h₃^(-1/2)` (degrees `13/2, 6, 5`). -/
-theorem box_sum_SoverP_half : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+noncomputable def C_boxSoverPhalf : ℝ := 24
+
+/-- Explicit-constant form of `box_sum_SoverP_half` (writeup 1810). -/
+theorem box_sum_SoverP_half_explicit : 0 < C_boxSoverPhalf ∧ C_boxSoverPhalf ≤ 100 ∧
     ∀ W : ℝ, 1 ≤ W →
       (∑ p ∈ box W,
           ((Sbox p.1 p.2.1 p.2.2 : ℝ) / (Pbox p.1 p.2.1 p.2.2 : ℝ)) ^ (1/2 : ℝ))
-        ≤ C * W ^ (13/2 : ℝ) := by
-  refine ⟨24, by norm_num, by norm_num, fun W hW => ?_⟩
+        ≤ C_boxSoverPhalf * W ^ (13/2 : ℝ) := by
+  unfold C_boxSoverPhalf
+  refine ⟨by norm_num, by norm_num, fun W hW => ?_⟩
   have hpt : ∀ p ∈ box W,
       ((Sbox p.1 p.2.1 p.2.2 : ℝ) / (Pbox p.1 p.2.1 p.2.2 : ℝ)) ^ (1/2 : ℝ)
         ≤ (p.1 : ℝ) ^ (-1/2:ℝ) * (p.2.1 : ℝ) ^ (0:ℝ) * (p.2.2 : ℝ) ^ (0:ℝ)
@@ -248,16 +277,30 @@ theorem box_sum_SoverP_half : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   rw [hC]
   exact add_le_add (add_le_add b1 b2) b3
 
+/-- `Σ_{box} (S/P)^(1/2) ≤ C·W^(13/2)` (writeup 1810). Pointwise
+`S/P = h₁⁻¹ + h₂⁻¹ + h₃⁻¹`, so by subadditivity
+`(S/P)^(1/2) ≤ h₁^(-1/2) + h₂^(-1/2) + h₃^(-1/2)` (degrees `13/2, 6, 5`). -/
+theorem box_sum_SoverP_half : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W →
+      (∑ p ∈ box W,
+          ((Sbox p.1 p.2.1 p.2.2 : ℝ) / (Pbox p.1 p.2.1 p.2.2 : ℝ)) ^ (1/2 : ℝ))
+        ≤ C * W ^ (13/2 : ℝ) :=
+  ⟨C_boxSoverPhalf, box_sum_SoverP_half_explicit⟩
+
 /-- `Σ_{box} S·(S/P)^(1/2) ≤ C·W^(25/2)` (writeup 1811). Pointwise
 `S·(S/P)^(1/2) ≤ (h₁h₂+h₁h₃+h₂h₃)·(h₁^(-1/2)+h₂^(-1/2)+h₃^(-1/2))`, nine monomials of
 weighted degrees `19/2, 9, 8, 23/2, 11, 10, 25/2, 12, 11`. -/
-theorem box_sum_S_SoverP_half : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+noncomputable def C_boxSSoverPhalf : ℝ := 72
+
+/-- Explicit-constant form of `box_sum_S_SoverP_half` (writeup 1811). -/
+theorem box_sum_S_SoverP_half_explicit : 0 < C_boxSSoverPhalf ∧ C_boxSSoverPhalf ≤ 100 ∧
     ∀ W : ℝ, 1 ≤ W →
       (∑ p ∈ box W,
           ((Sbox p.1 p.2.1 p.2.2 : ℝ)
             * ((Sbox p.1 p.2.1 p.2.2 : ℝ) / (Pbox p.1 p.2.1 p.2.2 : ℝ)) ^ (1/2 : ℝ)))
-        ≤ C * W ^ (25/2 : ℝ) := by
-  refine ⟨72, by norm_num, by norm_num, fun W hW => ?_⟩
+        ≤ C_boxSSoverPhalf * W ^ (25/2 : ℝ) := by
+  unfold C_boxSSoverPhalf
+  refine ⟨by norm_num, by norm_num, fun W hW => ?_⟩
   have hpt : ∀ p ∈ box W,
       ((Sbox p.1 p.2.1 p.2.2 : ℝ)
           * ((Sbox p.1 p.2.1 p.2.2 : ℝ) / (Pbox p.1 p.2.1 p.2.2 : ℝ)) ^ (1/2 : ℝ))
@@ -341,5 +384,16 @@ theorem box_sum_S_SoverP_half : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
   rw [hC]
   refine add_le_add (add_le_add (add_le_add (add_le_add (add_le_add (add_le_add
     (add_le_add (add_le_add m1 m2) m3) m4) m5) m6) m7) m8) m9
+
+/-- `Σ_{box} S·(S/P)^(1/2) ≤ C·W^(25/2)` (writeup 1811). Pointwise
+`S·(S/P)^(1/2) ≤ (h₁h₂+h₁h₃+h₂h₃)·(h₁^(-1/2)+h₂^(-1/2)+h₃^(-1/2))`, nine monomials of
+weighted degrees `19/2, 9, 8, 23/2, 11, 10, 25/2, 12, 11`. -/
+theorem box_sum_S_SoverP_half : ∃ C : ℝ, 0 < C ∧ C ≤ 100 ∧
+    ∀ W : ℝ, 1 ≤ W →
+      (∑ p ∈ box W,
+          ((Sbox p.1 p.2.1 p.2.2 : ℝ)
+            * ((Sbox p.1 p.2.1 p.2.2 : ℝ) / (Pbox p.1 p.2.1 p.2.2 : ℝ)) ^ (1/2 : ℝ)))
+        ≤ C * W ^ (25/2 : ℝ) :=
+  ⟨C_boxSSoverPhalf, box_sum_S_SoverP_half_explicit⟩
 
 end Squarefree

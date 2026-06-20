@@ -387,6 +387,9 @@ theorem typeI_card_bound {f : ℝ → ℝ} {N lam δ : ℝ}
     -- `N ≤ 2Nδ` (since `δ ≥ 1/2`), so `N + 2 ≤ 2Nδ + 2 ≤ 384(Nδ+1)`.
     nlinarith only [hcardleR, hN0, hδhalf, mul_nonneg hN0 hδ.le]
 
+/-- The pinned constant in `prop43_local` / `prop43_local_explicit`. -/
+noncomputable def C_prop43local : ℝ := 109159296
+
 /-- **Prop 4.3, λ-normalized core with the pinned constant** (writeup line 482).  Assembled from the
 residual bound and the Type I / Type II card bounds via the concrete partitions
 `#nearSet = #residual + #major` and `#major = #typeI + #typeII`.  For small `N`
@@ -398,9 +401,10 @@ theorem prop43_local_explicit :
       (∀ x ∈ Set.Icc (N / 2) (5 * N / 2), lam ≤ |iteratedDeriv 2 f x|) →
       (∀ x ∈ Set.Icc (N / 2) (5 * N / 2), |iteratedDeriv 2 f x| ≤ 256 * lam) →
       (((Finset.Icc ⌊N⌋ ⌊2 * N⌋).filter (fun n => distInt (f (n : ℝ)) ≤ δ)).card : ℝ)
-        ≤ 109159296 * (N * lam ^ (1/3 : ℝ) + N * δ
+        ≤ C_prop43local * (N * lam ^ (1/3 : ℝ) + N * δ
                + Real.sqrt (δ / lam) * Real.log (2 + Real.sqrt (δ / lam)) + 1) := by
   intro N lam δ f hN hlam hδ hδ1 hf hfloor hlower hupper
+  unfold C_prop43local
   -- Normalize the `do`-block (`bind`/`pure`) in the goal into `.image Int.cast`.
   simp only [bind_pure_comp, Finset.fmap_def]
   -- The conclusion's `ℝ`-cast image filtered set has the same card as the integer
@@ -474,6 +478,6 @@ theorem prop43_local : ∃ C : ℝ, 0 < C ∧
       (((Finset.Icc ⌊N⌋ ⌊2 * N⌋).filter (fun n => distInt (f (n : ℝ)) ≤ δ)).card : ℝ)
         ≤ C * (N * lam ^ (1/3 : ℝ) + N * δ
                + Real.sqrt (δ / lam) * Real.log (2 + Real.sqrt (δ / lam)) + 1) := by
-  exact ⟨109159296, by norm_num, prop43_local_explicit⟩
+  exact ⟨C_prop43local, by unfold C_prop43local; norm_num, prop43_local_explicit⟩
 
 end Squarefree.Geometry

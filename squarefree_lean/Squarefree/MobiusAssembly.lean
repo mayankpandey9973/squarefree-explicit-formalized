@@ -811,17 +811,70 @@ private lemma sqrt_diff_le (X H : ℝ) (hX : 0 < X) (hH : 0 ≤ H) :
     linarith
   nlinarith only [hnn, hsXH, hsX, hfac]
 
-/-- **Final short-interval estimate.**  Assembles `count_master` with `H = X^{(1-g)/5}`,
-`D₁ = ⌊X^{(1-g)/10}⌋ ≈ √H`, and the per-block bound `B = (C_k+1)·H/X^{u_k}+1` (`C_k, u_k` from
-`key_dyadic_assembly`) into the headline bound `|S − (6/π²)H| ≤ C·H/X^u`. -/
-theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
-    ∃ u : ℝ, 0 < u ∧ ∃ C : ℝ, 0 < C ∧ ∃ X₀ : ℝ, ∀ X : ℝ, X₀ ≤ X →
+/-- Explicit savings exponent of `count_short_interval`. -/
+noncomputable def countSI_u (g : ℝ) : ℝ :=
+  min (Squarefree.keyDyadic_u g) ((1 - g) / 5 / 2) / 2
+
+/-- Explicit constant of `count_short_interval`. -/
+noncomputable def countSI_C (g : ℝ) : ℝ :=
+  2 + 2 + 3 + ((Squarefree.keyDyadic_C g + 1)
+        * (1 + (Squarefree.keyDyadic_u g - countSI_u g)⁻¹ / (2 * Real.log 2))
+      + ((1 - g) / 5 - countSI_u g)⁻¹ / (2 * Real.log 2) + 1)
+
+/-- Explicit threshold of `count_short_interval`. -/
+noncomputable def countSI_X0 (g : ℝ) : ℝ :=
+  max (max (Squarefree.keyDyadic_X0 g) 1) (2 ^ (2 / ((1 - g) / 5)))
+
+private theorem countSI_u_pos (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
+    0 < countSI_u g := by
+  have huk : 0 < Squarefree.keyDyadic_u g := Squarefree.keyDyadic_u_pos g hg hg'
+  have he : (0 : ℝ) < (1 - g) / 5 / 2 := by linarith
+  unfold countSI_u
+  have := lt_min huk he
+  linarith
+
+private theorem countSI_C_pos (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
+    0 < countSI_C g := by
+  have hCk : 0 < Squarefree.keyDyadic_C g := Squarefree.keyDyadic_C_pos g hg hg'
+  have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  have hduk : 0 < Squarefree.keyDyadic_u g - countSI_u g := by
+    have h1 : countSI_u g < Squarefree.keyDyadic_u g := by
+      have huk : 0 < Squarefree.keyDyadic_u g := Squarefree.keyDyadic_u_pos g hg hg'
+      unfold countSI_u
+      have hm : min (Squarefree.keyDyadic_u g) ((1 - g) / 5 / 2)
+          ≤ Squarefree.keyDyadic_u g := min_le_left _ _
+      linarith
+    linarith
+  have hdeu : 0 < (1 - g) / 5 - countSI_u g := by
+    have h2 : countSI_u g < (1 - g) / 5 := by
+      unfold countSI_u
+      have hm : min (Squarefree.keyDyadic_u g) ((1 - g) / 5 / 2)
+          ≤ (1 - g) / 5 / 2 := min_le_right _ _
+      linarith
+    linarith
+  unfold countSI_C
+  have h1 : 0 ≤ (Squarefree.keyDyadic_C g + 1)
+      * (1 + (Squarefree.keyDyadic_u g - countSI_u g)⁻¹ / (2 * Real.log 2)) := by positivity
+  have h2 : 0 ≤ ((1 - g) / 5 - countSI_u g)⁻¹ / (2 * Real.log 2) := by positivity
+  linarith
+
+/-- **Final short-interval estimate (explicit witnesses).**  Assembles `count_master` with
+`H = X^{(1-g)/5}`, `D₁ = ⌊X^{(1-g)/10}⌋ ≈ √H`, and the per-block bound `B = (C_k+1)·H/X^{u_k}+1`
+(`C_k, u_k` from `key_dyadic_assembly_explicit`) into the headline bound `|S − (6/π²)H| ≤ C·H/X^u`,
+with the explicit witnesses `countSI_u`, `countSI_C`, `countSI_X0`. -/
+theorem count_short_interval_explicit (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
+    ∀ X : ℝ, countSI_X0 g ≤ X →
       |(∑ n ∈ Finset.Icc ⌈X⌉ ⌊X + X ^ ((1 - g) / 5)⌋,
             (if Squarefree n.toNat then (1 : ℝ) else 0))
           - 6 / Real.pi ^ 2 * X ^ ((1 - g) / 5)|
-        ≤ C * X ^ ((1 - g) / 5) / X ^ u := by
+        ≤ countSI_C g * X ^ ((1 - g) / 5) / X ^ (countSI_u g) := by
   classical
-  obtain ⟨uk, huk, Ck, hCk, Xk, hkey⟩ := Squarefree.key_dyadic_assembly g hg hg'
+  have hkey := Squarefree.key_dyadic_assembly_explicit g hg hg'
+  set uk : ℝ := Squarefree.keyDyadic_u g with hukdef
+  set Ck : ℝ := Squarefree.keyDyadic_C g with hCkdef
+  set Xk : ℝ := Squarefree.keyDyadic_X0 g with hXkdef
+  have huk : 0 < uk := by rw [hukdef]; exact Squarefree.keyDyadic_u_pos g hg hg'
+  have hCk : 0 < Ck := by rw [hCkdef]; exact Squarefree.keyDyadic_C_pos g hg hg'
   set e : ℝ := (1 - g) / 5 with hedef
   have he0 : 0 < e := by rw [hedef]; linarith [hg']
   have he12 : e < 1/2 := by rw [hedef]; linarith [hg]
@@ -849,7 +902,13 @@ theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
     linarith
   -- X₀: large enough for all elementary bounds
   set X₀ : ℝ := max (max Xk 1) (2 ^ (2 / e)) with hX0def
-  refine ⟨u, hu0, C, hC0, X₀, fun X hX => ?_⟩
+  -- bridge the explicit witnesses to the local `set` abbreviations
+  have hbu : countSI_u g = u := by unfold countSI_u; rw [hudef, hukdef, hedef]
+  have hbC : countSI_C g = C := by
+    unfold countSI_C; rw [hbu, hCdef, hCkdef, hukdef, hedef]
+  have hbX : countSI_X0 g = X₀ := by unfold countSI_X0; rw [hX0def, hXkdef, hedef]
+  rw [hbu, hbC, hbX]
+  intro X hX
   have hXk : Xk ≤ X := le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hX
   have hX1 : 1 ≤ X := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hX
   have hX2e : (2 : ℝ) ^ (2 / e) ≤ X := le_trans (le_max_right _ _) hX
@@ -1048,5 +1107,16 @@ theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
   -- hbnd : |…| ≤ 2·D₁ + H/D₁ + (J+1)·B + boundary
   -- and 2·D₁ ≤ 2R, H/D₁ ≤ 2R, boundary ≤ 3R, (J+1)·B ≤ Cblk·R
   linarith [hbnd, hT1, hT2, hbdry, hJB]
+
+/-- **Final short-interval estimate.**  Existential wrapper around `count_short_interval_explicit`:
+`|S − (6/π²)·X^{(1-g)/5}| ≤ C·X^{(1-g)/5}/X^u` for explicit `u, C, X₀`. -/
+theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
+    ∃ u : ℝ, 0 < u ∧ ∃ C : ℝ, 0 < C ∧ ∃ X₀ : ℝ, ∀ X : ℝ, X₀ ≤ X →
+      |(∑ n ∈ Finset.Icc ⌈X⌉ ⌊X + X ^ ((1 - g) / 5)⌋,
+            (if Squarefree n.toNat then (1 : ℝ) else 0))
+          - 6 / Real.pi ^ 2 * X ^ ((1 - g) / 5)|
+        ≤ C * X ^ ((1 - g) / 5) / X ^ u :=
+  ⟨countSI_u g, countSI_u_pos g hg hg', countSI_C g, countSI_C_pos g hg hg',
+    countSI_X0 g, count_short_interval_explicit g hg hg'⟩
 
 end Squarefree.Mob

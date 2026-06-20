@@ -661,9 +661,18 @@ The prop-6.1 budget constant is exposed as `C6 := prop_6_1.choose`; the merger p
 relative to it.  Throughout, `S.x = H/Δ²`, `A = ΔΩ`, `R = HGΩ³/Δ`, `Wval = GU⁵`. -/
 
 /-- The (opaque) Prop 6.1 budget constant. -/
-noncomputable def C6 : ℝ := prop_6_1.choose
+noncomputable def C6 : ℝ := Squarefree.C6val
 
-theorem C6_pos : 0 < C6 := prop_6_1.choose_spec.1
+theorem C6_pos : 0 < C6 := by
+  show (0:ℝ) < Squarefree.C6val
+  unfold Squarefree.C6val
+  refine lt_max_of_lt_left ?_
+  unfold Squarefree.Prop61.prop6lowF_C
+  have h1 := Squarefree.prop6ScaleLo_pos
+  have h2 := Squarefree.Cval6_pos
+  have h3 := Squarefree.cderiv6_pos
+  have h4 := Squarefree.K0_pos
+  positivity
 
 /-- Prop 6.1, specialised to `RaOf` with its budget constant named `C6`. -/
 theorem prop_6_1_spec (P : Globals) (S : Scale P) (hX1 : 1 ≤ P.X) (hu0 : 0 < P.u)
@@ -678,7 +687,7 @@ theorem prop_6_1_spec (P : Globals) (S : Scale P) (hX1 : 1 ≤ P.X) (hu0 : 0 < P
         ( S.x * P.G * S.Ω ^ 2
         + S.x ^ (2/3 : ℝ) * P.G ^ (4/3 : ℝ) * S.Ω ^ (11/3 : ℝ)
         + P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ) ) :=
-  prop_6_1.choose_spec.2 P S hX1 hu0 hg1 hAD5 hband hΩfloor hlog RaOf hwit
+  Squarefree.prop_6_1_explicit P S hX1 hu0 hg1 hAD5 hband hΩfloor hlog RaOf hwit
 
 /-- Band edge for negative `Ω`-powers: for `p ≤ 0`, `Ω^p ≤ c₀^p·X^{(-g/4-3u/4)·p}`
 (the lower band gives an *upper* bound on a negative power of `Ω`). -/
@@ -807,9 +816,11 @@ theorem smallx_edge_T3 (P : Globals) (S : Scale P) (hΩU : S.Ω ≤ P.U) :
 /-! #### Large-x branch (Prop 5.1) -/
 
 /-- The Prop 5.1 constant, named. -/
-noncomputable def C5 : ℝ := prop_5_1.choose
+noncomputable def C5 : ℝ := Squarefree.C_prop51
 
-theorem C5_pos : 0 < C5 := prop_5_1.choose_spec.1
+theorem C5_pos : 0 < C5 := by
+  show (0:ℝ) < Squarefree.C_prop51
+  unfold Squarefree.C_prop51; norm_num
 
 /-- Prop 5.1, specialised with its constant named `C5` (carries the AUDITED-FAITHFUL regime
 pack of `prop_5_1`, regime ruling 2026-06-10). -/
@@ -835,7 +846,7 @@ theorem prop_5_1_spec (P : Globals) (S : Scale P) (a : ℤ) (ha : 0 < a)
       ( P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
       + P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
       + (S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27 ) :=
-  prop_5_1.choose_spec.2 P S a ha hAD hΩfloor Ra hwit h1 h2 h3
+  Squarefree.prop_5_1_explicit P S a ha hAD hΩfloor Ra hwit h1 h2 h3
     hG1 hU1 hΔ1 hH1 hΩU hband hUbig hUH hDeW hHbig hδbud ha_lo ha_hi hΩH hlogcap
 
 /-- For nonpositive `p`, `Δ^p ≤ X^{(1/100)·p}` from `Δ ≥ X^{1/100}`. -/

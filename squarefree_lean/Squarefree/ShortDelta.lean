@@ -16,20 +16,37 @@ open Classical Finset Set Squarefree.Counting Squarefree.ShortDeltaAux Real
 
 namespace Squarefree
 
+/-- The explicit constant of **Prop 2.4** (`prop_2_4`). -/
+noncomputable def C_prop24 : ℝ := C_fourthDeriv 729 * (3 + 7 ^ (1 / 8 : ℝ)) + 4
+
+/-- The explicit savings exponent of **Prop 2.4** (`prop_2_4`). -/
+noncomputable def u_prop24 : ℝ := 1 / 200
+
+/-- The explicit threshold `X₀` of **Prop 2.4** (`prop_2_4`). -/
+noncomputable def X0_prop24 : ℝ := 1
+
 set_option maxHeartbeats 1600000 in
-/-- **Prop 2.4** (writeup 209–241): `Δ = D/H ≤ X^{1/100}` ⇒ `#𝒟[D,2D] ≪ H/U`. -/
-theorem prop_2_4 (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
-    ∃ u : ℝ, 0 < u ∧ ∃ C : ℝ, 0 < C ∧ ∃ X₀ : ℝ, ∀ X : ℝ, X₀ ≤ X →
+/-- **Prop 2.4** (writeup 209–241), explicit-constant form: the constant is `C_prop24`, the
+savings exponent is `u_prop24`, the threshold is `X0_prop24`. -/
+theorem prop_2_4_explicit (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
+    ∀ X : ℝ, X0_prop24 ≤ X →
       ∀ D : ℝ, 0 < D → D ≤ X ^ ((1 - g) / 5) * X ^ (1 / 100 : ℝ) →
-        (dCard X (X ^ ((1 - g) / 5)) D : ℝ) ≤ C * X ^ ((1 - g) / 5) / X ^ u := by
+        (dCard X (X ^ ((1 - g) / 5)) D : ℝ)
+          ≤ C_prop24 * X ^ ((1 - g) / 5) / X ^ u_prop24 := by
   -- choices
   set a : ℝ := (1 - g) / 5 with ha
   have hapos : 0 < a := by
     rw [ha]; have hg1 : g < 1 := by linarith
     linarith
-  refine ⟨1 / 200, by norm_num, ?_⟩
-  obtain ⟨C₀, hC₀pos, hC₀⟩ := fourthDeriv_count 729 (by norm_num)
-  refine ⟨C₀ * (3 + 7 ^ (1 / 8 : ℝ)) + 4, by positivity, 1, ?_⟩
+  have hC₀ := fourthDeriv_count_explicit 729 (by norm_num)
+  set C₀ : ℝ := C_fourthDeriv 729 with hC₀def
+  have hC₀pos : 0 < C₀ := by
+    rw [hC₀def]; unfold C_fourthDeriv
+    exact lt_of_lt_of_le one_pos (le_max_right _ _)
+  have hCbridge : C_prop24 = C₀ * (3 + 7 ^ (1 / 8 : ℝ)) + 4 := by
+    unfold C_prop24; rw [hC₀def]
+  rw [hCbridge]
+  unfold u_prop24 X0_prop24
   intro X hX1 D hDpos hDle
   set b : ℝ := a + 1 / 100 with hb
   have hX0 : (0 : ℝ) < X := lt_of_lt_of_le one_pos hX1
@@ -134,5 +151,14 @@ theorem prop_2_4 (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
           have h7 : (0 : ℝ) ≤ 7 ^ (1 / 8 : ℝ) := Real.rpow_nonneg (by norm_num) _
           nlinarith [hHUpos, hC₀pos.le, h7]
       _ = (C₀ * (3 + 7 ^ (1 / 8 : ℝ)) + 4) * X ^ a / X ^ (1 / 200 : ℝ) := by rw [hU]; ring
+
+/-- **Prop 2.4** (writeup 209–241): `Δ = D/H ≤ X^{1/100}` ⇒ `#𝒟[D,2D] ≪ H/U`. -/
+theorem prop_2_4 (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
+    ∃ u : ℝ, 0 < u ∧ ∃ C : ℝ, 0 < C ∧ ∃ X₀ : ℝ, ∀ X : ℝ, X₀ ≤ X →
+      ∀ D : ℝ, 0 < D → D ≤ X ^ ((1 - g) / 5) * X ^ (1 / 100 : ℝ) →
+        (dCard X (X ^ ((1 - g) / 5)) D : ℝ) ≤ C * X ^ ((1 - g) / 5) / X ^ u :=
+  ⟨u_prop24, by unfold u_prop24; norm_num,
+   C_prop24, by unfold C_prop24 C_fourthDeriv; positivity,
+   X0_prop24, prop_2_4_explicit g hg hg'⟩
 
 end Squarefree

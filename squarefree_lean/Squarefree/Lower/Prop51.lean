@@ -17,6 +17,10 @@ open Classical Finset
 namespace Squarefree
 
 set_option exponentiation.threshold 500 in
+/-- The explicit constant of `prop_5_1`: `10 ^ 415`. -/
+noncomputable def C_prop51 : ℝ := 10 ^ 415
+
+set_option exponentiation.threshold 500 in
 /-- **Prop 5.1** (writeup 731–741). `Ra` is the §3 set `ℛ_a` (cardinality `#ℛ_a`):
 the structural hypothesis `∀ r ∈ Ra, RaWitness P S a r` records that each `r ∈ Ra` is
 witnessed by a popular `d` at the `D`-scale with `r ≈ R_a(d)` (writeup §3 / `DaSpacing`).
@@ -36,7 +40,7 @@ band / window facts the §5 step lemmas consume (all discharged by the large-`x`
 `60Ω ≤ H`, and the `N`-free log cap: the Step-3 `hlogcap` evaluated at the `hNenv` max cap
 `10⁹⁰(Na+Nb+Nc)` (it implies `log N + 1 ≤ G³U¹⁵√Δ·Ω` for every `N` below the cap by log
 monotonicity).  NOT included (ruled UNFAITHFUL): `1 ≤ Ω` and `G ≤ U`. -/
-theorem prop_5_1 : ∃ C : ℝ, 0 < C ∧
+theorem prop_5_1_explicit :
     ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a → 10 * S.A ≤ S.D →
       (16777216 : ℝ) ≤ P.G * P.H * S.Ω ^ 3 → ∀ (Ra : Finset ℕ),
       (∀ r ∈ Ra, RaWitness P S a r) →
@@ -56,11 +60,11 @@ theorem prop_5_1 : ∃ C : ℝ, 0 < C ∧
           + 10 ^ 90 * (P.H * P.G ^ 4 * S.Ω ^ 2 * P.U ^ 15 / S.Δ ^ ((5 : ℝ) / 2))
           + 10 ^ 90 * (P.G ^ 2 * P.U ^ 15 / S.Ω ^ 5)) + 1
         ≤ P.G ^ 3 * P.U ^ 15 * Real.sqrt S.Δ * S.Ω) →
-      (Ra.card : ℝ) ≤ C * (P.H / S.Δ) *
+      (Ra.card : ℝ) ≤ C_prop51 * (P.H / S.Δ) *
         ( P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
         + P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
         + (S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27 ) := by
-  refine ⟨10 ^ 415, by positivity, ?_⟩
+  unfold C_prop51
   intro P S a ha hAD hGHΩ Ra hwit hreg1 hreg2 hpop hG1 hU1 hΔ1 hH1 hΩU hband hX
     hUcal hDeW hHbig hδbud haA1 haA2 hΩH hlogcap
   classical
@@ -120,5 +124,33 @@ theorem prop_5_1 : ∃ C : ℝ, 0 < C ∧
   have hcombine := prop51_combine (P := P) (S := S) hG1 hU1 hΩU hband hreg2
     Wnat ⟨by linarith, hWhi⟩ B hBle hB0
   linarith
+
+set_option exponentiation.threshold 500 in
+/-- **Prop 5.1**, existential form (writeup 731–741): the constant is `C_prop51 = 10 ^ 415`. -/
+theorem prop_5_1 : ∃ C : ℝ, 0 < C ∧
+    ∀ (P : Globals) (S : Scale P) (a : ℤ), 0 < a → 10 * S.A ≤ S.D →
+      (16777216 : ℝ) ≤ P.G * P.H * S.Ω ^ 3 → ∀ (Ra : Finset ℕ),
+      (∀ r ∈ Ra, RaWitness P S a r) →
+      (P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2) →
+      (P.G ^ 2 * P.U ^ 5 ≤ S.Δ) →
+      (S.R / P.Wval ≤ (Ra.card : ℝ)) →
+      -- AUDITED-FAITHFUL regime pack (regime ruling 2026-06-10)
+      (1 ≤ P.G) → (1 ≤ P.U) → (1 ≤ S.Δ) → (1 ≤ P.H) →
+      (S.Ω ≤ P.U) → (1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4) → ((10:ℝ) ^ 33 ≤ P.U) →
+      (P.U ^ 9 ≤ P.G ^ 7 * P.H ^ 2) →
+      (10 ^ 27 * (P.G ^ 4 * P.U ^ 20) ≤ S.Δ) →
+      (10 ^ 121 * (S.Δ ^ 4 * P.G ^ 5 * P.U ^ 45) ≤ P.H ^ 2 * S.Ω ^ 14) →
+      (10 ^ 70 * ((1 / S.Δ) * P.G ^ 4 * P.U ^ 15 / S.Ω ^ 5) ≤ 1 / 2) →
+      (S.A / 5 ≤ (a : ℝ)) → ((a : ℝ) ≤ 11 * S.A) →
+      (60 * S.Ω ≤ P.H) →
+      (Real.log (10 ^ 90 * (P.G ^ ((9 : ℝ) / 2) * P.U ^ ((55 : ℝ) / 2) / S.Ω ^ 5)
+          + 10 ^ 90 * (P.H * P.G ^ 4 * S.Ω ^ 2 * P.U ^ 15 / S.Δ ^ ((5 : ℝ) / 2))
+          + 10 ^ 90 * (P.G ^ 2 * P.U ^ 15 / S.Ω ^ 5)) + 1
+        ≤ P.G ^ 3 * P.U ^ 15 * Real.sqrt S.Δ * S.Ω) →
+      (Ra.card : ℝ) ≤ C * (P.H / S.Δ) *
+        ( P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
+        + P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
+        + (S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27 ) :=
+  ⟨C_prop51, by unfold C_prop51; positivity, prop_5_1_explicit⟩
 
 end Squarefree

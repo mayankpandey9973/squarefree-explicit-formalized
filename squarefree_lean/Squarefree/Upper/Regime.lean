@@ -173,9 +173,21 @@ private theorem K0delta0_le {P : Globals} (S : Scale P)
   exact le_mul_of_one_le_right hKF
     (show (1:ℝ) ≤ (P.G * P.H * S.Ω ^ 3) / 16777216 by rw [le_div_iff₀ (by norm_num)]; linarith)
 
-/-- The §6 low-curvature (elementary-count) branch of Prop 6.1. -/
-private theorem prop6_lowF :
-    ∃ C : ℝ, 0 < C ∧
+/-- Explicit spine constant for the §6 low-curvature branch of Prop 6.1. -/
+noncomputable def prop6lowF_C : ℝ :=
+  (2 * Cval6 / prop6ScaleLo + 2 * K0 / (prop6ScaleLo * 16777216) + 1) * (64 * K0 / cderiv6)
+    + 32 * (2 * Cval6 / prop6ScaleLo + 2 * K0 / (prop6ScaleLo * 16777216) + 1)
+      * Real.sqrt (1 / prop6ScaleLo) + 1
+
+private theorem prop6lowF_C_pos : 0 < prop6lowF_C := by
+  have hLo := prop6ScaleLo_pos
+  have hCv := Cval6_pos
+  have hcd := cderiv6_pos
+  have hK0 := K0_pos
+  unfold prop6lowF_C; positivity
+
+/-- The §6 low-curvature (elementary-count) branch of Prop 6.1, with explicit spine constant. -/
+private theorem prop6_lowF_explicit :
     ∀ (P : Globals) (S : Scale P), 1 ≤ P.X → 0 < P.u → P.g ≤ 1 → 10 * S.A ≤ S.D →
       P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) ≤ S.Ω →
       (16777216 : ℝ) ≤ P.G * P.H * S.Ω ^ 3 →
@@ -183,7 +195,7 @@ private theorem prop6_lowF :
       ∀ (RaOf : ℤ → Finset ℕ),
       (∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, (0 < a) ∧ ∀ r ∈ RaOf a, RaWitness P S a r) →
       (∑ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, ((RaOf a).card : ℝ)) ≤
-        C * P.H * P.X ^ (C * P.u) *
+        prop6lowF_C * P.H * P.X ^ (prop6lowF_C * P.u) *
           ( S.x * P.G * S.Ω ^ 2
           + S.x ^ (2/3 : ℝ) * P.G ^ (4/3 : ℝ) * S.Ω ^ (11/3 : ℝ)
           + P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ) ) := by
@@ -195,7 +207,9 @@ private theorem prop6_lowF :
   have hsrt0 : 0 ≤ srt := Real.sqrt_nonneg _
   set B₁ : ℝ := 2 * Cval6 / prop6ScaleLo + 2 * K0 / (prop6ScaleLo * 16777216) + 1 with hB1def
   have hB1pos : 0 < B₁ := by rw [hB1def]; positivity
-  refine ⟨B₁ * (64 * K0 / cderiv6) + 32 * B₁ * srt + 1, by positivity, ?_⟩
+  have hpre : prop6lowF_C = B₁ * (64 * K0 / cderiv6) + 32 * B₁ * srt + 1 := by
+    unfold prop6lowF_C; rw [hB1def, hsrtdef]
+  rw [hpre]
   set C : ℝ := B₁ * (64 * K0 / cderiv6) + 32 * B₁ * srt + 1 with hCdef
   have hCpos : 0 < C := by rw [hCdef]; positivity
   intro P S hX hu hg1 hAD hband hΩfloor hF RaOf hwit
@@ -386,6 +400,22 @@ private theorem prop6_lowF :
           have hCHX : (0:ℝ) ≤ C * P.H * P.X ^ (C * P.u) := by positivity
           have hr1 := RHS1_nonneg S; have hr2 := RHS2_nonneg S
           exact mul_le_mul_of_nonneg_left (by linarith) hCHX
+
+/-- The §6 low-curvature (elementary-count) branch of Prop 6.1. -/
+private theorem prop6_lowF :
+    ∃ C : ℝ, 0 < C ∧
+    ∀ (P : Globals) (S : Scale P), 1 ≤ P.X → 0 < P.u → P.g ≤ 1 → 10 * S.A ≤ S.D →
+      P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) ≤ S.Ω →
+      (16777216 : ℝ) ≤ P.G * P.H * S.Ω ^ 3 →
+      ¬ (1 < prop6ScaleLo * S.F) →
+      ∀ (RaOf : ℤ → Finset ℕ),
+      (∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, (0 < a) ∧ ∀ r ∈ RaOf a, RaWitness P S a r) →
+      (∑ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, ((RaOf a).card : ℝ)) ≤
+        C * P.H * P.X ^ (C * P.u) *
+          ( S.x * P.G * S.Ω ^ 2
+          + S.x ^ (2/3 : ℝ) * P.G ^ (4/3 : ℝ) * S.Ω ^ (11/3 : ℝ)
+          + P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ) ) :=
+  ⟨prop6lowF_C, prop6lowF_C_pos, prop6_lowF_explicit⟩
 
 /-! ## High-curvature branch (`1 < prop6ScaleLo·F`) -/
 
@@ -707,9 +737,29 @@ private theorem highF_perr_count {P : Globals} (S : Scale P) {r : ℝ}
         + kk * (Real.sqrt (K0 / prop6ScaleLo) * sd0F * (logc * P.X ^ P.u)) from by ring]
   linarith [q1, q3, q4]
 
-/-- The §6 high-curvature (Prop 4.3 sharp-count) branch of Prop 6.1. -/
-private theorem prop6_highF :
-    ∃ C : ℝ, 0 < C ∧
+/-- Explicit spine constant for the §6 high-curvature branch of Prop 6.1. -/
+noncomputable def prop6highF_C : ℝ :=
+  96 * prop6CountConst * (prop6ScaleHi ^ (1/3 : ℝ) + K0
+      + Real.sqrt (K0 / prop6ScaleLo) * (Real.log (2 + Real.sqrt K0) + 1/2)
+      + Real.sqrt (1 / prop6ScaleLo) + 1) + 1
+
+private theorem prop6highF_C_pos : 0 < prop6highF_C := by
+  have hLo := prop6ScaleLo_pos
+  have hHi := prop6ScaleHi_pos
+  have hK0 := K0_pos
+  have hcc := prop6CountConst_pos
+  unfold prop6highF_C
+  have hlogc0 : (0:ℝ) ≤ Real.log (2 + Real.sqrt K0) + 1/2 := by
+    have : (0:ℝ) ≤ Real.log (2 + Real.sqrt K0) :=
+      Real.log_nonneg (by have := Real.sqrt_nonneg K0; linarith)
+    linarith
+  have h1 : (0:ℝ) ≤ prop6ScaleHi ^ (1/3 : ℝ) := Real.rpow_nonneg hHi.le _
+  have h2 : (0:ℝ) ≤ Real.sqrt (K0 / prop6ScaleLo) * (Real.log (2 + Real.sqrt K0) + 1/2) :=
+    mul_nonneg (Real.sqrt_nonneg _) hlogc0
+  positivity
+
+/-- The §6 high-curvature (Prop 4.3 sharp-count) branch of Prop 6.1, with explicit spine constant. -/
+private theorem prop6_highF_explicit :
     ∀ (P : Globals) (S : Scale P), 1 ≤ P.X → 0 < P.u → P.g ≤ 1 → 10 * S.A ≤ S.D →
       P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) ≤ S.Ω →
       (16777216 : ℝ) ≤ P.G * P.H * S.Ω ^ 3 →
@@ -718,7 +768,7 @@ private theorem prop6_highF :
       ∀ (RaOf : ℤ → Finset ℕ),
       (∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, (0 < a) ∧ ∀ r ∈ RaOf a, RaWitness P S a r) →
       (∑ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, ((RaOf a).card : ℝ)) ≤
-        C * P.H * P.X ^ (C * P.u) *
+        prop6highF_C * P.H * P.X ^ (prop6highF_C * P.u) *
           ( S.x * P.G * S.Ω ^ 2
           + S.x ^ (2/3 : ℝ) * P.G ^ (4/3 : ℝ) * S.Ω ^ (11/3 : ℝ)
           + P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ) ) := by
@@ -745,7 +795,9 @@ private theorem prop6_highF :
     have h2 : (0:ℝ) ≤ Real.sqrt (K0 / prop6ScaleLo) * logc :=
       mul_nonneg (Real.sqrt_nonneg _) hlogc0
     positivity
-  refine ⟨96 * kk * Ccoef + 1, by positivity, ?_⟩
+  have hpre : prop6highF_C = 96 * kk * Ccoef + 1 := by
+    unfold prop6highF_C; rw [hkkdef, hCcoefdef, hlogcdef, hsrtdef]
+  rw [hpre]
   set C : ℝ := 96 * kk * Ccoef + 1 with hCdef
   have hCpos : 0 < C := by rw [hCdef]; positivity
   have hC1 : (1:ℝ) ≤ C := by
@@ -1024,7 +1076,61 @@ private theorem prop6_highF :
       linarith [hRHS2nn, hRHS3pos]
     exact e2
 
+/-- The §6 high-curvature (Prop 4.3 sharp-count) branch of Prop 6.1. -/
+private theorem prop6_highF :
+    ∃ C : ℝ, 0 < C ∧
+    ∀ (P : Globals) (S : Scale P), 1 ≤ P.X → 0 < P.u → P.g ≤ 1 → 10 * S.A ≤ S.D →
+      P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) ≤ S.Ω →
+      (16777216 : ℝ) ≤ P.G * P.H * S.Ω ^ 3 →
+      Real.log P.X ≤ P.X ^ P.u →
+      (1 < prop6ScaleLo * S.F) →
+      ∀ (RaOf : ℤ → Finset ℕ),
+      (∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, (0 < a) ∧ ∀ r ∈ RaOf a, RaWitness P S a r) →
+      (∑ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, ((RaOf a).card : ℝ)) ≤
+        C * P.H * P.X ^ (C * P.u) *
+          ( S.x * P.G * S.Ω ^ 2
+          + S.x ^ (2/3 : ℝ) * P.G ^ (4/3 : ℝ) * S.Ω ^ (11/3 : ℝ)
+          + P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ) ) :=
+  ⟨prop6highF_C, prop6highF_C_pos, prop6_highF_explicit⟩
+
 end Prop61
+
+/-- Explicit spine constant for Prop 6.1: the max of the two branch constants. -/
+noncomputable def C6val : ℝ := max Prop61.prop6lowF_C Prop61.prop6highF_C
+
+/-- **Prop 6.1** (writeup 1230–1236) with explicit spine constant `C6val`. -/
+theorem prop_6_1_explicit :
+    ∀ (P : Globals) (S : Scale P), 1 ≤ P.X → 0 < P.u → P.g ≤ 1 → 10 * S.A ≤ S.D →
+      P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) ≤ S.Ω →
+      (16777216 : ℝ) ≤ P.G * P.H * S.Ω ^ 3 →
+      Real.log P.X ≤ P.X ^ P.u →
+      ∀ (RaOf : ℤ → Finset ℕ),
+      (∀ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, (0 < a) ∧ ∀ r ∈ RaOf a, RaWitness P S a r) →
+      (∑ a ∈ Finset.Icc ⌈S.A⌉ ⌊2 * S.A⌋, ((RaOf a).card : ℝ)) ≤
+        C6val * P.H * P.X ^ (C6val * P.u) *
+          ( S.x * P.G * S.Ω ^ 2
+          + S.x ^ (2/3 : ℝ) * P.G ^ (4/3 : ℝ) * S.Ω ^ (11/3 : ℝ)
+          + P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ) ) := by
+  have hlo := Prop61.prop6_lowF_explicit
+  have hhi := Prop61.prop6_highF_explicit
+  have hClo : 0 < Prop61.prop6lowF_C := Prop61.prop6lowF_C_pos
+  have hChi : 0 < Prop61.prop6highF_C := Prop61.prop6highF_C_pos
+  set Clo : ℝ := Prop61.prop6lowF_C with hClodef
+  set Chi : ℝ := Prop61.prop6highF_C with hChidef
+  have hC6 : C6val = max Clo Chi := by unfold C6val; rw [hClodef, hChidef]
+  rw [hC6]
+  intro P S hX hu hg1 hAD hband hΩfloor hlog RaOf hwit
+  have hu0 : 0 ≤ P.u := hu.le
+  have hRHSnn : (0:ℝ) ≤ S.x * P.G * S.Ω ^ 2
+      + S.x ^ (2/3 : ℝ) * P.G ^ (4/3 : ℝ) * S.Ω ^ (11/3 : ℝ)
+      + P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ) := by
+    have := Prop61.RHS1_nonneg S; have := Prop61.RHS2_nonneg S
+    have := Prop61.RHS3_pos S; linarith
+  by_cases hF : 1 < prop6ScaleLo * S.F
+  · have h := hhi P S hX hu hg1 hAD hband hΩfloor hlog hF RaOf hwit
+    exact Prop61.widen_budget S _ Chi (max Clo Chi) hX hu0 hChi (le_max_right _ _) hRHSnn h
+  · have h := hlo P S hX hu hg1 hAD hband hΩfloor hF RaOf hwit
+    exact Prop61.widen_budget S _ Clo (max Clo Chi) hX hu0 hClo (le_max_left _ _) hRHSnn h
 
 /-- **Prop 6.1** (writeup 1230–1236); `x = H/Δ²` is `S.x`; the single `C` is both the `≪`
 constant and the absolute `X^{O(u)}` budget constant.  The `a ↔ r` swap reduces to per-`r`
@@ -1041,21 +1147,7 @@ theorem prop_6_1 : ∃ C : ℝ, 0 < C ∧
         C * P.H * P.X ^ (C * P.u) *
           ( S.x * P.G * S.Ω ^ 2
           + S.x ^ (2/3 : ℝ) * P.G ^ (4/3 : ℝ) * S.Ω ^ (11/3 : ℝ)
-          + P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ) ) := by
-  obtain ⟨Clo, hClo, hlo⟩ := Prop61.prop6_lowF
-  obtain ⟨Chi, hChi, hhi⟩ := Prop61.prop6_highF
-  refine ⟨max Clo Chi, lt_max_of_lt_left hClo, ?_⟩
-  intro P S hX hu hg1 hAD hband hΩfloor hlog RaOf hwit
-  have hu0 : 0 ≤ P.u := hu.le
-  have hRHSnn : (0:ℝ) ≤ S.x * P.G * S.Ω ^ 2
-      + S.x ^ (2/3 : ℝ) * P.G ^ (4/3 : ℝ) * S.Ω ^ (11/3 : ℝ)
-      + P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ) := by
-    have := Prop61.RHS1_nonneg S; have := Prop61.RHS2_nonneg S
-    have := Prop61.RHS3_pos S; linarith
-  by_cases hF : 1 < prop6ScaleLo * S.F
-  · have h := hhi P S hX hu hg1 hAD hband hΩfloor hlog hF RaOf hwit
-    exact Prop61.widen_budget S _ Chi (max Clo Chi) hX hu0 hChi (le_max_right _ _) hRHSnn h
-  · have h := hlo P S hX hu hg1 hAD hband hΩfloor hF RaOf hwit
-    exact Prop61.widen_budget S _ Clo (max Clo Chi) hX hu0 hClo (le_max_left _ _) hRHSnn h
+          + P.H ^ (-1/2 : ℝ) * P.G ^ (1/2 : ℝ) * S.Ω ^ (5/2 : ℝ) ) :=
+  ⟨C6val, by unfold C6val; exact lt_max_of_lt_left Prop61.prop6lowF_C_pos, prop_6_1_explicit⟩
 
 end Squarefree

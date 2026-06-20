@@ -108,6 +108,13 @@ private theorem ghΩ3_ge_500 (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 1
         apply mul_le_mul_of_nonneg_left hΩ3
         positivity
 
+/-- Explicit witness constant for `dblock_off_strip`. -/
+noncomputable def dblockOffStrip_C (c₀ : ℝ) : ℝ :=
+  prop32fiberD_C2 * ((1 + c₀ ^ (-8/3 : ℝ)) * (StripAux.C6 * c₀ ^ (-7/2 : ℝ) + StripAux.C6 + StripAux.C6)
+    + StripAux.C5 * ((1 + c₀ ^ (-8/3 : ℝ)) * (1 + c₀ ^ (-12 : ℝ) + 1)
+      + (1 + c₀ ^ (-8/3 : ℝ)) * (c₀ ^ (-1 : ℝ) + c₀ ^ (-13 : ℝ) + c₀ ^ (-14 : ℝ)))
+    + 2 + 2)
+
 set_option maxHeartbeats 600000 in
 /-- **Off-strip case** of `dblock_bound` (Prop 8.1, writeup 2020–2079). `u, c₀, Cu` are shared
 parameters (the merger `dblock_bound` picks them). Small-x edge `x ≤ G^{-2}Ω^{-11/2}X^{-Cu·u}` via
@@ -120,11 +127,11 @@ the opaque Prop 6.1 budget constant `StripAux.C6`):
   budget (small-x term 2) and the Prop 5.1 `U^{100}` budget (large-x terms 3, +1·3).
 * `hubudget : (C6 + 100)·u ≤ 1/200 - 20·g` — the "shrink `u`" of the writeup (line 2079);
   RHS `> 0` since `g < 2/18187`. -/
-theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187)
+theorem dblock_off_strip_explicit (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187)
     (u : ℝ) (hu0 : 0 < u) (hopt : 18187 * g + 15315 * u < 2) (hu2 : u ≤ 1 / 100)
     (c₀ : ℝ) (hc₀ : 1 ≤ c₀) (Cu : ℝ) (hCu : (3/2) * StripAux.C6 + 232 ≤ Cu)
     (hubudget : (StripAux.C6 + 100) * u ≤ 1/200 - 20 * g) :
-    ∃ C : ℝ, 0 < C ∧
+    0 < dblockOffStrip_C c₀ ∧
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
@@ -135,27 +142,35 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187)
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω → S.Ω ≤ P.U →
         ( S.x ≤ P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u))
           ∨ P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x ) →
-        ∀ D : ℝ, 0 < D → D = S.D → DBlock P S D ≤ C * P.H / P.U := by
+        ∀ D : ℝ, 0 < D → D = S.D → DBlock P S D ≤ dblockOffStrip_C c₀ * P.H / P.U := by
   have hC6 := StripAux.C6_pos
   have hC5 := StripAux.C5_pos
   set C6 : ℝ := StripAux.C6 with hC6def
   set C5 : ℝ := StripAux.C5 with hC5def
-  obtain ⟨c₁', C₁', C₂', hc₁', hC₁', hC₂', hfiber'⟩ := prop_3_2_fiber_dStar
+  obtain ⟨hc₁', hC₁', hC₂', hfiber'⟩ := prop_3_2_fiber_dStar_explicit
+  set c₁' : ℝ := prop32fiberD_c1 with hc1'def
+  set C₁' : ℝ := prop32fiberD_C1 with hC1'def
+  set C₂' : ℝ := prop32fiberD_C2 with hC2'def
   set Bf : ℝ := 1 + c₀ ^ (-8/3 : ℝ) with hBfdef
   have hBf1 : (1:ℝ) ≤ Bf := by
     rw [hBfdef]; have := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-8/3 : ℝ); linarith
-  -- the output absolute constant (dominates both disjunction branches)
-  refine ⟨C₂' * (Bf * (C6 * c₀ ^ (-7/2 : ℝ) + C6 + C6)
+  have hbr : dblockOffStrip_C c₀ = C₂' * (Bf * (C6 * c₀ ^ (-7/2 : ℝ) + C6 + C6)
       + C5 * (Bf * (1 + c₀ ^ (-12 : ℝ) + 1)
         + Bf * (c₀ ^ (-1 : ℝ) + c₀ ^ (-13 : ℝ) + c₀ ^ (-14 : ℝ)))
-      + 2 + 2), ?_, ?_⟩
-  · have hBfpos : (0:ℝ) < Bf := by linarith
+      + 2 + 2) := by
+    unfold dblockOffStrip_C; rw [hBfdef, hC5def, hC6def, hC2'def]
+  clear_value C₂'
+  -- the output absolute constant (dominates both disjunction branches)
+  refine ⟨?_, ?_⟩
+  · rw [hbr]
+    have hBfpos : (0:ℝ) < Bf := by linarith
     have := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-7/2 : ℝ)
     have h12 := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-12 : ℝ)
     have h1 := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-1 : ℝ)
     have h13 := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-13 : ℝ)
     have h14 := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-14 : ℝ)
     positivity
+  rw [hbr]
   intro P hg hu hX S hΔlong hX0big hlog hUbig hNR hAD hbandlo hΩU hdisj D hDpos hDeq
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hG := P.G_pos; have hH := P.H_pos; have hU := P.U_pos
@@ -614,6 +629,25 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187)
                     + Bf * (c₀ ^ (-1 : ℝ) + c₀ ^ (-13 : ℝ) + c₀ ^ (-14 : ℝ))) * (P.H / P.U)) by ring]
           linarith [hslackL]
 
+/-- **Off-strip case** of `dblock_bound` — existential wrapper over `dblock_off_strip_explicit`. -/
+theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187)
+    (u : ℝ) (hu0 : 0 < u) (hopt : 18187 * g + 15315 * u < 2) (hu2 : u ≤ 1 / 100)
+    (c₀ : ℝ) (hc₀ : 1 ≤ c₀) (Cu : ℝ) (hCu : (3/2) * StripAux.C6 + 232 ≤ Cu)
+    (hubudget : (StripAux.C6 + 100) * u ≤ 1/200 - 20 * g) :
+    ∃ C : ℝ, 0 < C ∧
+      ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
+      ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
+        (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+        Real.log P.X ≤ P.X ^ P.u →
+        (10:ℝ) ^ 33 ≤ P.U →
+        (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
+        2 * S.A ≤ S.D →
+        c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω → S.Ω ≤ P.U →
+        ( S.x ≤ P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u))
+          ∨ P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x ) →
+        ∀ D : ℝ, 0 < D → D = S.D → DBlock P S D ≤ C * P.H / P.U :=
+  ⟨dblockOffStrip_C c₀, dblock_off_strip_explicit g hg0 hg1 u hu0 hopt hu2 c₀ hc₀ Cu hCu hubudget⟩
+
 /-- Small-Ω block bound (below the band): the trivial Prop 3.2 bound (writeup 400–406), no §5/§6/§7.
 Uniform (absolute) `C`, valid for any band constant `c₀` (with `C` depending on `c₀`). The regime
 hypotheses match `dblock_bound`'s, so the two compose over `a_decomposition`'s sum.
@@ -624,8 +658,14 @@ leaves a `+g/4` surplus over `H/U`. The `1/100` margin dominates `g/4 < 1/36374`
 holds (no `X^{O(u)}`). Term-by-term: the two `A·R` terms are killed by the band edge; `A`, `Δ·…`
 by the Nair–Roth Δ-ceiling `Δ ≤ Ω³X/(64³H⁴)`; the two `/Δ` terms by `Δ ≥ X^{1/100}`; the rest by
 `H/U → ∞`. (Needs `g < 2/18187`, `u ≤ 1/100`.) -/
-theorem dblock_small_omega (c₀ : ℝ) (hc₀ : 0 < c₀) :
-    ∃ C : ℝ, 0 < C ∧
+noncomputable def dblockSmallOmega_C (c₀ : ℝ) : ℝ :=
+  prop32fiber_C2 * (prop32fiber_C1 * c₀ ^ (4:ℝ) + prop32fiber_C1 * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / (1/4) ^ 3
+    + c₀ ^ (4/3:ℝ) / (1/4) ^ 3 + prop32fiber_C1 * c₀ ^ (3:ℝ) + prop32fiber_C1 * c₀ ^ (1/3:ℝ) + 1
+    + (1/4:ℝ) ^ (-8/3:ℝ))
+
+/-- Explicit-constant form of `dblock_small_omega`. -/
+theorem dblock_small_omega_explicit (c₀ : ℝ) (hc₀ : 0 < c₀) :
+    0 < dblockSmallOmega_C c₀ ∧
       ∀ (P : Globals), 1 ≤ P.X → 0 < P.g → P.g < 2 / 18187 → 0 < P.u → P.u ≤ 1 / 100 →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
@@ -633,12 +673,18 @@ theorem dblock_small_omega (c₀ : ℝ) (hc₀ : 0 < c₀) :
         2 * S.A ≤ S.D →
         S.Ω ≤ c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) →
         ∀ D : ℝ, 0 < D → D = S.D →
-          DBlock P S D ≤ C * P.H / P.U := by
-  obtain ⟨c₁, C₁, C₂, hc₁, hC₁, hC₂, hfiber⟩ := prop_3_2_fiber
+          DBlock P S D ≤ dblockSmallOmega_C c₀ * P.H / P.U := by
+  obtain ⟨hc₁, hC₁, hC₂, hfiber⟩ := prop_3_2_fiber_explicit
+  set c₁ : ℝ := prop32fiber_c1 with hc1def
+  set C₁ : ℝ := prop32fiber_C1 with hC1def
+  set C₂ : ℝ := prop32fiber_C2 with hC2def
+  have hbr : dblockSmallOmega_C c₀ = C₂ * (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / (1/4) ^ 3
+      + c₀ ^ (4/3:ℝ) / (1/4) ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1 + (1/4:ℝ) ^ (-8/3:ℝ)) := by
+    unfold dblockSmallOmega_C; rw [hC1def, hC2def]
+  clear_value c₁ C₁ C₂
   -- the absolute constant: sum of the eight monomial constants, times C₂
-  refine ⟨C₂ * (C₁ * c₀ ^ (4:ℝ) + C₁ * c₀ ^ (4/3:ℝ) + c₀ ^ (4:ℝ) / (1/4) ^ 3
-      + c₀ ^ (4/3:ℝ) / (1/4) ^ 3 + C₁ * c₀ ^ (3:ℝ) + C₁ * c₀ ^ (1/3:ℝ) + 1 + (1/4:ℝ) ^ (-8/3:ℝ)),
-    by positivity, ?_⟩
+  refine ⟨by rw [hbr]; positivity, ?_⟩
+  rw [hbr]
   intro P hX hg0 hg hu0 hu' S hΔlong hX0big hNR hAD hband D hDpos hDeq
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hH := P.H_pos
@@ -778,5 +824,18 @@ theorem dblock_small_omega (c₀ : ℝ) (hc₀ : 0 < c₀) :
   -- C * P.H / P.U = C * (P.H / P.U)
   rw [mul_div_assoc]
   exact hfin
+
+/-- Small-Ω block bound — existential wrapper over `dblock_small_omega_explicit`. -/
+theorem dblock_small_omega (c₀ : ℝ) (hc₀ : 0 < c₀) :
+    ∃ C : ℝ, 0 < C ∧
+      ∀ (P : Globals), 1 ≤ P.X → 0 < P.g → P.g < 2 / 18187 → 0 < P.u → P.u ≤ 1 / 100 →
+      ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
+        (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+        (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
+        2 * S.A ≤ S.D →
+        S.Ω ≤ c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) →
+        ∀ D : ℝ, 0 < D → D = S.D →
+          DBlock P S D ≤ C * P.H / P.U :=
+  ⟨dblockSmallOmega_C c₀, dblock_small_omega_explicit c₀ hc₀⟩
 
 end Squarefree

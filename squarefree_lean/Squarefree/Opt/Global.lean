@@ -20,20 +20,19 @@ open Classical Finset
 
 namespace Squarefree
 
-/-- **On-strip case** of `dblock_bound` (§9 core, writeup 2083–2221). Shared params `u, c₀, Cu`.
-On the strip `G^{-2}Ω^{-11/2}X^{-Cu·u} ≤ x ≤ G^{17}Ω^{-26}X^{Cu·u}`, `𝐃(Ω) ≪ H/U` via Prop 7.3 with
-`W = W_{≠0}` and `18187g+15315u<2`. Added hypothesis `hubudget : 18187g+(18675+790·Cu)u ≤ 2`
-(the writeup's "shrink `u`"): the **sharp** `g`-coefficient `18187` keeps the full range
-`g < 2/18187`, while all `X^{O(u)}` bookkeeping (`2u` fiber, the AM-7 `X^{-2u}` envelope
-deflation, Prop 7.3's `X^{O(u)}`, strip-edge `X^{±Cu·u}`) sits in the `u`-coefficient
-`18675+790·Cu`.  Implies `hopt` and the on-strip envelope/closing budgets; for any
-`g < 2/18187`, `u := (2 − 18187g)/(2(18675+790·Cu)) > 0` satisfies it (the budget value is
-then `(2 + 18187g)/2 < 2`).  AM-8: threads `hlog : log X ≤ X^u` to Prop 7.3's pack. -/
-theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187)
+/-- Explicit on-strip block constant: `prop32fiberD_C2 · (C_prop73 · 10²⁵ · 4·(1+c₀^{-8/3}))`,
+where `prop32fiberD_C2` is the Prop 3.2 fiber constant and `C_prop73` the Prop 7.3 constant. -/
+noncomputable def dblockOnStrip_C (c₀ : ℝ) : ℝ :=
+  prop32fiberD_C2 * (C_prop73 * 10 ^ 25 * (4 * (1 + c₀ ^ (-8/3 : ℝ))))
+
+/-- Explicit-constant form of `dblock_on_strip` (§9 core, writeup 2083–2221): the on-strip block
+constant is `dblockOnStrip_C c₀`. Math is the original `dblock_on_strip` body; only the witnessed
+constant is surfaced. -/
+theorem dblock_on_strip_explicit (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187)
     (u : ℝ) (hu0 : 0 < u) (hopt : 18187 * g + 15315 * u < 2) (hu2 : u ≤ 1 / 100)
     (c₀ : ℝ) (hc₀ : 1 ≤ c₀) (Cu : ℝ) (hCu : 1 ≤ Cu)
     (hubudget : 18187 * g + (18675 + 790 * Cu) * u ≤ 2) :
-    ∃ C : ℝ, 0 < C ∧
+    0 < dblockOnStrip_C c₀ ∧
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
@@ -45,11 +44,23 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187)
         S.Ω ≤ P.U →
         P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u)) ≤ S.x →
         S.x ≤ P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) →
-        ∀ D : ℝ, 0 < D → D = S.D → DBlock P S D ≤ C * P.H / P.U := by
-  obtain ⟨c₁', C₁', C₂', hc₁', hC₁', hC₂', hfiber'⟩ := prop_3_2_fiber_dStar
-  obtain ⟨C₇, hC₇, hp73⟩ := prop_7_3
+        ∀ D : ℝ, 0 < D → D = S.D → DBlock P S D ≤ dblockOnStrip_C c₀ * P.H / P.U := by
+  obtain ⟨hc₁', hC₁', hC₂', hfiber'⟩ := prop_3_2_fiber_dStar_explicit
+  set C₂' := prop32fiberD_C2 with hC2'def
+  clear_value C₂'
+  have hp73 := prop_7_3_explicit
+  set C₇ : ℝ := C_prop73 with hC₇def
+  have hC₇ : 0 < C₇ := by
+    rw [hC₇def]; unfold C_prop73
+    have h1 := sec7_cJ_pos
+    have h2 : (0 : ℝ) < C_prop71 := by unfold C_prop71; exact sec7_cCubeIn_pos
+    positivity
+  clear_value C₇
   -- output constant (the 10²⁵ absorbs `W = 10⁻²⁵·Wnz` in Prop 7.3's `R/W` denominator)
-  refine ⟨C₂' * (C₇ * 10 ^ 25 * (4 * (1 + c₀ ^ (-8/3 : ℝ)))), ?_, ?_⟩
+  have hCeq : dblockOnStrip_C c₀ = C₂' * (C₇ * 10 ^ 25 * (4 * (1 + c₀ ^ (-8/3 : ℝ)))) := by
+    unfold dblockOnStrip_C; rw [hC2'def, hC₇def]
+  rw [hCeq]
+  refine ⟨?_, ?_⟩
   · have := Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos hc₀) (-8/3 : ℝ)
     positivity
   intro P hg hu hX S hΔlong hX0big hlog hUbig hNR hAD hbandlo hΩU hxlo hxhi D hDpos hDeq
@@ -193,12 +204,20 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187)
         exact mul_le_mul_of_nonneg_left hclose (by positivity)
     _ = C₂' * (C₇ * 10 ^ 25 * (4 * (1 + c₀ ^ (-8/3 : ℝ)))) * (P.H / P.U) := by ring
 
-/-- **§8/§9 per-Ω block bound** (merger). For `Ω` in the band `[c₀·G^{-1/4}U^{-3/4}, U]`,
-`𝐃(Ω) ≪ H/U`. Picks shared `u, C, c₀, Cu`, splits `S.x` against the strip edges, and dispatches to
-`dblock_off_strip` / `dblock_on_strip`. The regime hypotheses `(1/4)·Δ^{4/3}(H⁴/X)^{1/3} ≤ A`,
-`2A ≤ D` are supplied by `a_decomposition`'s sum range. -/
-theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187) :
-    ∃ u : ℝ, 0 < u ∧ 18187 * g + 15315 * u < 2 ∧ ∃ C : ℝ, 0 < C ∧ ∃ c₀ : ℝ, 0 < c₀ ∧
+/-- **On-strip case** of `dblock_bound` (§9 core, writeup 2083–2221). Shared params `u, c₀, Cu`.
+On the strip `G^{-2}Ω^{-11/2}X^{-Cu·u} ≤ x ≤ G^{17}Ω^{-26}X^{Cu·u}`, `𝐃(Ω) ≪ H/U` via Prop 7.3 with
+`W = W_{≠0}` and `18187g+15315u<2`. Added hypothesis `hubudget : 18187g+(18675+790·Cu)u ≤ 2`
+(the writeup's "shrink `u`"): the **sharp** `g`-coefficient `18187` keeps the full range
+`g < 2/18187`, while all `X^{O(u)}` bookkeeping (`2u` fiber, the AM-7 `X^{-2u}` envelope
+deflation, Prop 7.3's `X^{O(u)}`, strip-edge `X^{±Cu·u}`) sits in the `u`-coefficient
+`18675+790·Cu`.  Implies `hopt` and the on-strip envelope/closing budgets; for any
+`g < 2/18187`, `u := (2 − 18187g)/(2(18675+790·Cu)) > 0` satisfies it (the budget value is
+then `(2 + 18187g)/2 < 2`).  AM-8: threads `hlog : log X ≤ X^u` to Prop 7.3's pack. -/
+theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187)
+    (u : ℝ) (hu0 : 0 < u) (hopt : 18187 * g + 15315 * u < 2) (hu2 : u ≤ 1 / 100)
+    (c₀ : ℝ) (hc₀ : 1 ≤ c₀) (Cu : ℝ) (hCu : 1 ≤ Cu)
+    (hubudget : 18187 * g + (18675 + 790 * Cu) * u ≤ 2) :
+    ∃ C : ℝ, 0 < C ∧
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
@@ -208,8 +227,42 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187) :
         2 * S.A ≤ S.D →
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω →
         S.Ω ≤ P.U →
+        P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u)) ≤ S.x →
+        S.x ≤ P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) →
+        ∀ D : ℝ, 0 < D → D = S.D → DBlock P S D ≤ C * P.H / P.U :=
+  ⟨dblockOnStrip_C c₀,
+    (dblock_on_strip_explicit g hg0 hg1 u hu0 hopt hu2 c₀ hc₀ Cu hCu hubudget).1,
+    (dblock_on_strip_explicit g hg0 hg1 u hu0 hopt hu2 c₀ hc₀ Cu hCu hubudget).2⟩
+
+/-- Explicit `u` witness for `dblock_bound`: half of the min of the three `u`-constraint
+thresholds (off-strip budget, on-strip budget, `u ≤ 1/100`), with `Cu = (3/2)·C6 + 232`. -/
+noncomputable def dblockBound_u (g : ℝ) : ℝ :=
+  min ((1/200 - 20 * g) / (StripAux.C6 + 100))
+      (min ((2 - 18187 * g) / (18675 + 790 * ((3/2) * StripAux.C6 + 232))) (1/100)) / 2
+
+/-- Explicit `C` witness for `dblock_bound`: `max` of the off/on-strip block constants at `c₀ = 1`. -/
+noncomputable def dblockBound_C (_g : ℝ) : ℝ :=
+  max (dblockOffStrip_C 1) (dblockOnStrip_C 1)
+
+/-- Explicit `c₀` witness for `dblock_bound`. -/
+noncomputable def dblockBound_c0 : ℝ := 1
+
+/-- Explicit-constant form of `dblock_bound`: surfaces the witnesses `dblockBound_u`,
+`dblockBound_C`, `dblockBound_c0`.  Math is the original `dblock_bound` body. -/
+theorem dblock_bound_explicit (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187) :
+    0 < dblockBound_u g ∧ 18187 * g + 15315 * (dblockBound_u g) < 2 ∧
+      0 < dblockBound_C g ∧ 0 < dblockBound_c0 ∧
+      ∀ (P : Globals), P.g = g → P.u = dblockBound_u g → 1 ≤ P.X →
+      ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
+        (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+        Real.log P.X ≤ P.X ^ P.u →
+        (10:ℝ) ^ 33 ≤ P.U →
+        (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
+        2 * S.A ≤ S.D →
+        dblockBound_c0 * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω →
+        S.Ω ≤ P.U →
         ∀ D : ℝ, 0 < D → D = S.D →
-          DBlock P S D ≤ C * P.H / P.U := by
+          DBlock P S D ≤ dblockBound_C g * P.H / P.U := by
   -- shared constants
   have hC6 := StripAux.C6_pos
   set C6 : ℝ := StripAux.C6 with hC6def
@@ -256,34 +309,66 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187) :
       apply mul_lt_mul_of_pos_right _ hu0
       linarith only [hCu_on]
     linarith [hubud_on, hcoef]
-  refine ⟨u, hu0, hopt, ?_⟩
-  -- instantiate the two halves
-  obtain ⟨Coff, hCoff, hoff⟩ :=
-    dblock_off_strip g hg0 hg1 u hu0 hopt hu2 1 le_rfl Cu hCu_off hubud_off
-  obtain ⟨Con, hCon, hon⟩ :=
-    dblock_on_strip g hg0 hg1 u hu0 hopt hu2 1 le_rfl Cu hCu_on hubud_on
-  refine ⟨max Coff Con, lt_max_of_lt_left hCoff, 1, one_pos, ?_⟩
-  intro P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU D hDpos hDeq
-  have hH := P.H_pos; have hU := P.U_pos
-  have hHU : (0:ℝ) ≤ P.H / P.U := by positivity
-  -- trichotomy on S.x
-  by_cases h1 : S.x ≤ P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u))
-  · have := hoff P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU (Or.inl h1) D hDpos hDeq
-    calc DBlock P S D ≤ Coff * P.H / P.U := this
-      _ ≤ max Coff Con * P.H / P.U := by
-          rw [mul_div_assoc, mul_div_assoc]
-          exact mul_le_mul_of_nonneg_right (le_max_left _ _) hHU
-  · by_cases h2 : P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x
-    · have := hoff P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU (Or.inr h2) D hDpos hDeq
+  -- bridge the witness defs to the local `u` / `max` value
+  have hbridge_u : dblockBound_u g = u := by
+    unfold dblockBound_u; rw [hudef, hCudef, hC6def]
+  -- instantiate the two halves (explicit constants)
+  have hoffpair := dblock_off_strip_explicit g hg0 hg1 u hu0 hopt hu2 1 le_rfl Cu hCu_off hubud_off
+  have honpair := dblock_on_strip_explicit g hg0 hg1 u hu0 hopt hu2 1 le_rfl Cu hCu_on hubud_on
+  set Coff := dblockOffStrip_C 1 with hCoffdef
+  set Con := dblockOnStrip_C 1 with hCondef
+  obtain ⟨hCoff, hoff⟩ := hoffpair
+  obtain ⟨hCon, hon⟩ := honpair
+  have hCbridge : dblockBound_C g = max Coff Con := by
+    unfold dblockBound_C; rw [← hCoffdef, ← hCondef]
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · rw [hbridge_u]; exact hu0
+  · rw [hbridge_u]; exact hopt
+  · rw [hCbridge]; exact lt_max_of_lt_left hCoff
+  · unfold dblockBound_c0; exact one_pos
+  · rw [hbridge_u, hCbridge]
+    intro P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU D hDpos hDeq
+    simp only [dblockBound_c0] at hband
+    have hH := P.H_pos; have hU := P.U_pos
+    have hHU : (0:ℝ) ≤ P.H / P.U := by positivity
+    -- trichotomy on S.x
+    by_cases h1 : S.x ≤ P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u))
+    · have := hoff P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU (Or.inl h1) D hDpos hDeq
       calc DBlock P S D ≤ Coff * P.H / P.U := this
         _ ≤ max Coff Con * P.H / P.U := by
             rw [mul_div_assoc, mul_div_assoc]
             exact mul_le_mul_of_nonneg_right (le_max_left _ _) hHU
-    · push Not at h1 h2
-      have := hon P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU h1.le h2.le D hDpos hDeq
-      calc DBlock P S D ≤ Con * P.H / P.U := this
-        _ ≤ max Coff Con * P.H / P.U := by
-            rw [mul_div_assoc, mul_div_assoc]
-            exact mul_le_mul_of_nonneg_right (le_max_right _ _) hHU
+    · by_cases h2 : P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x
+      · have := hoff P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU (Or.inr h2) D hDpos hDeq
+        calc DBlock P S D ≤ Coff * P.H / P.U := this
+          _ ≤ max Coff Con * P.H / P.U := by
+              rw [mul_div_assoc, mul_div_assoc]
+              exact mul_le_mul_of_nonneg_right (le_max_left _ _) hHU
+      · push Not at h1 h2
+        have := hon P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU h1.le h2.le D hDpos hDeq
+        calc DBlock P S D ≤ Con * P.H / P.U := this
+          _ ≤ max Coff Con * P.H / P.U := by
+              rw [mul_div_assoc, mul_div_assoc]
+              exact mul_le_mul_of_nonneg_right (le_max_right _ _) hHU
+
+/-- **§8/§9 per-Ω block bound** (merger). For `Ω` in the band `[c₀·G^{-1/4}U^{-3/4}, U]`,
+`𝐃(Ω) ≪ H/U`. Picks shared `u, C, c₀, Cu`, splits `S.x` against the strip edges, and dispatches to
+`dblock_off_strip` / `dblock_on_strip`. The regime hypotheses `(1/4)·Δ^{4/3}(H⁴/X)^{1/3} ≤ A`,
+`2A ≤ D` are supplied by `a_decomposition`'s sum range. -/
+theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187) :
+    ∃ u : ℝ, 0 < u ∧ 18187 * g + 15315 * u < 2 ∧ ∃ C : ℝ, 0 < C ∧ ∃ c₀ : ℝ, 0 < c₀ ∧
+      ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
+      ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
+        (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
+        Real.log P.X ≤ P.X ^ P.u →
+        (10:ℝ) ^ 33 ≤ P.U →
+        (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →
+        2 * S.A ≤ S.D →
+        c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω →
+        S.Ω ≤ P.U →
+        ∀ D : ℝ, 0 < D → D = S.D →
+          DBlock P S D ≤ C * P.H / P.U := by
+  obtain ⟨h1, h2, h3, h4, h5⟩ := dblock_bound_explicit g hg0 hg1
+  exact ⟨dblockBound_u g, h1, h2, dblockBound_C g, h3, dblockBound_c0, h4, h5⟩
 
 end Squarefree

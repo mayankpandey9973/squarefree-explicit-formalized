@@ -1527,15 +1527,12 @@ private theorem card_do_eq_card_int (a b δ : ℝ) (φ : ℝ → ℝ) :
   rw [hbind, Finset.filter_image,
     Finset.card_image_of_injective _ (fun x y h => by exact_mod_cast h)]
 
-/-- **Lemma 4.2** (writeup 426–461): derivative-band counting, faithful public statement.
+/-- Explicit band-counting constant `C = 112` for `bands_count`. -/
+def Cbands : ℝ := 112
 
-The writeup's `log(T/δ)`-many dyadic bands are replaced by a **fixed `O(1)`-many** band partition
-(thresholds `√(δT)/N`, `√T/N`, `T/(4N)`), giving the log-free conclusion.  The `(K+1)` factor comes
-from splitting `[a,b]` into `≤ (#zeros of φ'')+1 ≤ K+1` constant-sign-`φ''` intervals (on which
-`φ'` is monotone).  The trivial regime `T ≤ 4δ` is handled by the crude length bound
-(`bands_count_trivial`); the active regime `4δ < T` is the band decomposition
-(`bands_count_active`).  Constant `C = 64`. -/
-theorem bands_count : ∃ C : ℝ, 0 < C ∧
+/-- **Lemma 4.2** (writeup 426–461), constant-explicit form: the `bands_count` bound with the
+named constant `Cbands` in place of the existentially-quantified `C`. -/
+theorem bands_count_explicit :
     ∀ (N T δ a b : ℝ) (K : ℕ) (φ : ℝ → ℝ),
       0 < N → 0 < T → 0 < δ → Set.Icc a b ⊆ Set.Icc N (3 * N) → ContDiff ℝ 2 φ →
       (∀ x ∈ Set.Icc a b, |deriv φ x| ≤ T / N) →
@@ -1544,8 +1541,8 @@ theorem bands_count : ∃ C : ℝ, 0 < C ∧
       (Set.Icc a b ∩ {x | iteratedDeriv 2 φ x = 0}).Finite →
       (Set.Icc a b ∩ {x | iteratedDeriv 2 φ x = 0}).ncard ≤ K →
       (((Finset.Icc ⌈a⌉ ⌊b⌋).filter (fun n => distInt (φ (n : ℝ)) ≤ δ)).card : ℝ)
-        ≤ C * ((K : ℝ) + 1) * (N * (δ + Real.sqrt (δ / T)) + T + 1) := by
-  refine ⟨112, by norm_num, ?_⟩
+        ≤ Cbands * ((K : ℝ) + 1) * (N * (δ + Real.sqrt (δ / T)) + T + 1) := by
+  unfold Cbands
   intro N T δ a b K φ hN hT hδ hsub hcd hd1 hlower hz1 hz2fin hz2
   -- Convert the public monadic-coerced count to the honest `Finset ℤ` form.
   rw [show (((Finset.Icc ⌈a⌉ ⌊b⌋).filter (fun n => distInt (φ (n : ℝ)) ≤ δ)).card : ℝ)
@@ -1567,5 +1564,25 @@ theorem bands_count : ∃ C : ℝ, 0 < C ∧
   · -- Active regime.
     have htriv' : 4 * δ < T := lt_of_not_ge htriv
     exact bands_count_active N T δ a b K φ hN hT hδ hsub hcd hd1 hlower hz1 hz2fin hz2 htriv'
+
+/-- **Lemma 4.2** (writeup 426–461): derivative-band counting, faithful public statement.
+
+The writeup's `log(T/δ)`-many dyadic bands are replaced by a **fixed `O(1)`-many** band partition
+(thresholds `√(δT)/N`, `√T/N`, `T/(4N)`), giving the log-free conclusion.  The `(K+1)` factor comes
+from splitting `[a,b]` into `≤ (#zeros of φ'')+1 ≤ K+1` constant-sign-`φ''` intervals (on which
+`φ'` is monotone).  The trivial regime `T ≤ 4δ` is handled by the crude length bound
+(`bands_count_trivial`); the active regime `4δ < T` is the band decomposition
+(`bands_count_active`).  Constant `C = 64`. -/
+theorem bands_count : ∃ C : ℝ, 0 < C ∧
+    ∀ (N T δ a b : ℝ) (K : ℕ) (φ : ℝ → ℝ),
+      0 < N → 0 < T → 0 < δ → Set.Icc a b ⊆ Set.Icc N (3 * N) → ContDiff ℝ 2 φ →
+      (∀ x ∈ Set.Icc a b, |deriv φ x| ≤ T / N) →
+      (∀ x ∈ Set.Icc a b, T / N ≤ |deriv φ x| + N * |iteratedDeriv 2 φ x|) →
+      (Set.Icc a b ∩ {x | deriv φ x = 0}).ncard ≤ K →
+      (Set.Icc a b ∩ {x | iteratedDeriv 2 φ x = 0}).Finite →
+      (Set.Icc a b ∩ {x | iteratedDeriv 2 φ x = 0}).ncard ≤ K →
+      (((Finset.Icc ⌈a⌉ ⌊b⌋).filter (fun n => distInt (φ (n : ℝ)) ≤ δ)).card : ℝ)
+        ≤ C * ((K : ℝ) + 1) * (N * (δ + Real.sqrt (δ / T)) + T + 1) :=
+  ⟨Cbands, by unfold Cbands; norm_num, bands_count_explicit⟩
 
 end Squarefree.Counting

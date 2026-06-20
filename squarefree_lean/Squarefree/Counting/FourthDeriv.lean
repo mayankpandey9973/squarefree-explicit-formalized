@@ -20,19 +20,21 @@ open Classical Finset Squarefree.FiniteDiff Set
 
 namespace Squarefree.Counting
 
+/-- The explicit constant of **Lemma 2.1** (`fourthDeriv_count`) as a function of `K`. -/
+noncomputable def C_fourthDeriv (K : ℝ) : ℝ :=
+  max ((4 * (2 ^ 70 * K)) ^ (1/8 : ℝ) + (4 * (2 ^ 70 * K)) ^ (1/15 : ℝ)) 1
+
 set_option maxHeartbeats 1200000 in
-/-- **Lemma 2.1** (writeup 84–194): 4th-derivative counting via 3-fold differencing.
-Generalized from `|f⁗| ≤ 2Λ` to `|f⁗| ≤ K·Λ`; the constant `C` may depend on `K` (the
-cross-term genuinely carries `K`, so a single absolute constant is impossible). -/
-theorem fourthDeriv_count : ∀ (K : ℝ), 1 ≤ K → ∃ C : ℝ, 0 < C ∧
+/-- **Lemma 2.1** (writeup 84–194), explicit-constant form: the constant is `C_fourthDeriv K`.
+See `fourthDeriv_count` for the existential wrapper. -/
+theorem fourthDeriv_count_explicit (K : ℝ) (hK1 : 1 ≤ K) :
     ∀ (N Λ δ : ℝ) (f : ℝ → ℝ),
       2 ≤ N → 0 < δ → δ < 1/4 → 0 < Λ → ContDiffOn ℝ 4 f (Set.Ioo 0 (4 * N)) →
       (∀ x ∈ Set.Icc N (3 * N), Λ ≤ |iteratedDeriv 4 f x|) →
       (∀ x ∈ Set.Icc N (3 * N), |iteratedDeriv 4 f x| ≤ K * Λ) →
       (((Finset.Ioc ⌊N⌋ ⌊2 * N⌋).filter (fun (n : ℤ) => distInt (f (n : ℝ)) ≤ δ)).card : ℝ)
-        ≤ C * (N ^ (7/8 : ℝ) + N * δ ^ (1/8 : ℝ)
+        ≤ C_fourthDeriv K * (N ^ (7/8 : ℝ) + N * δ ^ (1/8 : ℝ)
                + N ^ (7/8 : ℝ) * (δ / Λ) ^ (1/8 : ℝ) + Λ ^ (1/15 : ℝ) * N) := by
-  intro K hK1
   -- The combined budget multiplier for `four_case_bound`: `2^70 · K` (final_combine gives
   -- budget `(2^70·K)·(…)`).
   set Kfc : ℝ := 2 ^ 70 * K with hKfcdef
@@ -40,14 +42,16 @@ theorem fourthDeriv_count : ∀ (K : ℝ), 1 ≤ K → ∃ C : ℝ, 0 < C ∧
     rw [hKfcdef]; calc (1:ℝ) = 1 * 1 := by ring
       _ ≤ 2 ^ 70 * K := by
           apply mul_le_mul (one_le_pow₀ (by norm_num : (1:ℝ) ≤ 2)) hK1 (by norm_num) (by positivity)
-  obtain ⟨C₀, hC₀pos, hC₀⟩ :
-      ∃ C : ℝ, 0 < C ∧ ∀ M N Λ δ : ℝ, 0 < M → 1 ≤ N → 0 < Λ → 0 < δ →
-        M ^ 8 ≤ Kfc * (N ^ 7 + Λ * N ^ 15 / M ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) →
-        M ≤ C * (N ^ (7/8 : ℝ) + N * δ ^ (1/8 : ℝ)
-               + N ^ (7/8 : ℝ) * (δ / Λ) ^ (1/8 : ℝ) + Λ ^ (1/15 : ℝ) * N) := by
-    refine ⟨(4*Kfc) ^ (1/8 : ℝ) + (4*Kfc) ^ (1/15 : ℝ), by positivity, ?_⟩
-    exact four_case_bound Kfc hKfc1
-  refine ⟨max C₀ 1, by positivity, ?_⟩
+  set C₀ : ℝ := (4*Kfc) ^ (1/8 : ℝ) + (4*Kfc) ^ (1/15 : ℝ) with hC₀def
+  have hC₀pos : 0 < C₀ := by rw [hC₀def]; positivity
+  have hC₀ : ∀ M N Λ δ : ℝ, 0 < M → 1 ≤ N → 0 < Λ → 0 < δ →
+      M ^ 8 ≤ Kfc * (N ^ 7 + Λ * N ^ 15 / M ^ 7 + N ^ 8 * δ + N ^ 7 * δ / Λ) →
+      M ≤ C₀ * (N ^ (7/8 : ℝ) + N * δ ^ (1/8 : ℝ)
+             + N ^ (7/8 : ℝ) * (δ / Λ) ^ (1/8 : ℝ) + Λ ^ (1/15 : ℝ) * N) := by
+    rw [hC₀def]; exact four_case_bound Kfc hKfc1
+  have hbridge : C_fourthDeriv K = max C₀ 1 := by
+    unfold C_fourthDeriv; rw [hC₀def, hKfcdef]
+  rw [hbridge]
   intro N Λ δ f hN hδ hδ4 hΛ hf hlb hub
   have hNpos : (0:ℝ) < N := by linarith
   have hN1 : (1:ℝ) ≤ N := by linarith
@@ -459,5 +463,20 @@ theorem fourthDeriv_count : ∀ (K : ℝ), 1 ≤ K → ∃ C : ℝ, 0 < C ∧
       hMreal hN1 hΛ hδ (by linarith) hK1 hÑpos hÑ2N hP1 hPbd hM8ub
     -- `final_combine` gives the budget multiplier `2^70·K = Kfc`.
     rw [hKfcdef]; exact this
+
+/-- **Lemma 2.1** (writeup 84–194): 4th-derivative counting via 3-fold differencing.
+Generalized from `|f⁗| ≤ 2Λ` to `|f⁗| ≤ K·Λ`; the constant `C` may depend on `K` (the
+cross-term genuinely carries `K`, so a single absolute constant is impossible). -/
+theorem fourthDeriv_count : ∀ (K : ℝ), 1 ≤ K → ∃ C : ℝ, 0 < C ∧
+    ∀ (N Λ δ : ℝ) (f : ℝ → ℝ),
+      2 ≤ N → 0 < δ → δ < 1/4 → 0 < Λ → ContDiffOn ℝ 4 f (Set.Ioo 0 (4 * N)) →
+      (∀ x ∈ Set.Icc N (3 * N), Λ ≤ |iteratedDeriv 4 f x|) →
+      (∀ x ∈ Set.Icc N (3 * N), |iteratedDeriv 4 f x| ≤ K * Λ) →
+      (((Finset.Ioc ⌊N⌋ ⌊2 * N⌋).filter (fun (n : ℤ) => distInt (f (n : ℝ)) ≤ δ)).card : ℝ)
+        ≤ C * (N ^ (7/8 : ℝ) + N * δ ^ (1/8 : ℝ)
+               + N ^ (7/8 : ℝ) * (δ / Λ) ^ (1/8 : ℝ) + Λ ^ (1/15 : ℝ) * N) :=
+  fun K hK1 => ⟨C_fourthDeriv K,
+    by unfold C_fourthDeriv; exact lt_of_lt_of_le one_pos (le_max_right _ _),
+    fourthDeriv_count_explicit K hK1⟩
 
 end Squarefree.Counting
