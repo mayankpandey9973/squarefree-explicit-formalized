@@ -6,9 +6,12 @@ squarefree_lean/.lake/
 # scratch
 squarefree_lean/tmp/
 
-# visualizer runtime state (keep tools/*.py, tools/*.sh, progress/index.html)
-squarefree_lean/progress/status.json
-squarefree_lean/progress/*.pid
-squarefree_lean/progress/*.log
-squarefree_lean/progress/bootstrap.done
-squarefree_lean/progress/.lakebuild.lock
+# non-Lean files (untracked 2026-06-20: repo tracks only Lean source + Lake infrastructure)
+/.claude/
+/CLAUDE.md
+/explicit_writeup.md
+/formalization_plan.md
+/math_audit.md
+squarefree_lean/formalization_plan.md
+squarefree_lean/progress/
+squarefree_lean/tools/
