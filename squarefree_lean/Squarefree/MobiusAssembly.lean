@@ -814,7 +814,7 @@ private lemma sqrt_diff_le (X H : ℝ) (hX : 0 < X) (hH : 0 ≤ H) :
 /-- **Final short-interval estimate.**  Assembles `count_master` with `H = X^{(1-g)/5}`,
 `D₁ = ⌊X^{(1-g)/10}⌋ ≈ √H`, and the per-block bound `B = (C_k+1)·H/X^{u_k}+1` (`C_k, u_k` from
 `key_dyadic_assembly`) into the headline bound `|S − (6/π²)H| ≤ C·H/X^u`. -/
-theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
+theorem count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
     ∃ u : ℝ, 0 < u ∧ ∃ C : ℝ, 0 < C ∧ ∃ X₀ : ℝ, ∀ X : ℝ, X₀ ≤ X →
       |(∑ n ∈ Finset.Icc ⌈X⌉ ⌊X + X ^ ((1 - g) / 5)⌋,
             (if Squarefree n.toNat then (1 : ℝ) else 0))

@@ -21,14 +21,14 @@ open Classical Finset
 namespace Squarefree
 
 /-- §1 key estimate: every dyadic scale `H/U ≪ D ≪ X^{1/2}` has `#𝒟[D,2D] ≪ H/U`. -/
-theorem key_dyadic_estimate (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
+theorem key_dyadic_estimate (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
     ∃ u : ℝ, 0 < u ∧ ∃ C : ℝ, 0 < C ∧ ∃ X₀ : ℝ, ∀ X : ℝ, X₀ ≤ X →
       ∀ D : ℝ, X ^ ((1 - g) / 5) / X ^ u ≤ D → D ≤ X ^ (1/2 : ℝ) →
         (dCard X (X ^ ((1 - g) / 5)) D : ℝ) ≤ C * X ^ ((1 - g) / 5) / X ^ u :=
   key_dyadic_assembly g hg hg'
 
 /-- Main analytic theorem (§Theorem): `∑_{X≤n≤X+H} μ²(n) = 6/π² · H + O(H/U)`. -/
-theorem squarefree_count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
+theorem squarefree_count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
     ∃ u : ℝ, 0 < u ∧ ∃ C : ℝ, 0 < C ∧ ∃ X₀ : ℝ, ∀ X : ℝ, X₀ ≤ X →
       |(∑ n ∈ Finset.Icc ⌈X⌉ ⌊X + X ^ ((1 - g) / 5)⌋,
             (if Squarefree n.toNat then (1 : ℝ) else 0))
@@ -36,24 +36,24 @@ theorem squarefree_count_short_interval (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18
         ≤ C * X ^ ((1 - g) / 5) / X ^ u :=
   Squarefree.Mob.count_short_interval g hg hg'
 
-/-- Theorem 10.1: a squarefree number in `[X, X + X^{1/5 − 2/94885 + ε}]` for large `X`. -/
+/-- Theorem 10.1: a squarefree number in `[X, X + X^{1/5 − 2/90935 + ε}]` for large `X`. -/
 theorem theorem_10_1 (ε : ℝ) (hε : 0 < ε) :
     ∃ X₀ : ℝ, ∀ X : ℝ, X₀ ≤ X →
-      ∃ n : ℕ, Squarefree n ∧ (X : ℝ) ≤ (n : ℝ) ∧ (n : ℝ) ≤ X + X ^ (1/5 - 2/94885 + ε : ℝ) := by
-  -- Step 1: WLOG ε small.  Set ε' := min ε (1/94885); then 0 < ε' ≤ ε and ε' < 2/94885.
-  set ε' : ℝ := min ε (1 / 94885) with hε'def
+      ∃ n : ℕ, Squarefree n ∧ (X : ℝ) ≤ (n : ℝ) ∧ (n : ℝ) ≤ X + X ^ (1/5 - 2/90935 + ε : ℝ) := by
+  -- Step 1: WLOG ε small.  Set ε' := min ε (1/90935); then 0 < ε' ≤ ε and ε' < 2/90935.
+  set ε' : ℝ := min ε (1 / 90935) with hε'def
   have hε'pos : 0 < ε' := lt_min hε (by norm_num)
   have hε'le : ε' ≤ ε := min_le_left _ _
-  have hε'lt : ε' < 2 / 94885 := by
-    have : ε' ≤ 1 / 94885 := min_le_right _ _
+  have hε'lt : ε' < 2 / 90935 := by
+    have : ε' ≤ 1 / 90935 := min_le_right _ _
     linarith
-  -- Step 2: g := 2/18977 - 5·ε'.  Then 0 < g < 2/18977 and (1-g)/5 = 1/5 - 2/94885 + ε'.
-  set g : ℝ := 2 / 18977 - 5 * ε' with hgdef
+  -- Step 2: g := 2/18187 - 5·ε'.  Then 0 < g < 2/18187 and (1-g)/5 = 1/5 - 2/90935 + ε'.
+  set g : ℝ := 2 / 18187 - 5 * ε' with hgdef
   have hg : 0 < g := by
     rw [hgdef]; nlinarith [hε'lt]
-  have hg' : g < 2 / 18977 := by
+  have hg' : g < 2 / 18187 := by
     rw [hgdef]; linarith [hε'pos]
-  have hexp : (1 - g) / 5 = 1 / 5 - 2 / 94885 + ε' := by
+  have hexp : (1 - g) / 5 = 1 / 5 - 2 / 90935 + ε' := by
     rw [hgdef]; ring
   -- Step 3: invoke the counting theorem.
   obtain ⟨u, hu, C, hC, X₀, hX₀⟩ := squarefree_count_short_interval g hg hg'
@@ -66,7 +66,7 @@ theorem theorem_10_1 (ε : ℝ) (hε : 0 < ε) :
   have hX1 : X₁ ≤ X := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hX
   have hX1' : (1 : ℝ) ≤ X := le_trans (le_max_right _ _) hX
   have hXpos : (0 : ℝ) < X := lt_of_lt_of_le one_pos hX1'
-  -- H := X^((1-g)/5) = X^(1/5 - 2/94885 + ε') and H > 0.
+  -- H := X^((1-g)/5) = X^(1/5 - 2/90935 + ε') and H > 0.
   set H : ℝ := X ^ ((1 - g) / 5) with hHdef
   have hHpos : 0 < H := Real.rpow_pos_of_pos hXpos _
   -- From the counting bound, |S - 6/π²·H| ≤ C·H/X^u.
@@ -135,13 +135,13 @@ theorem theorem_10_1 (ε : ℝ) (hε : 0 < ε) :
     have hXle : (X : ℝ) ≤ (⌈X⌉ : ℝ) := Int.le_ceil X
     have : ((⌈X⌉ : ℤ) : ℝ) ≤ (n : ℝ) := by exact_mod_cast hnlo
     linarith
-  · -- n.toNat ≤ X + X^(1/5-2/94885+ε) : from n ≤ ⌊X+H⌋ ≤ X+H and H ≤ X^(...+ε).
+  · -- n.toNat ≤ X + X^(1/5-2/90935+ε) : from n ≤ ⌊X+H⌋ ≤ X+H and H ≤ X^(...+ε).
     rw [hcast]
     have hnle : (n : ℝ) ≤ (⌊X + H⌋ : ℝ) := by exact_mod_cast hnhi
     have hfloor : (⌊X + H⌋ : ℝ) ≤ X + H := Int.floor_le (X + H)
-    -- H = X^((1-g)/5) = X^(1/5-2/94885+ε') ≤ X^(1/5-2/94885+ε).
-    have hHval : H = X ^ (1 / 5 - 2 / 94885 + ε' : ℝ) := by rw [hHdef, hexp]
-    have hHle : H ≤ X ^ (1 / 5 - 2 / 94885 + ε : ℝ) := by
+    -- H = X^((1-g)/5) = X^(1/5-2/90935+ε') ≤ X^(1/5-2/90935+ε).
+    have hHval : H = X ^ (1 / 5 - 2 / 90935 + ε' : ℝ) := by rw [hHdef, hexp]
+    have hHle : H ≤ X ^ (1 / 5 - 2 / 90935 + ε : ℝ) := by
       rw [hHval]
       exact Real.rpow_le_rpow_of_exponent_le hX1' (by linarith [hε'le])
     linarith

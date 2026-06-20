@@ -114,7 +114,7 @@ those residuals `T₁`-scale, off the tight budget by `≍ G·U^{1/2}`; f₂ sta
 ⚠ DO NOT BUMP: `G·U^2` sits at the `hrel143` boundary — the Err discharge needs
 `sec7_relErrF·10^143 ≤ 1`, and `relErr·G·U^2 ≍ X^{-1/5}` has only ~1.5 orders of slack there.
 A larger power (or `>~32×` constant) breaks `sec7_relErrF_le`. Results-invariant as-is:
-`prop_7_1`/`prop_7_3` and `δ=2/94885` are residual-magnitude-independent. -/
+`prop_7_1`/`prop_7_3` and `δ=2/90935` are residual-magnitude-independent. -/
 noncomputable def sec7_cGU (P : Globals) (_S : Scale P) : ℝ := P.G * P.U ^ 2
 
 /-- Loosened f₁/f₃ relative-error scale.  After the `hG10x`-deletion re-pin this is the

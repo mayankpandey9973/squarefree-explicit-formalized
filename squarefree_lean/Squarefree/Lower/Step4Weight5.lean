@@ -57,13 +57,13 @@ private theorem ra_step4_ssum_collapse_add90
     (hdc : dc = P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4 * Real.sqrt L)
     (hcEnn : 0 ≤ cE)
     (hEA : cE * b * ((N : ℝ) * Real.sqrt (N : ℝ))
-        ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
+        ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
     (hEB : cE * dc * (N : ℝ)
-        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27))) :
+        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27))) :
     (∑ n ∈ Finset.Icc 1 N, weight4add b ev dc cE (n : ℝ))
       ≤ 48 * C * (P.H / S.Δ) *
-          ( P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-          + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27) ) := by
+          ( P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+          + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27) ) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -73,8 +73,8 @@ private theorem ra_step4_ssum_collapse_add90
   have hbnn : 0 ≤ b := by rw [hb]; positivity
   have hevnn : 0 ≤ ev := by rw [hev]; positivity
   have hdcnn : 0 ≤ dc := by rw [hdc]; positivity
-  set g75 : ℝ := P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13) with hg75
-  set g90 : ℝ := S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27) with hg90
+  set g75 : ℝ := P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13) with hg75
+  set g90 : ℝ := S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27) with hg90
   have hg75nn : 0 ≤ g75 := by rw [hg75]; positivity
   have hg90nn : 0 ≤ g90 := by rw [hg90]; positivity
   have hsharp := ra_step4_ssum_collapse' (P := P) (S := S) h1 hΔreg hG1 hU1 hΔ1 hH1 hΩU hUbig
@@ -169,21 +169,21 @@ theorem ra_step4_ssum_collapse5
     (hdc : dc = P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4 * Real.sqrt L)
     (hcEnn : 0 ≤ cE) (hcE₂nn : 0 ≤ cE₂) (hcCnn : 0 ≤ cC)
     (hEA : cE * b * ((N : ℝ) * Real.sqrt (N : ℝ))
-        ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
+        ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
     (hEB : cE * dc * (N : ℝ)
-        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
+        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
     (hEC : cE₂ * b * (N : ℝ) ^ 2
-        ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
+        ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
     (hED : cE₂ * dc * ((N : ℝ) * Real.sqrt (N : ℝ))
-        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
+        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
     (hEE : cC * b * (N : ℝ)
-        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
+        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
     (hEF : cC * dc * (2 * Real.sqrt (N : ℝ))
-        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27))) :
+        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27))) :
     (∑ n ∈ Finset.Icc 1 N, weight5 b ev dc cE cE₂ cC (n : ℝ))
       ≤ 80 * C * (P.H / S.Δ) *
-          ( P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-          + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27) ) := by
+          ( P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+          + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27) ) := by
   -- positivity scaffolding
   have hGpos := P.G_pos
   have hUpos := P.U_pos
@@ -224,8 +224,8 @@ theorem ra_step4_ssum_collapse5
       (mul_nonneg hcE₂nn hbnn) (mul_nonneg hcE₂nn hdcnn)
       (mul_nonneg hcCnn hdcnn) N
   -- nonnegativity of the two faithful monomial blocks
-  have hm75 : 0 ≤ C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by positivity
-  have hm95 : 0 ≤ C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
+  have hm75 : 0 ≤ C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by positivity
+  have hm95 : 0 ≤ C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
     positivity
   -- assemble: 48 + (8 + 8 + 8 + 8) = 80 with room (56·g75 + 72·g95 ≤ 80·(g75 + g95))
   rw [e1]
@@ -258,17 +258,17 @@ theorem ra_step4_range_add5
     (hdc : dc = P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4 * Real.sqrt L)
     (hcEnn : 0 ≤ cE) (hcE₂nn : 0 ≤ cE₂) (hcCnn : 0 ≤ cC)
     (hEA : cE * b * ((N : ℝ) * Real.sqrt (N : ℝ))
-        ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
+        ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
     (hEB : cE * dc * (N : ℝ)
-        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
+        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
     (hEC : cE₂ * b * (N : ℝ) ^ 2
-        ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
+        ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
     (hED : cE₂ * dc * ((N : ℝ) * Real.sqrt (N : ℝ))
-        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
+        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
     (hEE : cC * b * (N : ℝ)
-        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
+        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
     (hEF : cC * dc * (2 * Real.sqrt (N : ℝ))
-        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
+        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
     (K : ℝ) (hK : 0 ≤ K)
     (Rng : Finset ℕ) (sOf : ℕ → ℕ)
     (hsmaps : ∀ r ∈ Rng, sOf r ∈ Finset.Icc 1 N)
@@ -277,8 +277,8 @@ theorem ra_step4_range_add5
           ≤ K * weight5 b ev dc cE cE₂ cC (n : ℝ)) :
     (Rng.card : ℝ)
       ≤ 80 * K * C * (P.H / S.Δ) *
-          ( P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-          + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27) ) := by
+          ( P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+          + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27) ) := by
   classical
   have hmaps : (Rng : Set ℕ).MapsTo sOf (Finset.Icc 1 N) := fun r hr => hsmaps r hr
   have hcard : Rng.card = ∑ n ∈ Finset.Icc 1 N, (Rng.filter (fun r => sOf r = n)).card :=
@@ -297,11 +297,11 @@ theorem ra_step4_range_add5
     hcCnn hEA hEB hEC hED hEE hEF
   calc K * (∑ n ∈ Finset.Icc 1 N, weight5 b ev dc cE cE₂ cC (n : ℝ))
       ≤ K * (80 * C * (P.H / S.Δ) *
-          ( P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-          + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27) )) :=
+          ( P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+          + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27) )) :=
         mul_le_mul_of_nonneg_left hcollapse hK
     _ = 80 * K * C * (P.H / S.Δ) *
-          ( P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-          + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27) ) := by ring
+          ( P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+          + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27) ) := by ring
 
 end Squarefree

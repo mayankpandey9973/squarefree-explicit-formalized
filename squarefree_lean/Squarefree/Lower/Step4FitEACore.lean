@@ -41,7 +41,7 @@ theorem step4_fitEA_coreA
     (hG1 : 1 ≤ P.G) (hΩU : S.Ω ≤ P.U) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
     (C : ℝ) (hC : 1 ≤ C) (W : ℝ) (hW : W ≤ 10 ^ 11 * (P.G ^ 5 * P.U ^ 25)) :
     22 * 10 ^ 82 * C * P.H * P.G ^ 6 * P.U ^ 40 * W / (S.Δ ^ 2 * S.Ω ^ 9)
-      ≤ C ^ 2 * P.H * P.G ^ 15 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
+      ≤ C ^ 2 * P.H * P.G ^ 14 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -68,9 +68,9 @@ theorem step4_fitEA_coreA
         gcongr ?_ * ?_ * (C * P.H * P.G ^ 11 * P.U ^ 65 * (S.Δ ^ 2 * S.Ω ^ 9))
         exact le_trans h22 hU3
     _ = C * P.H * P.G ^ 11 * P.U ^ 72 * (S.Δ ^ 2 * S.Ω ^ 9) := by ring
-    _ ≤ C ^ 2 * P.H * P.G ^ 15 * P.U ^ 75 * (S.Δ ^ 2 * S.Ω ^ 9) := by
+    _ ≤ C ^ 2 * P.H * P.G ^ 14 * P.U ^ 75 * (S.Δ ^ 2 * S.Ω ^ 9) := by
         have hCsq : C ≤ C ^ 2 := by nlinarith
-        have hG' : P.G ^ 11 ≤ P.G ^ 15 := pow_le_pow_right₀ hG1 (by norm_num)
+        have hG' : P.G ^ 11 ≤ P.G ^ 14 := pow_le_pow_right₀ hG1 (by norm_num)
         have hU' : P.U ^ 72 ≤ P.U ^ 75 := pow_le_pow_right₀ (le_trans (by norm_num) hUbig)
           (by norm_num)
         gcongr ?_ * P.H * ?_ * ?_ * (S.Δ ^ 2 * S.Ω ^ 9)
@@ -83,7 +83,7 @@ theorem step4_fitEA_coreB
     (C : ℝ) (hC : 1 ≤ C) (K W : ℝ) (hK : K ≤ (10:ℝ) ^ 97)
     (hW0 : 0 ≤ W) (hW : W ≤ 10 ^ 15 * (P.G ^ 7 * P.U ^ 35)) :
     K * C * P.G ^ 5 * P.U ^ 40 * W / S.Ω ^ 12
-      ≤ C ^ 2 * P.H * P.G ^ 15 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
+      ≤ C ^ 2 * P.H * P.G ^ 14 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -110,9 +110,9 @@ theorem step4_fitEA_coreB
     _ ≤ P.H * (C * P.G ^ 11 * P.U ^ 70 * S.Ω ^ 12) := by
         gcongr ?_ * (C * P.G ^ 11 * P.U ^ 70 * S.Ω ^ 12)
     _ = C * P.H * P.G ^ 11 * P.U ^ 70 * S.Ω ^ 12 := by ring
-    _ ≤ C ^ 2 * P.H * P.G ^ 15 * P.U ^ 75 * S.Ω ^ 12 := by
+    _ ≤ C ^ 2 * P.H * P.G ^ 14 * P.U ^ 75 * S.Ω ^ 12 := by
         have hCsq : C ≤ C ^ 2 := by nlinarith
-        have hG' : P.G ^ 11 ≤ P.G ^ 15 := pow_le_pow_right₀ hG1 (by norm_num)
+        have hG' : P.G ^ 11 ≤ P.G ^ 14 := pow_le_pow_right₀ hG1 (by norm_num)
         have hU' : P.U ^ 70 ≤ P.U ^ 75 := pow_le_pow_right₀ (le_trans (by norm_num) hUbig)
           (by norm_num)
         gcongr ?_ * P.H * ?_ * ?_ * S.Ω ^ 12
@@ -159,7 +159,7 @@ theorem step4_fitEA_coreF
     (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
     (C : ℝ) (hC : 0 ≤ C) (W : ℝ) (hW : W ≤ 10 ^ 24 * (P.G ^ 11 * P.U ^ 55)) :
     528 * 10 ^ 101 * C * P.U ^ 40 * P.G ^ 5 * W / (S.Δ * P.H * S.Ω ^ 19)
-      ≤ C * P.H * P.G ^ 15 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
+      ≤ C * P.H * P.G ^ 14 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -168,7 +168,7 @@ theorem step4_fitEA_coreF
   have hH' : P.G * P.U ^ 10 * S.Δ ^ 2 ≤ P.H := by
     rw [← le_div_iff₀ (by positivity)]; exact h1
   have hpay := band_pay6 (P := P) (S := S) hband hΩU
-  have hG1315 : P.G ^ 13 ≤ P.G ^ 15 := pow_le_pow_right₀ hG1 (by norm_num)
+  have hG1315 : P.G ^ 13 ≤ P.G ^ 14 := pow_le_pow_right₀ hG1 (by norm_num)
   have hKfit3 : 528 * 10 ^ 125 * (P.G ^ 3 * P.U ^ 8) ≤ S.Δ ^ 3 := by
     have hU52 : (10:ℝ) ^ 47 ≤ P.U ^ 52 := by
       calc (10:ℝ) ^ 47 ≤ (10:ℝ) ^ 1716 := pow_le_pow_right₀ (by norm_num) (by norm_num)
@@ -215,7 +215,7 @@ theorem step4_fitEA_coreF
         mul_le_mul_of_nonneg_left
           (mul_le_mul_of_nonneg_right hH' (by positivity)) hHpos.le
     _ = C * P.H * P.G ^ 13 * P.U ^ 75 * (S.Δ * P.H * S.Ω ^ 19) := by ring
-    _ ≤ C * P.H * P.G ^ 15 * P.U ^ 75 * (S.Δ * P.H * S.Ω ^ 19) := by
+    _ ≤ C * P.H * P.G ^ 14 * P.U ^ 75 * (S.Δ * P.H * S.Ω ^ 19) := by
         gcongr C * P.H * ?_ * P.U ^ 75 * (S.Δ * P.H * S.Ω ^ 19)
 
 /-- P4-core: the capped `p₂` degree-4 summand monomial fraction fits the `C¹`-block,
@@ -227,7 +227,7 @@ theorem step4_fitEA_coreP4
     (hband : 1 ≤ P.G * P.U ^ 3 * S.Ω ^ 4) (hUbig : (10:ℝ) ^ 33 ≤ P.U)
     (C : ℝ) (hC : 0 ≤ C) (W : ℝ) (hW : W ≤ 2 * 10 ^ 22 * (P.G ^ 10 * P.U ^ 50)) :
     1694 * 10 ^ 141 * C * P.G ^ 6 * P.U ^ 50 * W / (S.Δ ^ 2 * S.Ω ^ 24)
-      ≤ C * P.H * P.G ^ 15 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
+      ≤ C * P.H * P.G ^ 14 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -244,18 +244,18 @@ theorem step4_fitEA_coreP4
       _ ≤ (P.G * P.U ^ 10) * S.Δ ^ 2 := mul_le_mul_of_nonneg_left hΔ2 (by positivity)
       _ = P.G * P.U ^ 10 * S.Δ ^ 2 := by ring
       _ ≤ P.H := hH'
-  have hscal : 3388 * 10 ^ 163 * (P.G ^ 4 * P.U ^ 35) ≤ P.H := by
+  have hscal : 3388 * 10 ^ 163 * (P.G ^ 5 * P.U ^ 35) ≤ P.H := by
     have hU15 : (3388:ℝ) * 10 ^ 109 ≤ P.U ^ 15 := by
       calc (3388:ℝ) * 10 ^ 109 ≤ (10:ℝ) ^ 113 := by norm_num
         _ ≤ (10:ℝ) ^ 495 := pow_le_pow_right₀ (by norm_num) (by norm_num)
         _ = ((10:ℝ) ^ 33) ^ 15 := by rw [← pow_mul]
         _ ≤ P.U ^ 15 := pow_le_pow_left₀ (by norm_num) hUbig 15
-    have hG49 : P.G ^ 4 ≤ P.G ^ 9 := pow_le_pow_right₀ hG1 (by norm_num)
-    calc 3388 * 10 ^ 163 * (P.G ^ 4 * P.U ^ 35)
-        = 10 ^ 54 * (3388 * 10 ^ 109) * (P.G ^ 4 * P.U ^ 35) := by ring
-      _ ≤ 10 ^ 54 * P.U ^ 15 * (P.G ^ 4 * P.U ^ 35) := by
-          gcongr 10 ^ 54 * ?_ * (P.G ^ 4 * P.U ^ 35)
-      _ = 10 ^ 54 * (P.G ^ 4 * P.U ^ 50) := by ring
+    have hG49 : P.G ^ 5 ≤ P.G ^ 9 := pow_le_pow_right₀ hG1 (by norm_num)
+    calc 3388 * 10 ^ 163 * (P.G ^ 5 * P.U ^ 35)
+        = 10 ^ 54 * (3388 * 10 ^ 109) * (P.G ^ 5 * P.U ^ 35) := by ring
+      _ ≤ 10 ^ 54 * P.U ^ 15 * (P.G ^ 5 * P.U ^ 35) := by
+          gcongr 10 ^ 54 * ?_ * (P.G ^ 5 * P.U ^ 35)
+      _ = 10 ^ 54 * (P.G ^ 5 * P.U ^ 50) := by ring
       _ ≤ 10 ^ 54 * (P.G ^ 9 * P.U ^ 50) := by
           gcongr 10 ^ 54 * (?_ * P.U ^ 50)
       _ ≤ P.H := hH54
@@ -271,10 +271,10 @@ theorem step4_fitEA_coreP4
     _ ≤ (3388 * 10 ^ 163 * (C * P.G ^ 16 * P.U ^ 100 * S.Δ ^ 2 * S.Ω ^ 13))
           * (P.G ^ 3 * P.U ^ 10 * S.Ω ^ 11) :=
         mul_le_mul_of_nonneg_left hpay (by positivity)
-    _ = (3388 * 10 ^ 163 * (P.G ^ 4 * P.U ^ 35))
-          * (C * P.G ^ 15 * P.U ^ 75 * S.Δ ^ 2 * S.Ω ^ 24) := by ring
-    _ ≤ P.H * (C * P.G ^ 15 * P.U ^ 75 * S.Δ ^ 2 * S.Ω ^ 24) :=
+    _ = (3388 * 10 ^ 163 * (P.G ^ 5 * P.U ^ 35))
+          * (C * P.G ^ 14 * P.U ^ 75 * S.Δ ^ 2 * S.Ω ^ 24) := by ring
+    _ ≤ P.H * (C * P.G ^ 14 * P.U ^ 75 * S.Δ ^ 2 * S.Ω ^ 24) :=
         mul_le_mul_of_nonneg_right hscal (by positivity)
-    _ = C * P.H * P.G ^ 15 * P.U ^ 75 * (S.Δ ^ 2 * S.Ω ^ 24) := by ring
+    _ = C * P.H * P.G ^ 14 * P.U ^ 75 * (S.Δ ^ 2 * S.Ω ^ 24) := by ring
 
 end Squarefree

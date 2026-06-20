@@ -353,7 +353,7 @@ theorem sec7_relErr_le {P : Globals} {S : Scale P}
     have h' : P.X ≤ 1 := not_lt.mp h
     have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
     linarith
-  have hbud' : 18977 * P.g + 18675 * P.u ≤ 2 := by
+  have hbud' : 18187 * P.g + 18675 * P.u ≤ 2 := by
     have hCu0 : 0 ≤ Cu := le_trans zero_le_one hsd.hCu
     have hextra : 0 ≤ 790 * Cu * P.u := by
       nlinarith [mul_nonneg hCu0 hu0.le]
@@ -451,7 +451,7 @@ theorem sec7_relErrF_le {P : Globals} {S : Scale P} {W : ℝ}
     (hUbig : (10 : ℝ) ^ 33 ≤ P.U) :
     sec7_relErrF P S * 10 ^ 143 ≤ 1 := by
   -- admissibility consequence of the budget: `u ≤ 2/18675`
-  have hb : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hb : 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have hCu1 : (1 : ℝ) ≤ Cu := hsd.hCu
   have hCuu_nn : (0 : ℝ) ≤ Cu * P.u := mul_nonneg (le_trans zero_le_one hCu1) hu0.le
   have hu_le : P.u ≤ 2 / 18675 := by nlinarith [hb, hg0, hCuu_nn]

@@ -48,7 +48,7 @@ private theorem sec7_hxsmall (P : Globals) (S : Scale P) (c₀ Cu : ℝ)
     have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
     linarith
   have hCu := D.hCu
-  have hbud' : 18977 * P.g + (16995 + 790 * Cu) * P.u ≤ 2 := by
+  have hbud' : 18187 * P.g + (16995 + 790 * Cu) * P.u ≤ 2 := by
     have h := hbud
     unfold OnStripAux.Budget at h
     nlinarith only [h, mul_nonneg (by norm_num : (0:ℝ) ≤ 1680) hu]
@@ -320,7 +320,7 @@ private theorem sec7_zero_hsub2 {P : Globals} {S : Scale P} (c₀ Cu : ℝ)
     have h' : P.X ≤ 1 := not_lt.mp h
     have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
     linarith
-  have hbud' : 18977 * P.g + 18675 * P.u ≤ 2 := by
+  have hbud' : 18187 * P.g + 18675 * P.u ≤ 2 := by
     have hCu0 : 0 ≤ Cu := le_trans zero_le_one hsd.hCu
     have hextra : 0 ≤ 790 * Cu * P.u := by
       nlinarith only [mul_nonneg hCu0 hu0.le]
@@ -409,7 +409,7 @@ private theorem sec7_zero_hGΩ5F {P : Globals} {S : Scale P} (c₀ Cu : ℝ)
       have h1 : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h.le (by norm_num)
       have : (16777216 : ℝ) ≤ 1 := le_trans hX24 h1
       norm_num at this
-  have hbud' : 18977 * P.g + 18675 * P.u ≤ 2 := by
+  have hbud' : 18187 * P.g + 18675 * P.u ≤ 2 := by
     have hCu0 : 0 ≤ Cu := le_trans zero_le_one hsd.hCu
     have hextra : 0 ≤ 790 * Cu * P.u := by
       nlinarith only [mul_nonneg hCu0 hu0.le]
@@ -976,7 +976,7 @@ private theorem sec7_cCal_delta1_lt_one {P : Globals} {S : Scale P} {W : ℝ}
     have h' : P.X ≤ 1 := not_lt.mp h
     have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
     linarith
-  have hbud' : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hbud' : 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have huCu : (0:ℝ) ≤ P.u * Cu := mul_nonneg hu0.le (by linarith [hsd.hCu])
   have huCu1 : (0:ℝ) ≤ P.u * (Cu - 1) := mul_nonneg hu0.le (by linarith [hsd.hCu])
   have e1 : P.H ^ ((1:ℝ)/2) * S.x ^ ((5:ℝ)/2) * S.Ω ^ 2

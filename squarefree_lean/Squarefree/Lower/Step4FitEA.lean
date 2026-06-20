@@ -29,7 +29,7 @@ theorem step4_fitEA_T1
         + 10 ^ 13 * ℓ₁ * S.Δ ^ 3 / (P.H * P.G ^ 2 * S.Ω ^ 6))
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     (10 ^ 10 * a * P.G * S.Ω ^ 3 * gap / S.Δ ^ 2) * b * m
-      ≤ 2 * (C ^ 2 * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))) := by
+      ≤ 2 * (C ^ 2 * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -116,11 +116,11 @@ theorem step4_fitEA_T1
             * (ℓ₁ ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁))) / (S.Δ ^ 2 * S.Ω ^ 9)
         + 11 * 10 ^ 83 * C * P.G ^ 5 * P.U ^ 40
             * (ℓ₁ ^ 4 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁))) / S.Ω ^ 12 := hsplit
-    _ ≤ C ^ 2 * P.H * P.G ^ 15 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13)
-        + C ^ 2 * P.H * P.G ^ 15 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) :=
+    _ ≤ C ^ 2 * P.H * P.G ^ 14 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13)
+        + C ^ 2 * P.H * P.G ^ 14 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) :=
         add_le_add (step4_fitEA_coreA hG1 hΩU hUbig C hC _ hW1)
           (step4_fitEA_coreB h1 hG1 hΩU hUbig C hC _ _ (by norm_num) hW20 hW2)
-    _ = 2 * (C ^ 2 * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))) := by
+    _ = 2 * (C ^ 2 * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))) := by
         field_simp
         ring
 
@@ -137,7 +137,7 @@ theorem step4_fitEA_T2
     (a : ℝ) (ha_hi : a ≤ 11 * S.A)
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     (10 ^ 35 * a * P.G * S.Ω ^ 3 * ℓ₂ * S.B ^ 2 / (S.Δ ^ 2 * S.D)) * b * m
-      ≤ C ^ 2 * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
+      ≤ C ^ 2 * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -198,8 +198,8 @@ theorem step4_fitEA_T2
 
 /-- Target normalization: the `8·C·(H/Δ)·t`-block as a single fraction. -/
 theorem step4_fitEA_target_eq (C : ℝ) :
-    8 * C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))
-      = 8 * C * P.H * P.G ^ 15 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
+    8 * C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))
+      = 8 * C * P.H * P.G ^ 14 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
   have hΔne : S.Δ ≠ 0 := ne_of_gt S.Δ_pos
   have hΩne : S.Ω ≠ 0 := ne_of_gt S.Ω_pos
   field_simp
@@ -224,7 +224,7 @@ theorem step4_fitEA_T1'
         + 10 ^ 13 * ℓ₁ * S.Δ ^ 3 / (P.H * P.G ^ 2 * S.Ω ^ 6))
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     (10 ^ 10 * a * P.G * S.Ω ^ 3 * gap / S.Δ ^ 2) * b * m
-      ≤ 2 * (C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))) := by
+      ≤ 2 * (C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))) := by
   have hCpos : (0:ℝ) < C := lt_of_lt_of_le one_pos hC
   have hCne : C ≠ 0 := ne_of_gt hCpos
   have hm' : m / C ≤ 10 ^ 60 * 1 * ℓ₁ ^ 3 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * P.G * P.U ^ 25 / S.Ω ^ 8 := by
@@ -237,9 +237,9 @@ theorem step4_fitEA_T1'
   calc (10 ^ 10 * a * P.G * S.Ω ^ 3 * gap / S.Δ ^ 2) * b * m
       = C * ((10 ^ 10 * a * P.G * S.Ω ^ 3 * gap / S.Δ ^ 2) * b * (m / C)) := by
         field_simp
-    _ ≤ C * (2 * (1 ^ 2 * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))) :=
+    _ ≤ C * (2 * (1 ^ 2 * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))) :=
         mul_le_mul_of_nonneg_left h hCpos.le
-    _ = 2 * (C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))) := by ring
+    _ = 2 * (C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))) := by ring
 
 /-- **Hybrid fit, T2 summand, `C¹` form.** Scale `step4_fitEA_T2` at `C := 1`, `m := m/C`. -/
 theorem step4_fitEA_T2'
@@ -253,7 +253,7 @@ theorem step4_fitEA_T2'
     (a : ℝ) (ha_hi : a ≤ 11 * S.A)
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     (10 ^ 35 * a * P.G * S.Ω ^ 3 * ℓ₂ * S.B ^ 2 / (S.Δ ^ 2 * S.D)) * b * m
-      ≤ C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
+      ≤ C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
   have hCpos : (0:ℝ) < C := lt_of_lt_of_le one_pos hC
   have hCne : C ≠ 0 := ne_of_gt hCpos
   have hm' : m / C ≤ 10 ^ 60 * 1 * ℓ₁ ^ 3 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * P.G * P.U ^ 25 / S.Ω ^ 8 := by
@@ -266,8 +266,8 @@ theorem step4_fitEA_T2'
   calc (10 ^ 35 * a * P.G * S.Ω ^ 3 * ℓ₂ * S.B ^ 2 / (S.Δ ^ 2 * S.D)) * b * m
       = C * ((10 ^ 35 * a * P.G * S.Ω ^ 3 * ℓ₂ * S.B ^ 2 / (S.Δ ^ 2 * S.D)) * b * (m / C)) := by
         field_simp
-    _ ≤ C * (1 ^ 2 * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))) :=
+    _ ≤ C * (1 ^ 2 * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))) :=
         mul_le_mul_of_nonneg_left h hCpos.le
-    _ = C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by ring
+    _ = C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by ring
 
 end Squarefree

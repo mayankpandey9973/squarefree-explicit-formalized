@@ -177,7 +177,7 @@ private theorem log_absorb_sq (P : Globals) (hu : 0 ≤ P.u)
 
 /-- **The §7 full envelope at `W = 10⁻²⁵·X^{-2u}·Wnz`** (Sec7Envelope discharge on the strip).
 All 25 power-form entries close from the single uniform budget `Budget g u Cu`
-(`18977g + (18675+790·Cu)u ≤ 2`), exactly as `admissibleW_Wnz`; the `ε = 10⁻²⁵` prefactor
+(`18187g + (18675+790·Cu)u ≤ 2`), exactly as `admissibleW_Wnz`; the `ε = 10⁻²⁵` prefactor
 absorbs `sec7_envC = 10²⁰⁰` since every entry power is `k ≥ 8`, and the `X^{-2u}` deflation
 kills the AM-7 logs on the ten top-carry entries (`log_absorb`). -/
 theorem sec7Envelope_Wnz (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripData P S c₀ Cu)
@@ -185,7 +185,7 @@ theorem sec7Envelope_Wnz (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripD
     (hX24 : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ)) (hlog : Real.log P.X ≤ P.X ^ P.u) :
     Sec7Envelope P S ((10:ℝ) ^ (-25 : ℤ) * P.X ^ (-(2:ℝ) * P.u) * Wnz P S) := by
   have hCu := D.hCu
-  have hbud' : 18977 * P.g + (16995 + 790 * Cu) * P.u ≤ 2 := by
+  have hbud' : 18187 * P.g + (16995 + 790 * Cu) * P.u ≤ 2 := by
     have h := hbud
     unfold Budget at h
     nlinarith [mul_nonneg (by norm_num : (0:ℝ) ≤ 1680) hu]

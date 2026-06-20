@@ -133,7 +133,7 @@ theorem regime_omega_H (P : Globals) (S : Scale P) (hX : 1 ≤ P.X)
 theorem regime_Hbig (P : Globals) (S : Scale P) (Cu : ℝ) (hCu : (232:ℝ) ≤ Cu)
     (hX : 1 ≤ P.X) (hu0 : 0 < P.u) (hG1 : 1 ≤ P.G) (hΩU : S.Ω ≤ P.U)
     (hUbig : (10:ℝ) ^ 33 ≤ P.U)
-    (hlarge : P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x) :
+    (hlarge : P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x) :
     10 ^ 121 * (S.Δ ^ 4 * P.G ^ 5 * P.U ^ 45) ≤ P.H ^ 2 * S.Ω ^ 14 := by
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hG := P.G_pos; have hU := P.U_pos; have hH := P.H_pos
@@ -142,7 +142,7 @@ theorem regime_Hbig (P : Globals) (S : Scale P) (Cu : ℝ) (hCu : (232:ℝ) ≤ 
   have hΔ2 := delta_sq_edge_le P S Cu hlarge
   have hΔ2' : S.Δ ^ 2 ≤ P.H * (P.G ^ (-5/2 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))) := by
     refine hΔ2.trans (mul_le_mul_of_nonneg_left ?_ hH.le)
-    have hGw : P.G ^ (-17 : ℝ) ≤ P.G ^ (-5/2 : ℝ) :=
+    have hGw : P.G ^ (-16 : ℝ) ≤ P.G ^ (-5/2 : ℝ) :=
       Real.rpow_le_rpow_of_exponent_le hG1 (by norm_num)
     exact mul_le_mul_of_nonneg_right
       (mul_le_mul_of_nonneg_right hGw (Real.rpow_nonneg hΩ.le _))

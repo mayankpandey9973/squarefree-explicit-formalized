@@ -100,7 +100,7 @@ Threshold constant changed from the verbatim `D^{4/3}/X^{1/3}` to `D^{4/3}/(4 X^
 (`= ½·(D⁴/(8X))^{1/3}`, still `≍ D^{4/3}/X^{1/3}`, faithful). Added regime hypotheses (all hold
 for `X` large in the paper's range): `8HD ≤ X`, `1025 H ≤ D`, `64 H³ ≤ X D²`, `U ≤ H`. -/
 theorem a_decomposition (P : Globals) (D : ℝ)
-    (hX1 : 1 ≤ P.X) (hg : 0 < P.g) (hg' : P.g < 2 / 18977) (_hu : 0 < P.u)
+    (hX1 : 1 ≤ P.X) (hg : 0 < P.g) (hg' : P.g < 2 / 18187) (_hu : 0 < P.u)
     (_hD1 : P.H * P.X ^ (1 / 100 : ℝ) ≤ D) (hD2 : D ≤ P.X ^ (1 / 2 : ℝ))
     (hHD : 8 * P.H * D ≤ P.X) (hDlarge : 1025 * P.H ≤ D)
     (hEps : 64 * P.H ^ 3 ≤ P.X * D ^ 2) (hHU : P.U ≤ P.H) :

@@ -31,8 +31,8 @@ theorem Bcombine_eq (ℓ₁ ℓ₂ : ℕ) :
         + P.G ^ 5 * P.U ^ 35 / (S.Δ ^ ((1 : ℝ) / 2) * S.Ω ^ 8)
         + S.Δ ^ 2 * P.G ^ ((15 : ℝ) / 2) * P.U ^ ((95 : ℝ) / 2) / (P.H * S.Ω ^ 8)
         + P.G ^ 7 * P.U ^ 35 / (S.Δ ^ ((1 : ℝ) / 2) * S.Ω)
-        + P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-        + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27) ) := by
+        + P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+        + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27) ) := by
   have hGpos := P.G_pos; have hUpos := P.U_pos; have hΔpos := S.Δ_pos
   set g := P.G ^ ((1 : ℝ) / 4) with hgdef
   set u := P.U ^ ((1 : ℝ) / 4) with hudef
@@ -45,8 +45,8 @@ theorem Bcombine_eq (ℓ₁ ℓ₂ : ℕ) :
         + g ^ 20 * u ^ 140 / (dl * ω ^ 8)
         + dl ^ 4 * g ^ 30 * u ^ 190 / (P.H * ω ^ 8)
         + g ^ 28 * u ^ 140 / (dl * ω)
-        + g ^ 60 * u ^ 300 / (dl ^ 2 * ω ^ 13)
-        + dl ^ 4 * g ^ 60 * u ^ 360 / (P.H * ω ^ 27) ) := rfl
+        + g ^ 56 * u ^ 300 / (dl ^ 2 * ω ^ 13)
+        + dl ^ 4 * g ^ 56 * u ^ 360 / (P.H * ω ^ 27) ) := rfl
   have hg16 : g ^ 16 = P.G ^ 4 := by
     rw [hgdef, ← Real.rpow_natCast (P.G ^ ((1:ℝ)/4)) 16, ← Real.rpow_mul hGpos.le,
       show ((1:ℝ)/4) * (16 : ℕ) = ((4 : ℕ) : ℝ) by push_cast; ring, Real.rpow_natCast]
@@ -59,9 +59,9 @@ theorem Bcombine_eq (ℓ₁ ℓ₂ : ℕ) :
   have hg30 : g ^ 30 = P.G ^ ((15 : ℝ) / 2) := by
     rw [hgdef, ← Real.rpow_natCast (P.G ^ ((1:ℝ)/4)) 30, ← Real.rpow_mul hGpos.le]
     norm_num
-  have hg60 : g ^ 60 = P.G ^ 15 := by
-    rw [hgdef, ← Real.rpow_natCast (P.G ^ ((1:ℝ)/4)) 60, ← Real.rpow_mul hGpos.le,
-      show ((1:ℝ)/4) * (60 : ℕ) = ((15 : ℕ) : ℝ) by push_cast; ring, Real.rpow_natCast]
+  have hg56 : g ^ 56 = P.G ^ 14 := by
+    rw [hgdef, ← Real.rpow_natCast (P.G ^ ((1:ℝ)/4)) 56, ← Real.rpow_mul hGpos.le,
+      show ((1:ℝ)/4) * (56 : ℕ) = ((14 : ℕ) : ℝ) by push_cast; ring, Real.rpow_natCast]
   have hu60 : u ^ 60 = P.U ^ 15 := by
     rw [hudef, ← Real.rpow_natCast (P.U ^ ((1:ℝ)/4)) 60, ← Real.rpow_mul hUpos.le,
       show ((1:ℝ)/4) * (60 : ℕ) = ((15 : ℕ) : ℝ) by push_cast; ring, Real.rpow_natCast]
@@ -86,7 +86,7 @@ theorem Bcombine_eq (ℓ₁ ℓ₂ : ℕ) :
   have hdl4 : dl ^ 4 = S.Δ ^ 2 := by
     rw [hdldef, ← Real.rpow_natCast (S.Δ ^ ((1:ℝ)/2)) 4, ← Real.rpow_mul hΔpos.le,
       show ((1:ℝ)/2) * (4 : ℕ) = ((2 : ℕ) : ℝ) by push_cast; ring, Real.rpow_natCast]
-  rw [hBeq, hg16, hg20, hg28, hg30, hg60, hu60, hu140, hu180, hu190, hu300, hu360,
+  rw [hBeq, hg16, hg20, hg28, hg30, hg56, hu60, hu140, hu180, hu190, hu300, hu360,
     hωdef, hdl4, hdl2, hdldef]
 
 set_option maxHeartbeats 3200000 in
@@ -103,8 +103,8 @@ theorem perpair_sum_le_Bcombine {ℓ₁ ℓ₂ : ℕ} (hℓ1 : 0 < ℓ₁) (hℓ
             * ((S.Δ ^ 2 / P.H) * P.G ^ ((15 : ℝ) / 2) * P.U ^ ((95 : ℝ) / 2) / S.Ω ^ 8)
           + (P.H / S.Δ) * (P.G ^ 7 * P.U ^ 35 / (S.Δ ^ ((1 : ℝ) / 2) * S.Ω)))
       + 80 * (2 * 10 ^ 322) * 10 ^ 57 * (P.H / S.Δ) *
-          (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-            + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27))
+          (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+            + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27))
       ≤ Bcombine P S ℓ₁ ℓ₂ := by
   have hGpos := P.G_pos; have hUpos := P.U_pos; have hΔpos := S.Δ_pos
   have hHpos := P.H_pos; have hΩpos := S.Ω_pos
@@ -139,8 +139,8 @@ theorem perpair_sum_le_Bcombine {ℓ₁ ℓ₂ : ℕ} (hℓ1 : 0 < ℓ₁) (hℓ
       * (S.Δ ^ 2 * P.G ^ ((15:ℝ)/2) * P.U ^ ((95:ℝ)/2) / (P.H * S.Ω ^ 8)) := by positivity
   have hX5 : (0:ℝ) ≤ (P.H / S.Δ) * (P.G ^ 7 * P.U ^ 35 / (S.Δ ^ ((1:ℝ)/2) * S.Ω)) := by
     positivity
-  have hX6 : (0:ℝ) ≤ (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by positivity
-  have hX7 : (0:ℝ) ≤ (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
+  have hX6 : (0:ℝ) ≤ (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by positivity
+  have hX7 : (0:ℝ) ≤ (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
     positivity
   -- split the LHS groups into the seven slot shapes (pure `ring` in the field)
   have he2 : (10:ℝ) ^ 408 * ((P.H / S.Δ) * ((S.Δ ^ 2 / P.H) * P.G ^ 5 * P.U ^ 45 / S.Ω ^ 14)
@@ -156,11 +156,11 @@ theorem perpair_sum_le_Bcombine {ℓ₁ ℓ₂ : ℕ} (hℓ1 : 0 < ℓ₁) (hℓ
         + 10 ^ 258 * ((P.H / S.Δ)
             * (P.G ^ 7 * P.U ^ 35 / (S.Δ ^ ((1:ℝ)/2) * S.Ω))) := by ring
   have he4 : 80 * (2 * (10:ℝ) ^ 322) * 10 ^ 57 * (P.H / S.Δ) *
-        (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-          + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27))
-      = 160 * 10 ^ 379 * ((P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
+        (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+          + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27))
+      = 160 * 10 ^ 379 * ((P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
         + 160 * 10 ^ 379
-            * ((P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27))) := by
+            * ((P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27))) := by
     rw [show (80 : ℝ) * (2 * 10 ^ 322) * 10 ^ 57 = 160 * 10 ^ 379 from by norm_num]
     ring
   rw [he1, he2, he3, he4]
@@ -171,16 +171,16 @@ theorem perpair_sum_le_Bcombine {ℓ₁ ℓ₂ : ℕ} (hℓ1 : 0 < ℓ₁) (hℓ
         + P.G ^ 5 * P.U ^ 35 / (S.Δ ^ ((1 : ℝ) / 2) * S.Ω ^ 8)
         + S.Δ ^ 2 * P.G ^ ((15 : ℝ) / 2) * P.U ^ ((95 : ℝ) / 2) / (P.H * S.Ω ^ 8)
         + P.G ^ 7 * P.U ^ 35 / (S.Δ ^ ((1 : ℝ) / 2) * S.Ω)
-        + P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-        + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27) )
+        + P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+        + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27) )
     = 10 ^ 409 * ((P.H / S.Δ) * (P.G ^ 4 * P.U ^ 15 / (S.Δ * S.Ω ^ 2)) * w)
       + 10 ^ 409 * ((P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 5 * P.U ^ 45 / (P.H * S.Ω ^ 14)))
       + 10 ^ 409 * ((P.H / S.Δ) * (P.G ^ 5 * P.U ^ 35 / (S.Δ ^ ((1:ℝ)/2) * S.Ω ^ 8)))
       + 10 ^ 409 * ((P.H / S.Δ)
           * (S.Δ ^ 2 * P.G ^ ((15:ℝ)/2) * P.U ^ ((95:ℝ)/2) / (P.H * S.Ω ^ 8)))
       + 10 ^ 409 * ((P.H / S.Δ) * (P.G ^ 7 * P.U ^ 35 / (S.Δ ^ ((1:ℝ)/2) * S.Ω)))
-      + 10 ^ 409 * ((P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
-      + 10 ^ 409 * ((P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
+      + 10 ^ 409 * ((P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
+      + 10 ^ 409 * ((P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
     from by ring]
   linarith [hX1, hX2, hX3, hX4, hX5, hX6, hX7]
 

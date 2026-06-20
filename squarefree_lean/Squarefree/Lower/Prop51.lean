@@ -58,8 +58,8 @@ theorem prop_5_1 : ∃ C : ℝ, 0 < C ∧
         ≤ P.G ^ 3 * P.U ^ 15 * Real.sqrt S.Δ * S.Ω) →
       (Ra.card : ℝ) ≤ C * (P.H / S.Δ) *
         ( P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
-        + P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
-        + (S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27 ) := by
+        + P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
+        + (S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27 ) := by
   refine ⟨10 ^ 415, by positivity, ?_⟩
   intro P S a ha hAD hGHΩ Ra hwit hreg1 hreg2 hpop hG1 hU1 hΔ1 hH1 hΩU hband hX
     hUcal hDeW hHbig hδbud haA1 haA2 hΩH hlogcap

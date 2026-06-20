@@ -11,7 +11,7 @@ The §9 core needs, on the unresolved strip
 * the 21 admissibility entries `Wnz ≤ m_k` for the §7 envelope `AdmissibleW P S Wnz` with `c = 1`,
   where `Wnz = H^{1/84}x^{5/84}G^{1/7}Ω^{11/21}` is the `e14` monomial (the strip minimum), plus
   `R > 1`, `T₁ > 1`;
-* the closing LP arithmetic reducing `(A+1)(1+φ)(1+H/A²)(R/Wnz) ≤ C·H/U` to `18977g+15315u<2`.
+* the closing LP arithmetic reducing `(A+1)(1+φ)(1+H/A²)(R/Wnz) ≤ C·H/U` to `18187g+15315u<2`.
 
 These keep `Opt/Global.lean`'s elaboration small.  See `explicit_writeup.md` §9 (2083–2221) and
 `math_audit.md` §9.  Every exponent here is reproduced in the route audit.
@@ -67,7 +67,7 @@ structure StripData (P : Globals) (S : Scale P) (c₀ Cu : ℝ) : Prop where
   hc₀ : 1 ≤ c₀
   hCu : 1 ≤ Cu
   hxlo : P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u)) ≤ S.x
-  hxhi : S.x ≤ P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u)
+  hxhi : S.x ≤ P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u)
   hΩlo : c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω
   hΩhi : S.Ω ≤ P.U
 
@@ -78,7 +78,7 @@ private theorem x_pow_lb (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripD
     (if 0 ≤ b then
       P.G ^ (-2*b) * S.Ω ^ (-11/2*b) * P.X ^ (-(Cu*P.u)*b)
      else
-      P.G ^ (17*b) * S.Ω ^ (-26*b) * P.X ^ ((Cu*P.u)*b)) ≤ S.x ^ b := by
+      P.G ^ (16*b) * S.Ω ^ (-26*b) * P.X ^ ((Cu*P.u)*b)) ≤ S.x ^ b := by
   have hx := x_pos P S
   have hG := P.G_pos; have hΩ := S.Ω_pos; have hX := P.X_pos
   by_cases hb : 0 ≤ b
@@ -94,14 +94,14 @@ private theorem x_pow_lb (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripD
     exact e.symm
   · rw [if_neg hb]
     have hble : b ≤ 0 := not_le.mp hb |>.le
-    have h1 : S.x ^ b ≥ (P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u)) ^ b :=
+    have h1 : S.x ^ b ≥ (P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u)) ^ b :=
       Real.rpow_le_rpow_of_nonpos (by positivity) D.hxhi hble
     refine le_trans (le_of_eq ?_) h1
-    have e : (P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u)) ^ b
-        = P.G ^ ((17:ℝ)*b) * S.Ω ^ ((-26:ℝ)*b) * P.X ^ ((Cu*P.u)*b) := by
+    have e : (P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u)) ^ b
+        = P.G ^ ((16:ℝ)*b) * S.Ω ^ ((-26:ℝ)*b) * P.X ^ ((Cu*P.u)*b) := by
       rw [Real.mul_rpow (by positivity) (Real.rpow_nonneg hX.le _),
           Real.mul_rpow (by positivity) (Real.rpow_nonneg hΩ.le _),
-          ← Real.rpow_natCast P.G 17, ← Real.rpow_mul hG.le, ← Real.rpow_mul hΩ.le,
+          ← Real.rpow_natCast P.G 16, ← Real.rpow_mul hG.le, ← Real.rpow_mul hΩ.le,
           ← Real.rpow_mul hX.le]
       norm_num
     exact e.symm
@@ -151,7 +151,7 @@ worst `x`-edge (per sign of `B`) and then the worst `Ω`-edge (per sign of the r
 `Ω`-exponent).  A pure function of `g, u, Cu, A, B, C, cD`. -/
 noncomputable def ratioExp (g u Cu A B C cD : ℝ) : ℝ :=
   (1 - g)/5 * A + g * C
-  + (if 0 ≤ B then g * (-2*B) else g * (17*B))
+  + (if 0 ≤ B then g * (-2*B) else g * (16*B))
   + (if 0 ≤ B then (-(Cu*u))*B else (Cu*u)*B)
   + (let Op := (if 0 ≤ B then (-11/2*B) else (-26*B)) + cD;
      if 0 ≤ Op then g * (-1/4*Op) + u * (-3/4*Op) else u * Op)
@@ -163,7 +163,7 @@ private theorem ratio_lb (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripD
       ≤ P.H ^ A * S.x ^ B * P.G ^ C * S.Ω ^ cD := by
   have hH := P.H_pos; have hG := P.G_pos; have hΩ := S.Ω_pos; have hx := x_pos P S
   have hX := P.X_pos
-  set xG : ℝ := if 0 ≤ B then -2*B else 17*B with hxG
+  set xG : ℝ := if 0 ≤ B then -2*B else 16*B with hxG
   set xX : ℝ := if 0 ≤ B then (-(Cu*P.u))*B else (Cu*P.u)*B with hxX
   set xOm : ℝ := if 0 ≤ B then -11/2*B else -26*B with hxOm
   set Op : ℝ := xOm + cD with hOp
@@ -271,27 +271,27 @@ theorem T1_mono (P : Globals) (S : Scale P) :
   field_simp
 
 /-- The uniform on-strip `(g,u,Cu)`-budget that discharges every monomial comparison, the
-`R>1`/`T₁>1` exponents, and the closing LP.  The `g`-coefficient is the sharp `18977` (so the
-range is the full `g < 2/18977`); all `X^{O(u)}` bookkeeping (the `2u` fiber factor, Prop 7.3's
+`R>1`/`T₁>1` exponents, and the closing LP.  The `g`-coefficient is the sharp `18187` (so the
+range is the full `g < 2/18187`); all `X^{O(u)}` bookkeeping (the `2u` fiber factor, Prop 7.3's
 `X^{O(u)}`, and the strip-edge `X^{±Cu·u}`) lives purely in the `u`-coefficient `18675 + 790·Cu`
 (G1 ruling AM-7: the envelope's `(1+log X)` is killed by an extra `X^{-2u}` in the caller's `W`,
 whose `X^{+2u}` re-enters the closing LP — `+1680` on the `u`-coefficient, sympy-verified).
 The RHS is the sharp `2` (the binding `H·A` closing term needs exactly `≤ 2`), so the budget
-admits every `g < 2/18977` via a small `u > 0`. -/
-def Budget (g u Cu : ℝ) : Prop := 18977 * g + (18675 + 790 * Cu) * u ≤ 2
+admits every `g < 2/18187` via a small `u > 0`. -/
+def Budget (g u Cu : ℝ) : Prop := 18187 * g + (18675 + 790 * Cu) * u ≤ 2
 
 /-- **The §7 admissibility envelope at the §9 bottleneck `Wnz`** (with constant `c = 1`).
 Every entry `e0k` is `Wnz ≤ m_k` (the strip minimum), via `Wnz_le_mono`; `R>1`, `T₁>1` via
 `one_le_mono`.  All 22 facts close from the single uniform budget
-`18977g + (16995 + 790·Cu)u ≤ 199/100`.  For the 20 non-binding comparisons this is far stronger
+`18187g + (16995 + 790·Cu)u ≤ 199/100`.  For the 20 non-binding comparisons this is far stronger
 than needed: each has an affine exponent `α_k − β_k·g − (γ_k + δ_k·Cu)·u ≥ 0` with `β_k ≥ 0` and
-corner slack `α_k − β_k·(2/18977) ≥ 0.00122 > 0`, so `g ≤ 2/18977` (implied, since the `u`-term is
+corner slack `α_k − β_k·(2/18187) ≥ 0.00122 > 0`, so `g ≤ 2/18187` (implied, since the `u`-term is
 `≥ 0`) plus the resulting pure-`u` bound suffices. -/
 noncomputable def admissibleW_Wnz (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripData P S c₀ Cu)
     (hXgt : 1 < P.X) (hg : 0 ≤ P.g) (hu : 0 ≤ P.u) (hbud : Budget P.g P.u Cu) :
     AdmissibleW P S (Wnz P S) := by
   have hCu := D.hCu
-  have hbud' : 18977 * P.g + (16995 + 790 * Cu) * P.u ≤ 2 := by
+  have hbud' : 18187 * P.g + (16995 + 790 * Cu) * P.u ≤ 2 := by
     have h := hbud
     unfold Budget at h
     linarith [mul_nonneg (by norm_num : (0:ℝ) ≤ 1680) hu]
@@ -361,17 +361,17 @@ noncomputable def admissibleW_Wnz (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D
 `v ≤ vhi` for `δ ≥ 0`, `v ≥ vlo` for `δ ≤ 0`. -/
 private theorem x_pow_ub (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripData P S c₀ Cu)
     (b : ℝ) :
-    S.x ^ b ≤ (if 0 ≤ b then P.G ^ (17*b) * S.Ω ^ (-26*b) * P.X ^ ((Cu*P.u)*b)
+    S.x ^ b ≤ (if 0 ≤ b then P.G ^ (16*b) * S.Ω ^ (-26*b) * P.X ^ ((Cu*P.u)*b)
               else P.G ^ (-2*b) * S.Ω ^ (-11/2*b) * P.X ^ (-(Cu*P.u)*b)) := by
   have hx := x_pos P S; have hG := P.G_pos; have hΩ := S.Ω_pos; have hX := P.X_pos
   by_cases hb : 0 ≤ b
   · rw [if_pos hb]
-    have h1 : S.x ^ b ≤ (P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u)) ^ b :=
+    have h1 : S.x ^ b ≤ (P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u)) ^ b :=
       Real.rpow_le_rpow hx.le D.hxhi hb
     refine le_trans h1 (le_of_eq ?_)
     rw [Real.mul_rpow (by positivity) (Real.rpow_nonneg hX.le _),
         Real.mul_rpow (by positivity) (Real.rpow_nonneg hΩ.le _),
-        ← Real.rpow_natCast P.G 17, ← Real.rpow_mul hG.le, ← Real.rpow_mul hΩ.le,
+        ← Real.rpow_natCast P.G 16, ← Real.rpow_mul hG.le, ← Real.rpow_mul hΩ.le,
         ← Real.rpow_mul hX.le]
     norm_num
   · rw [if_neg hb]
@@ -415,7 +415,7 @@ private theorem om_pow_ub (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : Strip
 /-- Worst-case (largest) `X`-exponent of `H^A x^B G^C Ω^D` on the strip. -/
 noncomputable def ratioExpU (g u Cu A B C cD : ℝ) : ℝ :=
   (1 - g)/5 * A + g * C
-  + (if 0 ≤ B then g * (17*B) else g * (-2*B))
+  + (if 0 ≤ B then g * (16*B) else g * (-2*B))
   + (if 0 ≤ B then (Cu*u)*B else (-(Cu*u))*B)
   + (let Op := (if 0 ≤ B then (-26*B) else (-11/2*B)) + cD;
      if 0 ≤ Op then u * Op else g * (-1/4*Op) + u * (-3/4*Op))
@@ -426,7 +426,7 @@ private theorem mono_ub (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripDa
     P.H ^ A * S.x ^ B * P.G ^ C * S.Ω ^ cD ≤ P.X ^ (ratioExpU P.g P.u Cu A B C cD) := by
   have hH := P.H_pos; have hG := P.G_pos; have hΩ := S.Ω_pos; have hx := x_pos P S
   have hX := P.X_pos
-  set xG : ℝ := if 0 ≤ B then 17*B else -2*B with hxG
+  set xG : ℝ := if 0 ≤ B then 16*B else -2*B with hxG
   set xX : ℝ := if 0 ≤ B then (Cu*P.u)*B else -(Cu*P.u)*B with hxX
   set xOm : ℝ := if 0 ≤ B then -26*B else -11/2*B with hxOm
   set Op : ℝ := xOm + cD with hOp
@@ -546,15 +546,15 @@ private theorem RW_mul (P : Globals) (S : Scale P) (a₂ b₂ c₂ d₂ : ℝ) :
   rw [Real.rpow_add hH, Real.rpow_add hx, Real.rpow_add hG, Real.rpow_add hΩ]; ring
 
 /-- **Closing LP** (Step D): on the strip, with the uniform budget
-`18977g + (18675 + 790·Cu)u ≤ 2`, the per-scale envelope
+`18187g + (18675 + 790·Cu)u ≤ 2`, the per-scale envelope
 `X^{2u}·(A+1)·(1+φ)·(1+H/A²)·(R/Wnz)` is `≤ 4·(1+c₀^{-8/3})·(H/U)`.  The leading `X^{2u}` is
 the AM-7 envelope `W`-deflation re-entering through `R/W`.  The binding `H·A` term has the
-sharp `g`-coefficient `18977` (writeup (9.3): `840·(9.3) = 18977g + 15315u − 2`, plus the `+2u`
+sharp `g`-coefficient `18187` (writeup (9.3): `840·(9.3) = 18187g + 15315u − 2`, plus the `+2u`
 fiber factor, the `+2u` deflation, and the `±Cu·u` strip edges absorbed into the
 `u`-coefficient: `15315 + 1680 + 1680 = 18675`, sympy-verified). -/
 theorem closing_bound (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (D : StripData P S c₀ Cu)
     (hg : 0 ≤ P.g) (hu : 0 < P.u)
-    (hbud : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2) :
+    (hbud : 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2) :
     P.X ^ (2 * P.u)
         * ((S.A + 1) * (1 + StripAux.fiberφ P S) * ((1 + P.H / S.A ^ 2) * (S.R / Wnz P S)))
       ≤ (4 * (1 + c₀ ^ (-8/3 : ℝ))) * (P.H / P.U) := by

@@ -11,7 +11,7 @@ The dichotomy is split by `Ω` against `c₀·G^{-1/4}U^{-3/4}` for a fixed abso
 `dblock_bound` (the writeup's `Ω ≫ G^{-1/4}U^{-3/4}` threshold, line 406):
 * `dblock_bound`     — `Ω ≥ c₀·G^{-1/4}U^{-3/4}` (the band): the lower edge makes Prop 3.2's
   fiber factor `1+Ω^{-8/3}G^{-2/3} ≤ X^{O(u)}`. Strip dichotomy internal (off-strip Props 5.1/6.1;
-  on-strip Prop 7.3 + `18977g+15315u<2`).
+  on-strip Prop 7.3 + `18187g+15315u<2`).
 * `dblock_small_omega` — `Ω ≤ c₀·G^{-1/4}U^{-3/4}` (below the band): the trivial Prop 3.2 bound
   (writeup lines 400–406), no §5/§6/§7. Works for any `c₀`, with `C` depending on `c₀`.
 
@@ -30,7 +30,7 @@ namespace Squarefree
 /-- In the §6 range, `10U ≤ H`: with `H = X^{(1-g)/5}`, `U = X^u`, the exponent gap
 `(1-g)/5 - u ≥ 1/100` and `X^{1/100} ≥ 16777216 ≥ 10`. -/
 private theorem five_U_le_H (P : Globals) (hX : (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ))
-    (hg : P.g < 2 / 18977) (hu : P.u ≤ 1 / 100) : 10 * P.U ≤ P.H := by
+    (hg : P.g < 2 / 18187) (hu : P.u ≤ 1 / 100) : 10 * P.U ≤ P.H := by
   have hX0 : 0 < P.X := P.X_pos
   -- X > 1 (else X^{1/100} ≤ 1 < 16777216)
   have hX1 : (1:ℝ) ≤ P.X := by
@@ -119,9 +119,9 @@ the opaque Prop 6.1 budget constant `StripAux.C6`):
 * `hCu : (3/2)·C6 + 232 ≤ Cu` (was `1 ≤ Cu`) — the edge cutoff must dominate the Prop 6.1
   budget (small-x term 2) and the Prop 5.1 `U^{100}` budget (large-x terms 3, +1·3).
 * `hubudget : (C6 + 100)·u ≤ 1/200 - 20·g` — the "shrink `u`" of the writeup (line 2079);
-  RHS `> 0` since `g < 2/18977`. -/
-theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
-    (u : ℝ) (hu0 : 0 < u) (hopt : 18977 * g + 15315 * u < 2) (hu2 : u ≤ 1 / 100)
+  RHS `> 0` since `g < 2/18187`. -/
+theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187)
+    (u : ℝ) (hu0 : 0 < u) (hopt : 18187 * g + 15315 * u < 2) (hu2 : u ≤ 1 / 100)
     (c₀ : ℝ) (hc₀ : 1 ≤ c₀) (Cu : ℝ) (hCu : (3/2) * StripAux.C6 + 232 ≤ Cu)
     (hubudget : (StripAux.C6 + 100) * u ≤ 1/200 - 20 * g) :
     ∃ C : ℝ, 0 < C ∧
@@ -134,7 +134,7 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
         2 * S.A ≤ S.D →
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω → S.Ω ≤ P.U →
         ( S.x ≤ P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u))
-          ∨ P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x ) →
+          ∨ P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x ) →
         ∀ D : ℝ, 0 < D → D = S.D → DBlock P S D ≤ C * P.H / P.U := by
   have hC6 := StripAux.C6_pos
   have hC5 := StripAux.C5_pos
@@ -364,17 +364,17 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
         exact Real.rpow_le_rpow hΩ.le hΩU (by norm_num)
       have hUm26 : P.U ^ (-26 : ℝ) = P.X ^ (P.u * (-26)) := by
         rw [Globals.U, ← Real.rpow_mul hX0.le]
-      have hG17e : (P.G : ℝ) ^ 17 = P.X ^ (P.g * 17) := by
-        rw [Globals.G, ← Real.rpow_natCast (P.X ^ P.g) 17, ← Real.rpow_mul hX0.le]; norm_num
+      have hG17e : (P.G : ℝ) ^ 16 = P.X ^ (P.g * 16) := by
+        rw [Globals.G, ← Real.rpow_natCast (P.X ^ P.g) 16, ← Real.rpow_mul hX0.le]; norm_num
       have h36 : 36 * P.u ≤ Cu * P.u :=
         mul_le_mul_of_nonneg_right (by linarith [hCuP, hC6]) hPu.le
       calc P.G * P.U ^ 10 = P.X ^ (P.g + P.u * 10) := hGUe
-        _ ≤ P.X ^ (17 * P.g + P.u * (-26) + Cu * P.u) := by
+        _ ≤ P.X ^ (16 * P.g + P.u * (-26) + Cu * P.u) := by
             apply Real.rpow_le_rpow_of_exponent_le hX
             linarith [h36, hg0']
-        _ = (P.G ^ 17) * (P.U ^ (-26 : ℝ)) * P.X ^ (Cu * P.u) := by
+        _ = (P.G ^ 16) * (P.U ^ (-26 : ℝ)) * P.X ^ (Cu * P.u) := by
             rw [hG17e, hUm26, ← Real.rpow_add hX0, ← Real.rpow_add hX0]; congr 1; ring
-        _ ≤ P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) := by
+        _ ≤ P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) := by
             apply mul_le_mul_of_nonneg_right _ (by positivity)
             apply mul_le_mul_of_nonneg_left hΩ26 (by positivity)
     -- prop_5_1 hyp (ii): G²U^5 ≤ Δ via Δ ≥ X^{1/100} ≥ G²U^5.
@@ -412,8 +412,8 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       hband6 hΩU hΔ1 hUbig hlog
     -- abbreviations for the three prop-5.1 terms
     set P1 : ℝ := P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω) with hP1def
-    set P2 : ℝ := P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13) with hP2def
-    set P3 : ℝ := (S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27 with hP3def
+    set P2 : ℝ := P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13) with hP2def
+    set P3 : ℝ := (S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27 with hP3def
     set RW : ℝ := S.R / P.Wval with hRWdef
     have hRpos : (0:ℝ) < S.R := by unfold Scale.R; positivity
     have hWpos2 : (0:ℝ) < P.Wval := by rw [StripAux.Wval_eq]; positivity
@@ -493,17 +493,17 @@ theorem dblock_off_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
       mul_le_mul_of_nonneg_right (by linarith [hCuP, hC6]) hPu.le
     have heM1 : 9 * P.g + 51 * P.u + (1/100 : ℝ) * (-1/2) ≤ -3 * P.u := by
       linarith [hbu', hC6u, hg0', hPu]
-    have heM2 : 17 * P.g + 85 * P.u + (1/100 : ℝ) * (-1) + (-P.g/4 - 3*P.u/4) * (-12) ≤ -3 * P.u := by
+    have heM2 : 16 * P.g + 85 * P.u + (1/100 : ℝ) * (-1) + (-P.g/4 - 3*P.u/4) * (-12) ≤ -3 * P.u := by
       rw [show (-P.g/4 - 3*P.u/4) * (-12) = 3*P.g + 9*P.u by ring]
       linarith [hbu', hC6u, hg0', hPu]
     have heM3 : 100 * P.u - Cu * P.u ≤ -3 * P.u := by linarith [h100]
     have heL1 : 9 * P.g + 51 * P.u + (1/100 : ℝ) * (-3/2) + (-P.g/4 - 3*P.u/4) * (-1) ≤ -3 * P.u := by
       rw [show (-P.g/4 - 3*P.u/4) * (-1) = P.g/4 + 3*P.u/4 by ring]
       linarith [hbu', hC6u, hg0', hPu]
-    have heL2 : 17 * P.g + 85 * P.u + (1/100 : ℝ) * (-2) + (-P.g/4 - 3*P.u/4) * (-13) ≤ -3 * P.u := by
+    have heL2 : 16 * P.g + 85 * P.u + (1/100 : ℝ) * (-2) + (-P.g/4 - 3*P.u/4) * (-13) ≤ -3 * P.u := by
       rw [show (-P.g/4 - 3*P.u/4) * (-13) = 13*P.g/4 + 39*P.u/4 by ring]
       linarith [hbu', hC6u, hg0', hPu]
-    have heL3 : (-(1 - P.g))/10 + 17 * P.g / 2 + 100 * P.u
+    have heL3 : (-(1 - P.g))/10 + 16 * P.g / 2 + 100 * P.u
         + (-P.g/4 - 3*P.u/4) * (-14) - Cu * P.u / 2 ≤ -3 * P.u := by
       rw [show (-P.g/4 - 3*P.u/4) * (-14) = 14*P.g/4 + 42*P.u/4 by ring]
       have h113 : 113 * P.u ≤ Cu * P.u / 2 := by
@@ -620,13 +620,13 @@ hypotheses match `dblock_bound`'s, so the two compose over `a_decomposition`'s s
 
 The hypothesis `X^{1/100} ≤ Δ` (the long range, supplied by `key_dyadic`) is ESSENTIAL: with only
 `1 ≤ Δ` the statement is false — at `Δ=1`, band-edge `Ω`, the `+1`-induced bare `R = HGΩ³/Δ` term
-leaves a `+g/4` surplus over `H/U`. The `1/100` margin dominates `g/4 < 1/37954`, so absolute `C`
+leaves a `+g/4` surplus over `H/U`. The `1/100` margin dominates `g/4 < 1/36374`, so absolute `C`
 holds (no `X^{O(u)}`). Term-by-term: the two `A·R` terms are killed by the band edge; `A`, `Δ·…`
 by the Nair–Roth Δ-ceiling `Δ ≤ Ω³X/(64³H⁴)`; the two `/Δ` terms by `Δ ≥ X^{1/100}`; the rest by
-`H/U → ∞`. (Needs `g < 2/18977`, `u ≤ 1/100`.) -/
+`H/U → ∞`. (Needs `g < 2/18187`, `u ≤ 1/100`.) -/
 theorem dblock_small_omega (c₀ : ℝ) (hc₀ : 0 < c₀) :
     ∃ C : ℝ, 0 < C ∧
-      ∀ (P : Globals), 1 ≤ P.X → 0 < P.g → P.g < 2 / 18977 → 0 < P.u → P.u ≤ 1 / 100 →
+      ∀ (P : Globals), 1 ≤ P.X → 0 < P.g → P.g < 2 / 18187 → 0 < P.u → P.u ≤ 1 / 100 →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
         (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A →

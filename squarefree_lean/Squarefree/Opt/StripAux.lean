@@ -507,7 +507,7 @@ theorem deltaInv_le (P : Globals) (S : Scale P) (hX : 1 ≤ P.X)
 /-- **Term 5** `1·C₁R·1 = C₁·H·G·Ω³/Δ ≤ C₁c₀³·H/U`.  Killed by `Δ ≥ X^{1/100}`
 (`exp - exp(H/U) = g/4 - 5u/4 - 1/100 ≤ 0`). -/
 theorem term5_le (P : Globals) (S : Scale P) (c₀ : ℝ) (C₁ : ℝ) (hC₁ : 0 < C₁) (hc₀ : 0 < c₀)
-    (hX : 1 ≤ P.X) (hg : P.g < 2 / 18977) (hu : 0 < P.u)
+    (hX : 1 ≤ P.X) (hg : P.g < 2 / 18187) (hu : 0 < P.u)
     (hΔlong : P.X ^ (1/100 : ℝ) ≤ S.Δ)
     (hband : S.Ω ≤ c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ))) :
     C₁ * S.R ≤ (C₁ * c₀ ^ (3:ℝ)) * (P.H / P.U) := by
@@ -549,7 +549,7 @@ theorem term5_le (P : Globals) (S : Scale P) (c₀ : ℝ) (C₁ : ℝ) (hC₁ : 
 /-- **Term 6** `1·C₁R·φ = C₁·H·G^{1/3}·Ω^{1/3}/Δ ≤ C₁c₀^{1/3}·H/U`.  Killed by `Δ ≥ X^{1/100}`
 (`exp - exp(H/U) = g/4 + 3u/4 - 1/100 ≤ 0`). -/
 theorem term6_le (P : Globals) (S : Scale P) (c₀ : ℝ) (C₁ : ℝ) (hC₁ : 0 < C₁) (hc₀ : 0 < c₀)
-    (hX : 1 ≤ P.X) (hg : P.g < 2 / 18977) (hu : 0 < P.u) (hu' : P.u ≤ 1 / 100)
+    (hX : 1 ≤ P.X) (hg : P.g < 2 / 18187) (hu : 0 < P.u) (hu' : P.u ≤ 1 / 100)
     (hΔlong : P.X ^ (1/100 : ℝ) ≤ S.Δ)
     (hband : S.Ω ≤ c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ))) :
     C₁ * S.R * fiberφ P S ≤ (C₁ * c₀ ^ (1/3:ℝ)) * (P.H / P.U) := by
@@ -599,7 +599,7 @@ theorem term6_le (P : Globals) (S : Scale P) (c₀ : ℝ) (C₁ : ℝ) (hC₁ : 
           congr 1; ring
 
 /-- **Term 7** `1·1·1 = 1 ≤ H/U`. Killed by `H/U → ∞` (`exp(H/U) = (1-g)/5 - u ≥ 0`). -/
-theorem term7_le (P : Globals) (hX : 1 ≤ P.X) (hg : P.g < 2 / 18977) (hu' : P.u ≤ 1 / 100) :
+theorem term7_le (P : Globals) (hX : 1 ≤ P.X) (hg : P.g < 2 / 18187) (hu' : P.u ≤ 1 / 100) :
     (1 : ℝ) ≤ (1 : ℝ) * (P.H / P.U) := by
   refine term_le_HU P hX (c := 1) (e := 0) (by norm_num) ?_ ?_
   · nlinarith [hg, hu']
@@ -608,7 +608,7 @@ theorem term7_le (P : Globals) (hX : 1 ≤ P.X) (hg : P.g < 2 / 18977) (hu' : P.
 /-- **Term 8** `1·1·φ = Ω^{-8/3}·G^{-2/3} ≤ (1/4)^{-8/3}·H/U`.  Killed by the Ω lower bound
 `Ω ≥ (1/4)(H⁴/X)^{1/3}` plus `H/U → ∞` (`exp - exp(H/U) = u + 11g/45 - 1/45 ≤ 0`). -/
 theorem term8_le (P : Globals) (S : Scale P)
-    (hX : 1 ≤ P.X) (hg : P.g < 2 / 18977) (hu' : P.u ≤ 1 / 100) (hΔ1 : 1 ≤ S.Δ)
+    (hX : 1 ≤ P.X) (hg : P.g < 2 / 18187) (hu' : P.u ≤ 1 / 100) (hΔ1 : 1 ≤ S.Δ)
     (hNR : (1/4 : ℝ) * S.Δ ^ (4/3 : ℝ) * (P.H ^ 4 / P.X) ^ (1/3 : ℝ) ≤ S.A) :
     fiberφ P S ≤ ((1/4:ℝ) ^ (-8/3:ℝ)) * (P.H / P.U) := by
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
@@ -833,8 +833,8 @@ theorem prop_5_1_spec (P : Globals) (S : Scale P) (a : ℤ) (ha : 0 < a)
         ≤ P.G ^ 3 * P.U ^ 15 * Real.sqrt S.Δ * S.Ω) :
     (Ra.card : ℝ) ≤ C5 * (P.H / S.Δ) *
       ( P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
-      + P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
-      + (S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27 ) :=
+      + P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
+      + (S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27 ) :=
   prop_5_1.choose_spec.2 P S a ha hAD hΩfloor Ra hwit h1 h2 h3
     hG1 hU1 hΔ1 hH1 hΩU hband hUbig hUH hDeW hHbig hδbud ha_lo ha_hi hΩH hlogcap
 
@@ -850,8 +850,8 @@ theorem deltaPow_neg_le (P : Globals) (S : Scale P) (hX : 1 ≤ P.X)
 /-- Edge bound for the large-`x` branch: `x ≥ G^{17}Ω^{-26}X^{Cu·u}` ⟹
 `Δ² ≤ H·G^{-17}·Ω^{26}·X^{-Cu·u}` (since `x = H/Δ²`). -/
 theorem delta_sq_edge_le (P : Globals) (S : Scale P) (Cu : ℝ)
-    (hx : P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x) :
-    S.Δ ^ 2 ≤ P.H * (P.G ^ (-17 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))) := by
+    (hx : P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x) :
+    S.Δ ^ 2 ≤ P.H * (P.G ^ (-16 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))) := by
   have hX := P.X_pos
   have hG := P.G_pos
   have hΩ := S.Ω_pos
@@ -860,32 +860,32 @@ theorem delta_sq_edge_le (P : Globals) (S : Scale P) (Cu : ℝ)
   -- x = H/Δ², so Δ² = H/x ≤ H / (G^17 Ω^{-26} X^{Cu u})
   have hxpos : 0 < S.x := by unfold Scale.x; positivity
   have hxval : S.x = P.H / S.Δ ^ 2 := rfl
-  have hrhs_pos : 0 < P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) := by positivity
+  have hrhs_pos : 0 < P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) := by positivity
   -- Δ² = H/x
   have hΔ2 : S.Δ ^ 2 = P.H / S.x := by rw [hxval]; field_simp
   rw [hΔ2]
   rw [div_le_iff₀ hxpos]
-  rw [show P.H * (P.G ^ (-17 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))) * S.x
-        = P.H * (P.G ^ (-17 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u)) * S.x) by ring]
+  rw [show P.H * (P.G ^ (-16 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))) * S.x
+        = P.H * (P.G ^ (-16 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u)) * S.x) by ring]
   -- want H ≤ H·(G^{-17}Ω^{26}X^{-Cu u}·x); i.e. 1 ≤ G^{-17}Ω^{26}X^{-Cu u}·x
   refine le_mul_of_one_le_right hH.le ?_
   -- G^{-17}Ω^{26}X^{-Cu u}·x ≥ G^{-17}Ω^{26}X^{-Cu u}·(G^17 Ω^{-26}X^{Cu u}) = 1
-  have hcoef_pos : 0 < P.G ^ (-17 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u)) := by positivity
+  have hcoef_pos : 0 < P.G ^ (-16 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u)) := by positivity
   have hmul := mul_le_mul_of_nonneg_left hx hcoef_pos.le
   refine le_trans ?_ hmul
-  have hGnat : P.G ^ (17 : ℕ) = P.G ^ (17 : ℝ) := by
-    rw [← Real.rpow_natCast P.G 17]; norm_num
-  have hprod : P.G ^ (-17 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))
-        * (P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u)) = 1 := by
-    have e1 : P.G ^ (-17 : ℝ) * P.G ^ 17 = 1 := by
+  have hGnat : P.G ^ (16 : ℕ) = P.G ^ (16 : ℝ) := by
+    rw [← Real.rpow_natCast P.G 16]; norm_num
+  have hprod : P.G ^ (-16 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))
+        * (P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u)) = 1 := by
+    have e1 : P.G ^ (-16 : ℝ) * P.G ^ 16 = 1 := by
       rw [hGnat, ← Real.rpow_add hG]; norm_num
     have e2 : S.Ω ^ (26 : ℝ) * S.Ω ^ (-26 : ℝ) = 1 := by
       rw [← Real.rpow_add hΩ]; norm_num
     have e3 : P.X ^ (-(Cu * P.u)) * P.X ^ (Cu * P.u) = 1 := by
       rw [← Real.rpow_add hX]; norm_num
-    calc P.G ^ (-17 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))
-          * (P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u))
-        = (P.G ^ (-17 : ℝ) * P.G ^ 17) * (S.Ω ^ (26 : ℝ) * S.Ω ^ (-26 : ℝ))
+    calc P.G ^ (-16 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))
+          * (P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u))
+        = (P.G ^ (-16 : ℝ) * P.G ^ 16) * (S.Ω ^ (26 : ℝ) * S.Ω ^ (-26 : ℝ))
             * (P.X ^ (-(Cu * P.u)) * P.X ^ (Cu * P.u)) := by ring
       _ = 1 := by rw [e1, e2, e3]; norm_num
   rw [hprod]
@@ -963,17 +963,17 @@ theorem largex_main_P1 (P : Globals) (S : Scale P) (hX : 1 ≤ P.X)
 theorem largex_main_P2 (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 0 < c₀) (hX : 1 ≤ P.X)
     (hΔlong : P.X ^ (1/100 : ℝ) ≤ S.Δ)
     (hband : c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω) :
-    S.A * (P.H / S.Δ) * (P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13))
+    S.A * (P.H / S.Δ) * (P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13))
       ≤ c₀ ^ (-12 : ℝ) * P.H *
-        P.X ^ (17 * P.g + 85 * P.u + (1/100 : ℝ) * (-1) + (-P.g/4 - 3*P.u/4) * (-12)) := by
+        P.X ^ (16 * P.g + 85 * P.u + (1/100 : ℝ) * (-1) + (-P.g/4 - 3*P.u/4) * (-12)) := by
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hG := P.G_pos; have hΩ := S.Ω_pos; have hΔ := S.Δ_pos; have hH := P.H_pos
   have hΩ13 : (S.Ω ^ 13 : ℝ) = S.Ω ^ (13 : ℝ) := Ωnat S 13
   have hΔinv : S.Δ ^ (-1 : ℝ) = (S.Δ)⁻¹ := Real.rpow_neg_one S.Δ
   have hΩ12 : S.Ω ^ (-12 : ℝ) = S.Ω ^ (1:ℝ) * (S.Ω ^ (13:ℝ))⁻¹ := by
     rw [← Real.rpow_neg hΩ.le, ← Real.rpow_add hΩ]; norm_num
-  have heq : S.A * (P.H / S.Δ) * (P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13))
-      = P.H * (P.G ^ 17 * P.U ^ 85) * (S.Δ ^ (-1 : ℝ) * S.Ω ^ (-12 : ℝ)) := by
+  have heq : S.A * (P.H / S.Δ) * (P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13))
+      = P.H * (P.G ^ 16 * P.U ^ 85) * (S.Δ ^ (-1 : ℝ) * S.Ω ^ (-12 : ℝ)) := by
     rw [hΔinv, hΩ12, hΩ13, Real.rpow_one]
     unfold Scale.A
     field_simp
@@ -982,45 +982,45 @@ theorem largex_main_P2 (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 0 < c�
     deltaPow_neg_le P S hX hΔlong (by norm_num)
   have hΩneg : S.Ω ^ (-12 : ℝ) ≤ c₀ ^ (-12 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-12)) :=
     band_rpow_neg P S c₀ hc₀ (by norm_num) hband
-  have hGU_nn : (0:ℝ) ≤ P.H * (P.G ^ 17 * P.U ^ 85) := by
+  have hGU_nn : (0:ℝ) ≤ P.H * (P.G ^ 16 * P.U ^ 85) := by
     have := hG; have := P.U_pos; positivity
-  have hxpow : P.G ^ 17 * P.U ^ 85 * (P.X ^ ((1/100 : ℝ) * (-1))
+  have hxpow : P.G ^ 16 * P.U ^ 85 * (P.X ^ ((1/100 : ℝ) * (-1))
         * (c₀ ^ (-12 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-12))))
       = c₀ ^ (-12 : ℝ) *
-          P.X ^ (17 * P.g + 85 * P.u + (1/100 : ℝ) * (-1) + (-P.g/4 - 3*P.u/4) * (-12)) := by
+          P.X ^ (16 * P.g + 85 * P.u + (1/100 : ℝ) * (-1) + (-P.g/4 - 3*P.u/4) * (-12)) := by
     rw [Gnat_xpow, Unat_xpow]
-    rw [show P.X ^ (P.g * (17:ℕ)) * P.X ^ (P.u * (85:ℕ)) * (P.X ^ ((1/100 : ℝ) * (-1))
+    rw [show P.X ^ (P.g * (16:ℕ)) * P.X ^ (P.u * (85:ℕ)) * (P.X ^ ((1/100 : ℝ) * (-1))
           * (c₀ ^ (-12 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-12))))
-        = c₀ ^ (-12 : ℝ) * (P.X ^ (P.g * (17:ℕ)) * P.X ^ (P.u * (85:ℕ)) * P.X ^ ((1/100 : ℝ) * (-1))
+        = c₀ ^ (-12 : ℝ) * (P.X ^ (P.g * (16:ℕ)) * P.X ^ (P.u * (85:ℕ)) * P.X ^ ((1/100 : ℝ) * (-1))
             * P.X ^ ((-P.g/4 - 3*P.u/4) * (-12))) by ring]
     rw [← Real.rpow_add hX0, ← Real.rpow_add hX0, ← Real.rpow_add hX0]
     congr 2; push_cast; ring
-  calc P.H * (P.G ^ 17 * P.U ^ 85) * (S.Δ ^ (-1 : ℝ) * S.Ω ^ (-12 : ℝ))
-      ≤ P.H * (P.G ^ 17 * P.U ^ 85)
+  calc P.H * (P.G ^ 16 * P.U ^ 85) * (S.Δ ^ (-1 : ℝ) * S.Ω ^ (-12 : ℝ))
+      ≤ P.H * (P.G ^ 16 * P.U ^ 85)
           * (P.X ^ ((1/100 : ℝ) * (-1)) * (c₀ ^ (-12 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-12)))) := by
         apply mul_le_mul_of_nonneg_left _ hGU_nn
         exact mul_le_mul hΔneg hΩneg (by positivity) (by positivity)
     _ = c₀ ^ (-12 : ℝ) * P.H *
-          P.X ^ (17 * P.g + 85 * P.u + (1/100 : ℝ) * (-1) + (-P.g/4 - 3*P.u/4) * (-12)) := by
-        rw [show P.H * (P.G ^ 17 * P.U ^ 85) * (P.X ^ ((1/100 : ℝ) * (-1))
+          P.X ^ (16 * P.g + 85 * P.u + (1/100 : ℝ) * (-1) + (-P.g/4 - 3*P.u/4) * (-12)) := by
+        rw [show P.H * (P.G ^ 16 * P.U ^ 85) * (P.X ^ ((1/100 : ℝ) * (-1))
               * (c₀ ^ (-12 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-12))))
-            = P.H * (P.G ^ 17 * P.U ^ 85 * (P.X ^ ((1/100 : ℝ) * (-1))
+            = P.H * (P.G ^ 16 * P.U ^ 85 * (P.X ^ ((1/100 : ℝ) * (-1))
               * (c₀ ^ (-12 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-12))))) by ring, hxpow]
         ring
 
 /-- **Main term 3** (binding) `A·(H/Δ)·P₃ = Δ²·G¹⁷U¹⁰⁰·Ω^{-26} ≤ H·U¹⁰⁰·X^{-Cu·u}` via the edge
 `x ≥ G¹⁷Ω^{-26}X^{Cu·u}`. -/
 theorem largex_main_P3 (P : Globals) (S : Scale P) (Cu : ℝ) (hX : 1 ≤ P.X)
-    (hx : P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x) :
-    S.A * (P.H / S.Δ) * ((S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27)
+    (hx : P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x) :
+    S.A * (P.H / S.Δ) * ((S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27)
       ≤ (1 : ℝ) * P.H * P.X ^ (100 * P.u - Cu * P.u) := by
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hG := P.G_pos; have hΩ := S.Ω_pos; have hΔ := S.Δ_pos; have hH := P.H_pos
   have hΩ27 : (S.Ω ^ 27 : ℝ) = S.Ω ^ (27 : ℝ) := Ωnat S 27
   have hΩ26 : (S.Ω ^ (26 : ℝ) : ℝ) = S.Ω ^ (26 : ℕ) := by rw [← Real.rpow_natCast]; norm_num
   -- A·(H/Δ)·P₃ = Δ²·G¹⁷U¹⁰⁰·Ω^{-26}
-  have heq : S.A * (P.H / S.Δ) * ((S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27)
-      = S.Δ ^ 2 * (P.G ^ 17 * P.U ^ 100) * S.Ω ^ (-26 : ℝ) := by
+  have heq : S.A * (P.H / S.Δ) * ((S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27)
+      = S.Δ ^ 2 * (P.G ^ 16 * P.U ^ 100) * S.Ω ^ (-26 : ℝ) := by
     have hΩneg26 : S.Ω ^ (-26 : ℝ) = S.Ω ^ (1:ℝ) * (S.Ω ^ (27:ℝ))⁻¹ := by
       rw [← Real.rpow_neg hΩ.le, ← Real.rpow_add hΩ]; norm_num
     rw [hΩneg26, hΩ27, Real.rpow_one]
@@ -1029,27 +1029,27 @@ theorem largex_main_P3 (P : Globals) (S : Scale P) (Cu : ℝ) (hX : 1 ≤ P.X)
   rw [heq]
   -- substitute Δ² ≤ H·G^{-17}Ω^{26}X^{-Cu u}
   have hΔ2 := delta_sq_edge_le P S Cu hx
-  have hrest_nn : (0:ℝ) ≤ P.G ^ 17 * P.U ^ 100 * S.Ω ^ (-26 : ℝ) := by
+  have hrest_nn : (0:ℝ) ≤ P.G ^ 16 * P.U ^ 100 * S.Ω ^ (-26 : ℝ) := by
     have := hG; have := P.U_pos; positivity
   have hΔ2_nn : (0:ℝ) ≤ S.Δ ^ 2 := by positivity
   -- Δ² · (G¹⁷U¹⁰⁰Ω^{-26}) ≤ (H G^{-17}Ω^{26}X^{-Cu u}) · (G¹⁷U¹⁰⁰Ω^{-26})
-  have hstep : S.Δ ^ 2 * (P.G ^ 17 * P.U ^ 100) * S.Ω ^ (-26 : ℝ)
-      ≤ (P.H * (P.G ^ (-17 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))))
-          * (P.G ^ 17 * P.U ^ 100 * S.Ω ^ (-26 : ℝ)) := by
-    rw [show S.Δ ^ 2 * (P.G ^ 17 * P.U ^ 100) * S.Ω ^ (-26 : ℝ)
-          = S.Δ ^ 2 * (P.G ^ 17 * P.U ^ 100 * S.Ω ^ (-26 : ℝ)) by ring]
+  have hstep : S.Δ ^ 2 * (P.G ^ 16 * P.U ^ 100) * S.Ω ^ (-26 : ℝ)
+      ≤ (P.H * (P.G ^ (-16 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))))
+          * (P.G ^ 16 * P.U ^ 100 * S.Ω ^ (-26 : ℝ)) := by
+    rw [show S.Δ ^ 2 * (P.G ^ 16 * P.U ^ 100) * S.Ω ^ (-26 : ℝ)
+          = S.Δ ^ 2 * (P.G ^ 16 * P.U ^ 100 * S.Ω ^ (-26 : ℝ)) by ring]
     exact mul_le_mul_of_nonneg_right hΔ2 hrest_nn
   refine hstep.trans (le_of_eq ?_)
   -- collapse: H·G^{-17}·G¹⁷ = H, Ω^{26}·Ω^{-26}=1, U¹⁰⁰=X^{100u}, X^{-Cu u}
-  have hGcol : P.G ^ (-17 : ℝ) * P.G ^ 17 = 1 := by
-    rw [show (P.G : ℝ) ^ 17 = P.G ^ (17 : ℝ) by rw [← Real.rpow_natCast]; norm_num,
+  have hGcol : P.G ^ (-16 : ℝ) * P.G ^ 16 = 1 := by
+    rw [show (P.G : ℝ) ^ 16 = P.G ^ (16 : ℝ) by rw [← Real.rpow_natCast]; norm_num,
         ← Real.rpow_add hG]; norm_num
   have hΩcol : S.Ω ^ (26 : ℝ) * S.Ω ^ (-26 : ℝ) = 1 := by
     rw [← Real.rpow_add hΩ]; norm_num
   rw [Unat_xpow]
-  rw [show (P.H * (P.G ^ (-17 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))))
-        * (P.G ^ 17 * P.X ^ (P.u * (100:ℕ)) * S.Ω ^ (-26 : ℝ))
-      = P.H * (P.G ^ (-17 : ℝ) * P.G ^ 17) * (S.Ω ^ (26 : ℝ) * S.Ω ^ (-26 : ℝ))
+  rw [show (P.H * (P.G ^ (-16 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u))))
+        * (P.G ^ 16 * P.X ^ (P.u * (100:ℕ)) * S.Ω ^ (-26 : ℝ))
+      = P.H * (P.G ^ (-16 : ℝ) * P.G ^ 16) * (S.Ω ^ (26 : ℝ) * S.Ω ^ (-26 : ℝ))
           * (P.X ^ (-(Cu * P.u)) * P.X ^ (P.u * (100:ℕ))) by ring,
       hGcol, hΩcol, ← Real.rpow_add hX0]
   rw [show (1:ℝ) * P.H * P.X ^ (100 * P.u - Cu * P.u)
@@ -1109,14 +1109,14 @@ theorem largex_plus_P1 (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 0 < c�
 theorem largex_plus_P2 (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 0 < c₀) (hX : 1 ≤ P.X)
     (hΔlong : P.X ^ (1/100 : ℝ) ≤ S.Δ)
     (hband : c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω) :
-    (P.H / S.Δ) * (P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13))
+    (P.H / S.Δ) * (P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13))
       ≤ c₀ ^ (-13 : ℝ) * P.H *
-        P.X ^ (17 * P.g + 85 * P.u + (1/100 : ℝ) * (-2) + (-P.g/4 - 3*P.u/4) * (-13)) := by
+        P.X ^ (16 * P.g + 85 * P.u + (1/100 : ℝ) * (-2) + (-P.g/4 - 3*P.u/4) * (-13)) := by
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hG := P.G_pos; have hΩ := S.Ω_pos; have hΔ := S.Δ_pos; have hH := P.H_pos
   have hΩ13 : (S.Ω ^ 13 : ℝ) = S.Ω ^ (13 : ℝ) := Ωnat S 13
-  have heq : (P.H / S.Δ) * (P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13))
-      = P.H * (P.G ^ 17 * P.U ^ 85) * (S.Δ ^ (-2 : ℝ) * S.Ω ^ (-13 : ℝ)) := by
+  have heq : (P.H / S.Δ) * (P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13))
+      = P.H * (P.G ^ 16 * P.U ^ 85) * (S.Δ ^ (-2 : ℝ) * S.Ω ^ (-13 : ℝ)) := by
     have hΔc : S.Δ ^ (-2 : ℝ) = (S.Δ)⁻¹ * (S.Δ)⁻¹ := by
       rw [← Real.rpow_neg_one S.Δ, ← Real.rpow_add hΔ]; norm_num
     have hΩc : S.Ω ^ (-13 : ℝ) = (S.Ω ^ (13:ℝ))⁻¹ := by
@@ -1128,41 +1128,41 @@ theorem largex_plus_P2 (P : Globals) (S : Scale P) (c₀ : ℝ) (hc₀ : 0 < c�
     deltaPow_neg_le P S hX hΔlong (by norm_num)
   have hΩneg : S.Ω ^ (-13 : ℝ) ≤ c₀ ^ (-13 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-13)) :=
     band_rpow_neg P S c₀ hc₀ (by norm_num) hband
-  have hGU_nn : (0:ℝ) ≤ P.H * (P.G ^ 17 * P.U ^ 85) := by
+  have hGU_nn : (0:ℝ) ≤ P.H * (P.G ^ 16 * P.U ^ 85) := by
     have := hG; have := P.U_pos; positivity
-  have hxpow : P.G ^ 17 * P.U ^ 85 * (P.X ^ ((1/100 : ℝ) * (-2))
+  have hxpow : P.G ^ 16 * P.U ^ 85 * (P.X ^ ((1/100 : ℝ) * (-2))
         * (c₀ ^ (-13 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-13))))
       = c₀ ^ (-13 : ℝ) *
-          P.X ^ (17 * P.g + 85 * P.u + (1/100 : ℝ) * (-2) + (-P.g/4 - 3*P.u/4) * (-13)) := by
+          P.X ^ (16 * P.g + 85 * P.u + (1/100 : ℝ) * (-2) + (-P.g/4 - 3*P.u/4) * (-13)) := by
     rw [Gnat_xpow, Unat_xpow,
-        show P.X ^ (P.g * (17:ℕ)) * P.X ^ (P.u * (85:ℕ)) * (P.X ^ ((1/100 : ℝ) * (-2))
+        show P.X ^ (P.g * (16:ℕ)) * P.X ^ (P.u * (85:ℕ)) * (P.X ^ ((1/100 : ℝ) * (-2))
           * (c₀ ^ (-13 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-13))))
-        = c₀ ^ (-13 : ℝ) * (P.X ^ (P.g * (17:ℕ)) * P.X ^ (P.u * (85:ℕ)) * P.X ^ ((1/100 : ℝ) * (-2))
+        = c₀ ^ (-13 : ℝ) * (P.X ^ (P.g * (16:ℕ)) * P.X ^ (P.u * (85:ℕ)) * P.X ^ ((1/100 : ℝ) * (-2))
             * P.X ^ ((-P.g/4 - 3*P.u/4) * (-13))) by ring,
         ← Real.rpow_add hX0, ← Real.rpow_add hX0, ← Real.rpow_add hX0]
     congr 2; push_cast; ring
-  calc P.H * (P.G ^ 17 * P.U ^ 85) * (S.Δ ^ (-2 : ℝ) * S.Ω ^ (-13 : ℝ))
-      ≤ P.H * (P.G ^ 17 * P.U ^ 85)
+  calc P.H * (P.G ^ 16 * P.U ^ 85) * (S.Δ ^ (-2 : ℝ) * S.Ω ^ (-13 : ℝ))
+      ≤ P.H * (P.G ^ 16 * P.U ^ 85)
           * (P.X ^ ((1/100 : ℝ) * (-2)) * (c₀ ^ (-13 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-13)))) := by
         apply mul_le_mul_of_nonneg_left _ hGU_nn
         exact mul_le_mul hΔneg hΩneg (by positivity) (by positivity)
     _ = c₀ ^ (-13 : ℝ) * P.H *
-          P.X ^ (17 * P.g + 85 * P.u + (1/100 : ℝ) * (-2) + (-P.g/4 - 3*P.u/4) * (-13)) := by
-        rw [show P.H * (P.G ^ 17 * P.U ^ 85) * (P.X ^ ((1/100 : ℝ) * (-2))
+          P.X ^ (16 * P.g + 85 * P.u + (1/100 : ℝ) * (-2) + (-P.g/4 - 3*P.u/4) * (-13)) := by
+        rw [show P.H * (P.G ^ 16 * P.U ^ 85) * (P.X ^ ((1/100 : ℝ) * (-2))
               * (c₀ ^ (-13 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-13))))
-            = P.H * (P.G ^ 17 * P.U ^ 85 * (P.X ^ ((1/100 : ℝ) * (-2))
+            = P.H * (P.G ^ 16 * P.U ^ 85 * (P.X ^ ((1/100 : ℝ) * (-2))
               * (c₀ ^ (-13 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-13))))) by ring, hxpow]
         ring
 
-/-- **`+1` term 3** `(H/Δ)·P₃ = Δ·G¹⁷U¹⁰⁰·Ω^{-27}`.  Via the edge `Δ ≤ H^{1/2}G^{-17/2}Ω^{13}X^{-Cu·u/2}`
+/-- **`+1` term 3** `(H/Δ)·P₃ = Δ·G¹⁷U¹⁰⁰·Ω^{-27}`.  Via the edge `Δ ≤ H^{1/2}G^{-16/2}Ω^{13}X^{-Cu·u/2}`
 and the band on `Ω^{-14}`, this is `≤ c₀^{-14}·H·X^{e}` with
 `e = -(1-g)/10 + 17g/2 + 100u + (-g/4-3u/4)(-14) - Cu·u/2`. -/
 theorem largex_plus_P3 (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (hc₀ : 0 < c₀) (hX : 1 ≤ P.X)
-    (hx : P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x)
+    (hx : P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x)
     (hband : c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω) :
-    (P.H / S.Δ) * ((S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27)
+    (P.H / S.Δ) * ((S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27)
       ≤ c₀ ^ (-14 : ℝ) * P.H *
-        P.X ^ ((-(1 - P.g))/10 + 17 * P.g / 2 + 100 * P.u
+        P.X ^ ((-(1 - P.g))/10 + 16 * P.g / 2 + 100 * P.u
           + (-P.g/4 - 3*P.u/4) * (-14) - Cu * P.u / 2) := by
   have hX0 : (0:ℝ) < P.X := lt_of_lt_of_le one_pos hX
   have hG := P.G_pos; have hΩ := S.Ω_pos; have hΔ := S.Δ_pos; have hH := P.H_pos
@@ -1172,33 +1172,33 @@ theorem largex_plus_P3 (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (hc₀ : 0 < 
   -- (H/Δ)·P₃ = Δ·G¹⁷U¹⁰⁰·Ω^{-27}
   have hΩ27nat : S.Ω ^ (-27 : ℝ) = (S.Ω ^ (27:ℕ))⁻¹ := by
     rw [← Real.rpow_natCast S.Ω 27, ← Real.rpow_neg hΩ.le]; norm_num
-  have heq : (P.H / S.Δ) * ((S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27)
-      = S.Δ * (P.G ^ 17 * P.U ^ 100) * S.Ω ^ (-27 : ℝ) := by
+  have heq : (P.H / S.Δ) * ((S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27)
+      = S.Δ * (P.G ^ 16 * P.U ^ 100) * S.Ω ^ (-27 : ℝ) := by
     rw [hΩ27nat]; field_simp
   rw [heq]
   -- Δ ≤ sqrt(H G^{-17}Ω^{26}X^{-Cu u}), expand
   have hΔ2 := delta_sq_edge_le P S Cu hx
   have hΔeq : S.Δ = (S.Δ ^ 2) ^ (1/2 : ℝ) := by
     rw [← Real.rpow_natCast S.Δ 2, ← Real.rpow_mul hΔ.le]; norm_num
-  have hΔle : S.Δ ≤ (P.H * (P.G ^ (-17 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u)))) ^ (1/2 : ℝ) := by
+  have hΔle : S.Δ ≤ (P.H * (P.G ^ (-16 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u)))) ^ (1/2 : ℝ) := by
     rw [hΔeq]; exact Real.rpow_le_rpow (by positivity) hΔ2 (by norm_num)
-  have hsqrt : (P.H * (P.G ^ (-17 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u)))) ^ (1/2 : ℝ)
-      = P.H ^ (1/2 : ℝ) * P.G ^ (-17/2 : ℝ) * S.Ω ^ (13 : ℝ) * P.X ^ (-(Cu * P.u) / 2) := by
+  have hsqrt : (P.H * (P.G ^ (-16 : ℝ) * S.Ω ^ (26 : ℝ) * P.X ^ (-(Cu * P.u)))) ^ (1/2 : ℝ)
+      = P.H ^ (1/2 : ℝ) * P.G ^ (-16/2 : ℝ) * S.Ω ^ (13 : ℝ) * P.X ^ (-(Cu * P.u) / 2) := by
     rw [Real.mul_rpow hH.le (by positivity),
         Real.mul_rpow (by positivity) (Real.rpow_nonneg hX0.le _),
         Real.mul_rpow (Real.rpow_nonneg hG.le _) (Real.rpow_nonneg hΩ.le _),
         ← Real.rpow_mul hG.le, ← Real.rpow_mul hΩ.le, ← Real.rpow_mul hX0.le]
     rw [show (-(Cu * P.u)) * (1/2 : ℝ) = -(Cu * P.u) / 2 by ring,
-        show (-17 : ℝ) * (1/2) = -17/2 by norm_num,
+        show (-16 : ℝ) * (1/2) = -16/2 by norm_num,
         show (26 : ℝ) * (1/2) = 13 by norm_num]
     ring
-  have hmid_nn : (0:ℝ) ≤ P.G ^ 17 * P.U ^ 100 * S.Ω ^ (-27 : ℝ) := by
+  have hmid_nn : (0:ℝ) ≤ P.G ^ 16 * P.U ^ 100 * S.Ω ^ (-27 : ℝ) := by
     have := hG; have := P.U_pos; positivity
-  have hstep : S.Δ * (P.G ^ 17 * P.U ^ 100) * S.Ω ^ (-27 : ℝ)
-      ≤ (P.H ^ (1/2 : ℝ) * P.G ^ (-17/2 : ℝ) * S.Ω ^ (13 : ℝ) * P.X ^ (-(Cu * P.u) / 2))
-          * (P.G ^ 17 * P.U ^ 100 * S.Ω ^ (-27 : ℝ)) := by
-    rw [show S.Δ * (P.G ^ 17 * P.U ^ 100) * S.Ω ^ (-27 : ℝ)
-          = S.Δ * (P.G ^ 17 * P.U ^ 100 * S.Ω ^ (-27 : ℝ)) by ring]
+  have hstep : S.Δ * (P.G ^ 16 * P.U ^ 100) * S.Ω ^ (-27 : ℝ)
+      ≤ (P.H ^ (1/2 : ℝ) * P.G ^ (-16/2 : ℝ) * S.Ω ^ (13 : ℝ) * P.X ^ (-(Cu * P.u) / 2))
+          * (P.G ^ 16 * P.U ^ 100 * S.Ω ^ (-27 : ℝ)) := by
+    rw [show S.Δ * (P.G ^ 16 * P.U ^ 100) * S.Ω ^ (-27 : ℝ)
+          = S.Δ * (P.G ^ 16 * P.U ^ 100 * S.Ω ^ (-27 : ℝ)) by ring]
     refine mul_le_mul_of_nonneg_right ?_ hmid_nn
     rw [← hsqrt]; exact hΔle
   refine hstep.trans ?_
@@ -1212,27 +1212,27 @@ theorem largex_plus_P3 (P : Globals) (S : Scale P) (c₀ Cu : ℝ) (hc₀ : 0 < 
         ← Real.rpow_add hH]; norm_num
   have hH12x : P.H ^ (-1/2 : ℝ) = P.X ^ ((-(1 - P.g))/10) := by
     rw [Globals.H, ← Real.rpow_mul hX0.le]; congr 1; ring
-  have hG17 : (P.G : ℝ) ^ 17 = P.G ^ (17 : ℝ) := by rw [← Real.rpow_natCast]; norm_num
-  have hGx : P.G ^ (-17/2 : ℝ) * P.G ^ (17 : ℝ) = P.X ^ (P.g * (17/2 : ℝ)) := by
+  have hG17 : (P.G : ℝ) ^ 16 = P.G ^ (16 : ℝ) := by rw [← Real.rpow_natCast]; norm_num
+  have hGx : P.G ^ (-16/2 : ℝ) * P.G ^ (16 : ℝ) = P.X ^ (P.g * (16/2 : ℝ)) := by
     rw [← Real.rpow_add hG, Globals.G, ← Real.rpow_mul hX0.le]; congr 1; norm_num
-  rw [show (P.H ^ (1/2 : ℝ) * P.G ^ (-17/2 : ℝ) * S.Ω ^ (13 : ℝ) * P.X ^ (-(Cu * P.u) / 2))
-        * (P.G ^ 17 * P.U ^ 100 * S.Ω ^ (-27 : ℝ))
-      = P.H ^ (1/2 : ℝ) * (P.G ^ (-17/2 : ℝ) * P.G ^ 17) * (S.Ω ^ (13 : ℝ) * S.Ω ^ (-27 : ℝ))
+  rw [show (P.H ^ (1/2 : ℝ) * P.G ^ (-16/2 : ℝ) * S.Ω ^ (13 : ℝ) * P.X ^ (-(Cu * P.u) / 2))
+        * (P.G ^ 16 * P.U ^ 100 * S.Ω ^ (-27 : ℝ))
+      = P.H ^ (1/2 : ℝ) * (P.G ^ (-16/2 : ℝ) * P.G ^ 16) * (S.Ω ^ (13 : ℝ) * S.Ω ^ (-27 : ℝ))
           * (P.U ^ 100 * P.X ^ (-(Cu * P.u) / 2)) by ring]
   rw [hG17, hGx, hΩcol, hH12, hH12x, Unat_xpow]
   -- now: (H·X^{-(1-g)/10})·X^{g·17/2}·Ω^{-14}·(X^{u·100}·X^{-Cu u/2}) ≤ c₀^{-14}·H·X^E
-  have hbound : P.H * P.X ^ ((-(1 - P.g))/10) * P.X ^ (P.g * (17/2 : ℝ)) * S.Ω ^ (-14 : ℝ)
+  have hbound : P.H * P.X ^ ((-(1 - P.g))/10) * P.X ^ (P.g * (16/2 : ℝ)) * S.Ω ^ (-14 : ℝ)
         * (P.X ^ (P.u * (100:ℕ)) * P.X ^ (-(Cu * P.u) / 2))
-      ≤ P.H * P.X ^ ((-(1 - P.g))/10) * P.X ^ (P.g * (17/2 : ℝ))
+      ≤ P.H * P.X ^ ((-(1 - P.g))/10) * P.X ^ (P.g * (16/2 : ℝ))
           * (c₀ ^ (-14 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-14)))
           * (P.X ^ (P.u * (100:ℕ)) * P.X ^ (-(Cu * P.u) / 2)) := by
     apply mul_le_mul_of_nonneg_right _ (by positivity)
     exact mul_le_mul_of_nonneg_left hΩneg (by positivity)
   refine hbound.trans (le_of_eq ?_)
-  have hcombine : P.H * P.X ^ ((-(1 - P.g))/10) * P.X ^ (P.g * (17/2 : ℝ))
+  have hcombine : P.H * P.X ^ ((-(1 - P.g))/10) * P.X ^ (P.g * (16/2 : ℝ))
         * (c₀ ^ (-14 : ℝ) * P.X ^ ((-P.g/4 - 3*P.u/4) * (-14)))
         * (P.X ^ (P.u * (100:ℕ)) * P.X ^ (-(Cu * P.u) / 2))
-      = c₀ ^ (-14 : ℝ) * P.H * (P.X ^ ((-(1 - P.g))/10) * P.X ^ (P.g * (17/2 : ℝ))
+      = c₀ ^ (-14 : ℝ) * P.H * (P.X ^ ((-(1 - P.g))/10) * P.X ^ (P.g * (16/2 : ℝ))
           * P.X ^ ((-P.g/4 - 3*P.u/4) * (-14)) * P.X ^ (P.u * (100:ℕ)) * P.X ^ (-(Cu * P.u) / 2)) := by
     ring
   rw [hcombine, ← Real.rpow_add hX0, ← Real.rpow_add hX0, ← Real.rpow_add hX0, ← Real.rpow_add hX0]

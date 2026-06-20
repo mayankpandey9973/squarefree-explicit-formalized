@@ -181,7 +181,7 @@ end DyadicAssembly
 
 open DyadicAssembly in
 set_option maxHeartbeats 1600000 in
-theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
+theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
     ∃ u : ℝ, 0 < u ∧ ∃ C : ℝ, 0 < C ∧ ∃ X₀ : ℝ, ∀ X : ℝ, X₀ ≤ X →
       ∀ D : ℝ, X ^ ((1 - g) / 5) / X ^ u ≤ D → D ≤ X ^ (1/2 : ℝ) →
         (dCard X (X ^ ((1 - g) / 5)) D : ℝ) ≤ C * X ^ ((1 - g) / 5) / X ^ u := by
@@ -190,7 +190,7 @@ theorem key_dyadic_assembly (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
   obtain ⟨u_b, hu_b, hopt, C_b, hC_b, c₀, hc₀, hbound⟩ := dblock_bound g hg hg'
   obtain ⟨C_s, hC_s, hsmall⟩ := dblock_small_omega c₀ hc₀
   obtain ⟨u_2, hu_2, C_2, hC_2, X_2, h2⟩ := prop_2_4 g hg hg'
-  -- u_b < 1/100 < 1/200 from the optimization budget 18977 g + 15315 u_b < 2
+  -- u_b < 1/100 < 1/200 from the optimization budget 18187 g + 15315 u_b < 2
   have hub100 : u_b < 1 / 100 := by linarith [hg, hopt]
   have hub200 : u_b < 1 / 200 := by linarith [hg, hopt]
   -- result exponent: below both u_b/2 (room for the O(log) shrink) and u_2 (prop_2_4 budget)

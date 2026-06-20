@@ -8,8 +8,8 @@ import Squarefree.Bracket.BoxSum
 
 `dblock_on_strip` is the §9 core (writeup 2083–2221): on the unresolved strip,
 `𝐃(Ω) ≪ H/U` via Prop 7.3 with `W = W_{≠0}` (the largest admissible envelope, = the `e14`
-monomial `H^{1/84}x^{5/84}G^{1/7}Ω^{11/21}`) and the optimization `18977g+15315u<2` (the `e14`
-constraint is the unique binding one: `840·(9.3) = 18977g+15315u−2`). It needs the full
+monomial `H^{1/84}x^{5/84}G^{1/7}Ω^{11/21}`) and the optimization `18187g+15315u<2` (the `e14`
+constraint is the unique binding one: `840·(9.3) = 18187g+15315u−2`). It needs the full
 `prop_3_2` (carrying `dStar`/`inDa`, gated by a `dtil = R_a⁻¹` right-inverse on the band).
 
 `dblock_bound` is the merger: it picks shared `u, C, c₀, Cu`, splits on `S.x` against the strip
@@ -22,17 +22,17 @@ namespace Squarefree
 
 /-- **On-strip case** of `dblock_bound` (§9 core, writeup 2083–2221). Shared params `u, c₀, Cu`.
 On the strip `G^{-2}Ω^{-11/2}X^{-Cu·u} ≤ x ≤ G^{17}Ω^{-26}X^{Cu·u}`, `𝐃(Ω) ≪ H/U` via Prop 7.3 with
-`W = W_{≠0}` and `18977g+15315u<2`. Added hypothesis `hubudget : 18977g+(18675+790·Cu)u ≤ 2`
-(the writeup's "shrink `u`"): the **sharp** `g`-coefficient `18977` keeps the full range
-`g < 2/18977`, while all `X^{O(u)}` bookkeeping (`2u` fiber, the AM-7 `X^{-2u}` envelope
+`W = W_{≠0}` and `18187g+15315u<2`. Added hypothesis `hubudget : 18187g+(18675+790·Cu)u ≤ 2`
+(the writeup's "shrink `u`"): the **sharp** `g`-coefficient `18187` keeps the full range
+`g < 2/18187`, while all `X^{O(u)}` bookkeeping (`2u` fiber, the AM-7 `X^{-2u}` envelope
 deflation, Prop 7.3's `X^{O(u)}`, strip-edge `X^{±Cu·u}`) sits in the `u`-coefficient
 `18675+790·Cu`.  Implies `hopt` and the on-strip envelope/closing budgets; for any
-`g < 2/18977`, `u := (2 − 18977g)/(2(18675+790·Cu)) > 0` satisfies it (the budget value is
-then `(2 + 18977g)/2 < 2`).  AM-8: threads `hlog : log X ≤ X^u` to Prop 7.3's pack. -/
-theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
-    (u : ℝ) (hu0 : 0 < u) (hopt : 18977 * g + 15315 * u < 2) (hu2 : u ≤ 1 / 100)
+`g < 2/18187`, `u := (2 − 18187g)/(2(18675+790·Cu)) > 0` satisfies it (the budget value is
+then `(2 + 18187g)/2 < 2`).  AM-8: threads `hlog : log X ≤ X^u` to Prop 7.3's pack. -/
+theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187)
+    (u : ℝ) (hu0 : 0 < u) (hopt : 18187 * g + 15315 * u < 2) (hu2 : u ≤ 1 / 100)
     (c₀ : ℝ) (hc₀ : 1 ≤ c₀) (Cu : ℝ) (hCu : 1 ≤ Cu)
-    (hubudget : 18977 * g + (18675 + 790 * Cu) * u ≤ 2) :
+    (hubudget : 18187 * g + (18675 + 790 * Cu) * u ≤ 2) :
     ∃ C : ℝ, 0 < C ∧
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
@@ -44,7 +44,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
         c₀ * (P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ)) ≤ S.Ω →
         S.Ω ≤ P.U →
         P.G ^ (-2 : ℝ) * S.Ω ^ (-11/2 : ℝ) * P.X ^ (-(Cu * P.u)) ≤ S.x →
-        S.x ≤ P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) →
+        S.x ≤ P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) →
         ∀ D : ℝ, 0 < D → D = S.D → DBlock P S D ≤ C * P.H / P.U := by
   obtain ⟨c₁', C₁', C₂', hc₁', hC₁', hC₂', hfiber'⟩ := prop_3_2_fiber_dStar
   obtain ⟨C₇, hC₇, hp73⟩ := prop_7_3
@@ -77,7 +77,7 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
   -- admissibility envelope at Wnz
   have hgP : P.g = g := hg
   have hbudP : OnStripAux.Budget P.g P.u Cu := by
-    show 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2
+    show 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2
     rw [hg, hu]; exact hubudget
   have hEnv : Sec7Envelope P S
       ((10:ℝ) ^ (-25 : ℤ) * P.X ^ (-(2:ℝ) * P.u) * OnStripAux.Wnz P S) :=
@@ -197,8 +197,8 @@ theorem dblock_on_strip (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977)
 `𝐃(Ω) ≪ H/U`. Picks shared `u, C, c₀, Cu`, splits `S.x` against the strip edges, and dispatches to
 `dblock_off_strip` / `dblock_on_strip`. The regime hypotheses `(1/4)·Δ^{4/3}(H⁴/X)^{1/3} ≤ A`,
 `2A ≤ D` are supplied by `a_decomposition`'s sum range. -/
-theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
-    ∃ u : ℝ, 0 < u ∧ 18977 * g + 15315 * u < 2 ∧ ∃ C : ℝ, 0 < C ∧ ∃ c₀ : ℝ, 0 < c₀ ∧
+theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18187) :
+    ∃ u : ℝ, 0 < u ∧ 18187 * g + 15315 * u < 2 ∧ ∃ C : ℝ, 0 < C ∧ ∃ c₀ : ℝ, 0 < c₀ ∧
       ∀ (P : Globals), P.g = g → P.u = u → 1 ≤ P.X →
       ∀ (S : Scale P), P.X ^ (1/100 : ℝ) ≤ S.Δ →
         (16777216 : ℝ) ≤ P.X ^ (1/100 : ℝ) →
@@ -221,23 +221,23 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
   have hden2 : (0:ℝ) < 18675 + 790 * Cu := by linarith only [hCu_on]
   have hg1' : g < 1 / 4000 := by linarith [hg1]
   have hnum1 : (0:ℝ) < 1/200 - 20 * g := by linarith [hg1']
-  have hnum2 : (0:ℝ) < 2 - 18977 * g := by linarith only [hg1]
+  have hnum2 : (0:ℝ) < 2 - 18187 * g := by linarith only [hg1]
   -- u witness: half of the min of the three constraints' thresholds
   set u : ℝ := min ((1/200 - 20 * g) / (C6 + 100))
-      (min ((2 - 18977 * g) / (18675 + 790 * Cu)) (1/100)) / 2 with hudef
+      (min ((2 - 18187 * g) / (18675 + 790 * Cu)) (1/100)) / 2 with hudef
   have hm1 : (0:ℝ) < (1/200 - 20 * g) / (C6 + 100) := div_pos hnum1 hden1
-  have hm2 : (0:ℝ) < (2 - 18977 * g) / (18675 + 790 * Cu) := div_pos hnum2 hden2
+  have hm2 : (0:ℝ) < (2 - 18187 * g) / (18675 + 790 * Cu) := div_pos hnum2 hden2
   have hm3 : (0:ℝ) < (1:ℝ)/100 := by norm_num
   have hminpos : (0:ℝ) < min ((1/200 - 20 * g) / (C6 + 100))
-      (min ((2 - 18977 * g) / (18675 + 790 * Cu)) (1/100)) := lt_min hm1 (lt_min hm2 hm3)
+      (min ((2 - 18187 * g) / (18675 + 790 * Cu)) (1/100)) := lt_min hm1 (lt_min hm2 hm3)
   have hu0 : 0 < u := by rw [hudef]; linarith [hminpos]
   -- u ≤ each threshold (half of min ≤ min ≤ each arg)
   have hule_min : u ≤ min ((1/200 - 20 * g) / (C6 + 100))
-      (min ((2 - 18977 * g) / (18675 + 790 * Cu)) (1/100)) := by
+      (min ((2 - 18187 * g) / (18675 + 790 * Cu)) (1/100)) := by
     rw [hudef]; linarith [hminpos]
   have hu_off : u ≤ (1/200 - 20 * g) / (C6 + 100) :=
     le_trans hule_min (min_le_left _ _)
-  have hu_on : u ≤ (2 - 18977 * g) / (18675 + 790 * Cu) :=
+  have hu_on : u ≤ (2 - 18187 * g) / (18675 + 790 * Cu) :=
     le_trans hule_min (le_trans (min_le_right _ _) (min_le_left _ _))
   have hu2 : u ≤ 1 / 100 :=
     le_trans hule_min (le_trans (min_le_right _ _) (min_le_right _ _))
@@ -246,12 +246,12 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
     rw [← hC6def]
     have := (le_div_iff₀ hden1).mp hu_off
     linarith [this]
-  -- on budget: 18977g + (18675+790Cu)·u ≤ 2
-  have hubud_on : 18977 * g + (18675 + 790 * Cu) * u ≤ 2 := by
+  -- on budget: 18187g + (18675+790Cu)·u ≤ 2
+  have hubud_on : 18187 * g + (18675 + 790 * Cu) * u ≤ 2 := by
     have := (le_div_iff₀ hden2).mp hu_on
     linarith only [this]
-  -- goal opt: 18977g + 15315u < 2  (strict, via 15315 < 18675+790Cu and u>0)
-  have hopt : 18977 * g + 15315 * u < 2 := by
+  -- goal opt: 18187g + 15315u < 2  (strict, via 15315 < 18675+790Cu and u>0)
+  have hopt : 18187 * g + 15315 * u < 2 := by
     have hcoef : 15315 * u < (18675 + 790 * Cu) * u := by
       apply mul_lt_mul_of_pos_right _ hu0
       linarith only [hCu_on]
@@ -273,7 +273,7 @@ theorem dblock_bound (g : ℝ) (hg0 : 0 < g) (hg1 : g < 2 / 18977) :
       _ ≤ max Coff Con * P.H / P.U := by
           rw [mul_div_assoc, mul_div_assoc]
           exact mul_le_mul_of_nonneg_right (le_max_left _ _) hHU
-  · by_cases h2 : P.G ^ 17 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x
+  · by_cases h2 : P.G ^ 16 * S.Ω ^ (-26 : ℝ) * P.X ^ (Cu * P.u) ≤ S.x
     · have := hoff P hPg hPu hX S hΔ hX0big hlog hUbig hNR hAD hband hΩU (Or.inr h2) D hDpos hDeq
       calc DBlock P S D ≤ Coff * P.H / P.U := this
         _ ≤ max Coff Con * P.H / P.U := by

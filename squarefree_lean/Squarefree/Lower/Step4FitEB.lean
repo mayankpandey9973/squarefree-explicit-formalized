@@ -17,11 +17,11 @@ variable {P : Globals} {S : Scale P}
 private theorem fitEB_tail (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.Δ)
     (hΩU : S.Ω ≤ P.U) (C K : ℝ) (hC0 : 0 ≤ C)
     (hK : K ≤ P.U ^ 2) (m : ℕ) (hm11 : 11 ≤ m) (hm27 : m ≤ 27) :
-    K * C * P.G ^ 8 * P.U ^ 45 / S.Ω ^ m ≤ C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := by
+    K * C * P.G ^ 8 * P.U ^ 45 / S.Ω ^ m ≤ C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := by
   have hΩpos := S.Ω_pos
   have hGpos := P.G_pos
   have hUpos := P.U_pos
-  have hG815 : P.G ^ 8 ≤ P.G ^ 15 := pow_le_pow_right₀ hG1 (by norm_num)
+  have hG815 : P.G ^ 8 ≤ P.G ^ 14 := pow_le_pow_right₀ hG1 (by norm_num)
   have hpad : S.Ω ^ (27 - m) ≤ P.U ^ 16 :=
     le_trans (pow_le_pow_left₀ hΩpos.le hΩU _) (pow_le_pow_right₀ hU1 (by omega))
   have hsplit : S.Ω ^ 27 = S.Ω ^ (27 - m) * S.Ω ^ m := by
@@ -29,13 +29,13 @@ private theorem fitEB_tail (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U) (hΔ1 : 1 ≤ S.�
   rw [div_le_div_iff₀ (by positivity) (by positivity)]
   calc K * C * P.G ^ 8 * P.U ^ 45 * S.Ω ^ 27
       = (K * C * P.G ^ 8 * P.U ^ 45 * S.Ω ^ (27 - m)) * S.Ω ^ m := by rw [hsplit]; ring
-    _ ≤ (P.U ^ 2 * C * P.G ^ 15 * P.U ^ 45 * P.U ^ 16) * S.Ω ^ m := by
+    _ ≤ (P.U ^ 2 * C * P.G ^ 14 * P.U ^ 45 * P.U ^ 16) * S.Ω ^ m := by
         gcongr (?_ * C * ?_ * P.U ^ 45 * ?_) * S.Ω ^ m
-    _ = C * 1 * P.G ^ 15 * P.U ^ 63 * S.Ω ^ m := by ring
-    _ ≤ C * S.Δ * P.G ^ 15 * P.U ^ 63 * S.Ω ^ m := by
-        gcongr C * ?_ * P.G ^ 15 * P.U ^ 63 * S.Ω ^ m
-    _ ≤ C * S.Δ * P.G ^ 15 * P.U ^ 90 * S.Ω ^ m := by
-        gcongr C * S.Δ * P.G ^ 15 * ?_ * S.Ω ^ m
+    _ = C * 1 * P.G ^ 14 * P.U ^ 63 * S.Ω ^ m := by ring
+    _ ≤ C * S.Δ * P.G ^ 14 * P.U ^ 63 * S.Ω ^ m := by
+        gcongr C * ?_ * P.G ^ 14 * P.U ^ 63 * S.Ω ^ m
+    _ ≤ C * S.Δ * P.G ^ 14 * P.U ^ 90 * S.Ω ^ m := by
+        gcongr C * S.Δ * P.G ^ 14 * ?_ * S.Ω ^ m
         exact pow_le_pow_right₀ hU1 (by norm_num)
 
 /-- Collapse `Δ²/H ≤ 1/(G·U¹⁰)` (from `h1`) and the 6-factor window `W ≤ G⁶U³⁰`,
@@ -45,7 +45,7 @@ private theorem fitEB_pieceH (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
     (hΩU : S.Ω ≤ P.U) (C K W : ℝ) (hC0 : 0 ≤ C) (hK0 : 0 ≤ K)
     (hK : 130 ^ 6 * K ≤ P.U ^ 2) (hW : W ≤ 130 ^ 6 * (P.G ^ 6 * P.U ^ 30)) :
     K * C * S.Δ ^ 2 * P.G ^ 3 * P.U ^ 25 * W / (P.H * S.Ω ^ 14)
-      ≤ C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := by
+      ≤ C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := by
   have hΩpos := S.Ω_pos
   have hGpos := P.G_pos
   have hUpos := P.U_pos
@@ -67,7 +67,7 @@ private theorem fitEB_pieceH (h1 : P.G * P.U ^ 10 ≤ P.H / S.Δ ^ 2)
     _ ≤ ((130 ^ 6 * K) * C * P.G ^ 8 * P.U ^ 45 / S.Ω ^ 14) * 1 := by
         gcongr ((130 ^ 6 * K) * C * P.G ^ 8 * P.U ^ 45 / S.Ω ^ 14) * ?_
     _ = (130 ^ 6 * K) * C * P.G ^ 8 * P.U ^ 45 / S.Ω ^ 14 := mul_one _
-    _ ≤ C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 :=
+    _ ≤ C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 :=
         fitEB_tail hG1 hU1 hΔ1 hΩU C (130 ^ 6 * K) hC0
           hK 14 (by norm_num) (by norm_num)
 
@@ -85,7 +85,7 @@ theorem step4_fitEB_T1
     (gap : ℝ) (hgap0 : 0 ≤ gap)
     (hgap : gap ≤ 2*10^12*S.Δ/(P.G*S.Ω^3*ℓ₁) + 10^13*ℓ₁*S.Δ^3/(P.H*P.G^2*S.Ω^6)) :
     (10^10*a*P.G*S.Ω^3*gap/S.Δ^2) * (P.G^4*P.U^15/S.Ω^4) * n
-      ≤ 2 * (C * (P.H/S.Δ) * (S.Δ^2*P.G^15*P.U^90/(P.H*S.Ω^27))) := by
+      ≤ 2 * (C * (P.H/S.Δ) * (S.Δ^2*P.G^14*P.U^90/(P.H*S.Ω^27))) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -130,12 +130,12 @@ theorem step4_fitEB_T1
           mul_le_mul h2 hm2 (mul_nonneg (by linarith) hd0.le) (by positivity)
       _ = 130^4*(P.G^4*P.U^20) := by ring
   have hP1 : 22*10^22*C*P.G^4*P.U^25*(ℓ₁^2*(ℓ₂*(ℓ₂-ℓ₁)))/S.Ω^11
-      ≤ C*S.Δ*P.G^15*P.U^90/S.Ω^27 := by
+      ≤ C*S.Δ*P.G^14*P.U^90/S.Ω^27 := by
     calc 22*10^22*C*P.G^4*P.U^25*(ℓ₁^2*(ℓ₂*(ℓ₂-ℓ₁)))/S.Ω^11
         ≤ 22*10^22*C*P.G^4*P.U^25*(130^4*(P.G^4*P.U^20))/S.Ω^11 := by
           gcongr 22*10^22*C*P.G^4*P.U^25*?_/S.Ω^11
       _ = (130^4*(22*10^22))*C*P.G^8*P.U^45/S.Ω^11 := by ring
-      _ ≤ C*S.Δ*P.G^15*P.U^90/S.Ω^27 :=
+      _ ≤ C*S.Δ*P.G^14*P.U^90/S.Ω^27 :=
           fitEB_tail hG1 hU1 hΔ1 hΩU C (130^4*(22*10^22)) hC0.le hK1 11
             (by norm_num) (by norm_num)
   -- step 4: gap₂ piece — 6-factor window then H-collapse + tail
@@ -148,11 +148,11 @@ theorem step4_fitEB_T1
           mul_le_mul h4 hm2 (mul_nonneg (by linarith) hd0.le) (by positivity)
       _ = 130^6*(P.G^6*P.U^30) := by ring
   have hP2 : 11*10^23*C*S.Δ^2*P.G^3*P.U^25*(ℓ₁^4*(ℓ₂*(ℓ₂-ℓ₁)))/(P.H*S.Ω^14)
-      ≤ C*S.Δ*P.G^15*P.U^90/S.Ω^27 :=
+      ≤ C*S.Δ*P.G^14*P.U^90/S.Ω^27 :=
     fitEB_pieceH h1 hG1 hU1 hΔ1 hΩU C (11*10^23) _ hC0.le (by norm_num) hK2 hW6
   -- assemble
-  have h2t : 2 * (C * (P.H/S.Δ) * (S.Δ^2*P.G^15*P.U^90/(P.H*S.Ω^27)))
-      = 2 * (C*S.Δ*P.G^15*P.U^90/S.Ω^27) := by
+  have h2t : 2 * (C * (P.H/S.Δ) * (S.Δ^2*P.G^14*P.U^90/(P.H*S.Ω^27)))
+      = 2 * (C*S.Δ*P.G^14*P.U^90/S.Ω^27) := by
     field_simp
   refine (hmono.trans (le_of_eq hsplit)).trans ?_
   linarith [hP1, hP2]
@@ -169,7 +169,7 @@ theorem step4_fitEB_T2
     (hncap : n ≤ C*ℓ₁^2*(ℓ₁*ℓ₂*(ℓ₂-ℓ₁))*P.U^10/S.Ω^8) (hn0 : 0 ≤ n)
     (a : ℝ) (ha_hi : a ≤ 11*S.A) :
     (10^35*a*P.G*S.Ω^3*ℓ₂*S.B^2/(S.Δ^2*S.D)) * (P.G^4*P.U^15/S.Ω^4) * n
-      ≤ C * (P.H/S.Δ) * (S.Δ^2*P.G^15*P.U^90/(P.H*S.Ω^27)) := by
+      ≤ C * (P.H/S.Δ) * (S.Δ^2*P.G^14*P.U^90/(P.H*S.Ω^27)) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -212,18 +212,18 @@ theorem step4_fitEB_T2
           mul_le_mul h3 hm (mul_nonneg (sq_nonneg ℓ₂) hd0.le) (by positivity)
       _ = 130^6*(P.G^6*P.U^30) := by ring
   have hP3 : 11*10^35*C*S.Δ^2*P.G^3*P.U^25*(ℓ₁^3*(ℓ₂^2*(ℓ₂-ℓ₁)))/(P.H*S.Ω^14)
-      ≤ C*S.Δ*P.G^15*P.U^90/S.Ω^27 :=
+      ≤ C*S.Δ*P.G^14*P.U^90/S.Ω^27 :=
     fitEB_pieceH h1 hG1 hU1 hΔ1 hΩU C (11*10^35) _ hC0.le (by norm_num) hK3 hW6
   -- assemble
-  rw [show C*(P.H/S.Δ)*(S.Δ^2*P.G^15*P.U^90/(P.H*S.Ω^27))
-      = C*S.Δ*P.G^15*P.U^90/S.Ω^27 from by field_simp]
+  rw [show C*(P.H/S.Δ)*(S.Δ^2*P.G^14*P.U^90/(P.H*S.Ω^27))
+      = C*S.Δ*P.G^14*P.U^90/S.Ω^27 from by field_simp]
   exact (hmono.trans (le_of_eq hcollect)).trans hP3
 
 /-- **Hybrid E-fit, target form.** The summed `t7'`-shaped budget collapses to
 `8·C·Δ·G¹⁵·U⁹⁰/Ω²⁷`. -/
 theorem step4_fitEB_target_eq (C : ℝ) :
-    8 * C * (P.H/S.Δ) * (S.Δ^2*P.G^15*P.U^90/(P.H*S.Ω^27))
-      = 8 * C * S.Δ*P.G^15*P.U^90/S.Ω^27 := by
+    8 * C * (P.H/S.Δ) * (S.Δ^2*P.G^14*P.U^90/(P.H*S.Ω^27))
+      = 8 * C * S.Δ*P.G^14*P.U^90/S.Ω^27 := by
   have hΔne : S.Δ ≠ 0 := ne_of_gt S.Δ_pos
   have hΩne : S.Ω ≠ 0 := ne_of_gt S.Ω_pos
   have hHne : P.H ≠ 0 := ne_of_gt P.H_pos

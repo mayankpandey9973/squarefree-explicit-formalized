@@ -20,8 +20,8 @@ set_option maxHeartbeats 1600000
 
 /-- The `t7'` target block in monomial form: `4C·(H/Δ)·Δ²G¹⁵U⁹⁰/(HΩ²⁷) = 4C·ΔG¹⁵U⁹⁰/Ω²⁷`. -/
 private theorem cC_target_eq4 (C : ℝ) :
-    4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27))
-      = 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := by
+    4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27))
+      = 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := by
   have hHne : P.H ≠ 0 := ne_of_gt P.H_pos
   have hΔne : S.Δ ≠ 0 := ne_of_gt S.Δ_pos
   have hΩne : S.Ω ≠ 0 := ne_of_gt S.Ω_pos
@@ -62,7 +62,7 @@ private theorem step4_fit_cCM_E
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     (10 ^ 44 * a * P.G * S.Ω ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * S.B ^ 3 / (S.Δ ^ 3 * S.D))
         * b * (N : ℝ)
-      ≤ 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
+      ≤ 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -123,31 +123,31 @@ private theorem step4_fit_cCM_E
     have h := pow_le_pow_left₀ (by norm_num : (0:ℝ) ≤ 10 ^ 33) hUbig 14
     calc (10:ℝ) ^ 462 = ((10:ℝ) ^ 33) ^ 14 := by rw [← pow_mul]
       _ ≤ P.U ^ 14 := h
-  have hscalar : 11 * 10 ^ 61 * S.Ω ^ 11 ≤ 4 * P.G ^ 4 * P.U ^ 25 := by
+  have hscalar : 11 * 10 ^ 61 * S.Ω ^ 11 ≤ 4 * P.G ^ 3 * P.U ^ 25 := by
     have h46 : (11:ℝ) * 10 ^ 61 ≤ (10:ℝ) ^ 462 := by
       calc (11:ℝ) * 10 ^ 61 ≤ 10 ^ 2 * 10 ^ 61 := by norm_num
         _ = (10:ℝ) ^ 63 := by rw [← pow_add]
         _ ≤ (10:ℝ) ^ 462 := pow_le_pow_right₀ (by norm_num) (by norm_num)
-    have hG4 : (1:ℝ) ≤ P.G ^ 4 := one_le_pow₀ hG1
+    have hG4 : (1:ℝ) ≤ P.G ^ 3 := one_le_pow₀ hG1
     calc 11 * 10 ^ 61 * S.Ω ^ 11 ≤ 11 * 10 ^ 61 * P.U ^ 11 :=
           mul_le_mul_of_nonneg_left hΩ11 (by norm_num)
       _ ≤ (10:ℝ) ^ 462 * P.U ^ 11 := mul_le_mul_of_nonneg_right h46 (by positivity)
       _ ≤ P.U ^ 14 * P.U ^ 11 := mul_le_mul_of_nonneg_right hU14 (by positivity)
       _ = 1 * P.U ^ 25 := by ring
-      _ ≤ 4 * P.G ^ 4 * P.U ^ 25 := by
-          have h4G : (1:ℝ) ≤ 4 * P.G ^ 4 := by linarith only [hG4]
+      _ ≤ 4 * P.G ^ 3 * P.U ^ 25 := by
+          have h4G : (1:ℝ) ≤ 4 * P.G ^ 3 := by linarith only [hG4]
           exact mul_le_mul_of_nonneg_right h4G (by positivity)
   -- step 5: cross-multiplied comparison
   have hfin : 11 * 10 ^ 44 * C * P.G ^ 3 * P.U ^ 25 * S.Δ
         * (10 ^ 17 * (P.G ^ 8 * P.U ^ 40)) / S.Ω ^ 16
-      ≤ 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := by
+      ≤ 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := by
     rw [div_le_div_iff₀ (by positivity) (by positivity)]
     calc 11 * 10 ^ 44 * C * P.G ^ 3 * P.U ^ 25 * S.Δ * (10 ^ 17 * (P.G ^ 8 * P.U ^ 40))
           * S.Ω ^ 27
         = (11 * 10 ^ 61 * S.Ω ^ 11) * (C * P.G ^ 11 * P.U ^ 65 * S.Δ * S.Ω ^ 16) := by ring
-      _ ≤ (4 * P.G ^ 4 * P.U ^ 25) * (C * P.G ^ 11 * P.U ^ 65 * S.Δ * S.Ω ^ 16) :=
+      _ ≤ (4 * P.G ^ 3 * P.U ^ 25) * (C * P.G ^ 11 * P.U ^ 65 * S.Δ * S.Ω ^ 16) :=
           mul_le_mul_of_nonneg_right hscalar (by positivity)
-      _ = 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 * S.Ω ^ 16 := by ring
+      _ = 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 * S.Ω ^ 16 := by ring
   -- assemble
   calc 10 ^ 44 * a * P.G * S.Ω ^ 2 * L * S.B ^ 3 / (S.Δ ^ 3 * S.D) * b * (N : ℝ)
       ≤ (11 * 10 ^ 44 * S.Δ ^ 3 * L / (P.G ^ 2 * P.H * S.Ω ^ 6))
@@ -157,8 +157,8 @@ private theorem step4_fit_cCM_E
     _ ≤ 11 * 10 ^ 44 * C * P.G ^ 3 * P.U ^ 25 * S.Δ
           * (10 ^ 17 * (P.G ^ 8 * P.U ^ 40)) / S.Ω ^ 16 := by
         gcongr 11 * 10 ^ 44 * C * P.G ^ 3 * P.U ^ 25 * S.Δ * ?_ / S.Ω ^ 16
-    _ ≤ 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := hfin
-    _ = 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) :=
+    _ ≤ 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := hfin
+    _ = 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) :=
         (cC_target_eq4 C).symm
 
 /-- **cC-slot `B³`-monomial fit, F-block.** `M·dc·2√N ≤ 4·C·(H/Δ)·t7'` — keep-net form:
@@ -176,7 +176,7 @@ private theorem step4_fit_cCM_F
     (hdc : dc = P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4 * Real.sqrt (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁))) :
     (10 ^ 44 * a * P.G * S.Ω ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * S.B ^ 3 / (S.Δ ^ 3 * S.D))
         * dc * (2 * Real.sqrt (N : ℝ))
-      ≤ 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
+      ≤ 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -277,8 +277,8 @@ private theorem step4_fit_cCM_F
           mul_le_mul_of_nonneg_right hG1 (by positivity)
       _ = P.G * P.U ^ 10 * S.Δ ^ 2 := by ring
       _ ≤ P.H := hHcap
-  have hscalarF : 22 * 10 ^ 119 * (S.Δ ^ 2 * S.Ω ^ 13) ≤ 4 * P.G ^ 6 * P.U ^ 35 * P.H := by
-    have hG6 : (1:ℝ) ≤ P.G ^ 6 := one_le_pow₀ hG1
+  have hscalarF : 22 * 10 ^ 119 * (S.Δ ^ 2 * S.Ω ^ 13) ≤ 4 * P.G ^ 5 * P.U ^ 35 * P.H := by
+    have hG6 : (1:ℝ) ≤ P.G ^ 5 := one_le_pow₀ hG1
     have hU3135 : P.U ^ 31 ≤ P.U ^ 35 := pow_le_pow_right₀ hU1 (by norm_num)
     calc 22 * 10 ^ 119 * (S.Δ ^ 2 * S.Ω ^ 13)
         ≤ P.U ^ 28 * (S.Δ ^ 2 * S.Ω ^ 13) :=
@@ -290,25 +290,25 @@ private theorem step4_fit_cCM_F
       _ ≤ P.U ^ 31 * P.H := mul_le_mul_of_nonneg_left hUΔH (by positivity)
       _ ≤ P.U ^ 35 * P.H := mul_le_mul_of_nonneg_right hU3135 hHpos.le
       _ = 1 * (P.U ^ 35 * P.H) := (one_mul _).symm
-      _ ≤ 4 * P.G ^ 6 * (P.U ^ 35 * P.H) := by
-          have h4G : (1:ℝ) ≤ 4 * P.G ^ 6 := by linarith
+      _ ≤ 4 * P.G ^ 5 * (P.U ^ 35 * P.H) := by
+          have h4G : (1:ℝ) ≤ 4 * P.G ^ 5 := by linarith
           exact mul_le_mul_of_nonneg_right h4G (by positivity)
-      _ = 4 * P.G ^ 6 * P.U ^ 35 * P.H := by ring
+      _ = 4 * P.G ^ 5 * P.U ^ 35 * P.H := by ring
   -- step 7: cross-multiplied comparison
   have hfinF : 22 * 10 ^ 104 * S.Δ ^ 3 * P.G ^ 2 * P.U ^ 20
         * (10 ^ 15 * (P.G ^ 7 * P.U ^ 35)) / (P.H * S.Ω ^ 14)
-      ≤ 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := by
+      ≤ 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := by
     rw [div_le_div_iff₀ (by positivity) (by positivity)]
     calc 22 * 10 ^ 104 * S.Δ ^ 3 * P.G ^ 2 * P.U ^ 20 * (10 ^ 15 * (P.G ^ 7 * P.U ^ 35))
           * S.Ω ^ 27
         = (22 * 10 ^ 119 * (S.Δ ^ 2 * S.Ω ^ 13)) * (S.Δ * P.G ^ 9 * P.U ^ 55 * S.Ω ^ 14) := by
           ring
-      _ ≤ (4 * P.G ^ 6 * P.U ^ 35 * P.H) * (S.Δ * P.G ^ 9 * P.U ^ 55 * S.Ω ^ 14) :=
+      _ ≤ (4 * P.G ^ 5 * P.U ^ 35 * P.H) * (S.Δ * P.G ^ 9 * P.U ^ 55 * S.Ω ^ 14) :=
           mul_le_mul_of_nonneg_right hscalarF (by positivity)
-      _ = 1 * (4 * S.Δ * P.G ^ 15 * P.U ^ 90 * (P.H * S.Ω ^ 14)) := by ring
-      _ ≤ C * (4 * S.Δ * P.G ^ 15 * P.U ^ 90 * (P.H * S.Ω ^ 14)) :=
+      _ = 1 * (4 * S.Δ * P.G ^ 14 * P.U ^ 90 * (P.H * S.Ω ^ 14)) := by ring
+      _ ≤ C * (4 * S.Δ * P.G ^ 14 * P.U ^ 90 * (P.H * S.Ω ^ 14)) :=
           mul_le_mul_of_nonneg_right hC (by positivity)
-      _ = 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 * (P.H * S.Ω ^ 14) := by ring
+      _ = 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 * (P.H * S.Ω ^ 14) := by ring
   -- assemble
   calc 10 ^ 44 * a * P.G * S.Ω ^ 2 * L * S.B ^ 3 / (S.Δ ^ 3 * S.D) * dc
         * (2 * Real.sqrt (N : ℝ))
@@ -320,8 +320,8 @@ private theorem step4_fit_cCM_F
     _ ≤ 22 * 10 ^ 104 * S.Δ ^ 3 * P.G ^ 2 * P.U ^ 20 * (10 ^ 15 * (P.G ^ 7 * P.U ^ 35))
           / (P.H * S.Ω ^ 14) := by
         gcongr 22 * 10 ^ 104 * S.Δ ^ 3 * P.G ^ 2 * P.U ^ 20 * ?_ / (P.H * S.Ω ^ 14)
-    _ ≤ 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := hfinF
-    _ = 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) :=
+    _ ≤ 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := hfinF
+    _ = 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) :=
         (cC_target_eq4 C).symm
 
 /-- **cC-slot fit, E-block.** `cC·b·N ≤ 8·C·(H/Δ)·t7'`: the `B³`-monomial part and the
@@ -337,7 +337,7 @@ theorem step4_fit_cC_E
     (a : ℝ) (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     cChyb P S a ℓ₁ ℓ₂ * b * (N : ℝ)
-      ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
+      ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
   have hsplit : cChyb P S a ℓ₁ ℓ₂ * b * (N : ℝ)
       = (10 ^ 44 * a * P.G * S.Ω ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * S.B ^ 3 / (S.Δ ^ 3 * S.D))
           * b * (N : ℝ)
@@ -367,7 +367,7 @@ theorem step4_fit_cC_F
     (dc : ℝ)
     (hdc : dc = P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4 * Real.sqrt (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁))) :
     cChyb P S a ℓ₁ ℓ₂ * dc * (2 * Real.sqrt (N : ℝ))
-      ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
+      ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
   have hsplit : cChyb P S a ℓ₁ ℓ₂ * dc * (2 * Real.sqrt (N : ℝ))
       = (10 ^ 44 * a * P.G * S.Ω ^ 2 * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * S.B ^ 3 / (S.Δ ^ 3 * S.D))
           * dc * (2 * Real.sqrt (N : ℝ))

@@ -66,7 +66,7 @@ theorem step4_fit_cCp3_E
     (a : ℝ) (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     (4 * a * Ecap4p3 P S ℓ₁ ℓ₂ / Real.sqrt (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁))) * b * (N : ℝ)
-      ≤ 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
+      ≤ 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -157,37 +157,38 @@ theorem step4_fit_cCp3_E
     calc (10:ℝ) ^ 54 * (P.G ^ 8 * P.U ^ 40) = (10 ^ 27 * (P.G ^ 4 * P.U ^ 20)) ^ 2 := by ring
       _ ≤ S.Δ ^ 2 := pow_le_pow_left₀ (by positivity) hDeW 2
   have hΩ7 : S.Ω ^ 7 ≤ P.U ^ 7 := pow_le_pow_left₀ hΩpos.le hΩU 7
-  have hsc : 30492 * 10 ^ 95 * P.U ^ 7 ≤ 4 * (10 ^ 54 * (P.G ^ 8 * P.U ^ 40)) := by
+  have hsc : 30492 * 10 ^ 95 * (P.G * P.U ^ 7) ≤ 4 * (10 ^ 54 * (P.G ^ 8 * P.U ^ 40)) := by
     have hU33 : (30492:ℝ) * 10 ^ 41 ≤ P.U ^ 33 := by
       calc (30492:ℝ) * 10 ^ 41 ≤ (10:ℝ) ^ 46 := by norm_num
         _ ≤ (10:ℝ) ^ 1089 := pow_le_pow_right₀ (by norm_num) (by norm_num)
         _ = ((10:ℝ) ^ 33) ^ 33 := by rw [← pow_mul]
         _ ≤ P.U ^ 33 := pow_le_pow_left₀ (by norm_num) hUbig 33
-    have hG8 : (1:ℝ) ≤ P.G ^ 8 := one_le_pow₀ hG1
-    calc 30492 * 10 ^ 95 * P.U ^ 7 = 10 ^ 54 * (30492 * 10 ^ 41) * P.U ^ 7 := by ring
-      _ ≤ 10 ^ 54 * P.U ^ 33 * P.U ^ 7 := by gcongr 10 ^ 54 * ?_ * P.U ^ 7
-      _ = 10 ^ 54 * (1 * P.U ^ 40) := by ring
+    have hG18 : P.G ≤ P.G ^ 8 := le_self_pow₀ hG1 (by norm_num)
+    calc 30492 * 10 ^ 95 * (P.G * P.U ^ 7)
+        = 10 ^ 54 * (30492 * 10 ^ 41) * (P.G * P.U ^ 7) := by ring
+      _ ≤ 10 ^ 54 * P.U ^ 33 * (P.G * P.U ^ 7) := by gcongr 10 ^ 54 * ?_ * (P.G * P.U ^ 7)
+      _ = 10 ^ 54 * (P.G * P.U ^ 40) := by ring
       _ ≤ 10 ^ 54 * (P.G ^ 8 * P.U ^ 40) := by gcongr 10 ^ 54 * (?_ * P.U ^ 40)
       _ ≤ 4 * (10 ^ 54 * (P.G ^ 8 * P.U ^ 40)) := by
           nlinarith [mul_pos (pow_pos hGpos 8) (pow_pos hUpos 40)]
   have hfin : 10164 * 10 ^ 73 * C * P.G ^ 5 * P.U ^ 40 * (3 * 10 ^ 22 * (P.G ^ 10 * P.U ^ 50))
         / (S.Δ * S.Ω ^ 20)
-      ≤ 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := by
+      ≤ 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := by
     rw [div_le_div_iff₀ (by positivity) (by positivity)]
     calc 10164 * 10 ^ 73 * C * P.G ^ 5 * P.U ^ 40 * (3 * 10 ^ 22 * (P.G ^ 10 * P.U ^ 50))
           * S.Ω ^ 27
-        = (30492 * 10 ^ 95 * S.Ω ^ 7) * (C * P.G ^ 15 * P.U ^ 90 * S.Ω ^ 20) := by ring
-      _ ≤ (30492 * 10 ^ 95 * P.U ^ 7) * (C * P.G ^ 15 * P.U ^ 90 * S.Ω ^ 20) := by
-          gcongr (30492 * 10 ^ 95 * ?_) * (C * P.G ^ 15 * P.U ^ 90 * S.Ω ^ 20)
-      _ ≤ (4 * (10 ^ 54 * (P.G ^ 8 * P.U ^ 40))) * (C * P.G ^ 15 * P.U ^ 90 * S.Ω ^ 20) :=
+        = (30492 * 10 ^ 95 * (P.G * S.Ω ^ 7)) * (C * P.G ^ 14 * P.U ^ 90 * S.Ω ^ 20) := by ring
+      _ ≤ (30492 * 10 ^ 95 * (P.G * P.U ^ 7)) * (C * P.G ^ 14 * P.U ^ 90 * S.Ω ^ 20) := by
+          gcongr (30492 * 10 ^ 95 * (P.G * ?_)) * (C * P.G ^ 14 * P.U ^ 90 * S.Ω ^ 20)
+      _ ≤ (4 * (10 ^ 54 * (P.G ^ 8 * P.U ^ 40))) * (C * P.G ^ 14 * P.U ^ 90 * S.Ω ^ 20) :=
           mul_le_mul_of_nonneg_right hsc (by positivity)
-      _ ≤ (4 * S.Δ ^ 2) * (C * P.G ^ 15 * P.U ^ 90 * S.Ω ^ 20) := by
+      _ ≤ (4 * S.Δ ^ 2) * (C * P.G ^ 14 * P.U ^ 90 * S.Ω ^ 20) := by
           have := mul_le_mul_of_nonneg_left hΔsq (by norm_num : (0:ℝ) ≤ 4)
           exact mul_le_mul_of_nonneg_right this (by positivity)
-      _ = 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 * (S.Δ * S.Ω ^ 20) := by ring
+      _ = 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 * (S.Δ * S.Ω ^ 20) := by ring
   -- assemble
-  have htgt : 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27))
-      = 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := by
+  have htgt : 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27))
+      = 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := by
     have hΩne : S.Ω ≠ 0 := ne_of_gt hΩpos
     have hHne : P.H ≠ 0 := ne_of_gt hHpos
     have hΔne : S.Δ ≠ 0 := ne_of_gt hΔpos
@@ -210,7 +211,7 @@ theorem step4_fit_cCp3_F
     (hdc : dc = P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4 * Real.sqrt (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁))) :
     (4 * a * Ecap4p3 P S ℓ₁ ℓ₂ / Real.sqrt (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁))) * dc
         * (2 * Real.sqrt (N : ℝ))
-      ≤ 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
+      ≤ 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -343,7 +344,7 @@ theorem step4_fit_cCp3_F
   have hΩ9 : S.Ω ^ 9 ≤ P.U ^ 9 := pow_le_pow_left₀ hΩpos.le hΩU 9
   have hfin : 20328 * 10 ^ 133 * S.Δ * P.G ^ 4 * P.U ^ 35
         * (3 * 10 ^ 20 * (P.G ^ 9 * P.U ^ 45)) / (P.H * S.Ω ^ 18)
-      ≤ 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := by
+      ≤ 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := by
     rw [div_le_div_iff₀ (by positivity) (by positivity)]
     have hsc : 60984 * 10 ^ 153 * P.U ^ 9 ≤ 4 * P.U ^ 10 * P.H := by
       have hU11 : (60984:ℝ) * 10 ^ 153 ≤ P.U ^ 11 := by
@@ -364,12 +365,12 @@ theorem step4_fit_cCp3_F
       _ ≤ (4 * P.U ^ 10 * P.H) * (S.Δ * P.G ^ 13 * P.U ^ 80 * S.Ω ^ 18) :=
           mul_le_mul_of_nonneg_right hsc (by positivity)
       _ = 4 * 1 * S.Δ * P.G ^ 13 * P.U ^ 90 * (P.H * S.Ω ^ 18) := by ring
-      _ ≤ 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 * (P.H * S.Ω ^ 18) := by
-          have hG1315 : P.G ^ 13 ≤ P.G ^ 15 := pow_le_pow_right₀ hG1 (by norm_num)
+      _ ≤ 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 * (P.H * S.Ω ^ 18) := by
+          have hG1315 : P.G ^ 13 ≤ P.G ^ 14 := pow_le_pow_right₀ hG1 (by norm_num)
           gcongr 4 * ?_ * S.Δ * ?_ * P.U ^ 90 * (P.H * S.Ω ^ 18)
   -- assemble
-  have htgt : 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27))
-      = 4 * C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := by
+  have htgt : 4 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27))
+      = 4 * C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := by
     have hΩne : S.Ω ≠ 0 := ne_of_gt hΩpos
     have hHne : P.H ≠ 0 := ne_of_gt hHpos
     have hΔne : S.Δ ≠ 0 := ne_of_gt hΔpos

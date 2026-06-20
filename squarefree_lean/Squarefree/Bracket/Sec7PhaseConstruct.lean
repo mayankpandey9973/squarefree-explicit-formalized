@@ -3594,11 +3594,11 @@ private theorem sec7_relErr_le_relErrF {P : Globals} {S : Scale P}
     sec7_relErr P S ≤ sec7_relErrF P S := by
   have hHpos := P.H_pos
   have hUpos := P.U_pos
-  have hb : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hb : 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have hCu1 : (1 : ℝ) ≤ Cu := hsd.hCu
   have hCuu_nn : (0 : ℝ) ≤ Cu * P.u := mul_nonneg (le_trans zero_le_one hCu1) hu0.le
   have hu_le : P.u ≤ 2 / 18675 := by linarith [hb, hg0, hCuu_nn]
-  have hg_le : P.g ≤ 2 / 18977 := by linarith [hb, hu0.le, hCuu_nn]
+  have hg_le : P.g ≤ 2 / 18187 := by linarith [hb, hu0.le, hCuu_nn]
   have key : sec7_relErr P S ≤ P.U / P.H * P.U ^ 3 := by
     unfold sec7_relErr
     gcongr
@@ -3619,11 +3619,11 @@ private theorem sec7_A_le_T₃_relErrF {P : Globals} {S : Scale P}
     S.A ≤ S.T₃ * sec7_relErrF P S := by
   have hHpos := P.H_pos
   have hΔpos := S.Δ_pos
-  have hb : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hb : 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have hCu1 : (1 : ℝ) ≤ Cu := hsd.hCu
   have hCuu_nn : (0 : ℝ) ≤ Cu * P.u := mul_nonneg (le_trans zero_le_one hCu1) hu0.le
   have hu_le : P.u ≤ 2 / 18675 := by linarith [hb, hg0, hCuu_nn]
-  have hg_le : P.g ≤ 2 / 18977 := by linarith [hb, hu0.le, hCuu_nn]
+  have hg_le : P.g ≤ 2 / 18187 := by linarith [hb, hu0.le, hCuu_nn]
   have hHrelF : P.H * sec7_relErrF P S = P.X ^ ((1 - P.g) / 5 - 19 / 100 : ℝ) := by
     rw [Globals.H, show sec7_relErrF P S = P.X ^ (-(19 : ℝ) / 100) from rfl,
       ← Real.rpow_add P.X_pos]
@@ -3759,11 +3759,11 @@ private theorem sec7_ra_jF_powersaving {P : Globals} {S : Scale P} {c₀ Cu : �
       exact lt_of_lt_of_le (by norm_num) hUbig
     exact (Real.rpow_lt_rpow_left_iff hX_gt1).mp h0
   -- admissibility consequences of the budget
-  have hb : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hb : 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have hCu1 : (1 : ℝ) ≤ Cu := hsd.hCu
   have hCuu_nn : (0 : ℝ) ≤ Cu * P.u := mul_nonneg (le_trans zero_le_one hCu1) hu_pos.le
   have hu_le : P.u ≤ 2 / 18675 := by linarith [hb, hg0, hCuu_nn]
-  have hg_le : P.g ≤ 2 / 18977 := by linarith [hb, hu_pos.le, hCuu_nn]
+  have hg_le : P.g ≤ 2 / 18187 := by linarith [hb, hu_pos.le, hCuu_nn]
   have hCuu_le : Cu * P.u ≤ 2 / 790 := by linarith [hb, hg0, hu_pos.le]
   -- the strip lower bound on Ω and x as clean X-powers
   have hΩpow : P.G ^ (-1/4 : ℝ) * P.U ^ (-3/4 : ℝ) = P.X ^ (-P.g/4 - 3*P.u/4 : ℝ) := by

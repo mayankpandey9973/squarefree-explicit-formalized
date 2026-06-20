@@ -66,8 +66,8 @@ theorem ra_step4_ssum_collapse'
     (hdc : dc = P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4 * Real.sqrt L) :
     (∑ n ∈ Finset.Icc 1 N, weight4' b ev dc (n : ℝ))
       ≤ 16 * C * (P.H / S.Δ) *
-          ( P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-          + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27) ) := by
+          ( P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+          + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27) ) := by
   -- positivity facts
   have hGpos := P.G_pos
   have hUpos := P.U_pos
@@ -142,12 +142,12 @@ theorem ra_step4_ssum_collapse'
         _ = C * (ev * dc * Scap) := by ring
     linarith [t1, t2, t3]
   refine le_trans hkey ?_
-  set HDt6 : ℝ := P.H * P.G ^ 15 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) with hHDt6
-  set HDt7 : ℝ := S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 with hHDt7
+  set HDt6 : ℝ := P.H * P.G ^ 14 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) with hHDt6
+  set HDt7 : ℝ := S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 with hHDt7
   have hHDt6nn : 0 ≤ HDt6 := by rw [hHDt6]; positivity
   have hHDt7nn : 0 ≤ HDt7 := by rw [hHDt7]; positivity
-  have hRHS : 16 * C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-        + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27))
+  have hRHS : 16 * C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+        + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27))
       = C * (16 * HDt6 + 16 * HDt7) := by
     rw [hHDt6, hHDt7]; field_simp; try ring
   rw [hRHS]
@@ -214,63 +214,63 @@ theorem ra_step4_ssum_collapse'
         _ = 130 ^ 4 * (P.G * P.U ^ 5) ^ 4 := by ring
     -- the regime power facts
     have hU17k : (130 : ℝ) ^ 5 ≤ P.U := le_trans (by norm_num) hUbig
-    have R1 : 130 ^ 5 * S.Ω ^ 3 ≤ P.G ^ 5 * P.U ^ 25 := by
+    have R1 : 130 ^ 5 * S.Ω ^ 3 ≤ P.G ^ 4 * P.U ^ 25 := by
       calc (130:ℝ) ^ 5 * S.Ω ^ 3 ≤ 130 ^ 5 * P.U ^ 3 :=
             mul_le_mul_of_nonneg_left (hΩ_le 3) (by positivity)
         _ ≤ P.U * P.U ^ 3 := mul_le_mul_of_nonneg_right hU17k (by positivity)
         _ = P.U ^ 4 := by ring
         _ ≤ P.U ^ 25 := pow_le_pow_right₀ hU1 (by norm_num)
-        _ ≤ P.G ^ 5 * P.U ^ 25 := le_mul_of_one_le_left (by positivity) (one_le_pow₀ hG1)
-    have R2 : 2 * 130 ^ 4 * S.Ω ^ 19 ≤ S.Δ * P.G ^ 7 * P.U ^ 50 := by
+        _ ≤ P.G ^ 4 * P.U ^ 25 := le_mul_of_one_le_left (by positivity) (one_le_pow₀ hG1)
+    have R2 : 2 * 130 ^ 4 * S.Ω ^ 19 ≤ S.Δ * P.G ^ 6 * P.U ^ 50 := by
       calc (2:ℝ) * 130 ^ 4 * S.Ω ^ 19 ≤ 2 * 130 ^ 4 * P.U ^ 19 :=
             mul_le_mul_of_nonneg_left (hΩ_le 19) (by positivity)
         _ ≤ P.U * P.U ^ 19 := mul_le_mul_of_nonneg_right (le_trans (by norm_num) hU17k) (by positivity)
         _ = P.U ^ 20 := by ring
         _ ≤ P.U ^ 50 := pow_le_pow_right₀ hU1 (by norm_num)
-        _ ≤ S.Δ * P.G ^ 7 * P.U ^ 50 := by
-            have h17 : (1 : ℝ) ≤ S.Δ * P.G ^ 7 := by
-              have := mul_le_mul hΔ1 (one_le_pow₀ hG1 (n := 7)) zero_le_one (le_trans zero_le_one hΔ1)
+        _ ≤ S.Δ * P.G ^ 6 * P.U ^ 50 := by
+            have h17 : (1 : ℝ) ≤ S.Δ * P.G ^ 6 := by
+              have := mul_le_mul hΔ1 (one_le_pow₀ hG1 (n := 6)) zero_le_one (le_trans zero_le_one hΔ1)
               simpa using this
             calc P.U ^ 50 = 1 * P.U ^ 50 := (one_mul _).symm
-              _ ≤ (S.Δ * P.G ^ 7) * P.U ^ 50 := mul_le_mul_of_nonneg_right h17 (by positivity)
-              _ = S.Δ * P.G ^ 7 * P.U ^ 50 := by ring
-    have R3 : 260 * S.Ω ^ 8 ≤ P.G ^ 5 * P.U ^ 30 := by
+              _ ≤ (S.Δ * P.G ^ 6) * P.U ^ 50 := mul_le_mul_of_nonneg_right h17 (by positivity)
+              _ = S.Δ * P.G ^ 6 * P.U ^ 50 := by ring
+    have R3 : 260 * S.Ω ^ 8 ≤ P.G ^ 4 * P.U ^ 30 := by
       calc 260 * S.Ω ^ 8 ≤ 260 * P.U ^ 8 :=
             mul_le_mul_of_nonneg_left (hΩ_le 8) (by positivity)
         _ ≤ P.U * P.U ^ 8 := mul_le_mul_of_nonneg_right (le_trans (by norm_num) hU17k) (by positivity)
         _ = P.U ^ 9 := by ring
         _ ≤ P.U ^ 30 := pow_le_pow_right₀ hU1 (by norm_num)
-        _ ≤ P.G ^ 5 * P.U ^ 30 := le_mul_of_one_le_left (by positivity) (one_le_pow₀ hG1)
-    have R4 : 260 * S.Δ ^ 2 * S.Ω ^ 8 ≤ P.H * P.G ^ 4 * P.U ^ 20 := by
+        _ ≤ P.G ^ 4 * P.U ^ 30 := le_mul_of_one_le_left (by positivity) (one_le_pow₀ hG1)
+    have R4 : 260 * S.Δ ^ 2 * S.Ω ^ 8 ≤ P.H * P.G ^ 3 * P.U ^ 20 := by
       have hf1 := mul_le_mul_of_nonneg_left R3 (by positivity : (0:ℝ) ≤ S.Δ ^ 2)
-      have hf2 := mul_le_mul_of_nonneg_right hHbig (by positivity : (0:ℝ) ≤ P.G ^ 4 * P.U ^ 20)
+      have hf2 := mul_le_mul_of_nonneg_right hHbig (by positivity : (0:ℝ) ≤ P.G ^ 3 * P.U ^ 20)
       calc 260 * S.Δ ^ 2 * S.Ω ^ 8 = S.Δ ^ 2 * (260 * S.Ω ^ 8) := by ring
-        _ ≤ S.Δ ^ 2 * (P.G ^ 5 * P.U ^ 30) := hf1
-        _ = (S.Δ ^ 2 * P.G * P.U ^ 10) * (P.G ^ 4 * P.U ^ 20) := by ring
-        _ ≤ P.H * (P.G ^ 4 * P.U ^ 20) := hf2
-        _ = P.H * P.G ^ 4 * P.U ^ 20 := by ring
-    have R5 : 130 ^ 5 * S.Ω ^ 16 ≤ S.Δ * P.G ^ 2 * P.U ^ 20 := by
+        _ ≤ S.Δ ^ 2 * (P.G ^ 4 * P.U ^ 30) := hf1
+        _ = (S.Δ ^ 2 * P.G * P.U ^ 10) * (P.G ^ 3 * P.U ^ 20) := by ring
+        _ ≤ P.H * (P.G ^ 3 * P.U ^ 20) := hf2
+        _ = P.H * P.G ^ 3 * P.U ^ 20 := by ring
+    have R5 : 130 ^ 5 * S.Ω ^ 16 ≤ S.Δ * P.G * P.U ^ 20 := by
       calc (130:ℝ) ^ 5 * S.Ω ^ 16 ≤ 130 ^ 5 * P.U ^ 16 :=
             mul_le_mul_of_nonneg_left (hΩ_le 16) (by positivity)
         _ ≤ P.U * P.U ^ 16 := mul_le_mul_of_nonneg_right hU17k (by positivity)
         _ = P.U ^ 17 := by ring
         _ ≤ P.U ^ 20 := pow_le_pow_right₀ hU1 (by norm_num)
-        _ ≤ S.Δ * P.G ^ 2 * P.U ^ 20 := by
-            have h12 : (1 : ℝ) ≤ S.Δ * P.G ^ 2 := by
-              have := mul_le_mul hΔ1 (one_le_pow₀ hG1 (n := 2)) zero_le_one (le_trans zero_le_one hΔ1)
+        _ ≤ S.Δ * P.G * P.U ^ 20 := by
+            have h12 : (1 : ℝ) ≤ S.Δ * P.G := by
+              have := mul_le_mul hΔ1 hG1 zero_le_one (le_trans zero_le_one hΔ1)
               simpa using this
             calc P.U ^ 20 = 1 * P.U ^ 20 := (one_mul _).symm
-              _ ≤ (S.Δ * P.G ^ 2) * P.U ^ 20 := mul_le_mul_of_nonneg_right h12 (by positivity)
-              _ = S.Δ * P.G ^ 2 * P.U ^ 20 := by ring
-    have R6 : 130 ^ 5 * (S.Δ ^ 4 * P.U ^ 5 * S.Ω ^ 2) ≤ P.G * P.H ^ 2 := by
+              _ ≤ (S.Δ * P.G) * P.U ^ 20 := mul_le_mul_of_nonneg_right h12 (by positivity)
+              _ = S.Δ * P.G * P.U ^ 20 := by ring
+    have R6 : 130 ^ 5 * (S.Δ ^ 4 * P.U ^ 5 * S.Ω ^ 2) ≤ P.H ^ 2 := by
       have hHsq : (S.Δ ^ 2 * P.G * P.U ^ 10) ^ 2 ≤ P.H ^ 2 :=
         pow_le_pow_left₀ (by positivity) hHbig 2
-      have hu : (130:ℝ) ^ 5 * P.U ^ 7 ≤ P.G ^ 3 * P.U ^ 20 := by
+      have hu : (130:ℝ) ^ 5 * P.U ^ 7 ≤ P.G ^ 2 * P.U ^ 20 := by
         calc (130:ℝ) ^ 5 * P.U ^ 7 ≤ P.U * P.U ^ 7 :=
               mul_le_mul_of_nonneg_right hU17k (by positivity)
           _ = P.U ^ 8 := by ring
           _ ≤ P.U ^ 20 := pow_le_pow_right₀ hU1 (by norm_num)
-          _ ≤ P.G ^ 3 * P.U ^ 20 :=
+          _ ≤ P.G ^ 2 * P.U ^ 20 :=
               le_mul_of_one_le_left (by positivity) (one_le_pow₀ hG1)
       calc (130:ℝ) ^ 5 * (S.Δ ^ 4 * P.U ^ 5 * S.Ω ^ 2)
             ≤ 130 ^ 5 * (S.Δ ^ 4 * P.U ^ 5 * P.U ^ 2) :=
@@ -278,9 +278,9 @@ theorem ra_step4_ssum_collapse'
               (mul_le_mul_of_nonneg_left (hΩ_le 2) (by positivity : (0:ℝ) ≤ S.Δ ^ 4 * P.U ^ 5))
               (by positivity)
         _ = S.Δ ^ 4 * (130 ^ 5 * P.U ^ 7) := by ring
-        _ ≤ S.Δ ^ 4 * (P.G ^ 3 * P.U ^ 20) := mul_le_mul_of_nonneg_left hu (by positivity)
-        _ = P.G * (S.Δ ^ 2 * P.G * P.U ^ 10) ^ 2 := by ring
-        _ ≤ P.G * P.H ^ 2 := mul_le_mul_of_nonneg_left hHsq (by positivity)
+        _ ≤ S.Δ ^ 4 * (P.G ^ 2 * P.U ^ 20) := mul_le_mul_of_nonneg_left hu (by positivity)
+        _ = (S.Δ ^ 2 * P.G * P.U ^ 10) ^ 2 := by ring
+        _ ≤ P.H ^ 2 := hHsq
     -- the six collapsed-monomial bounds `Wᵈᵉᵍ·m̂ᵢ ≤ HDtⱼ`
     have hm1 : (130 ^ 5 * (P.G * P.U ^ 5) ^ 5)
           * (P.H * P.G ^ 5 * P.U ^ 25 / (S.Δ ^ 2 * S.Ω ^ 10)) ≤ HDt6 := by
@@ -291,8 +291,8 @@ theorem ra_step4_ssum_collapse'
       have hf := mul_le_mul_of_nonneg_left R1 (by positivity : (0:ℝ) ≤ P.H * P.G ^ 10 * P.U ^ 50 * S.Δ ^ 2 * S.Ω ^ 10)
       calc (130:ℝ) ^ 5 * (P.H * P.G ^ 10 * P.U ^ 50) * (S.Δ ^ 2 * S.Ω ^ 13)
           = (P.H * P.G ^ 10 * P.U ^ 50 * S.Δ ^ 2 * S.Ω ^ 10) * (130 ^ 5 * S.Ω ^ 3) := by ring
-        _ ≤ (P.H * P.G ^ 10 * P.U ^ 50 * S.Δ ^ 2 * S.Ω ^ 10) * (P.G ^ 5 * P.U ^ 25) := hf
-        _ = P.H * P.G ^ 15 * P.U ^ 75 * (S.Δ ^ 2 * S.Ω ^ 10) := by ring
+        _ ≤ (P.H * P.G ^ 10 * P.U ^ 50 * S.Δ ^ 2 * S.Ω ^ 10) * (P.G ^ 4 * P.U ^ 25) := hf
+        _ = P.H * P.G ^ 14 * P.U ^ 75 * (S.Δ ^ 2 * S.Ω ^ 10) := by ring
     have hm2 : (130 ^ 4 * (P.G * P.U ^ 5) ^ 4) * (2 * (P.G ^ 4 * P.U ^ 20 / S.Ω ^ 8)) ≤ HDt7 := by
       rw [hHDt7]
       have hrw : ((130:ℝ) ^ 4 * (P.G * P.U ^ 5) ^ 4) * (2 * (P.G ^ 4 * P.U ^ 20 / S.Ω ^ 8))
@@ -301,8 +301,8 @@ theorem ra_step4_ssum_collapse'
       have hf := mul_le_mul_of_nonneg_left R2 (by positivity : (0:ℝ) ≤ P.G ^ 8 * P.U ^ 40 * S.Ω ^ 8)
       calc (2:ℝ) * 130 ^ 4 * P.G ^ 8 * P.U ^ 40 * S.Ω ^ 27
           = (P.G ^ 8 * P.U ^ 40 * S.Ω ^ 8) * (2 * 130 ^ 4 * S.Ω ^ 19) := by ring
-        _ ≤ (P.G ^ 8 * P.U ^ 40 * S.Ω ^ 8) * (S.Δ * P.G ^ 7 * P.U ^ 50) := hf
-        _ = S.Δ * P.G ^ 15 * P.U ^ 90 * S.Ω ^ 8 := by ring
+        _ ≤ (P.G ^ 8 * P.U ^ 40 * S.Ω ^ 8) * (S.Δ * P.G ^ 6 * P.U ^ 50) := hf
+        _ = S.Δ * P.G ^ 14 * P.U ^ 90 * S.Ω ^ 8 := by ring
     have hm3 : (130 * (P.G * P.U ^ 5))
           * (2 * (P.H * P.G ^ 9 * P.U ^ 40 / (S.Δ ^ 2 * S.Ω ^ 5))) ≤ HDt6 := by
       rw [hHDt6]
@@ -312,8 +312,8 @@ theorem ra_step4_ssum_collapse'
       have hf := mul_le_mul_of_nonneg_left R3 (by positivity : (0:ℝ) ≤ P.H * P.G ^ 10 * P.U ^ 45 * S.Δ ^ 2 * S.Ω ^ 5)
       calc 260 * P.H * P.G ^ 10 * P.U ^ 45 * (S.Δ ^ 2 * S.Ω ^ 13)
           = (P.H * P.G ^ 10 * P.U ^ 45 * S.Δ ^ 2 * S.Ω ^ 5) * (260 * S.Ω ^ 8) := by ring
-        _ ≤ (P.H * P.G ^ 10 * P.U ^ 45 * S.Δ ^ 2 * S.Ω ^ 5) * (P.G ^ 5 * P.U ^ 30) := hf
-        _ = P.H * P.G ^ 15 * P.U ^ 75 * (S.Δ ^ 2 * S.Ω ^ 5) := by ring
+        _ ≤ (P.H * P.G ^ 10 * P.U ^ 45 * S.Δ ^ 2 * S.Ω ^ 5) * (P.G ^ 4 * P.U ^ 30) := hf
+        _ = P.H * P.G ^ 14 * P.U ^ 75 * (S.Δ ^ 2 * S.Ω ^ 5) := by ring
     have hm4 : (130 * (P.G * P.U ^ 5))
           * (2 * (S.Δ ^ 3 * P.G ^ 10 * P.U ^ 65 / (P.H * S.Ω ^ 19))) ≤ HDt7 := by
       rw [hHDt7]
@@ -323,8 +323,8 @@ theorem ra_step4_ssum_collapse'
       have hf := mul_le_mul_of_nonneg_left R4 (by positivity : (0:ℝ) ≤ S.Δ * P.G ^ 11 * P.U ^ 70 * S.Ω ^ 19)
       calc 260 * S.Δ ^ 3 * P.G ^ 11 * P.U ^ 70 * S.Ω ^ 27
           = (S.Δ * P.G ^ 11 * P.U ^ 70 * S.Ω ^ 19) * (260 * S.Δ ^ 2 * S.Ω ^ 8) := by ring
-        _ ≤ (S.Δ * P.G ^ 11 * P.U ^ 70 * S.Ω ^ 19) * (P.H * P.G ^ 4 * P.U ^ 20) := hf
-        _ = S.Δ * P.G ^ 15 * P.U ^ 90 * (P.H * S.Ω ^ 19) := by ring
+        _ ≤ (S.Δ * P.G ^ 11 * P.U ^ 70 * S.Ω ^ 19) * (P.H * P.G ^ 3 * P.U ^ 20) := hf
+        _ = S.Δ * P.G ^ 14 * P.U ^ 90 * (P.H * S.Ω ^ 19) := by ring
     have hm5 : (130 ^ 5 * (P.G * P.U ^ 5) ^ 5) * (P.G ^ 8 * P.U ^ 45 / S.Ω ^ 11) ≤ HDt7 := by
       rw [hHDt7]
       have hrw : ((130:ℝ) ^ 5 * (P.G * P.U ^ 5) ^ 5) * (P.G ^ 8 * P.U ^ 45 / S.Ω ^ 11)
@@ -333,8 +333,8 @@ theorem ra_step4_ssum_collapse'
       have hf := mul_le_mul_of_nonneg_left R5 (by positivity : (0:ℝ) ≤ P.G ^ 13 * P.U ^ 70 * S.Ω ^ 11)
       calc (130:ℝ) ^ 5 * (P.G ^ 13 * P.U ^ 70) * S.Ω ^ 27
           = (P.G ^ 13 * P.U ^ 70 * S.Ω ^ 11) * (130 ^ 5 * S.Ω ^ 16) := by ring
-        _ ≤ (P.G ^ 13 * P.U ^ 70 * S.Ω ^ 11) * (S.Δ * P.G ^ 2 * P.U ^ 20) := hf
-        _ = S.Δ * P.G ^ 15 * P.U ^ 90 * S.Ω ^ 11 := by ring
+        _ ≤ (P.G ^ 13 * P.U ^ 70 * S.Ω ^ 11) * (S.Δ * P.G * P.U ^ 20) := hf
+        _ = S.Δ * P.G ^ 14 * P.U ^ 90 * S.Ω ^ 11 := by ring
     have hm6 : (130 ^ 5 * (P.G * P.U ^ 5) ^ 5)
           * (S.Δ ^ 5 * P.G ^ 9 * P.U ^ 70 / (P.H ^ 2 * S.Ω ^ 25)) ≤ HDt7 := by
       rw [hHDt7]
@@ -344,8 +344,8 @@ theorem ra_step4_ssum_collapse'
       have hf := mul_le_mul_of_nonneg_left R6 (by positivity : (0:ℝ) ≤ S.Δ * P.G ^ 14 * P.U ^ 90 * S.Ω ^ 25)
       calc (130:ℝ) ^ 5 * (S.Δ ^ 5 * P.G ^ 14 * P.U ^ 95) * S.Ω ^ 27
           = (S.Δ * P.G ^ 14 * P.U ^ 90 * S.Ω ^ 25) * (130 ^ 5 * (S.Δ ^ 4 * P.U ^ 5 * S.Ω ^ 2)) := by ring
-        _ ≤ (S.Δ * P.G ^ 14 * P.U ^ 90 * S.Ω ^ 25) * (P.G * P.H ^ 2) := hf
-        _ = S.Δ * P.G ^ 15 * P.U ^ 90 * (P.H ^ 2 * S.Ω ^ 25) := by ring
+        _ ≤ (S.Δ * P.G ^ 14 * P.U ^ 90 * S.Ω ^ 25) * P.H ^ 2 := hf
+        _ = S.Δ * P.G ^ 14 * P.U ^ 90 * (P.H ^ 2 * S.Ω ^ 25) := by ring
     -- assemble: each `lᵢ·m̂ᵢ ≤ Wᵈᵉᵍ·m̂ᵢ ≤ HDtⱼ`
     have hm1hat : 0 ≤ P.H * P.G ^ 5 * P.U ^ 25 / (S.Δ ^ 2 * S.Ω ^ 10) := by positivity
     have hm2hat : 0 ≤ 2 * (P.G ^ 4 * P.U ^ 20 / S.Ω ^ 8) := by positivity

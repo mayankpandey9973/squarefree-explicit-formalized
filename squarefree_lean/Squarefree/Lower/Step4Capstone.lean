@@ -104,8 +104,8 @@ theorem ra_step4_range_complete
     ((Ra.filter (fun r => (r + ℓ₁ ∈ Ra) ∧ (r + ℓ₂ ∈ Ra)
         ∧ V₂var < |vval P a dStar ℓ₁ ℓ₂ r|)).card : ℝ)
       ≤ 80 * (2 * 10 ^ 322) * C * (P.H / S.Δ) *
-          (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-           + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
+          (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+           + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
   classical
   have hGpos := P.G_pos; have hUpos := P.U_pos; have hHpos := P.H_pos
   have hΔpos := S.Δ_pos; have hΩpos := S.Ω_pos

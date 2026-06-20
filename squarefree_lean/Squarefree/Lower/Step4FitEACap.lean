@@ -24,7 +24,7 @@ private theorem step4_fitEA_capFlat
     (hm0 : 0 ≤ m) (a : ℝ) (ha_hi : a ≤ 11 * S.A)
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     (480 * a * (ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁)) * ℓ₁ ^ 2 * (Vmax P S) ^ 2 / S.D ^ 2) * b * m
-      ≤ C * P.H * P.G ^ 15 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
+      ≤ C * P.H * P.G ^ 14 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -105,7 +105,7 @@ private theorem step4_fitEA_capP4
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     (1540 * a * (P.G * S.Ω / S.Δ ^ 4) * (ℓ₁ ^ 3 * (2 * ℓ₂ - ℓ₁)) * (Vmax P S) ^ 4 / S.D)
         * b * m
-      ≤ C * P.H * P.G ^ 15 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
+      ≤ C * P.H * P.G ^ 14 * P.U ^ 75 / (S.Δ ^ 2 * S.Ω ^ 13) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -190,7 +190,7 @@ theorem step4_fitEA_cap
     (a : ℝ) (ha0 : 0 < a) (ha_hi : a ≤ 11 * S.A)
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     (4 * a * Ecap4a P S a ℓ₁ ℓ₂) * b * m
-      ≤ 2 * (C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))) := by
+      ≤ 2 * (C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13))) := by
   have hΔne : S.Δ ≠ 0 := ne_of_gt S.Δ_pos
   have hΩne : S.Ω ≠ 0 := ne_of_gt S.Ω_pos
   have hHne : P.H ≠ 0 := ne_of_gt P.H_pos
@@ -274,7 +274,7 @@ theorem step4_fit_cE_A
         + 10 ^ 13 * ℓ₁ * S.Δ ^ 3 / (P.H * P.G ^ 2 * S.Ω ^ 6))
     (b : ℝ) (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2)) :
     cEhyb P S a ℓ₁ ℓ₂ gap * b * ((N:ℝ) * Real.sqrt (N:ℝ))
-      ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
+      ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
   have hℓ1pos : (0:ℝ) < ℓ₁ := lt_of_lt_of_le one_pos hℓ1lo
   have hℓ2pos : (0:ℝ) < ℓ₂ := by linarith
   have hL0 : (0:ℝ) < ℓ₁ * ℓ₂ * (ℓ₂ - ℓ₁) :=
@@ -322,7 +322,7 @@ theorem step4_fit_cE_A
     hmpad hm0 a ha_hi b hb
   have hCap := step4_fitEA_cap h1 hDeW hG1 hU1 hΩU hband hUbig ℓ₁ ℓ₂ hℓ1lo hℓ12 hℓ1W
     hℓ2W m C hC hm hm0 a ha0 ha_hi b hb
-  have hblock0 : 0 ≤ C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
+  have hblock0 : 0 ≤ C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
     have := P.H_pos; have := S.Δ_pos; have := P.G_pos; have := P.U_pos
     positivity
   have htot := add_le_add (add_le_add hT1 hT2) hCap

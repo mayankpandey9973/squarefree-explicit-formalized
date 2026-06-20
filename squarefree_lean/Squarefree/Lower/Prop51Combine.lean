@@ -16,14 +16,14 @@ seven landed monomials in substituted variables `g = G^{1/4}, u = U^{1/4}, dl = 
 * `t1 = g¹⁶u⁶⁰/(dl²ω²)` carrying the Step-1 `ℓ`-weight `(1 + GΩ⁵/(ℓ₁ℓ₂(ℓ₂−ℓ₁)))`;
 * `t2 = dl⁴g²⁰u¹⁸⁰/(Hω¹⁴)`, `t3 = g²⁰u¹⁴⁰/(dlω⁸)` (Step 2 at `G⁵`);
 * `t4′ = dl⁴g³⁰u¹⁹⁰/(Hω⁸)`, `t5′ = g²⁸u¹⁴⁰/(dlω)` (Step 3 landed, payless hHbig-route);
-* `t6′ = g⁶⁰u³⁰⁰/(dl²ω¹³)`, `t7′ = dl⁴g⁶⁰u³⁶⁰/(Hω²⁷)` (Step 4 capstone).
+* `t6′ = g⁵⁶u³⁰⁰/(dl²ω¹³)`, `t7′ = dl⁴g⁵⁶u³⁶⁰/(Hω²⁷)` (Step 4 capstone).
 
 `prop51_combine` sums over the `O(W²)` pairs `[1,Wnat]²` with the TWO-SIDED window
 `Wval ≤ Wnat ≤ 130·Wval` (the Wnat-route: the exact cast `Wnat = Wval` is unsatisfiable since
 `Wval` is generically irrational), splits the `ℓ`-weight (`1/L ≤ 1` on the integer grid),
 applies `step5_combine_core` (8 → 3 terms), and folds `Wnat² ≤ 130²·G²U¹⁰`, landing the
-faithful `prop_5_1` RHS shape `10⁴¹⁵·(H/Δ)·( G⁹U⁵¹/(√ΔΩ) + G¹⁷U⁸⁵/(ΔΩ¹³)
-+ (Δ²/H)·G¹⁷U¹⁰⁰/Ω²⁷ )` (terms 2,3 are the writeup's `U⁸⁵`/`U¹⁰⁰` `G¹⁷`-forms; term 1 is the
+faithful `prop_5_1` RHS shape `10⁴¹⁵·(H/Δ)·( G⁹U⁵¹/(√ΔΩ) + G¹⁶U⁸⁵/(ΔΩ¹³)
++ (Δ²/H)·G¹⁶U¹⁰⁰/Ω²⁷ )` (terms 2,3 are the writeup's `U⁸⁵`/`U¹⁰⁰` `G¹⁶`-forms; term 1 is the
 W²-fold of the landed `S1 = G⁷U⁴¹/(√ΔΩ)`, matching `prop_5_1`'s `G⁹` exactly).
 
 The per-pair bound is a **hypothesis** here (the four Step per-pair counts feed it in R9).
@@ -54,14 +54,14 @@ noncomputable def Bcombine (P : Globals) (S : Scale P) (ℓ₁ ℓ₂ : ℕ) : �
       + g ^ 20 * u ^ 140 / (dl * ω ^ 8)
       + dl ^ 4 * g ^ 30 * u ^ 190 / (P.H * ω ^ 8)
       + g ^ 28 * u ^ 140 / (dl * ω)
-      + g ^ 60 * u ^ 300 / (dl ^ 2 * ω ^ 13)
-      + dl ^ 4 * g ^ 60 * u ^ 360 / (P.H * ω ^ 27) )
+      + g ^ 56 * u ^ 300 / (dl ^ 2 * ω ^ 13)
+      + dl ^ 4 * g ^ 56 * u ^ 360 / (P.H * ω ^ 27) )
 
 /-- **§5 capstone wiring.** From a per-pair count bound `B ℓ₁ ℓ₂ ≤ Bcombine P S ℓ₁ ℓ₂` (the
 seven landed monomials with the `10⁴⁰⁹·H/Δ` prefix), the pair-sum `2·Σ_{[1,Wnat]²} B` over the
 two-sided window `Wval ≤ Wnat ≤ 130·Wval` is bounded by the `prop_5_1` 3-term RHS. The `W²`
 factor is `Wnat² ≤ 130²·(G·U⁵)² = 16900·G²·U¹⁰`; the sharp Step-4 monomials give
-`S2,S3 = G¹⁵·…`, so `G²·G¹⁵ = G¹⁷` lands the prop's `G¹⁷` exactly. -/
+`S2,S3 = G¹⁴·…`, so `G²·G¹⁴ = G¹⁶` lands the prop's `G¹⁶` exactly. -/
 theorem prop51_combine
     (hG1 : 1 ≤ P.G) (hU1 : 1 ≤ P.U)
     (hΩU : S.Ω ≤ P.U)
@@ -74,8 +74,8 @@ theorem prop51_combine
     2 * (∑ p ∈ Finset.Icc 1 Wnat ×ˢ Finset.Icc 1 Wnat, B p.1 p.2)
       ≤ 10 ^ 415 * (P.H / S.Δ) *
         ( P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
-        + P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
-        + (S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27 ) := by
+        + P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
+        + (S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27 ) := by
   -- positivity facts
   have hGpos : 0 < P.G := P.G_pos
   have hUpos : 0 < P.U := P.U_pos
@@ -122,11 +122,11 @@ theorem prop51_combine
     + g ^ 20 * u ^ 140 / (dl * ω ^ 8)
     + dl ^ 4 * g ^ 30 * u ^ 190 / (P.H * ω ^ 8)
     + g ^ 28 * u ^ 140 / (dl * ω)
-    + g ^ 60 * u ^ 300 / (dl ^ 2 * ω ^ 13)
-    + dl ^ 4 * g ^ 60 * u ^ 360 / (P.H * ω ^ 27) with hLdef
+    + g ^ 56 * u ^ 300 / (dl ^ 2 * ω ^ 13)
+    + dl ^ 4 * g ^ 56 * u ^ 360 / (P.H * ω ^ 27) with hLdef
   set RHS3 : ℝ := g ^ 28 * u ^ 164 / (dl * ω)
-    + g ^ 60 * u ^ 300 / (dl ^ 2 * ω ^ 13)
-    + dl ^ 4 * g ^ 60 * u ^ 360 / (P.H * ω ^ 27) with hRHS3def
+    + g ^ 56 * u ^ 300 / (dl ^ 2 * ω ^ 13)
+    + dl ^ 4 * g ^ 56 * u ^ 360 / (P.H * ω ^ 27) with hRHS3def
   -- nonnegativity
   have hHΔnn : 0 ≤ P.H / S.Δ := by positivity
   have hLnn : 0 ≤ L := by rw [hLdef]; positivity
@@ -142,8 +142,8 @@ theorem prop51_combine
           + g ^ 20 * u ^ 140 / (dl * ω ^ 8)
           + dl ^ 4 * g ^ 30 * u ^ 190 / (P.H * ω ^ 8)
           + g ^ 28 * u ^ 140 / (dl * ω)
-          + g ^ 60 * u ^ 300 / (dl ^ 2 * ω ^ 13)
-          + dl ^ 4 * g ^ 60 * u ^ 360 / (P.H * ω ^ 27) ) := rfl
+          + g ^ 56 * u ^ 300 / (dl ^ 2 * ω ^ 13)
+          + dl ^ 4 * g ^ 56 * u ^ 360 / (P.H * ω ^ 27) ) := rfl
     rw [hBeq]
     -- the ℓ-weight collapse: `GΩ⁵/L_ℓ ≤ GΩ⁵` on the integer grid
     have hGΩnn : (0 : ℝ) ≤ P.G * S.Ω ^ 5 := by positivity
@@ -193,8 +193,8 @@ theorem prop51_combine
           + g ^ 20 * u ^ 140 / (dl * ω ^ 8)
           + dl ^ 4 * g ^ 30 * u ^ 190 / (P.H * ω ^ 8)
           + g ^ 28 * u ^ 140 / (dl * ω)
-          + g ^ 60 * u ^ 300 / (dl ^ 2 * ω ^ 13)
-          + dl ^ 4 * g ^ 60 * u ^ 360 / (P.H * ω ^ 27) ≤ L := by
+          + g ^ 56 * u ^ 300 / (dl ^ 2 * ω ^ 13)
+          + dl ^ 4 * g ^ 56 * u ^ 360 / (P.H * ω ^ 27) ≤ L := by
       rw [hLdef]; linarith only [hsplit]
     calc 10 ^ 409 * (P.H / S.Δ) *
         ( g ^ 16 * u ^ 60 / (dl ^ 2 * ω ^ 2)
@@ -203,8 +203,8 @@ theorem prop51_combine
           + g ^ 20 * u ^ 140 / (dl * ω ^ 8)
           + dl ^ 4 * g ^ 30 * u ^ 190 / (P.H * ω ^ 8)
           + g ^ 28 * u ^ 140 / (dl * ω)
-          + g ^ 60 * u ^ 300 / (dl ^ 2 * ω ^ 13)
-          + dl ^ 4 * g ^ 60 * u ^ 360 / (P.H * ω ^ 27) )
+          + g ^ 56 * u ^ 300 / (dl ^ 2 * ω ^ 13)
+          + dl ^ 4 * g ^ 56 * u ^ 360 / (P.H * ω ^ 27) )
         ≤ 10 ^ 409 * (P.H / S.Δ) * L := by
           apply mul_le_mul_of_nonneg_left hbr (by positivity)
       _ = 10 ^ 409 * ((P.H / S.Δ) * L) := by rw [mul_assoc]
@@ -248,9 +248,9 @@ theorem prop51_combine
   have hg28 : g ^ 28 = P.G ^ 7 := by
     rw [hgdef, ← Real.rpow_natCast (P.G ^ ((1:ℝ)/4)) 28, ← Real.rpow_mul hGpos.le,
       show ((1:ℝ)/4) * (28 : ℕ) = (7 : ℕ) by push_cast; ring, Real.rpow_natCast]
-  have hg60 : g ^ 60 = P.G ^ 15 := by
-    rw [hgdef, ← Real.rpow_natCast (P.G ^ ((1:ℝ)/4)) 60, ← Real.rpow_mul hGpos.le,
-      show ((1:ℝ)/4) * (60 : ℕ) = (15 : ℕ) by push_cast; ring, Real.rpow_natCast]
+  have hg56 : g ^ 56 = P.G ^ 14 := by
+    rw [hgdef, ← Real.rpow_natCast (P.G ^ ((1:ℝ)/4)) 56, ← Real.rpow_mul hGpos.le,
+      show ((1:ℝ)/4) * (56 : ℕ) = (14 : ℕ) by push_cast; ring, Real.rpow_natCast]
   have hu164 : u ^ 164 = P.U ^ 41 := by
     rw [hudef, ← Real.rpow_natCast (P.U ^ ((1:ℝ)/4)) 164, ← Real.rpow_mul hUpos.le,
       show ((1:ℝ)/4) * (164 : ℕ) = (41 : ℕ) by push_cast; ring, Real.rpow_natCast]
@@ -266,14 +266,14 @@ theorem prop51_combine
       show ((1:ℝ)/2) * (4 : ℕ) = (2 : ℕ) by push_cast; ring, Real.rpow_natCast]
   -- RHS3 in `G,U,Δ,Ω`.  Rewrite `dl^4`,`dl^2` (compound) before the bare `dl`.
   have hRHS3_GU : RHS3 = P.G ^ 7 * P.U ^ 41 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
-      + P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-      + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27) := by
-    rw [hRHS3def, hg28, hg60, hu164, hu300, hu360, hωdef, hdl4, hdl2, hdleq]
+      + P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+      + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27) := by
+    rw [hRHS3def, hg28, hg56, hu164, hu300, hu360, hωdef, hdl4, hdl2, hdleq]
   rw [hRHS3_GU]
   -- abbreviate the translated `(H/Δ)·RHS3` body
   set X : ℝ := (P.H / S.Δ) * (P.G ^ 7 * P.U ^ 41 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
-      + P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-      + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) with hXdef
+      + P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+      + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) with hXdef
   have hXnn : 0 ≤ X := by rw [hXdef]; positivity
   -- per-term translations (fold `G²U¹⁰`)
   have hΔ12pos : (0 : ℝ) < S.Δ ^ (1/2 : ℝ) := Real.rpow_pos_of_pos hΔpos _
@@ -284,27 +284,27 @@ theorem prop51_combine
   have ht1 : P.G ^ 2 * P.U ^ 10 * ((P.H / S.Δ) * (P.G ^ 7 * P.U ^ 41 / (S.Δ ^ (1/2 : ℝ) * S.Ω)))
       = (P.H / S.Δ) * (P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)) := by
     field_simp
-  have ht2 : P.G ^ 2 * P.U ^ 10 * ((P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
-      = (P.H / S.Δ) * (P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)) := by
+  have ht2 : P.G ^ 2 * P.U ^ 10 * ((P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
+      = (P.H / S.Δ) * (P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)) := by
     field_simp
   have ht3 : P.G ^ 2 * P.U ^ 10
-        * ((P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
-      = (P.H / S.Δ) * ((S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27) := by
+        * ((P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)))
+      = (P.H / S.Δ) * ((S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27) := by
     field_simp
   have hbody : P.G ^ 2 * P.U ^ 10 * X
       = (P.H / S.Δ) * ( P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
-        + P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
-        + (S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27 ) := by
+        + P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
+        + (S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27 ) := by
     have e1 : P.G ^ 2 * P.U ^ 10 * X
         = P.G ^ 2 * P.U ^ 10 * ((P.H / S.Δ) * (P.G ^ 7 * P.U ^ 41 / (S.Δ ^ (1/2 : ℝ) * S.Ω)))
-          + P.G ^ 2 * P.U ^ 10 * ((P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
+          + P.G ^ 2 * P.U ^ 10 * ((P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
           + P.G ^ 2 * P.U ^ 10
-            * ((P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27))) := by
+            * ((P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27))) := by
       rw [hXdef]; ring
     rw [e1, ht1, ht2, ht3]; ring
   have hbodynn : 0 ≤ (P.H / S.Δ) * ( P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
-      + P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
-      + (S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27 ) := by positivity
+      + P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
+      + (S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27 ) := by positivity
   -- the constant absorb `101400·10⁴⁰⁹ ≤ 10⁴¹⁵`
   have hconst : (101400 : ℝ) * 10 ^ 409 ≤ 10 ^ 415 := by
     have h6 : (101400 : ℝ) ≤ 10 ^ 6 := by norm_num
@@ -321,16 +321,16 @@ theorem prop51_combine
     _ = 101400 * 10 ^ 409 * (P.G ^ 2 * P.U ^ 10 * X) := by ring
     _ = 101400 * 10 ^ 409 * ((P.H / S.Δ)
         * ( P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
-          + P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
-          + (S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27 )) := by rw [hbody]
+          + P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
+          + (S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27 )) := by rw [hbody]
     _ ≤ 10 ^ 415 * ((P.H / S.Δ)
         * ( P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
-          + P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
-          + (S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27 )) :=
+          + P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
+          + (S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27 )) :=
         mul_le_mul_of_nonneg_right hconst hbodynn
     _ = 10 ^ 415 * (P.H / S.Δ)
         * ( P.G ^ 9 * P.U ^ 51 / (S.Δ ^ (1/2 : ℝ) * S.Ω)
-          + P.G ^ 17 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
-          + (S.Δ ^ 2 / P.H) * (P.G ^ 17 * P.U ^ 100) / S.Ω ^ 27 ) := by ring
+          + P.G ^ 16 * P.U ^ 85 / (S.Δ * S.Ω ^ 13)
+          + (S.Δ ^ 2 / P.H) * (P.G ^ 16 * P.U ^ 100) / S.Ω ^ 27 ) := by ring
 
 end Squarefree

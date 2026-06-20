@@ -82,13 +82,13 @@ theorem ra_step4_ssum_collapse_add
     (hdc : dc = P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4 * Real.sqrt L)
     (hcEnn : 0 ≤ cE)
     (hEA : cE * b * ((N : ℝ) * Real.sqrt (N : ℝ))
-        ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
+        ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)))
     (hEB : cE * dc * (N : ℝ)
-        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 95 / (P.H * S.Ω ^ 27))) :
+        ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 95 / (P.H * S.Ω ^ 27))) :
     (∑ n ∈ Finset.Icc 1 N, weight4add b ev dc cE (n : ℝ))
       ≤ 48 * C * (P.H / S.Δ) *
-          ( P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
-          + S.Δ ^ 2 * P.G ^ 15 * P.U ^ 95 / (P.H * S.Ω ^ 27) ) := by
+          ( P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)
+          + S.Δ ^ 2 * P.G ^ 14 * P.U ^ 95 / (P.H * S.Ω ^ 27) ) := by
   -- positivity scaffolding
   have hGpos := P.G_pos
   have hUpos := P.U_pos
@@ -100,9 +100,9 @@ theorem ra_step4_ssum_collapse_add
   have hevnn : 0 ≤ ev := by rw [hev]; positivity
   have hdcnn : 0 ≤ dc := by rw [hdc]; positivity
   -- abbreviations for the two faithful monomials and the half-RHS base
-  set g75 : ℝ := P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13) with hg75
-  set g90 : ℝ := S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27) with hg90
-  set g95 : ℝ := S.Δ ^ 2 * P.G ^ 15 * P.U ^ 95 / (P.H * S.Ω ^ 27) with hg95
+  set g75 : ℝ := P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13) with hg75
+  set g90 : ℝ := S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27) with hg90
+  set g95 : ℝ := S.Δ ^ 2 * P.G ^ 14 * P.U ^ 95 / (P.H * S.Ω ^ 27) with hg95
   have hg75nn : 0 ≤ g75 := by rw [hg75]; positivity
   have hg95nn : 0 ≤ g95 := by rw [hg95]; positivity
   have hHΔnn : 0 ≤ P.H / S.Δ := by positivity
@@ -110,7 +110,7 @@ theorem ra_step4_ssum_collapse_add
     rw [hg90, hg95, div_le_div_iff₀ (by positivity) (by positivity)]
     have hU : P.U ^ 90 ≤ P.U ^ 95 := pow_le_pow_right₀ hU1 (by norm_num)
     nlinarith [mul_le_mul_of_nonneg_left hU
-      (by positivity : (0:ℝ) ≤ S.Δ ^ 2 * P.G ^ 15 * (P.H * S.Ω ^ 27))]
+      (by positivity : (0:ℝ) ≤ S.Δ ^ 2 * P.G ^ 14 * (P.H * S.Ω ^ 27))]
   -- ============ SHARP part: reuse `ra_step4_ssum_collapse'` ============
   have hsharp := ra_step4_ssum_collapse' (P := P) (S := S) h1 hΔreg hG1 hU1 hΔ1 hH1 hΩU hUbig
     N ℓ₁ L hℓ1lo hLlo hℓ1W hLW3 C hC hNcap b ev dc hb hev hdc

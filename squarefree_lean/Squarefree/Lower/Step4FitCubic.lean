@@ -29,7 +29,7 @@ theorem step4_fit_cubic_A
     (hb : b = P.H * P.G ^ 5 * P.U ^ 15 / (S.Δ ^ 2 * S.Ω ^ 2))
     (hcE₂ : cE₂ ≤ 10 ^ 18 * P.G * S.Ω ^ 5 / (ℓ₁ * L)) :
     cE₂ * b * (N : ℝ) ^ 2
-      ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
+      ≤ 8 * C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -76,24 +76,24 @@ theorem step4_fit_cubic_A
     have h := pow_le_pow_left₀ (by norm_num : (0:ℝ) ≤ 10 ^ 33) hUbig 10
     calc (10:ℝ) ^ 330 = ((10:ℝ) ^ 33) ^ 10 := by rw [← pow_mul]
       _ ≤ P.U ^ 10 := h
-  have hscalar : (10:ℝ) ^ 31 * C ≤ 8 * P.G ^ 3 * P.U ^ 10 := by
+  have hscalar : (10:ℝ) ^ 31 * C ≤ 8 * P.G ^ 2 * P.U ^ 10 := by
     have hC138 : (10:ℝ) ^ 31 * C ≤ (10:ℝ) ^ 151 := by
       calc (10:ℝ) ^ 31 * C ≤ (10:ℝ) ^ 31 * (10:ℝ) ^ 120 :=
             mul_le_mul_of_nonneg_left hCcap (by positivity)
         _ = (10:ℝ) ^ 151 := by rw [← pow_add]
     have h138 : (10:ℝ) ^ 151 ≤ (10:ℝ) ^ 330 :=
       pow_le_pow_right₀ (by norm_num) (by norm_num)
-    have hG3 : (1:ℝ) ≤ P.G ^ 3 := one_le_pow₀ hG1
-    have hGU : (1:ℝ) * P.U ^ 10 ≤ P.G ^ 3 * P.U ^ 10 :=
+    have hG3 : (1:ℝ) ≤ P.G ^ 2 := one_le_pow₀ hG1
+    have hGU : (1:ℝ) * P.U ^ 10 ≤ P.G ^ 2 * P.U ^ 10 :=
       mul_le_mul_of_nonneg_right hG3 (le_of_lt (pow_pos hUpos 10))
     calc (10:ℝ) ^ 31 * C ≤ (10:ℝ) ^ 151 := hC138
       _ ≤ (10:ℝ) ^ 330 := h138
       _ ≤ P.U ^ 10 := hU10
       _ = 1 * P.U ^ 10 := (one_mul _).symm
-      _ ≤ P.G ^ 3 * P.U ^ 10 := hGU
-      _ ≤ 8 * (P.G ^ 3 * P.U ^ 10) :=
+      _ ≤ P.G ^ 2 * P.U ^ 10 := hGU
+      _ ≤ 8 * (P.G ^ 2 * P.U ^ 10) :=
           le_mul_of_one_le_left (by positivity) (by norm_num)
-      _ = 8 * P.G ^ 3 * P.U ^ 10 := by ring
+      _ = 8 * P.G ^ 2 * P.U ^ 10 := by ring
   -- assemble
   calc cE₂ * b * (N : ℝ) ^ 2
       ≤ (10 ^ 18 * P.G * S.Ω ^ 5 / (ℓ₁ * L))
@@ -106,10 +106,10 @@ theorem step4_fit_cubic_A
         gcongr 10 ^ 18 * C ^ 2 * P.H * P.G ^ 6 * P.U ^ 35 * ?_ / (S.Δ ^ 2 * S.Ω ^ 13)
     _ = (10 ^ 31 * C) * (C * P.H * P.G ^ 12 * P.U ^ 65) / (S.Δ ^ 2 * S.Ω ^ 13) := by
         ring
-    _ ≤ (8 * P.G ^ 3 * P.U ^ 10) * (C * P.H * P.G ^ 12 * P.U ^ 65)
+    _ ≤ (8 * P.G ^ 2 * P.U ^ 10) * (C * P.H * P.G ^ 12 * P.U ^ 65)
           / (S.Δ ^ 2 * S.Ω ^ 13) := by
         gcongr ?_ * (C * P.H * P.G ^ 12 * P.U ^ 65) / (S.Δ ^ 2 * S.Ω ^ 13)
-    _ = 8 * C * (P.H / S.Δ) * (P.G ^ 15 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
+    _ = 8 * C * (P.H / S.Δ) * (P.G ^ 14 * P.U ^ 75 / (S.Δ * S.Ω ^ 13)) := by
         field_simp
 
 /-- **Cubic E-part fit, B-block.** `c_E·dc·N√N ≤ 8·C·(H/Δ)·t7'` for the cubic confinement
@@ -125,7 +125,7 @@ theorem step4_fit_cubic_B
     (hdc : dc = P.G ^ 4 * P.U ^ 15 / S.Ω ^ 4 * Real.sqrt L)
     (hcE₂ : cE₂ ≤ 10 ^ 18 * P.G * S.Ω ^ 5 / (ℓ₁ * L)) :
     cE₂ * dc * ((N : ℝ) * Real.sqrt (N : ℝ))
-      ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
+      ≤ 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
   have hGpos := P.G_pos
   have hUpos := P.U_pos
   have hHpos := P.H_pos
@@ -201,29 +201,29 @@ theorem step4_fit_cubic_B
     calc (10:ℝ) ^ 89 ≤ (10:ℝ) ^ 264 := pow_le_pow_right₀ (by norm_num) (by norm_num)
       _ = ((10:ℝ) ^ 33) ^ 8 := by rw [← pow_mul]
       _ ≤ P.U ^ 8 := h
-  have hfin : 10 ^ 89 * C * P.G ^ 10 * P.U ^ 71 ≤ 8 * C * S.Δ * P.G ^ 15 * P.U ^ 90 := by
-    have hG1015 : P.G ^ 10 ≤ P.G ^ 15 := pow_le_pow_right₀ hG1 (by norm_num)
+  have hfin : 10 ^ 89 * C * P.G ^ 10 * P.U ^ 71 ≤ 8 * C * S.Δ * P.G ^ 14 * P.U ^ 90 := by
+    have hG1015 : P.G ^ 10 ≤ P.G ^ 14 := pow_le_pow_right₀ hG1 (by norm_num)
     have hU7990 : P.U ^ 79 ≤ P.U ^ 90 := pow_le_pow_right₀ hU1 (by norm_num)
     calc 10 ^ 89 * C * P.G ^ 10 * P.U ^ 71
         ≤ P.U ^ 8 * C * P.G ^ 10 * P.U ^ 71 := by gcongr ?_ * C * P.G ^ 10 * P.U ^ 71
       _ = C * P.G ^ 10 * P.U ^ 79 := by ring
-      _ ≤ C * P.G ^ 15 * P.U ^ 90 := by gcongr C * ?_ * ?_
-      _ = 1 * (C * P.G ^ 15 * P.U ^ 90) := (one_mul _).symm
-      _ ≤ (8 * S.Δ) * (C * P.G ^ 15 * P.U ^ 90) := by
+      _ ≤ C * P.G ^ 14 * P.U ^ 90 := by gcongr C * ?_ * ?_
+      _ = 1 * (C * P.G ^ 14 * P.U ^ 90) := (one_mul _).symm
+      _ ≤ (8 * S.Δ) * (C * P.G ^ 14 * P.U ^ 90) := by
           have h8Δ : (1:ℝ) ≤ 8 * S.Δ := by linarith
           exact mul_le_mul_of_nonneg_right h8Δ (by positivity)
-      _ = 8 * C * S.Δ * P.G ^ 15 * P.U ^ 90 := by ring
+      _ = 8 * C * S.Δ * P.G ^ 14 * P.U ^ 90 := by ring
   -- step 7: keep-net cross-multiplied comparison — pad Ω¹⁶ ≤ U¹⁶ (hΩU only)
   have hΩ16 : S.Ω ^ 16 ≤ P.U ^ 16 := pow_le_pow_left₀ (le_of_lt hΩpos) hΩU 16
   have hcross : 10 ^ 89 * C * P.G ^ 10 * P.U ^ 55 / S.Ω ^ 11
-      ≤ 8 * C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := by
+      ≤ 8 * C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := by
     rw [div_le_div_iff₀ (by positivity) (by positivity)]
     calc 10 ^ 89 * C * P.G ^ 10 * P.U ^ 55 * S.Ω ^ 27
         = (10 ^ 89 * C * P.G ^ 10 * P.U ^ 55 * S.Ω ^ 16) * S.Ω ^ 11 := by ring
       _ ≤ (10 ^ 89 * C * P.G ^ 10 * P.U ^ 55 * P.U ^ 16) * S.Ω ^ 11 := by
           gcongr (10 ^ 89 * C * P.G ^ 10 * P.U ^ 55 * ?_) * S.Ω ^ 11
       _ = (10 ^ 89 * C * P.G ^ 10 * P.U ^ 71) * S.Ω ^ 11 := by ring
-      _ ≤ (8 * C * S.Δ * P.G ^ 15 * P.U ^ 90) * S.Ω ^ 11 :=
+      _ ≤ (8 * C * S.Δ * P.G ^ 14 * P.U ^ 90) * S.Ω ^ 11 :=
           mul_le_mul_of_nonneg_right hfin (by positivity)
   -- assemble
   calc cE₂ * dc * ((N : ℝ) * Real.sqrt (N : ℝ))
@@ -235,8 +235,8 @@ theorem step4_fit_cubic_B
     _ ≤ 10 ^ 78 * C * P.G ^ 5 * P.U ^ 30 * (10 ^ 11 * (P.G ^ 5 * P.U ^ 25)) / S.Ω ^ 11 := by
         gcongr 10 ^ 78 * C * P.G ^ 5 * P.U ^ 30 * ?_ / S.Ω ^ 11
     _ = 10 ^ 89 * C * P.G ^ 10 * P.U ^ 55 / S.Ω ^ 11 := by ring
-    _ ≤ 8 * C * S.Δ * P.G ^ 15 * P.U ^ 90 / S.Ω ^ 27 := hcross
-    _ = 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 15 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
+    _ ≤ 8 * C * S.Δ * P.G ^ 14 * P.U ^ 90 / S.Ω ^ 27 := hcross
+    _ = 8 * C * (P.H / S.Δ) * (S.Δ ^ 2 * P.G ^ 14 * P.U ^ 90 / (P.H * S.Ω ^ 27)) := by
         field_simp
 
 end Squarefree

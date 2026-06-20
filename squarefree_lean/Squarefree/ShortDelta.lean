@@ -18,7 +18,7 @@ namespace Squarefree
 
 set_option maxHeartbeats 1600000 in
 /-- **Prop 2.4** (writeup 209–241): `Δ = D/H ≤ X^{1/100}` ⇒ `#𝒟[D,2D] ≪ H/U`. -/
-theorem prop_2_4 (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
+theorem prop_2_4 (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18187) :
     ∃ u : ℝ, 0 < u ∧ ∃ C : ℝ, 0 < C ∧ ∃ X₀ : ℝ, ∀ X : ℝ, X₀ ≤ X →
       ∀ D : ℝ, 0 < D → D ≤ X ^ ((1 - g) / 5) * X ^ (1 / 100 : ℝ) →
         (dCard X (X ^ ((1 - g) / 5)) D : ℝ) ≤ C * X ^ ((1 - g) / 5) / X ^ u := by
@@ -41,7 +41,7 @@ theorem prop_2_4 (g : ℝ) (hg : 0 < g) (hg' : g < 2 / 18977) :
   set H : ℝ := X ^ a with hH
   have hHpos : 0 < H := by rw [hH]; positivity
   have hH1 : 1 ≤ H := by rw [hH]; exact Real.one_le_rpow hX1 hapos.le
-  -- exponent budget facts (g < 2/18977, u = 1/200)
+  -- exponent budget facts (g < 2/18187, u = 1/200)
   have hg1 : g < 1 := by linarith
   have he1 : b * (7 / 8) ≤ a - 1 / 200 := by rw [hb, ha]; nlinarith [hg, hg']
   have he2 : a * (1 / 8) + b * (3 / 4) ≤ a - 1 / 200 := by rw [hb, ha]; nlinarith [hg, hg']

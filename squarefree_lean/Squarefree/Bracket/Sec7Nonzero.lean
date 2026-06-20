@@ -113,7 +113,7 @@ private theorem sec7_X150_le_R (P : Globals) (S : Scale P) (c₀ Cu : ℝ)
     P.X ^ ((1:ℝ)/50) ≤ S.R := by
   have hH := P.H_pos; have hG := P.G_pos
   have hCu := D.hCu
-  have hbudE : 18977 * P.g + 18675 * P.u + 790 * (Cu * P.u) ≤ 2 := by
+  have hbudE : 18187 * P.g + 18675 * P.u + 790 * (Cu * P.u) ≤ 2 := by
     have h := hbud; unfold OnStripAux.Budget at h; nlinarith
   have hw : (0:ℝ) ≤ Cu * P.u := mul_nonneg (by linarith) hu
   have hkey : (1:ℝ) <
@@ -144,7 +144,7 @@ private theorem sec7_X150_le_M (P : Globals) (S : Scale P) (c₀ Cu : ℝ)
     P.X ^ ((1:ℝ)/50) ≤ P.H ^ ((1:ℝ)/2) * S.x ^ ((1:ℝ)/2) * P.G ^ 2 * S.Ω ^ 8 := by
   have hH := P.H_pos; have hG := P.G_pos; have hΩ := S.Ω_pos
   have hCu := D.hCu
-  have hbudE : 18977 * P.g + 18675 * P.u + 790 * (Cu * P.u) ≤ 2 := by
+  have hbudE : 18187 * P.g + 18675 * P.u + 790 * (Cu * P.u) ≤ 2 := by
     have h := hbud; unfold OnStripAux.Budget at h; nlinarith
   have hw : (0:ℝ) ≤ Cu * P.u := mul_nonneg (by linarith) hu
   have hkey : (1:ℝ) <
@@ -319,9 +319,9 @@ theorem sec7_side_R_ge_W8 :
    not a consequence of the W-constraints alone; it is a genuine Section 4 side condition,
    verified in the final application from the unresolved strip of Proposition 8.1. Namely,
    using x ≪ G¹⁷Ω⁻²⁶X^{O(u)}, Ω ≫ G^{-1/4}U^{-3/4}X^{-O(u)}, one gets
-   T₁ ≫ H^{1/2}G^{-69/2}U^{-57/2}X^{-O(u)} > 1 for g < 2/18977 and u > 0 small."
+   T₁ ≫ H^{1/2}G^{-69/2}U^{-57/2}X^{-O(u)} > 1 for g < 2/18187 and u > 0 small."
    TRAP-2b: md 1898's G^{-69/2} is really G^{-36} (benign; T₁ > 1 still holds for
-   g < 1/361, a fortiori on the Budget window g ≤ 2/18977). -/
+   g < 1/361, a fortiori on the Budget window g ≤ 2/18187). -/
 /-- **N18b** (md 1875–1900): the genuine §4 side condition `T₁ > 1`, from the strip regime
 (this is what lets the call site populate the envelope field `T1_gt_one`). -/
 theorem sec7_side_T1_gt_one :
@@ -336,7 +336,7 @@ theorem sec7_side_T1_gt_one :
     have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
     linarith
   have hCu := D.hCu
-  have hbud' : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hbud' : 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have huCu : (0:ℝ) ≤ P.u * Cu := mul_nonneg hu.le (by linarith)
   have huCu1 : (0:ℝ) ≤ P.u * (Cu - 1) := mul_nonneg hu.le (by linarith)
   have key : (1:ℝ) < P.H ^ (1/2:ℝ) * S.x ^ (-3/2:ℝ) * P.G ^ (-1:ℝ) * S.Ω ^ (-1:ℝ) :=
@@ -1500,7 +1500,7 @@ theorem sec7_side_delta1_lt_one :
     have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
     linarith
   have hCu := D.hCu
-  have hbud' : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hbud' : 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have huCu : (0:ℝ) ≤ P.u * Cu := mul_nonneg hu.le (by linarith)
   have huCu1 : (0:ℝ) ≤ P.u * (Cu - 1) := mul_nonneg hu.le (by linarith)
   -- term 1: `1/(H^{1/2}x^{5/2}Ω²) ≤ 10⁻⁵⁰` (deflated exponent margin ≈ 0.0237)
@@ -1816,7 +1816,7 @@ private theorem sec7_T1_ge_pow50 (P : Globals) (S : Scale P) (c₀ Cu : ℝ)
     have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le h' (by norm_num)
     linarith
   have hCu := D.hCu
-  have hbud' : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hbud' : 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have huCu : (0:ℝ) ≤ P.u * Cu := mul_nonneg hu.le (by linarith)
   have huCu1 : (0:ℝ) ≤ P.u * (Cu - 1) := mul_nonneg hu.le (by linarith)
   have hinv : 1 / S.T₁ ≤ 1 / (10 : ℝ) ^ 50 := by
@@ -1839,7 +1839,7 @@ private theorem sec7_R_le_X (P : Globals) (S : Scale P) (c₀ Cu : ℝ)
     have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le hle (by norm_num)
     linarith
   have hCu := D.hCu
-  have hbud' : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hbud' : 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have huCu : (0:ℝ) ≤ P.u * Cu := mul_nonneg hu.le (by linarith)
   have huCu1 : (0:ℝ) ≤ P.u * (Cu - 1) := mul_nonneg hu.le (by linarith)
   have hmono : (1:ℝ) <
@@ -2366,7 +2366,7 @@ private theorem sec7_N20_delta0_strip_piece (P : Globals) (S : Scale P) (c₀ Cu
     have : P.X ^ (1/100 : ℝ) ≤ 1 := Real.rpow_le_one P.X_pos.le hle (by norm_num)
     linarith
   have hCu := D.hCu
-  have hbudE : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hbudE : 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
   have huCu : (0:ℝ) ≤ P.u * Cu := mul_nonneg hu.le (by linarith)
   have huCu1 : (0:ℝ) ≤ P.u * (Cu - 1) := mul_nonneg hu.le (by linarith)
   have hkey : (1:ℝ) <
@@ -2405,8 +2405,8 @@ private theorem sec7_N20_one_le_H {P : Globals} {S : Scale P} {c₀ Cu : ℝ}
     (1:ℝ) ≤ P.H := by
   have hcoef0 : 0 ≤ (18675 + 790 * Cu) * P.u := by
     nlinarith [D.hCu, hu.le]
-  have hgsmall : 18977 * P.g ≤ 2 := by
-    have hb : 18977 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
+  have hgsmall : 18187 * P.g ≤ 2 := by
+    have hb : 18187 * P.g + (18675 + 790 * Cu) * P.u ≤ 2 := hbud
     nlinarith
   have hg_le_one : P.g ≤ 1 := by
     nlinarith

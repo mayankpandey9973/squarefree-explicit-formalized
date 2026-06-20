@@ -12,8 +12,8 @@ The eight LHS terms are the LANDED per-range monomials (R7 reconciliation):
 * `T2 = dl⁴g²⁰u¹⁸⁰/(Hω¹⁴)`, `T3 = g²⁰u¹⁴⁰/(dlω⁸)` — Step-2 at `G⁵` (post-δ₂₃ bump);
 * `T4′ = dl⁴g³⁰u¹⁹⁰/(Hω⁸)`, `T5′ = g²⁸u¹⁴⁰/(dlω)` — Step-3 landed (payless hHbig-route)
   `(Δ²/H)G^{15/2}U^{95/2}/Ω⁸` and `G⁷U³⁵/(√ΔΩ)`;
-* `T6′ = g⁶⁰u³⁰⁰/(dl²ω¹³)`, `T7′ = dl⁴g⁶⁰u³⁶⁰/(Hω²⁷)` — Step-4 capstone
-  `G¹⁵U⁷⁵/(ΔΩ¹³)` and `Δ²G¹⁵U⁹⁰/(HΩ²⁷)`.
+* `T6′ = g⁵⁶u³⁰⁰/(dl²ω¹³)`, `T7′ = dl⁴g⁵⁶u³⁶⁰/(Hω²⁷)` — Step-4 capstone
+  `G¹⁴U⁷⁵/(ΔΩ¹³)` and `Δ²G¹⁴U⁹⁰/(HΩ²⁷)`.
 
 `S1 = g²⁸u¹⁶⁴/(dlω)` (= `G⁷U⁴¹/(√ΔΩ)`), the `t5′`-`G⁷` floor.
 
@@ -37,15 +37,15 @@ theorem step5_combine_core (g u dl ω H : ℝ)
       + g ^ 20 * u ^ 140 / (dl * ω ^ 8)
       + dl ^ 4 * g ^ 30 * u ^ 190 / (H * ω ^ 8)
       + g ^ 28 * u ^ 140 / (dl * ω)
-      + g ^ 60 * u ^ 300 / (dl ^ 2 * ω ^ 13)
-      + dl ^ 4 * g ^ 60 * u ^ 360 / (H * ω ^ 27)
+      + g ^ 56 * u ^ 300 / (dl ^ 2 * ω ^ 13)
+      + dl ^ 4 * g ^ 56 * u ^ 360 / (H * ω ^ 27)
     ≤ 3 * ( g ^ 28 * u ^ 164 / (dl * ω)                    -- S1
-          + g ^ 60 * u ^ 300 / (dl ^ 2 * ω ^ 13)            -- S2
-          + dl ^ 4 * g ^ 60 * u ^ 360 / (H * ω ^ 27) ) := by  -- S3
+          + g ^ 56 * u ^ 300 / (dl ^ 2 * ω ^ 13)            -- S2
+          + dl ^ 4 * g ^ 56 * u ^ 360 / (H * ω ^ 27) ) := by  -- S3
   -- abbreviations for the three target terms
   set S1 := g ^ 28 * u ^ 164 / (dl * ω) with hS1def
-  set S2 := g ^ 60 * u ^ 300 / (dl ^ 2 * ω ^ 13) with hS2def
-  set S3 := dl ^ 4 * g ^ 60 * u ^ 360 / (H * ω ^ 27) with hS3def
+  set S2 := g ^ 56 * u ^ 300 / (dl ^ 2 * ω ^ 13) with hS2def
+  set S3 := dl ^ 4 * g ^ 56 * u ^ 360 / (H * ω ^ 27) with hS3def
   -- nonnegativity of the targets
   have hS1nn : 0 ≤ S1 := by rw [hS1def]; positivity
   have hS2nn : 0 ≤ S2 := by rw [hS2def]; positivity
@@ -86,21 +86,21 @@ theorem step5_combine_core (g u dl ω H : ℝ)
     have hω16 : ω ^ 16 ≤ u ^ 64 := by
       calc ω ^ 16 ≤ (u ^ 4) ^ 16 := pow_le_pow_left₀ hω0.le hΩU 16
         _ = u ^ 64 := by ring
-    have hcore : g ^ 20 * u ^ 60 * ω ^ 16 ≤ g ^ 60 * u ^ 300 := by
+    have hcore : g ^ 20 * u ^ 60 * ω ^ 16 ≤ g ^ 56 * u ^ 300 := by
       have h1 : g ^ 20 * u ^ 60 * ω ^ 16 ≤ g ^ 20 * u ^ 60 * u ^ 64 := by
         nlinarith [hω16, mul_pos (pow_pos hg0 20) (pow_pos hu0 60)]
-      have h2 : g ^ 20 * u ^ 60 * u ^ 64 ≤ g ^ 60 * u ^ 300 := by
+      have h2 : g ^ 20 * u ^ 60 * u ^ 64 ≤ g ^ 56 * u ^ 300 := by
         have e1 : g ^ 20 * u ^ 60 * u ^ 64 = g ^ 20 * u ^ 124 := by ring
         rw [e1]
-        have hgle : g ^ 20 ≤ g ^ 60 := pow_le_pow_right₀ hg1 (by norm_num)
+        have hgle : g ^ 20 ≤ g ^ 56 := pow_le_pow_right₀ hg1 (by norm_num)
         have hule : u ^ 124 ≤ u ^ 300 := pow_le_pow_right₀ hu1 (by norm_num)
-        calc g ^ 20 * u ^ 124 ≤ g ^ 60 * u ^ 124 :=
+        calc g ^ 20 * u ^ 124 ≤ g ^ 56 * u ^ 124 :=
               mul_le_mul_of_nonneg_right hgle (by positivity)
-          _ ≤ g ^ 60 * u ^ 300 := mul_le_mul_of_nonneg_left hule (by positivity)
+          _ ≤ g ^ 56 * u ^ 300 := mul_le_mul_of_nonneg_left hule (by positivity)
       linarith [h1, h2]
     have hfac : g ^ 20 * u ^ 60 * ω ^ 3 * (dl ^ 2 * ω ^ 13)
         = dl ^ 2 * (g ^ 20 * u ^ 60 * ω ^ 16) := by ring
-    have hfac2 : g ^ 60 * u ^ 300 * dl ^ 2 = dl ^ 2 * (g ^ 60 * u ^ 300) := by ring
+    have hfac2 : g ^ 56 * u ^ 300 * dl ^ 2 = dl ^ 2 * (g ^ 56 * u ^ 300) := by ring
     rw [hfac, hfac2]
     exact mul_le_mul_of_nonneg_left hcore (by positivity)
   -- T2 ≤ S3
@@ -110,22 +110,22 @@ theorem step5_combine_core (g u dl ω H : ℝ)
     have hω13 : ω ^ 13 ≤ u ^ 52 := by
       calc ω ^ 13 ≤ (u ^ 4) ^ 13 := pow_le_pow_left₀ hω0.le hΩU 13
         _ = u ^ 52 := by ring
-    have hcore : g ^ 20 * u ^ 180 * ω ^ 13 ≤ g ^ 60 * u ^ 360 := by
+    have hcore : g ^ 20 * u ^ 180 * ω ^ 13 ≤ g ^ 56 * u ^ 360 := by
       have h1 : g ^ 20 * u ^ 180 * ω ^ 13 ≤ g ^ 20 * u ^ 180 * u ^ 52 := by
         nlinarith [hω13, mul_pos (pow_pos hg0 20) (pow_pos hu0 180)]
-      have h2 : g ^ 20 * u ^ 180 * u ^ 52 ≤ g ^ 60 * u ^ 360 := by
+      have h2 : g ^ 20 * u ^ 180 * u ^ 52 ≤ g ^ 56 * u ^ 360 := by
         have e1 : g ^ 20 * u ^ 180 * u ^ 52 = g ^ 20 * u ^ 232 := by ring
         rw [e1]
-        have hgle : g ^ 20 ≤ g ^ 60 := pow_le_pow_right₀ hg1 (by norm_num)
+        have hgle : g ^ 20 ≤ g ^ 56 := pow_le_pow_right₀ hg1 (by norm_num)
         have hule : u ^ 232 ≤ u ^ 360 := pow_le_pow_right₀ hu1 (by norm_num)
-        calc g ^ 20 * u ^ 232 ≤ g ^ 60 * u ^ 232 :=
+        calc g ^ 20 * u ^ 232 ≤ g ^ 56 * u ^ 232 :=
               mul_le_mul_of_nonneg_right hgle (by positivity)
-          _ ≤ g ^ 60 * u ^ 360 := mul_le_mul_of_nonneg_left hule (by positivity)
+          _ ≤ g ^ 56 * u ^ 360 := mul_le_mul_of_nonneg_left hule (by positivity)
       linarith [h1, h2]
     have hfac : dl ^ 4 * g ^ 20 * u ^ 180 * (H * ω ^ 27)
         = (dl ^ 4 * H * ω ^ 14) * (g ^ 20 * u ^ 180 * ω ^ 13) := by ring
-    have hfac2 : dl ^ 4 * g ^ 60 * u ^ 360 * (H * ω ^ 14)
-        = (dl ^ 4 * H * ω ^ 14) * (g ^ 60 * u ^ 360) := by ring
+    have hfac2 : dl ^ 4 * g ^ 56 * u ^ 360 * (H * ω ^ 14)
+        = (dl ^ 4 * H * ω ^ 14) * (g ^ 56 * u ^ 360) := by ring
     rw [hfac, hfac2]
     exact mul_le_mul_of_nonneg_left hcore (by positivity)
   -- T3 ≤ S1
@@ -164,22 +164,22 @@ theorem step5_combine_core (g u dl ω H : ℝ)
     have hω19 : ω ^ 19 ≤ u ^ 76 := by
       calc ω ^ 19 ≤ (u ^ 4) ^ 19 := pow_le_pow_left₀ hω0.le hΩU 19
         _ = u ^ 76 := by ring
-    have hcore : g ^ 30 * u ^ 190 * ω ^ 19 ≤ g ^ 60 * u ^ 360 := by
+    have hcore : g ^ 30 * u ^ 190 * ω ^ 19 ≤ g ^ 56 * u ^ 360 := by
       have h1 : g ^ 30 * u ^ 190 * ω ^ 19 ≤ g ^ 30 * u ^ 190 * u ^ 76 := by
         nlinarith [hω19, mul_pos (pow_pos hg0 30) (pow_pos hu0 190)]
-      have h2 : g ^ 30 * u ^ 190 * u ^ 76 ≤ g ^ 60 * u ^ 360 := by
+      have h2 : g ^ 30 * u ^ 190 * u ^ 76 ≤ g ^ 56 * u ^ 360 := by
         have e1 : g ^ 30 * u ^ 190 * u ^ 76 = g ^ 30 * u ^ 266 := by ring
         rw [e1]
-        have hgle : g ^ 30 ≤ g ^ 60 := pow_le_pow_right₀ hg1 (by norm_num)
+        have hgle : g ^ 30 ≤ g ^ 56 := pow_le_pow_right₀ hg1 (by norm_num)
         have hule : u ^ 266 ≤ u ^ 360 := pow_le_pow_right₀ hu1 (by norm_num)
-        calc g ^ 30 * u ^ 266 ≤ g ^ 60 * u ^ 266 :=
+        calc g ^ 30 * u ^ 266 ≤ g ^ 56 * u ^ 266 :=
               mul_le_mul_of_nonneg_right hgle (by positivity)
-          _ ≤ g ^ 60 * u ^ 360 := mul_le_mul_of_nonneg_left hule (by positivity)
+          _ ≤ g ^ 56 * u ^ 360 := mul_le_mul_of_nonneg_left hule (by positivity)
       linarith [h1, h2]
     have hfac : dl ^ 4 * g ^ 30 * u ^ 190 * (H * ω ^ 27)
         = (dl ^ 4 * H * ω ^ 8) * (g ^ 30 * u ^ 190 * ω ^ 19) := by ring
-    have hfac2 : dl ^ 4 * g ^ 60 * u ^ 360 * (H * ω ^ 8)
-        = (dl ^ 4 * H * ω ^ 8) * (g ^ 60 * u ^ 360) := by ring
+    have hfac2 : dl ^ 4 * g ^ 56 * u ^ 360 * (H * ω ^ 8)
+        = (dl ^ 4 * H * ω ^ 8) * (g ^ 56 * u ^ 360) := by ring
     rw [hfac, hfac2]
     exact mul_le_mul_of_nonneg_left hcore (by positivity)
   -- T5' ≤ S1  (Step-3 landed t5' = g^28 u^140/(dl ω))
@@ -190,9 +190,9 @@ theorem step5_combine_core (g u dl ω H : ℝ)
       mul_le_mul_of_nonneg_left hule (by positivity)
     nlinarith [mul_le_mul_of_nonneg_right hcore (mul_pos hdl0 hω0).le, mul_pos hdl0 hω0]
   -- T6' = S2
-  have hT6 : g ^ 60 * u ^ 300 / (dl ^ 2 * ω ^ 13) ≤ S2 := le_of_eq hS2def.symm
+  have hT6 : g ^ 56 * u ^ 300 / (dl ^ 2 * ω ^ 13) ≤ S2 := le_of_eq hS2def.symm
   -- T7' = S3
-  have hT7 : dl ^ 4 * g ^ 60 * u ^ 360 / (H * ω ^ 27) ≤ S3 := le_of_eq hS3def.symm
+  have hT7 : dl ^ 4 * g ^ 56 * u ^ 360 / (H * ω ^ 27) ≤ S3 := le_of_eq hS3def.symm
   -- combine: LHS ≤ 3·S1 + 2·S2 + 3·S3 ≤ 3·(S1+S2+S3)
   linarith [hT1a, hT1b, hT2, hT3, hT4, hT5, hT6, hT7, hS1nn, hS2nn, hS3nn]
 
