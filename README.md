@@ -6,10 +6,8 @@ with exponents made explicit.
 Specifically, we show that for all $\varepsilon > 0$, $X > 0$ and $H > X^{1/5 - \eta + \varepsilon}$, we have
 
 $$
-\begin{aligned}
-\left| \sum_{X < n \le X + H} \mathbf{1}_{n \text{ squarefree}} - \frac{6}{\pi^2}H \right| \\
-\le H X^{-\varepsilon}.
-\end{aligned}
+\displaystyle
+\left| \sum_{X < n \le X + H} \mathbf{1}_{n \text{ squarefree}} - \frac{6}{\pi^2}H \right| \le H X^{-\varepsilon}.
 $$
 
 
@@ -25,5 +23,4 @@ without any attempt at detecting the two cases.
 ## Rough outline of AI usage
 
 Most of the labor of this effort was carried out by AI. The execution of the
-
 
