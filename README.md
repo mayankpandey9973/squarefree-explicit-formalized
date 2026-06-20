@@ -4,9 +4,7 @@ This repository formalizes a proof of the result in https://arxiv.org/abs/2401.1
 with exponents made explicit.
 
 Specifically, we show that for all $\varepsilon > 0$, $X > $ and $H > X^{1/5 - \eta + \varepsilon}$, we have
-$$
-\biggl| \sum_{X < n \le X + H} \mathbf{1}_{n\text{ squarefree}} - \frac{6}{\pi^2}H \biggr|\le H X^{-\varepsilon}
-$$
+$$ \biggl| \sum_{X < n \le X + H} \mathbf{1}_{n\text{ squarefree}} - \frac{6}{\pi^2}H \biggr|\le H X^{-\varepsilon} $$
 
 
 The main novelty required to make this explicit was a bare-hands execution of the contents of 
