@@ -760,4 +760,41 @@ theorem theorem_10_1_effective_clean' (ε : ℝ) (hε : 0 < ε) (hε2 : ε ≤ 1
   apply theorem_10_1_effective_clean ε hε X
   rw [min_eq_left hε2]; exact hX
 
+/-- **Squarefree-counting asymptotic in a short window**, with fully explicit
+ε-dependence of the implied constant, power-saving, and threshold. -/
+theorem count_short_interval_eps (ε : ℝ) (hε : 0 < ε) (hε2 : ε ≤ 1 / 90935) :
+    ∀ X : ℝ, Real.exp (10 ^ 27 / ε ^ 2) ≤ X →
+      |(∑ n ∈ Finset.Icc ⌈X⌉ ⌊X + X ^ (1/5 - 2/90935 + ε : ℝ)⌋,
+            (if Squarefree n.toNat then (1 : ℝ) else 0))
+          - 6 / Real.pi ^ 2 * X ^ (1/5 - 2/90935 + ε : ℝ)|
+        ≤ (10 ^ 450 / ε) * X ^ (1/5 - 2/90935 + ε : ℝ) / X ^ (ε / 10 ^ 25) := by
+  intro X hX
+  have hmin : min ε (1 / 90935) = ε := min_eq_left hε2
+  have hexp : (1 - gEff ε) / 5 = 1/5 - 2/90935 + ε := by rw [gEff_eq, hmin]; ring
+  have hg : 0 < gEff ε := by rw [gEff_eq, hmin]; nlinarith [hε, hε2]
+  have hg' : gEff ε < 2 / 18187 := by rw [gEff_eq, hmin]; linarith [hε]
+  -- positivity of X
+  have hXpos : 0 < X := lt_of_lt_of_le (Real.exp_pos _) hX
+  have hX1 : 1 ≤ X :=
+    le_trans (Real.one_le_exp (by positivity)) hX
+  -- threshold dischargeable
+  have hXk : Mob.countSI_X0 (gEff ε) ≤ X := by
+    refine le_trans ?_ hX
+    have := countSI_X0_upper ε hε
+    rwa [hmin] at this
+  have hbound := Mob.count_short_interval_explicit (gEff ε) hg hg' X hXk
+  rw [hexp] at hbound
+  refine le_trans hbound ?_
+  set H : ℝ := X ^ (1/5 - 2/90935 + ε : ℝ) with hHdef
+  have hHpos : 0 < H := Real.rpow_pos_of_pos hXpos _
+  have hC : Mob.countSI_C (gEff ε) ≤ 10 ^ 450 / ε := by
+    have := countSI_C_upper ε hε; rwa [hmin] at this
+  have hC0 : (0 : ℝ) ≤ 10 ^ 450 / ε := by positivity
+  have husav : ε / 10 ^ 25 ≤ Mob.countSI_u (gEff ε) := by
+    have := countSI_u_lower ε hε; rwa [hmin] at this
+  have hxu : X ^ (ε / 10 ^ 25) ≤ X ^ (Mob.countSI_u (gEff ε)) :=
+    Real.rpow_le_rpow_of_exponent_le hX1 husav
+  have hxu0 : 0 < X ^ (ε / 10 ^ 25) := Real.rpow_pos_of_pos hXpos _
+  gcongr
+
 end Squarefree
