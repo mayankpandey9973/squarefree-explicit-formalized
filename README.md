@@ -16,7 +16,7 @@ is not an issue: we can consider the cases {x} + {y} = {x + y} and {x} + {y} = {
 without any attempt at detecting the two cases at the cost of losing a constant factor.
 
 
-## Rough outline of AI usage
+## Rough outline of AI usage/workflow
 
 Most of the labor of this effort was carried out by AI. The execution of the section 6 argument in the
 original paper was carried out by giving an outline of the argument to GPT5.4 Pro, which was then 
