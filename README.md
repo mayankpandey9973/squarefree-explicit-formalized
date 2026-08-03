@@ -3,7 +3,7 @@
 This repository formalizes a proof of the result in https://arxiv.org/abs/2401.13981 
 with exponents made explicit.
 
-Specifically, we show that with $\eta = 2/90935$, for all $\varepsilon > 0$, $X > \exp(10^32/\varepsilon^2)$
+Specifically, we show that with $\eta = 2/90935$, for all $\varepsilon > 0$, $X > \exp(10^{32}/\varepsilon^2)$
 and $H > X^{1/5 - \eta + \varepsilon}$, there exists a squarefree number in $[X, X + H]$
 
 
@@ -27,8 +27,3 @@ over the course of about 2-3 weeks.
 
 There was an earlier, nearly successful, less supervised attempt, which resulted an unmanageable, ~500k line
 attempt nearly entirely by Codex, which did inform the second 111k line attempt. 
-
-Though work was parallelized and modular, much of the time spent was spent on Lean compilation while at some
-bottleneck.
-
-
